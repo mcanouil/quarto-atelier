@@ -1,0 +1,67 @@
+---
+title: "Atelier Example"
+date: today
+---
+
+Set `project.type: atelier` in your `_quarto.yml`, provide a `_brand.yml`, then author pages as usual.
+The sections below exercise the elements the project type styles for dark mode and accessibility; toggle the colour scheme while scrolling to see each one hold up.
+
+## Announcement banner
+
+The banner above the navbar is pinned to a light tint of its alert type with a contrast-picked ink, so it reads the same in both schemes.
+Configure it as usual under `website.announcement`; without one, the rules are inert.
+
+## Code
+
+Inline `code`, a highlighted block:
+
+```bash
+quarto add mcanouil/quarto-atelier
+```
+
+and a plain block with no language:
+
+```text
+no language, still framed and styled
+```
+
+Hover a block: the copy button takes the palette accent instead of Quarto's fixed grey, in both schemes.
+
+## Tabset
+
+::: {.panel-tabset}
+
+## First
+
+Content of the first tab.
+
+## Second
+
+Content of the second tab.
+
+:::
+
+## Typography
+
+Headings carry a slight positive tracking from `--atelier-heading-letter-spacing`.
+Override it in a project stylesheet, for example with a small negative value for a tight serif.
+
+### A nested heading
+
+{{< lipsum 1 >}}
+
+## Table of contents
+
+Scroll this page and watch the table of contents on the right: the active entry and its left border take the palette accent.
+Sidebar links get the same active and hover treatment on sites that use one.
+
+{{< lipsum 2 >}}
+
+## Footer and back to top
+
+The page footer below shares the navbar surface and border, and its links take the navbar accent on hover.
+Once you scroll, the back-to-top pill appears with a hairline derived from the page scheme.
+
+## Dates
+
+This page is dated with an ordinal suffix rendered by the bundled script.

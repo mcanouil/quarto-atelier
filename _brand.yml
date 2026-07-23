@@ -1,0 +1,17 @@
+color:
+  palette:
+    ink: "#1A1A1A"
+    paper: "#FBFAF7"
+    ink-dark: "#E8E6E1"
+    paper-dark: "#14181C"
+    teal: "#1F7A8C"
+    teal-dark: "#5BB5C7"
+  background:
+    light: paper
+    dark: paper-dark
+  foreground:
+    light: ink
+    dark: ink-dark
+  primary:
+    light: teal
+    dark: teal-dark

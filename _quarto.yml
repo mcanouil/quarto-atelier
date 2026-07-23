@@ -1,0 +1,27 @@
+project:
+  type: atelier
+  render:
+    - index.qmd
+    - example.qmd
+    - 404.qmd
+
+website:
+  title: "Atelier"
+  description: "An accessible, brand-driven documentation-website project type for Quarto."
+  site-url: https://m.canouil.dev/quarto-atelier
+  repo-url: https://github.com/mcanouil/quarto-atelier
+  page-footer:
+    right: |
+      Licence: [MIT](https://github.com/mcanouil/quarto-atelier?tab=MIT-1-ov-file#readme).
+  announcement:
+    icon: info-circle
+    dismissable: true
+    type: info
+    position: below-navbar
+    content: "Atelier keeps this banner readable in both colour schemes."
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: example.qmd
+        text: "Example"

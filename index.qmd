@@ -1,0 +1,75 @@
+---
+title: "Atelier"
+subtitle: "An accessible, brand-driven documentation-website project type for Quarto."
+date: last-modified
+---
+
+This site is itself an `atelier` project: its `_quarto.yml` sets `project.type: atelier`, and a `_brand.yml` drives the palette.
+It packages the navbar, footer, 404 page, and accessibility scripts described below, and toggling the colour scheme in the navbar shows the code, tabset, and scrollbar surfaces stay correct in both light and dark.
+
+## Getting started
+
+```bash
+quarto add mcanouil/quarto-atelier
+```
+
+Then set the project type in your `_quarto.yml`:
+
+```yaml
+project:
+  type: atelier
+website:
+  title: "My Docs"
+  repo-url: https://github.com/owner/repo
+```
+
+## Code
+
+Inline `code`, a highlighted block:
+
+```python
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+```
+
+and a plain block with no language:
+
+```text
+no language, still readable on the scheme surface
+```
+
+## Tabsets
+
+::: {.panel-tabset}
+
+## Overview
+
+The panel borders adapt to the active scheme instead of Quarto's baked light grey.
+
+## Details
+
+All four edges of the panel are derived from the brand palette.
+
+:::
+
+## Links and dates
+
+External links such as [Quarto](https://quarto.org) open in a new tab with an
+external-link marker, and this page carries an ordinal date in the header.
+
+## Callouts
+
+::: {.callout-note}
+Callouts, tables, and the table of contents inherit the same accessible,
+scheme-aware treatment.
+:::
+
+| Feature             | Light | Dark |
+| ------------------- | ----- | ---- |
+| Code surface        | ✓     | ✓    |
+| Copy button         | ✓     | ✓    |
+| Tabsets             | ✓     | ✓    |
+| Scrollbars          | ✓     | ✓    |
+| Sidebar and TOC     | ✓     | ✓    |
+| Footer              | ✓     | ✓    |
+| Announcement banner | ✓     | ✓    |
