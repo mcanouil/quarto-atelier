@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 (2026-07-24)
+
 ### New Features
 
 - feat: `atelier` project type providing a portable, accessible documentation-website foundation (dark-pinned navbar with search, page footer, repo actions, Open Graph, page navigation, back-to-top, and `llms-txt`).
