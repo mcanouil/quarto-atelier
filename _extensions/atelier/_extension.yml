@@ -47,6 +47,10 @@ contributes:
       code-link: false
     html:
       respect-user-color-scheme: true
+      # Quarto builds the canonical link from `website.site-url`, giving a
+      # directory index the URL of its directory. Set `canonical-url: false`
+      # on a page served from more than one URL, such as `404.qmd`.
+      canonical-url: true
       theme:
         light:
           - brand

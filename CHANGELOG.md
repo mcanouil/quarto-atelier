@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: emit the canonical link through Quarto's own `canonical-url`, now on by default, instead of from the bundled filter. `canonical-url` is a render key and never reaches a Lua filter, so a project that set it shipped two `<link rel="canonical">` tags. Quarto builds the same directory URL for a directory index, so the tag itself is unchanged; set `canonical-url: false` on a page served from more than one URL, as the bundled 404 front matter now does.
+
+### Documentation
+
+- docs: correct the icon path note. Since 0.5.0 the filter writes each path exactly as configured and Quarto's resource resolver applies the page offset.
+- docs: note that `sitemap.xml` lists a directory index as `index.html` while the canonical link uses the directory URL, that both serve the same page, and that the canonical is the stronger signal.
+
 ## 0.5.0 (2026-07-26)
 
 ### Bug Fixes

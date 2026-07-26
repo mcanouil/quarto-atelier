@@ -7,10 +7,11 @@
 --- @description Quarto's `website.open-graph` covers title, description,
 --- image, image dimensions, image alt, locale, and site name, and
 --- `website.twitter-card` covers the Twitter equivalents. Neither emits
---- `og:type` or `og:url`, there is no canonical link, `<meta name="description">`
---- needs the pandoc `description-meta` variable that Quarto never populates,
---- and the icon and manifest links beyond `rel="icon"` have no configuration
---- key. This filter fills those gaps and nothing else.
+--- `og:type` or `og:url`, `<meta name="description">` needs the pandoc
+--- `description-meta` variable that Quarto never populates, and the icon and
+--- manifest links beyond `rel="icon"` have no configuration key. This filter
+--- fills those gaps and nothing else. The canonical link is Quarto's own
+--- `canonical-url`, which the format turns on.
 
 --- Extension name constant
 local EXTENSION_NAME = 'atelier'
@@ -35,7 +36,7 @@ local ICON_LINKS = {
 local THEME_COLOUR_SCHEMES = { 'light', 'dark' }
 
 --- Stem of the page Quarto renders for missing paths. It is served from any
---- URL depth, so it must not claim a canonical URL of its own.
+--- URL depth, so it must not claim a URL of its own.
 --- @type string
 local NOT_FOUND_STEM = '404'
 
@@ -63,10 +64,9 @@ local function is_not_found_page(relative_input)
 end
 
 --- The page path as the site serves it, relative to the site root.
---- A directory index is served from its directory rather than from
---- `index.html`, and that is the URL a visitor lands on and the one a scraper
---- de-duplicates against, so `index.qmd` maps to the site root and
---- `<directory>/index.qmd` to `<directory>/`.
+--- Matches the URL Quarto's own `canonical-url` builds: a directory index is
+--- served from its directory rather than from `index.html`, so `index.qmd`
+--- maps to the site root and `<directory>/index.qmd` to `<directory>/`.
 --- @param relative_input string The input path relative to the project root
 --- @return string The served path, empty at the site root
 local function served_path(relative_input)
@@ -81,14 +81,15 @@ local function served_path(relative_input)
   return stem .. '.html'
 end
 
---- Build the canonical URL for the page.
+--- Build the `og:url` for the page.
 --- Uses `extensions.atelier.site-url`, because Quarto keeps the `website`
 --- block out of the metadata it hands to Lua filters. Anchor the two together
---- in `_quarto.yml` so the URL is written once.
+--- in `_quarto.yml` so the URL is written once, and so this matches the
+--- canonical link Quarto builds from `website.site-url`.
 --- @param meta table The document metadata
 --- @param relative_input string The input path relative to the project root
 --- @return string|nil The absolute URL, or nil when `site-url` is unset
-local function canonical_url(meta, relative_input)
+local function page_url(meta, relative_input)
   local site_url = meta_mod.get_metadata_value(meta, EXTENSION_NAME, 'site-url')
   if str.is_empty(site_url) then
     return nil
@@ -193,11 +194,12 @@ local function social_metadata(meta)
   local tags = { '<meta property="og:type" content="website">' }
 
   if not is_not_found_page(relative_input) then
-    local url = canonical_url(meta, relative_input)
+    local url = page_url(meta, relative_input)
     if url then
-      local escaped = str.escape_attribute(url)
-      table.insert(tags, string.format('<meta property="og:url" content="%s">', escaped))
-      table.insert(tags, string.format('<link rel="canonical" href="%s">', escaped))
+      table.insert(
+        tags,
+        string.format('<meta property="og:url" content="%s">', str.escape_attribute(url))
+      )
     end
   end
 

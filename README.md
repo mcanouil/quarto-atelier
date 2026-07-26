@@ -164,9 +164,13 @@ Override the two locale values together if you change `lang`.
 A bundled filter adds what Quarto has no configuration for:
 
 - `<meta property="og:type">`, always `website`.
-- `<meta property="og:url">` and `<link rel="canonical">`, per page. A directory index takes the URL of its directory, so `index.qmd` answers at the site root and `reference/index.qmd` at `reference/`, which is what the site serves.
+- `<meta property="og:url">`, per page, matching the canonical URL Quarto builds.
 - `<meta name="description">`, from the page's `description` or, failing that, its `subtitle`. Quarto never populates the pandoc `description-meta` variable that the HTML template reads, so without this every page ships without a plain description tag.
 - `<link rel="icon">` for an SVG icon, `<link rel="apple-touch-icon">`, `<link rel="manifest">`, and `<meta name="theme-color">`, each emitted only when configured.
+
+The canonical link is Quarto's own `canonical-url`, which the format turns on.
+It builds the URL from `website.site-url` and gives a directory index the URL of its directory, so `index.qmd` answers at the site root and `reference/index.qmd` at `reference/`.
+Set `canonical-url: false` on a page served from more than one URL.
 
 > [!NOTE]
 > Give every page a `description` or a `subtitle`.
@@ -188,15 +192,15 @@ extensions:
 
 | Option             | Description                                                              |
 | ------------------ | ------------------------------------------------------------------------ |
-| `site-url`         | Base URL for `og:url` and the canonical link. See the note below.        |
+| `site-url`         | Base URL for `og:url`. See the note below.                               |
 | `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`. |
 | `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.              |
 | `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                 |
 | `theme-color`      | `light` and `dark` colours, each emitted with a `prefers-color-scheme` media query. |
 
 Paths are relative to the site root.
-The filter rewrites them per page, so they work under `quarto preview` at the server root and under a GitHub Pages project prefix alike.
-On `404.html` Quarto rewrites them to site-absolute paths itself, since that page is served from any URL depth.
+The filter writes them exactly as configured and Quarto's website resource resolver prefixes each page's offset to the project root, so one value resolves at the site root, from a subdirectory, under `quarto preview` at the server root, and under a GitHub Pages project prefix alike.
+On `404.html` Quarto rewrites them to site-absolute paths instead, since that page is served from any URL depth.
 
 > [!IMPORTANT]
 > Quarto keeps the `website` block out of the metadata it hands to Lua filters, so the filter cannot read `website.site-url`.
@@ -210,9 +214,16 @@ On `404.html` Quarto rewrites them to site-absolute paths itself, since that pag
 >     site-url: *site-url
 > ```
 >
-> Without `extensions.atelier.site-url` the filter emits everything except `og:url` and the canonical link.
+> Without `extensions.atelier.site-url` the filter emits everything except `og:url`.
+> The canonical link is unaffected, since Quarto reads `website.site-url` itself.
 
-The 404 page never gets `og:url` or a canonical link: it answers for every missing path, so it has no canonical URL of its own.
+The 404 page gets neither tag: it answers for every missing path, so it has no URL of its own.
+The filter skips it, and the front matter below switches the canonical link off.
+
+> [!NOTE]
+> Quarto's `sitemap.xml` lists a directory index as `<directory>/index.html` while the canonical link and `og:url` use `<directory>/`.
+> Both URLs serve the same page and a crawler follows the canonical, which is the stronger signal.
+> The two forms come from different parts of Quarto and neither is configurable.
 
 Per-page images are left alone.
 Set `website.image` and `website.image-alt` for the site-wide social card; Quarto resolves a leading `/` against `website.site-url` and measures the file to fill the image width and height tags.
@@ -237,6 +248,7 @@ The theme styles an opt-in `.atelier-404` wrapper as a centred ghost-numeral her
 title: "Page not found"
 toc: false
 sidebar: false
+canonical-url: false
 ---
 
 ::: {.atelier-404}
@@ -250,10 +262,11 @@ The page you are looking for does not exist or has moved.
 :::
 ````
 
-Two requirements:
+Three requirements:
 
 - Set `website.site-url` (or `site-path`) so the 404 page's links are rewritten with the correct site prefix.
 - Add `404.qmd` to `project.render` if your project uses an explicit render list; Quarto does not auto-discover it there.
+- Keep `canonical-url: false`, since the page answers for every missing path and has no canonical URL of its own.
 
 The 404 page is automatically excluded from search, the sitemap, and `llms.txt`.
 
