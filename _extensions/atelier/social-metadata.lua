@@ -50,19 +50,6 @@ local function project_relative_input()
   return (pandoc.path.make_relative(input, project):gsub('\\', '/'))
 end
 
---- Prefix that walks from the page back to the site root, with a trailing
---- slash. Quarto builds its own `website.favicon` href from the same offset.
---- Empty at the root so hrefs carry no redundant `./`; Quarto prefixes the
---- site path on `404.html`, where `/project/./icon.svg` would be the result.
---- @return string The offset, with a trailing slash, or an empty string
-local function site_root_prefix()
-  local offset = quarto.project.offset
-  if not offset or offset == '.' then
-    return ''
-  end
-  return offset .. '/'
-end
-
 --- Whether the page is the project's 404 page.
 --- @param relative_input string The input path relative to the project root
 --- @return boolean
@@ -87,11 +74,15 @@ local function canonical_url(meta, relative_input)
 end
 
 --- Render one `<link>` tag.
+--- The `href` is written exactly as configured, relative to the site root.
+--- Quarto's website resource resolver rewrites every `link[href]` it finds in
+--- the rendered page, prefixing the page's own offset to the project root, so
+--- adding one here too would double it on any page below the root. The 404
+--- page is rewritten to a site-absolute path by the same pass.
 --- @param link table<string, string> One entry of `ICON_LINKS`
 --- @param href string The configured path, relative to the site root
---- @param offset string The offset to the site root, with a trailing slash
 --- @return string
-local function link_tag(link, href, offset)
+local function link_tag(link, href)
   local attributes = { string.format('rel="%s"', link.rel) }
   if link.type then
     table.insert(attributes, string.format('type="%s"', link.type))
@@ -99,7 +90,7 @@ local function link_tag(link, href, offset)
   if link.sizes then
     table.insert(attributes, string.format('sizes="%s"', link.sizes))
   end
-  table.insert(attributes, string.format('href="%s%s"', offset, str.escape_attribute(href)))
+  table.insert(attributes, string.format('href="%s"', str.escape_attribute(href)))
   return '<link ' .. table.concat(attributes, ' ') .. '>'
 end
 
@@ -120,9 +111,8 @@ end
 
 --- Collect the icon and manifest link tags for the page.
 --- @param config table|nil The `extensions.atelier` configuration table
---- @param offset string The offset to the site root, with a trailing slash
 --- @return table<integer, string>
-local function icon_tags(config, offset)
+local function icon_tags(config)
   local tags = {}
   if not config then
     return tags
@@ -130,7 +120,7 @@ local function icon_tags(config, offset)
   for _, link in ipairs(ICON_LINKS) do
     local href = config[link.option] and str.stringify(config[link.option])
     if not str.is_empty(href) then
-      table.insert(tags, link_tag(link, href, offset))
+      table.insert(tags, link_tag(link, href))
     end
   end
   return tags
@@ -192,7 +182,7 @@ local function social_metadata(meta)
     table.insert(tags, tag)
   end
 
-  for _, tag in ipairs(icon_tags(config, site_root_prefix())) do
+  for _, tag in ipairs(icon_tags(config)) do
     table.insert(tags, tag)
   end
 
