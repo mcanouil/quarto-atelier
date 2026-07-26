@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.0 (2026-07-26)
+
 ### New Features
 
 - feat: bundled `social-metadata` filter emitting the head tags Quarto's website machinery has no configuration for: `og:type`, a per-page `og:url` and `<link rel="canonical">`, and `<meta name="description">` from the page's `description` or `subtitle` (Quarto never populates the pandoc `description-meta` variable its own HTML template reads).
