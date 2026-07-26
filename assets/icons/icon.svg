@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-labelledby="atelier-icon-title">
+  <title id="atelier-icon-title">Atelier</title>
+  <style>
+    /* Colours come from _brand.yml: ink and teal in the light scheme,
+       ink-dark and teal-dark in the dark one. The mark is the thing the
+       extension actually does: a page frame with a pinned navbar. */
+    .frame { stroke: #1A1A1A; }
+    .navbar { fill: #1F7A8C; }
+
+    @media (prefers-color-scheme: dark) {
+      .frame { stroke: #E8E6E1; }
+      .navbar { fill: #5BB5C7; }
+    }
+  </style>
+  <rect class="frame" x="3.5" y="5.5" width="25" height="21" rx="3" fill="none" stroke-width="3"/>
+  <rect class="navbar" x="6" y="8" width="20" height="4"/>
+</svg>

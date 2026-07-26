@@ -4,12 +4,27 @@ project:
     - index.qmd
     - example.qmd
     - 404.qmd
+  # Quarto copies nothing to the output directory by convention: only these
+  # globs, plus files it finds behind an `href` or `src` in the rendered HTML.
+  # The manifest names its icons in JSON, which is not scanned, so they are
+  # listed here.
+  resources:
+    - favicon.ico
+    - site.webmanifest
+    - assets/icons/*.png
+    - assets/social/og-image.png
 
 website:
   title: "Atelier"
   description: "An accessible, brand-driven documentation-website project type for Quarto."
-  site-url: https://m.canouil.dev/quarto-atelier
+  site-url: &site-url https://m.canouil.dev/quarto-atelier
   repo-url: https://github.com/mcanouil/quarto-atelier
+  favicon: favicon.ico
+  # The leading slash marks a project-relative path, which Quarto turns into
+  # `<site-url>/assets/social/og-image.png` and measures to fill the image
+  # width and height tags.
+  image: /assets/social/og-image.png
+  image-alt: "The quarto-atelier social card: the extension name over a one-line description, beside a dark code window showing a _quarto.yml that sets the atelier project type."
   page-footer:
     right: |
       Licence: [MIT](https://github.com/mcanouil/quarto-atelier?tab=MIT-1-ov-file#readme).
@@ -25,3 +40,17 @@ website:
         text: "Home"
       - href: example.qmd
         text: "Example"
+
+# Quarto keeps the `website` block out of the metadata it hands to Lua
+# filters, so the social-metadata filter cannot read `website.site-url` to
+# build the canonical URL. The anchor above republishes the same scalar here,
+# without a second copy of the string.
+extensions:
+  atelier:
+    site-url: *site-url
+    icon: assets/icons/icon.svg
+    apple-touch-icon: assets/icons/apple-touch-icon.png
+    manifest: site.webmanifest
+    theme-color:
+      light: "#FBFAF7"
+      dark: "#14181C"
