@@ -76,6 +76,23 @@ Additional tokens:
 
 The announcement tokens are set per `.alert-<type>` (from the Bootstrap theme colours) so the banner reads the same in both schemes; override them on `#quarto-announcement.alert-<type>` to re-pin a single type.
 
+### Icon-only navbar links
+
+A navbar link with no visible text takes its accessible name and its themed tooltip from the glyph inside it.
+The glyph can be an `iconify-icon`, or any empty element carrying `aria-label` or `title`, which covers inline SVG and CSS `mask-image` marks:
+
+```yaml
+website:
+  navbar:
+    right:
+      - text: '[]{.brand-mark title="Brand" aria-label="Brand"}'
+        href: "https://example.org"
+```
+
+The element must be empty; a labelled element that contains text is treated as content rather than as a glyph.
+Atelier moves the label onto the link, hides the glyph from assistive technology so it is not announced twice, and drops its `title` so the browser's own tooltip does not appear alongside the themed one.
+Links opening in a new tab have that appended to the accessible name.
+
 ## 404 page
 
 Quarto renders a root `404.qmd` to `404.html` and rewrites its links to absolute paths, so the page works from any URL depth.
