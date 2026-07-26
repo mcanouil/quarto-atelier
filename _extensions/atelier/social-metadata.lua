@@ -21,16 +21,17 @@ local log = require(quarto.utils.resolve_path('_modules/logging.lua'):gsub('%.lu
 local meta_mod = require(quarto.utils.resolve_path('_modules/metadata.lua'):gsub('%.lua$', ''))
 
 --- Link tags built from the configured paths, in head order.
---- Each entry names the option that supplies its `href`.
---- @type table<integer, table<string, string>>
+--- `option` names the `extensions.atelier` key that supplies the `href`;
+--- `type` and `sizes` are optional and emitted only when present.
+--- @type table<integer, { option: string, rel: string, type: string?, sizes: string? }>
 local ICON_LINKS = {
   { option = 'icon', rel = 'icon', type = 'image/svg+xml' },
   { option = 'apple-touch-icon', rel = 'apple-touch-icon', sizes = '180x180' },
   { option = 'manifest', rel = 'manifest' },
 }
 
---- Colour schemes carried by the `theme-color` option, in head order.
---- @type table<integer, string>
+--- Colour schemes read from the `theme-color` option, in head order.
+--- @type string[]
 local THEME_COLOUR_SCHEMES = { 'light', 'dark' }
 
 --- Stem of the page Quarto renders for missing paths. It is served from any
@@ -49,20 +50,17 @@ local function project_relative_input()
   return (pandoc.path.make_relative(input, project):gsub('\\', '/'))
 end
 
---- The `../` steps that separate the page from the site root.
+--- Prefix that walks from the page back to the site root, with a trailing
+--- slash. Quarto builds its own `website.favicon` href from the same offset.
 --- Empty at the root so hrefs carry no redundant `./`; Quarto prefixes the
 --- site path on `404.html`, where `/project/./icon.svg` would be the result.
---- @param relative_input string The input path relative to the project root
 --- @return string The offset, with a trailing slash, or an empty string
-local function offset_to_root(relative_input)
-  local steps = {}
-  for _ in relative_input:gmatch('/') do
-    table.insert(steps, '..')
-  end
-  if #steps == 0 then
+local function site_root_prefix()
+  local offset = quarto.project.offset
+  if not offset or offset == '.' then
     return ''
   end
-  return table.concat(steps, '/') .. '/'
+  return offset .. '/'
 end
 
 --- Whether the page is the project's 404 page.
@@ -194,7 +192,7 @@ local function social_metadata(meta)
     table.insert(tags, tag)
   end
 
-  for _, tag in ipairs(icon_tags(config, offset_to_root(relative_input))) do
+  for _, tag in ipairs(icon_tags(config, site_root_prefix())) do
     table.insert(tags, tag)
   end
 

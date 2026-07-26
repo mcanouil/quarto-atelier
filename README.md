@@ -168,6 +168,11 @@ A bundled filter adds what Quarto has no configuration for:
 - `<meta name="description">`, from the page's `description` or, failing that, its `subtitle`. Quarto never populates the pandoc `description-meta` variable that the HTML template reads, so without this every page ships without a plain description tag.
 - `<link rel="icon">` for an SVG icon, `<link rel="apple-touch-icon">`, `<link rel="manifest">`, and `<meta name="theme-color">`, each emitted only when configured.
 
+> [!NOTE]
+> Give every page a `description` or a `subtitle`.
+> Quarto falls back to `website.description` for `og:description`, but the filter cannot: `website` never reaches a Lua filter, so a page with neither key gets no `<meta name="description">` at all while its `og:description` still carries the site text.
+> A distinct one-sentence description per page is what stops every link preview looking the same anyway.
+
 Nothing here needs configuration except the paths you want emitted:
 
 ```yaml
