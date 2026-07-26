@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - fix: write the icon, Apple touch icon, and manifest `href` exactly as configured. Quarto's website resource resolver already prefixes each page's offset to the project root onto every `link[href]` it finds, so adding one in the filter doubled it and broke every icon on pages below the site root.
+- fix: point `og:url` and `<link rel="canonical">` of a directory index at its directory rather than at `index.html`, since that is the URL the site serves and the one a scraper de-duplicates against.
 
 ## 0.4.0 (2026-07-26)
 

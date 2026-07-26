@@ -164,7 +164,7 @@ Override the two locale values together if you change `lang`.
 A bundled filter adds what Quarto has no configuration for:
 
 - `<meta property="og:type">`, always `website`.
-- `<meta property="og:url">` and `<link rel="canonical">`, per page.
+- `<meta property="og:url">` and `<link rel="canonical">`, per page. A directory index takes the URL of its directory, so `index.qmd` answers at the site root and `reference/index.qmd` at `reference/`, which is what the site serves.
 - `<meta name="description">`, from the page's `description` or, failing that, its `subtitle`. Quarto never populates the pandoc `description-meta` variable that the HTML template reads, so without this every page ships without a plain description tag.
 - `<link rel="icon">` for an SVG icon, `<link rel="apple-touch-icon">`, `<link rel="manifest">`, and `<meta name="theme-color">`, each emitted only when configured.
 

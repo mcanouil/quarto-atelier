@@ -39,6 +39,11 @@ local THEME_COLOUR_SCHEMES = { 'light', 'dark' }
 --- @type string
 local NOT_FOUND_STEM = '404'
 
+--- Stem of a directory index, served from its directory rather than from the
+--- file itself.
+--- @type string
+local INDEX_STEM = 'index'
+
 --- The input file, relative to the project root, with forward slashes.
 --- @return string|nil The relative path, or nil outside a project context
 local function project_relative_input()
@@ -57,6 +62,25 @@ local function is_not_found_page(relative_input)
   return relative_input:match('^' .. NOT_FOUND_STEM .. '%.%w+$') ~= nil
 end
 
+--- The page path as the site serves it, relative to the site root.
+--- A directory index is served from its directory rather than from
+--- `index.html`, and that is the URL a visitor lands on and the one a scraper
+--- de-duplicates against, so `index.qmd` maps to the site root and
+--- `<directory>/index.qmd` to `<directory>/`.
+--- @param relative_input string The input path relative to the project root
+--- @return string The served path, empty at the site root
+local function served_path(relative_input)
+  local stem = relative_input:gsub('%.%w+$', '')
+  if stem == INDEX_STEM then
+    return ''
+  end
+  local directory = stem:match('^(.*)/' .. INDEX_STEM .. '$')
+  if directory then
+    return directory .. '/'
+  end
+  return stem .. '.html'
+end
+
 --- Build the canonical URL for the page.
 --- Uses `extensions.atelier.site-url`, because Quarto keeps the `website`
 --- block out of the metadata it hands to Lua filters. Anchor the two together
@@ -69,8 +93,7 @@ local function canonical_url(meta, relative_input)
   if str.is_empty(site_url) then
     return nil
   end
-  local page = relative_input:gsub('%.%w+$', '.html')
-  return (site_url:gsub('/+$', '')) .. '/' .. page
+  return (site_url:gsub('/+$', '')) .. '/' .. served_path(relative_input)
 end
 
 --- Render one `<link>` tag.
