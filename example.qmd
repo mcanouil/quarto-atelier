@@ -46,6 +46,8 @@ Content of the second tab.
 Headings carry a slight positive tracking from `--atelier-heading-letter-spacing`.
 Override it in a project stylesheet, for example with a small negative value for a tight serif.
 
+Add that stylesheet under `format.atelier-html.theme`, not `format.html`, which would replace the project type's format and drop the theme along with the bundled scripts.
+
 ### A nested heading
 
 {{< lipsum 1 >}}
@@ -61,6 +63,11 @@ Sidebar links get the same active and hover treatment on sites that use one.
 
 The page footer below shares the navbar surface and border, and its links take the navbar accent on hover.
 Once you scroll, the back-to-top pill appears with a hairline derived from the page scheme.
+
+## Navbar tooltips
+
+Hover the colour-scheme toggle in the navbar, or the site title, for a themed tooltip on the palette surface rather than the browser default.
+The named links beside them show no tooltip on purpose: an item with visible text is given an `aria-label` instead, because repeating the label would announce it twice to a screen reader.
 
 ## Dates
 

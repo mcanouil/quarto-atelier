@@ -23,6 +23,40 @@ website:
   repo-url: https://github.com/owner/repo
 ```
 
+The project type sets `format: atelier-html`.
+Configure that format by name when you need to change format options or add a stylesheet:
+
+```yaml
+format:
+  atelier-html:
+    toc-depth: 4
+    theme:
+      light:
+        - brand
+        - assets/stylesheets/theme.scss
+      dark:
+        - brand
+        - assets/stylesheets/theme.scss
+```
+
+::: {.callout-important}
+
+## Configure `atelier-html`, not `html`
+
+Declaring `format: html` replaces `atelier-html` rather than configuring it, and Quarto reports nothing at render time.
+The accessibility scripts, `lang: en-GB`, the syntax-highlighting pair, and the theme are all dropped at once, while the `website:` configuration is untouched, so the site still looks broadly right.
+
+Check a rendered page for the scripts if something seems missing:
+
+```bash
+grep -c 'id="navbar-tooltips"' _site/index.html
+```
+
+:::
+
+Your stylesheet is appended after the extension's, so its rules win the cascade.
+It can use the theme's `body-mix()` function and the Sass variables generated from `_brand.yml`, where a `midnight` palette entry becomes `$brand-midnight`.
+
 ## Code
 
 Inline `code`, a highlighted block:
