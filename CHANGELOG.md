@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0 (2026-07-26)
+
 ### Documentation
 
 - docs: document that format options go under `atelier-html`, since declaring `html` replaces the format and silently drops the bundled scripts, `lang`, and the theme.
