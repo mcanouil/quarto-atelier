@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 (2026-07-26)
+
 ### Bug Fixes
 
 - fix: give icon-only navbar links a themed tooltip and an accessible name when the glyph is not an `iconify-icon`, such as an inline SVG or a CSS `mask-image` mark; the link previously kept the browser's unstyled tooltip and gained no label.
