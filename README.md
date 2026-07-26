@@ -39,6 +39,62 @@ website:
         text: "Home"
 ```
 
+### Setting format options
+
+The project type sets `format: atelier-html`.
+Configure that format by name; do not declare `html`.
+
+```yaml
+project:
+  type: atelier
+format:
+  atelier-html:
+    toc-depth: 4
+```
+
+Declaring `format: html` **replaces** `atelier-html` rather than configuring it, and Quarto reports nothing at render time.
+Everything the format contributes is dropped: the skip link, the focus ring, the navbar tooltips, the external-link treatment, the ordinal dates, `lang: en-GB`, the syntax-highlighting pair, and the theme itself.
+The symptom is a site that still looks broadly right, because the project type's `website:` configuration is unaffected, while none of the scripts run.
+
+To check a project, look for the bundled scripts in any rendered page:
+
+```bash
+grep -c 'id="navbar-tooltips"' _site/index.html
+```
+
+### Adding a project stylesheet
+
+Add your own file to `theme`, under `atelier-html`.
+The extension stylesheet is still applied, and your file is appended after it, so your rules win the cascade:
+
+```yaml
+format:
+  atelier-html:
+    theme:
+      light:
+        - brand
+        - assets/stylesheets/theme.scss
+      dark:
+        - brand
+        - assets/stylesheets/theme.scss
+```
+
+Both lists are written out because a YAML anchor shared between them is rejected by the schema check.
+Your stylesheet can use the theme's `body-mix()` function and the Sass variables generated from `_brand.yml` (a `midnight` palette entry becomes `$brand-midnight`), which keeps the palette in one place:
+
+```scss
+/*-- scss:rules --*/
+:root {
+  --atelier-navbar-bg: #{$brand-midnight};
+  --atelier-navbar-accent: #{$brand-amber};
+}
+
+.my-card {
+  border: 1px solid body-mix(85%);
+  background: body-mix(97%);
+}
+```
+
 ## Configuration
 
 The dark-pinned navbar surfaces are exposed as CSS custom properties with neutral-slate defaults.
@@ -87,11 +143,17 @@ website:
     right:
       - text: '[]{.brand-mark title="Brand" aria-label="Brand"}'
         href: "https://example.org"
+      - text: "{{< iconify octicon:mark-github-16 title='GitHub' >}}"
+        href: "https://github.com/owner/repo"
 ```
 
 The element must be empty; a labelled element that contains text is treated as content rather than as a glyph.
 Atelier moves the label onto the link, hides the glyph from assistive technology so it is not announced twice, and drops its `title` so the browser's own tooltip does not appear alongside the themed one.
 Links opening in a new tab have that appended to the accessible name.
+
+Tooltips are limited to controls that carry no visible text: these icon-only links, the colour-scheme toggle, and the brand.
+A navbar item with a text label is given an `aria-label` and no tooltip, since repeating the visible text adds nothing and doubles the screen-reader announcement.
+That is expected behaviour rather than a tooltip failing to bind.
 
 ## 404 page
 

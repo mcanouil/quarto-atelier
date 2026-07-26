@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Documentation
+
+- docs: document that format options go under `atelier-html`, since declaring `html` replaces the format and silently drops the bundled scripts, `lang`, and the theme.
+- docs: document how to add a project stylesheet, including the `body-mix()` function and the `$brand-*` variables generated from `_brand.yml`.
+- docs: document which controls receive a tooltip, and that a navbar item with visible text is given an `aria-label` instead.
+
 ## 0.2.0 (2026-07-26)
 
 ### Bug Fixes
