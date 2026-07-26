@@ -8,6 +8,7 @@
 
 ### Documentation
 
+- docs: add a reference page listing the website, format, and `extensions.atelier` options the project type contributes, which is also the demo site's first page below the site root.
 - docs: correct the icon path note. Since 0.5.0 the filter writes each path exactly as configured and Quarto's resource resolver applies the page offset.
 - docs: note that `sitemap.xml` lists a directory index as `index.html` while the canonical link uses the directory URL, that both serve the same page, and that the canonical is the stronger signal.
 

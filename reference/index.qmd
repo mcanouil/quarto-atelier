@@ -1,0 +1,79 @@
+---
+title: "Reference"
+description: "Every option the atelier project type contributes, and the extension keys it reads."
+---
+
+This page lists what `project.type: atelier` sets on your behalf and the keys you can set yourself.
+It is also the site's only page below the root, which is what proves the icon, manifest, and URL paths resolve from a subdirectory.
+
+## Extension options
+
+These go under `extensions.atelier` in `_quarto.yml`, and each tag is emitted only when its key is set.
+
+| Option             | Description                                                                         |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| `site-url`         | Base URL for `<meta property="og:url">`. Anchor it to `website.site-url`.           |
+| `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`.           |
+| `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.                         |
+| `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
+| `theme-color`      | `light` and `dark` colours, each emitted with a `prefers-color-scheme` media query. |
+
+Paths are relative to the site root.
+Quarto's website resource resolver prefixes each page's offset to the project root, so the same value resolves at the root, from a subdirectory such as this page, and from the 404 page.
+
+```yaml
+website:
+  site-url: &site-url https://example.com/my-project
+extensions:
+  atelier:
+    site-url: *site-url
+    icon: assets/icons/icon.svg
+    apple-touch-icon: assets/icons/apple-touch-icon.png
+    manifest: site.webmanifest
+    theme-color:
+      light: "#F5F7FA"
+      dark: "#0B1220"
+```
+
+The anchor is needed because Quarto keeps the `website` block out of the metadata it hands to Lua filters.
+
+## Website defaults
+
+The project type sets these under `website`, and any of them can be overridden in your own `_quarto.yml`.
+
+| Key                                         | Value                                  |
+| ------------------------------------------- | -------------------------------------- |
+| `repo-actions`                              | `[edit, issue]`                        |
+| `repo-link-target`, `repo-link-rel`         | `_blank`, `noopener noreferrer`        |
+| `open-graph.locale`                         | `en_GB`, matching the format's `lang`  |
+| `twitter-card.card-style`                   | `summary_large_image`                  |
+| `page-navigation`, `back-to-top-navigation` | `true`                                 |
+| `llms-txt`                                  | `true`                                 |
+| `search`                                    | Overlay search in the navbar           |
+| `navbar`, `page-footer`                     | Dark-pinned, with the footer border on |
+
+## Format defaults
+
+The project type sets `format: atelier-html`.
+Configure it by that name: declaring `format: html` replaces it rather than configuring it.
+
+| Key                          | Value                                               |
+| ---------------------------- | --------------------------------------------------- |
+| `lang`                       | `en-GB`                                             |
+| `date-format`                | `dddd[, the] Do [of] MMMM, YYYY`                    |
+| `theme`                      | `brand` plus the Atelier stylesheet, light and dark |
+| `syntax-highlighting`        | `github-light` and `github-dark`                    |
+| `toc`, `toc-depth`           | `true`, `3`                                         |
+| `anchor-sections`            | `true`                                              |
+| `code-copy`, `code-overflow` | `true`, `wrap`                                      |
+| `link-external-newwindow`    | `true`                                              |
+| `respect-user-color-scheme`  | `true`                                              |
+| `canonical-url`              | `true`                                              |
+
+## Page keys
+
+| Key                    | Effect                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------- |
+| `description`          | Fills `<meta name="description">` and Quarto's `og:description`.                          |
+| `subtitle`             | Used for the description tags when `description` is absent.                               |
+| `canonical-url: false` | Drops the canonical link. Set it on a page served from more than one URL, like `404.qmd`. |
