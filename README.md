@@ -155,6 +155,73 @@ Tooltips are limited to controls that carry no visible text: these icon-only lin
 A navbar item with a text label is given an `aria-label` and no tooltip, since repeating the visible text adds nothing and doubles the screen-reader announcement.
 That is expected behaviour rather than a tooltip failing to bind.
 
+## Social metadata and icons
+
+Quarto's own `open-graph` and `twitter-card` handling covers title, description, image, image dimensions, image alt, locale, and site name.
+Atelier turns both on, with `og:locale` set to `en_GB` to match its `lang: en-GB` default and the Twitter card set to `summary_large_image`.
+Override the two locale values together if you change `lang`.
+
+A bundled filter adds what Quarto has no configuration for:
+
+- `<meta property="og:type">`, always `website`.
+- `<meta property="og:url">` and `<link rel="canonical">`, per page.
+- `<meta name="description">`, from the page's `description` or, failing that, its `subtitle`. Quarto never populates the pandoc `description-meta` variable that the HTML template reads, so without this every page ships without a plain description tag.
+- `<link rel="icon">` for an SVG icon, `<link rel="apple-touch-icon">`, `<link rel="manifest">`, and `<meta name="theme-color">`, each emitted only when configured.
+
+Nothing here needs configuration except the paths you want emitted:
+
+```yaml
+extensions:
+  atelier:
+    icon: assets/icons/icon.svg
+    apple-touch-icon: assets/icons/apple-touch-icon.png
+    manifest: site.webmanifest
+    theme-color:
+      light: "#F5F7FA"
+      dark: "#0B1220"
+```
+
+| Option             | Description                                                              |
+| ------------------ | ------------------------------------------------------------------------ |
+| `site-url`         | Base URL for `og:url` and the canonical link. See the note below.        |
+| `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`. |
+| `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.              |
+| `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                 |
+| `theme-color`      | `light` and `dark` colours, each emitted with a `prefers-color-scheme` media query. |
+
+Paths are relative to the site root.
+The filter rewrites them per page, so they work under `quarto preview` at the server root and under a GitHub Pages project prefix alike.
+On `404.html` Quarto rewrites them to site-absolute paths itself, since that page is served from any URL depth.
+
+> [!IMPORTANT]
+> Quarto keeps the `website` block out of the metadata it hands to Lua filters, so the filter cannot read `website.site-url`.
+> Anchor the value instead of writing it twice:
+>
+> ```yaml
+> website:
+>   site-url: &site-url https://example.com/my-project
+> extensions:
+>   atelier:
+>     site-url: *site-url
+> ```
+>
+> Without `extensions.atelier.site-url` the filter emits everything except `og:url` and the canonical link.
+
+The 404 page never gets `og:url` or a canonical link: it answers for every missing path, so it has no canonical URL of its own.
+
+Per-page images are left alone.
+Set `website.image` and `website.image-alt` for the site-wide social card; Quarto resolves a leading `/` against `website.site-url` and measures the file to fill the image width and height tags.
+
+Icon and manifest files are not copied to the output directory by convention.
+Quarto copies only `project.resources` globs plus files it finds behind an `href` or `src` in the rendered HTML, and a manifest names its icons in JSON, which is not scanned:
+
+```yaml
+project:
+  resources:
+    - site.webmanifest
+    - assets/icons/*.png
+```
+
 ## 404 page
 
 Quarto renders a root `404.qmd` to `404.html` and rewrites its links to absolute paths, so the page works from any URL depth.

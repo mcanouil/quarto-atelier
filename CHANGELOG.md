@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: bundled `social-metadata` filter emitting the head tags Quarto's website machinery has no configuration for: `og:type`, a per-page `og:url` and `<link rel="canonical">`, and `<meta name="description">` from the page's `description` or `subtitle` (Quarto never populates the pandoc `description-meta` variable its own HTML template reads).
+- feat: `extensions.atelier` options for `icon`, `apple-touch-icon`, `manifest`, and a light and dark `theme-color`, each emitted only when set, with paths rewritten per page so they resolve under `quarto preview` and under a project-path prefix alike.
+- feat: `og:locale` set to `en_GB` to match the format's `lang: en-GB`, and the Twitter card switched on as `summary_large_image`, which Quarto otherwise leaves off entirely.
+
+### Documentation
+
+- docs: document the social metadata and icon options, including the YAML anchor needed to reach `website.site-url` from a Lua filter, and the `project.resources` entries that get the icon and manifest files copied to the output directory.
+
 ## 0.3.0 (2026-07-26)
 
 ### Documentation

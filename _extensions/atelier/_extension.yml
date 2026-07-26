@@ -11,7 +11,14 @@ contributes:
       repo-actions: [edit, issue]
       repo-link-target: _blank
       repo-link-rel: noopener noreferrer
-      open-graph: true
+      # `locale` matches `lang: en-GB` below; override the two together.
+      # Naming `twitter-card` at all is what switches Quarto's Twitter
+      # provider on, after which it inherits title, description, image, and
+      # image alt from each page.
+      open-graph:
+        locale: en_GB
+      twitter-card:
+        card-style: summary_large_image
       page-navigation: true
       back-to-top-navigation: true
       llms-txt: true
@@ -58,6 +65,8 @@ contributes:
         sidebar-width: 300px
         body-width: 1000px
         margin-width: 300px
+      filters:
+        - social-metadata.lua
       include-before-body:
         - file: html/scripts/skip-link.html
       include-after-body:
