@@ -3,6 +3,7 @@ project:
   render:
     - index.qmd
     - example.qmd
+    - reference/index.qmd
     - 404.qmd
   # Quarto copies nothing to the output directory by convention: only these
   # globs, plus files it finds behind an `href` or `src` in the rendered HTML.
@@ -40,6 +41,8 @@ website:
         text: "Home"
       - href: example.qmd
         text: "Example"
+      - href: reference/index.qmd
+        text: "Reference"
 
 # Quarto keeps the `website` block out of the metadata it hands to Lua
 # filters, so the social-metadata filter cannot read `website.site-url` to
