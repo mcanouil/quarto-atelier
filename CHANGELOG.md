@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.0 (2026-07-26)
+
 ### Bug Fixes
 
 - fix: build `og:url` from the page's output file rather than from its input name, so a page setting `output-file` no longer advertises a URL that does not exist and that disagrees with its own canonical link.
