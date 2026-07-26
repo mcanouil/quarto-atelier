@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-07-26)
+
 ### Bug Fixes
 
 - fix: write the icon, Apple touch icon, and manifest `href` exactly as configured. Quarto's website resource resolver already prefixes each page's offset to the project root onto every `link[href]` it finds, so adding one in the filter doubled it and broke every icon on pages below the site root.
