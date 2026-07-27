@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: keep a small gap between the colour-scheme toggle and the search button once they are grouped at the right edge of the collapsed navbar. Cancelling Quarto's automatic margin also removed every space between the two controls.
+
 ## 0.7.0 (2026-07-27)
 
 ### Bug Fixes
