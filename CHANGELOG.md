@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0 (2026-07-27)
+
 ### Bug Fixes
 
 - fix: group the colour-scheme toggle with the search button at the right edge of the collapsed navbar and centre the brand. Quarto hands all the free space to the search button alone, which left the toggle stranded beside the brand and the search on its own at the far right.

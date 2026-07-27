@@ -7,7 +7,7 @@ The theme also works around Quarto behaviours that break in dark mode: the baked
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-atelier@0.6.0
+quarto add mcanouil/quarto-atelier@0.7.0
 ```
 
 This will install the extension under the `_extensions` subdirectory.
