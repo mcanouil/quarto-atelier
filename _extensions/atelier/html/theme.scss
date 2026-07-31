@@ -529,8 +529,11 @@ body .navbar .gitlink-widget-dropdown {
 .navbar {
   // Quarto hands the search the whole free space with `margin-left: auto` below
   // the expand breakpoint and 0.25rem above it; the control gap replaces both,
-  // so the search keeps the same distance from the tools at every width.
-  #quarto-search {
+  // so the search keeps the same distance from the tools at every width. Scoped
+  // to `.type-overlay`, the search this project type configures: a `textbox`
+  // search in the navbar is a field rather than a control box, and Quarto's own
+  // margins are what place it.
+  #quarto-search.type-overlay {
     display: inline-flex;
     align-items: center;
     margin-left: var(--atelier-navbar-control-gap);
