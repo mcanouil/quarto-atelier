@@ -73,6 +73,3 @@ extensions:
     icon: assets/icons/icon.svg
     apple-touch-icon: assets/icons/apple-touch-icon.png
     manifest: site.webmanifest
-    theme-color:
-      light: "#FBFAF7"
-      dark: "#14181C"

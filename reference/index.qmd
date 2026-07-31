@@ -16,7 +16,7 @@ These go under `extensions.atelier` in `_quarto.yml`, and each tag is emitted on
 | `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`.           |
 | `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.                         |
 | `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
-| `theme-color`      | Browser UI tint (Safari toolbar, Android address bar, installed web app title bar), one colour per scheme, each emitted with a `prefers-color-scheme` media query. Give it the page background, not a bar colour. |
+| `theme-color`      | Browser UI tint (Safari toolbar, Android address bar, installed web app title bar), one colour per scheme, each emitted with a `prefers-color-scheme` media query. Each scheme falls back to `color.background` of the `_brand.yml` for that mode, which is the page background of the matching bundle; set a scheme only to override it. |
 
 Paths are relative to the site root.
 Quarto's website resource resolver prefixes each page's offset to the project root, so the same value resolves at the root, from a subdirectory such as this page, and from the 404 page.
