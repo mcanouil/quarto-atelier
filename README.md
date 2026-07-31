@@ -119,7 +119,7 @@ Override them in a project stylesheet to match your palette:
 
 The theme bridges these tokens onto the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget's `--gitlink-widget-*` custom properties, so the navbar widget matches the navbar with no extra CSS.
 The bridge is inert when the gitlink extension is not installed.
-The page footer surface and its links also follow the navbar tokens, so both dark-pinned bars share one palette, and all three edges (navbar bottom, sidebar right, footer top) are drawn with `--atelier-navbar-border`.
+The page footer surface and its links also follow the navbar tokens, so both dark-pinned bars share one palette, and the navbar's bottom edge and the footer's top edge are both drawn with `--atelier-navbar-border`.
 
 A docked sidebar is the third dark-pinned bar, and each of its tokens defaults to the navbar token of the same name:
 
@@ -132,6 +132,8 @@ A docked sidebar is the third dark-pinned bar, and each of its tokens defaults t
 | `--atelier-sidebar-accent`      | `--atelier-navbar-accent`      | Hover, active, and focus accent.   |
 | `--atelier-sidebar-accent-soft` | `--atelier-navbar-accent-soft` | Active item pill.                  |
 | `--atelier-sidebar-border`      | `--atelier-navbar-border`      | Sidebar edge and dividers.         |
+
+The sidebar's right edge is drawn with `--atelier-sidebar-border`, so by default it matches the navbar and footer edges.
 
 Overriding the navbar palette therefore carries the sidebar with it; re-point the sidebar tokens only when the two should differ.
 

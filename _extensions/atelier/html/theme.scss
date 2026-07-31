@@ -298,6 +298,25 @@ body.docked .sidebar-navigation .quarto-navigation-tool:focus-visible {
   color: var(--atelier-sidebar-accent);
 }
 
+// A sidebar tool with a `menu` opens a Bootstrap dropdown on the dark column;
+// give it the same surface as the navbar dropdowns.
+body.docked .sidebar-navigation .dropdown-menu {
+  background: var(--atelier-sidebar-surface);
+  border: 1px solid var(--atelier-sidebar-border);
+  border-radius: $border-radius-sm;
+}
+
+body.docked .sidebar-navigation .dropdown-item {
+  color: var(--atelier-sidebar-fg);
+}
+
+body.docked .sidebar-navigation .dropdown-item:hover,
+body.docked .sidebar-navigation .dropdown-item:focus,
+body.docked .sidebar-navigation .dropdown-item:focus-visible {
+  background: var(--atelier-sidebar-accent-soft);
+  color: var(--atelier-sidebar-accent);
+}
+
 // Inline sidebar search (`website.sidebar.search: true`). Quarto colours the
 // input from $body-color through a four-class rule, which matches the sidebar
 // surface in one of the two schemes and hides the text and the caret.

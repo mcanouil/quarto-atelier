@@ -5,7 +5,7 @@
 ### New Features
 
 - feat: dark-pinned docked sidebar, exposed as `--atelier-sidebar-*` custom properties that default to their `--atelier-navbar-*` counterparts, so a book-like sidebar joins the navbar and the footer as one chrome in both colour schemes. A `style: floating` sidebar keeps Quarto's page-coloured treatment, since it has no surface of its own.
-- feat: sidebar detail styling from the same tokens: active item pill, section dividers, collapse chevrons, group labels, header and logo link, sidebar tools, sidebar search, the mobile bar carrying the sidebar toggle and the breadcrumbs, the sidebar scrollbar, and the focus ring.
+- feat: sidebar detail styling from the same tokens: active item pill, section dividers, collapse chevrons, group labels, header and logo link, sidebar tools and their dropdown menus, sidebar search, the mobile bar carrying the sidebar toggle and the breadcrumbs, the sidebar scrollbar, and the focus ring.
 
 ### Bug Fixes
 
