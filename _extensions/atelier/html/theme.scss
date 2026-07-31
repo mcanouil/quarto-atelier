@@ -54,7 +54,7 @@ $enable-smooth-scroll: true !default;
 
   // A boxed control (a search field, a widget pill) needs a boundary that can
   // be seen, where the hairline above only has to separate two surfaces: at
-  // 0.14 it lands around 1.15:1 on the bar and reads as no border at all.
+  // 0.14 it lands around 1.5:1 on the bar and reads as no border at all.
   --atelier-navbar-control-border: rgba(232, 237, 242, 0.4);
 
   // A docked sidebar is the third dark-pinned bar, so its tokens default to
