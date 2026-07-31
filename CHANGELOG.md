@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0 (2026-07-31)
+
 ### Breaking Changes
 
 - The navbar, the page footer, and the sidebar now follow the colour scheme by default rather than staying dark in both. Set `$atelier-chrome: dark;` in the defaults block of a project stylesheet to keep the previous appearance.
