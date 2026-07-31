@@ -100,15 +100,19 @@ Your stylesheet can use the theme's `body-mix()` function and the Sass variables
 The dark-pinned navbar surfaces are exposed as CSS custom properties with neutral-slate defaults.
 Override them in a project stylesheet to match your palette:
 
-| Property                       | Default                     | Description                        |
-| ------------------------------ | --------------------------- | ---------------------------------- |
-| `--atelier-navbar-bg`          | `#1b242e`                   | Navbar background.                 |
-| `--atelier-navbar-surface`     | `#223041`                   | Dropdown and tool-pill surface.    |
-| `--atelier-navbar-fg`          | `#e8edf2`                   | Navbar text.                       |
-| `--atelier-navbar-muted`       | `#9db0c0`                   | Muted navbar text.                 |
-| `--atelier-navbar-accent`      | `#7fa8c4`                   | Hover and active accent.           |
-| `--atelier-navbar-accent-soft` | `rgba(127, 168, 196, 0.16)` | Accent tint for hover backgrounds. |
-| `--atelier-navbar-border`      | `rgba(232, 237, 242, 0.14)` | Navbar and dropdown borders.       |
+| Property                          | Default                     | Description                              |
+| --------------------------------- | --------------------------- | ---------------------------------------- |
+| `--atelier-navbar-bg`             | `#1b242e`                   | Navbar background.                       |
+| `--atelier-navbar-surface`        | `#223041`                   | Dropdown and tool-pill surface.          |
+| `--atelier-navbar-fg`             | `#e8edf2`                   | Navbar text.                             |
+| `--atelier-navbar-muted`          | `#9db0c0`                   | Muted navbar text.                       |
+| `--atelier-navbar-accent`         | `#7fa8c4`                   | Hover and active accent.                 |
+| `--atelier-navbar-accent-soft`    | `rgba(127, 168, 196, 0.16)` | Accent tint for hover backgrounds.       |
+| `--atelier-navbar-border`         | `rgba(232, 237, 242, 0.14)` | Navbar and dropdown borders.             |
+| `--atelier-navbar-control-border` | `rgba(232, 237, 242, 0.4)`  | Search field and widget pill boundaries. |
+
+The two border tokens do different jobs.
+`--atelier-navbar-border` is a hairline between two surfaces, around 1.5:1 against the bar, while `--atelier-navbar-control-border` outlines a boxed control and clears the 3:1 that [WCAG 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) asks of a user-interface component.
 
 ```css
 :root {
@@ -118,20 +122,22 @@ Override them in a project stylesheet to match your palette:
 ```
 
 The theme bridges these tokens onto the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget's `--gitlink-widget-*` custom properties, so the navbar widget matches the navbar with no extra CSS.
+The widget's own border comes from `--atelier-navbar-control-border`, since its trigger is a pill rather than a hairline, and from `--atelier-sidebar-control-border` when the widget is a sidebar tool.
 The bridge is inert when the gitlink extension is not installed.
 The page footer surface and its links also follow the navbar tokens, so both dark-pinned bars share one palette, and the navbar's bottom edge and the footer's top edge are both drawn with `--atelier-navbar-border`.
 
 A docked sidebar is the third dark-pinned bar, and each of its tokens defaults to the navbar token of the same name:
 
-| Property                        | Default                        | Description                        |
-| ------------------------------- | ------------------------------ | ---------------------------------- |
-| `--atelier-sidebar-bg`          | `--atelier-navbar-bg`          | Sidebar background.                |
-| `--atelier-sidebar-surface`     | `--atelier-navbar-surface`     | Search field and button surface.   |
-| `--atelier-sidebar-fg`          | `--atelier-navbar-fg`          | Sidebar text.                      |
-| `--atelier-sidebar-muted`       | `--atelier-navbar-muted`       | Group labels, chevrons, scrollbar. |
-| `--atelier-sidebar-accent`      | `--atelier-navbar-accent`      | Hover, active, and focus accent.   |
-| `--atelier-sidebar-accent-soft` | `--atelier-navbar-accent-soft` | Active item pill.                  |
-| `--atelier-sidebar-border`      | `--atelier-navbar-border`      | Sidebar edge and dividers.         |
+| Property                           | Default                           | Description                              |
+| ---------------------------------- | --------------------------------- | ---------------------------------------- |
+| `--atelier-sidebar-bg`             | `--atelier-navbar-bg`             | Sidebar background.                      |
+| `--atelier-sidebar-surface`        | `--atelier-navbar-surface`        | Search field and button surface.         |
+| `--atelier-sidebar-fg`             | `--atelier-navbar-fg`             | Sidebar text.                            |
+| `--atelier-sidebar-muted`          | `--atelier-navbar-muted`          | Group labels, chevrons, scrollbar.       |
+| `--atelier-sidebar-accent`         | `--atelier-navbar-accent`         | Hover, active, and focus accent.         |
+| `--atelier-sidebar-accent-soft`    | `--atelier-navbar-accent-soft`    | Active item pill.                        |
+| `--atelier-sidebar-border`         | `--atelier-navbar-border`         | Sidebar edge and dividers.               |
+| `--atelier-sidebar-control-border` | `--atelier-navbar-control-border` | Search field and widget pill boundaries. |
 
 The sidebar's right edge is drawn with `--atelier-sidebar-border`, so by default it matches the navbar and footer edges.
 
@@ -187,6 +193,16 @@ Because the docked column is repainted, `website.sidebar.background` and `websit
 > ```
 >
 > The overlay search then reaches the sidebar as a button; `search.type: textbox` gives an input field instead, and both are themed.
+
+Without a navbar, Quarto renders the sidebar tools (the colour-scheme toggle, the reader-mode toggle, any `sidebar.tools` entries, and an overlay search button) inside the sidebar title, which leaves the toggle sharing the title's line.
+Atelier gives that row a line of its own, below the title and above the search field, following `sidebar.align`.
+When the gitlink widget is one of those tools, the extension stacks the row into a column and orders itself between the icon tools and the search; Atelier leaves that ordering alone.
+
+This repository ships that layout as a Quarto profile, `_quarto-sidebar.yml`, which renders the demo site with no navbar and the docked sidebar carrying the navigation and the search:
+
+```bash
+quarto preview --profile sidebar
+```
 
 ### Icon-only navbar links
 

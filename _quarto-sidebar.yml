@@ -1,0 +1,23 @@
+# Quarto profile demonstrating the book-like layout: no navbar, with the
+# docked sidebar carrying the navigation and the search.
+# Render it with `quarto render --profile sidebar`.
+website:
+  # A scalar replaces the navbar the project type contributes, rather than
+  # merging into it.
+  navbar: false
+  # The project type puts an overlay search in the navbar, which there is none
+  # of here. A sidebar location gives the column its own search, and the type
+  # is what `website.sidebar.search` then defaults to: a field rather than the
+  # button an overlay search would leave in the tools row.
+  search:
+    location: sidebar
+    type: textbox
+  # The remaining keys merge into the `website.sidebar` of `_quarto.yml`,
+  # which keeps its `contents`. `background` and `foreground` are left out:
+  # Atelier repaints a docked sidebar from the `--atelier-sidebar-*` tokens,
+  # so neither has any effect on it.
+  sidebar:
+    style: docked
+    pinned: true
+    align: center
+    collapse-level: 2

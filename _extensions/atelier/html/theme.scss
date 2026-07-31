@@ -52,6 +52,11 @@ $enable-smooth-scroll: true !default;
   --atelier-navbar-accent-soft: rgba(127, 168, 196, 0.16);
   --atelier-navbar-border: rgba(232, 237, 242, 0.14);
 
+  // A boxed control (a search field, a widget pill) needs a boundary that can
+  // be seen, where the hairline above only has to separate two surfaces: at
+  // 0.14 it lands around 1.15:1 on the bar and reads as no border at all.
+  --atelier-navbar-control-border: rgba(232, 237, 242, 0.4);
+
   // A docked sidebar is the third dark-pinned bar, so its tokens default to
   // the navbar ones: overriding the navbar palette carries the sidebar with
   // it, and a project that wants the two to differ re-points these alone.
@@ -62,6 +67,7 @@ $enable-smooth-scroll: true !default;
   --atelier-sidebar-accent: var(--atelier-navbar-accent);
   --atelier-sidebar-accent-soft: var(--atelier-navbar-accent-soft);
   --atelier-sidebar-border: var(--atelier-navbar-border);
+  --atelier-sidebar-control-border: var(--atelier-navbar-control-border);
 }
 
 // ===========================================================================
@@ -309,6 +315,30 @@ body.docked {
     color: var(--atelier-sidebar-accent);
   }
 
+  // Quarto renders the sidebar tools inside `.sidebar-title` whenever the
+  // sidebar has a title and the project has no navbar, as an inline-flex
+  // pulled up 6px, which lands the colour-scheme toggle on the title's line.
+  // A block-level flex row breaks it onto its own line, which the document
+  // order then places above the search field. Nothing here is forced: the
+  // gitlink extension stacks the same container into a column from an id
+  // selector when its widget is one of the tools.
+  .sidebar-title .sidebar-tools-main {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  // `sidebar.align` reaches the header as a text class, which a flex row does
+  // not follow. Bootstrap has no `text-left`, so the rule above covers the
+  // left-aligned case on its own.
+  .sidebar-header.text-center .sidebar-title .sidebar-tools-main {
+    justify-content: center;
+  }
+
+  .sidebar-header.text-end .sidebar-title .sidebar-tools-main {
+    justify-content: flex-end;
+  }
+
   // Quarto dims the sidebar tools to 0.7, which on the dark column drops the
   // colour-scheme toggle and the repo links below the contrast floor.
   .sidebar-navigation .quarto-navigation-tool {
@@ -340,7 +370,7 @@ body.docked {
   // here to be outranked.
   .sidebar-search .aa-Form {
     background-color: var(--atelier-sidebar-surface);
-    border-color: var(--atelier-sidebar-border);
+    border-color: var(--atelier-sidebar-control-border);
     color: var(--atelier-sidebar-fg);
   }
 
@@ -463,7 +493,7 @@ body.docked {
 // widget's own custom properties so the pill, trigger, and dropdown match the
 // dark-pinned navbar. Inert when the gitlink extension is not installed.
 .navbar {
-  --gitlink-widget-border: var(--atelier-navbar-border);
+  --gitlink-widget-border: var(--atelier-navbar-control-border);
   --gitlink-widget-accent: var(--atelier-navbar-accent);
   --gitlink-widget-accent-soft: var(--atelier-navbar-accent-soft);
   --gitlink-widget-menu-bg: var(--atelier-navbar-surface);
@@ -473,7 +503,7 @@ body.docked {
 // The same widget can render in the sidebar tools, where it takes the sidebar
 // tokens instead.
 body.docked .sidebar-navigation {
-  --gitlink-widget-border: var(--atelier-sidebar-border);
+  --gitlink-widget-border: var(--atelier-sidebar-control-border);
   --gitlink-widget-accent: var(--atelier-sidebar-accent);
   --gitlink-widget-accent-soft: var(--atelier-sidebar-accent-soft);
   --gitlink-widget-menu-bg: var(--atelier-sidebar-surface);
