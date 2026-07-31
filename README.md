@@ -315,9 +315,12 @@ extensions:
 | `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`.           |
 | `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.                         |
 | `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
-| `theme-color`      | `light` and `dark` colours, each emitted with a `prefers-color-scheme` media query. |
+| `theme-color`      | Browser UI tint, one colour per scheme. See the note below.                          |
 
 Paths are relative to the site root.
+
+`theme-color` colours the browser's own chrome around the page, not anything the theme draws: the Safari toolbar, the Chrome address bar on Android, and the title bar and task-switcher entry of an installed web app.
+Each scheme is emitted with a `prefers-color-scheme` media query, so give it the page background of each bundle rather than a bar colour.
 The filter writes them exactly as configured and Quarto's website resource resolver prefixes each page's offset to the project root, so one value resolves at the site root, from a subdirectory, under `quarto preview` at the server root, and under a GitHub Pages project prefix alike.
 On `404.html` Quarto rewrites them to site-absolute paths instead, since that page is served from any URL depth.
 
