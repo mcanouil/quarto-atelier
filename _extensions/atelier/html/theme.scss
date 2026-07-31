@@ -526,67 +526,67 @@ body .navbar .gitlink-widget-dropdown {
   --atelier-navbar-search-icon-size: calc(var(--atelier-navbar-control-icon-size) * 1.2);
 }
 
-// Quarto hands the search the whole free space with `margin-left: auto` below
-// the expand breakpoint and 0.25rem above it; the control gap replaces both, so
-// the search keeps the same distance from the tools at every width.
-.navbar #quarto-search {
-  display: inline-flex;
-  align-items: center;
-  margin-left: var(--atelier-navbar-control-gap);
-}
+.navbar {
+  // Quarto hands the search the whole free space with `margin-left: auto` below
+  // the expand breakpoint and 0.25rem above it; the control gap replaces both,
+  // so the search keeps the same distance from the tools at every width.
+  #quarto-search {
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--atelier-navbar-control-gap);
+  }
 
-.navbar .quarto-navbar-tools {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--atelier-navbar-control-gap);
-}
+  .quarto-navbar-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--atelier-navbar-control-gap);
+  }
 
-// Quarto pins the overlay autocomplete to a 40px box, wider than every other
-// navbar control; let the button size it instead.
-.navbar #quarto-search.type-overlay .aa-Autocomplete {
-  width: auto;
-}
+  // Quarto pins the overlay autocomplete to a 40px box, wider than every other
+  // navbar control; let the button size it instead.
+  #quarto-search.type-overlay .aa-Autocomplete {
+    width: auto;
+  }
 
-// `min-width` rather than `width`, so a tool with a `menu`, which keeps its
-// dropdown caret in the navbar, can grow past the square rather than clip it.
-.navbar #quarto-search .aa-DetachedSearchButton,
-.navbar .quarto-navbar-tools .quarto-navigation-tool {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--atelier-navbar-control-size);
-  height: var(--atelier-navbar-control-size);
-  // !important is required: Bootstrap's .px-1 utility on the toggle is itself
-  // !important. The inline padding only shows on a control wide enough to
-  // exceed the square, which is the caret case above.
-  padding: 0 0.25rem !important;
-}
+  // `min-width` rather than `width`, so a tool with a `menu`, which keeps its
+  // dropdown caret in the navbar, can grow past the square rather than clip it.
+  #quarto-search .aa-DetachedSearchButton,
+  .quarto-navbar-tools .quarto-navigation-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--atelier-navbar-control-size);
+    height: var(--atelier-navbar-control-size);
+    // !important is required: Bootstrap's .px-1 utility on the toggle is itself
+    // !important. The inline padding only shows on a control wide enough to
+    // exceed the square, which is the caret case above.
+    padding: 0 0.25rem !important;
+  }
 
-// The glyph sits in a block wrapper whose height is a line box, so it is taller
-// than the icon and splits the leftover unevenly around it, dropping the glyph
-// off the button's centre. Collapse the wrapper onto the icon and centre it.
-.navbar #quarto-search .aa-DetachedSearchButtonIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: auto;
-  line-height: 1;
-}
+  // Quarto leaves the glyph in a block wrapper whose height is a line box, so it
+  // is taller than the icon and splits the leftover unevenly around it, dropping
+  // the glyph off the button's centre; a flex wrapper hugs the icon instead.
+  #quarto-search .aa-DetachedSearchButtonIcon {
+    display: flex;
+    align-items: center;
+  }
 
-// Quarto draws the overlay glyph at 26px, against the 1rem of the toggle glyph
-// and the tool icons. `display: block` drops the inline baseline gap under it.
-.navbar #quarto-search.type-overlay .aa-Autocomplete .aa-DetachedSearchButtonIcon svg,
-.navbar #quarto-search.type-overlay .aa-Autocomplete svg.aa-SubmitIcon {
-  display: block;
-  width: var(--atelier-navbar-search-icon-size);
-  height: var(--atelier-navbar-search-icon-size);
-}
+  // Quarto draws the overlay glyph at 26px, against the 1rem of the toggle glyph
+  // and the tool icons; `.aa-Autocomplete` is in the selector to match the
+  // specificity of that rule, which this then wins on order. `display: block`
+  // drops the inline baseline gap under the icon.
+  #quarto-search.type-overlay .aa-Autocomplete .aa-DetachedSearchButtonIcon svg {
+    display: block;
+    width: var(--atelier-navbar-search-icon-size);
+    height: var(--atelier-navbar-search-icon-size);
+  }
 
-// Quarto gives the search button no hover colour at all, where it takes the
-// colour-scheme toggle to the accent; match it.
-.navbar #quarto-search .aa-DetachedSearchButton:hover .aa-SubmitIcon,
-.navbar #quarto-search .aa-DetachedSearchButton:focus-visible .aa-SubmitIcon {
-  color: var(--atelier-navbar-accent);
+  // Quarto gives the search button no hover colour at all, where it takes the
+  // colour-scheme toggle to the accent; match it.
+  #quarto-search .aa-DetachedSearchButton:hover .aa-DetachedSearchButtonIcon svg,
+  #quarto-search .aa-DetachedSearchButton:focus-visible .aa-DetachedSearchButtonIcon svg {
+    color: var(--atelier-navbar-accent);
+  }
 }
 
 // ===========================================================================
