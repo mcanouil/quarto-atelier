@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: `--atelier-navbar-control-border` and `--atelier-sidebar-control-border`, the boundary of a boxed control, defaulting to `rgba(232, 237, 242, 0.4)`. The existing border tokens stay the hairline between two surfaces, which is what the sidebar edge, the section dividers, and the navbar and footer edges want.
+
+### Bug Fixes
+
+- fix: draw the sidebar search field and the gitlink widget pill from the new control-border tokens. Both took the hairline token, which against the bars is around 1.5:1 and reads as no border at all, where [WCAG 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) asks 3:1 of a user-interface component; the new default is 3.1:1 against the search surface and 3.3:1 against the bar.
+- fix: give the sidebar tools their own line, below the title and above the search field, following `sidebar.align`. Quarto renders them inside the sidebar title whenever a titled sidebar has no navbar, as an inline row pulled up six pixels, which left the colour-scheme toggle trailing the title text. The rule forces nothing the gitlink extension sets, so a sidebar tool widget keeps its column layout and its ordering between the icon tools and the search.
+
+### Documentation
+
+- docs: add a `sidebar` Quarto profile to the demo site, rendering it with `navbar: false` and a pinned, docked sidebar carrying the navigation and a `location: sidebar`, `type: textbox` search, which is the book-like layout the README describes. Run it with `quarto preview --profile sidebar`.
+
 ## 0.8.0 (2026-07-31)
 
 ### New Features
