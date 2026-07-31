@@ -25,14 +25,14 @@ contributes:
       search:
         location: navbar
         type: overlay
+      # `background` and `foreground` are left to the theme on both bars: the
+      # chrome palette in `html/chrome.scss` sets `$navbar-bg`, `$navbar-fg`,
+      # `$footer-bg`, and `$footer-fg` from a layer Quarto evaluates first, so
+      # naming them here would be a configuration with no effect.
       navbar:
-        background: dark
-        foreground: light
         search: true
       page-footer:
         border: true
-        background: dark
-        foreground: light
         left: |
           Powered by [Quarto](https://quarto.org){target="_blank" rel="noopener noreferrer"}.
         center: |
@@ -51,11 +51,16 @@ contributes:
       # directory index the URL of its directory. Set `canonical-url: false`
       # on a page served from more than one URL, such as `404.qmd`.
       canonical-url: true
+      # `html/chrome.scss` comes before `brand` on purpose: Quarto evaluates
+      # user layer defaults in reverse list order, so a file placed first is
+      # evaluated last, after the brand palette it derives the chrome from.
       theme:
         light:
+          - html/chrome.scss
           - brand
           - html/theme.scss
         dark:
+          - html/chrome.scss
           - brand
           - html/theme.scss
       syntax-highlighting:
