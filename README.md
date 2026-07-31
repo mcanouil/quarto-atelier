@@ -168,10 +168,12 @@ website:
 ```
 
 Atelier pins a docked sidebar to the `--atelier-sidebar-*` tokens, so it joins the navbar and the footer as one dark chrome in both colour schemes.
-Quarto would otherwise derive the sidebar surface from Bootstrap's `$light`, which `_brand.yml` never sets, and paint a near-white column beside a dark page.
-The section dividers, the collapse chevrons, the active item, the mobile bar that carries the sidebar toggle, the sidebar search field, and the sidebar scrollbar all follow the same tokens.
+Quarto derives that surface from the page instead, so alongside a navbar the column follows the body and the chrome does not read as one bar; without a navbar it falls back to Bootstrap's `$light`, which `_brand.yml` never sets, and paints a near-white column beside a dark page.
+The section dividers, the collapse chevrons, the active item, the sidebar edge, the mobile bar that carries the sidebar toggle, the sidebar search field, and the sidebar scrollbar all follow the same tokens.
 
 A `style: floating` sidebar is left to Quarto: it has no surface of its own, so dark ink there would land on the page background.
+
+Because the docked column is repainted, `website.sidebar.background` and `website.sidebar.foreground` have no effect on it; set the tokens instead.
 
 > [!NOTE]
 > The project type puts search in the navbar.

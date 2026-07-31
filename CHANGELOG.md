@@ -12,7 +12,8 @@
 - fix: repaint the docked sidebar from the sidebar tokens. Quarto derives `$sidebar-bg` from Bootstrap's `$light`, which `_brand.yml` never sets, so a docked sidebar without a navbar painted a near-white column beside a dark page, and every colour derived from it followed the wrong surface.
 - fix: colour sidebar links, hover, and the active item from the sidebar accent instead of `$primary`, which with the default tokens was 3.2:1 against the dark column in the light scheme. The focus ring inside the sidebar takes the accent for the same reason.
 - fix: ink the sidebar search glyph, field, caret, and placeholder. Quarto colours the detached search button only inside `.sidebar-tools-*` and the inline field from `$body-color`, either of which can match the surface it sits on.
-- fix: paint the mobile secondary navigation bar, which Quarto inks for the sidebar surface but renders with no background of its own.
+- fix: paint the mobile secondary navigation bar, which Quarto paints with the sidebar surface this theme replaces.
+- fix: draw the docked sidebar's right edge with the sidebar border token. `sidebar.border` defaults to true for a docked sidebar and Quarto draws that edge from the baked `#dee2e6` with `!important`, so the column carried a bright line while the navbar and the footer carried a hairline.
 - fix: draw the footer's top edge with the navbar border token. `page-footer.border: true` sets it to Quarto's baked `#dee2e6` through a `body`-prefixed rule, which outranked the previous selector and left a bright line where the navbar and the sidebar carry a hairline.
 
 ## 0.7.1 (2026-07-27)
