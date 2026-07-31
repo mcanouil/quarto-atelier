@@ -16,7 +16,7 @@ Configure it as usual under `website.announcement`; without one, the rules are i
 Inline `code`, a highlighted block:
 
 ```bash
-quarto add mcanouil/quarto-atelier@0.7.1
+quarto add mcanouil/quarto-atelier@0.8.0
 ```
 
 and a plain block with no language:

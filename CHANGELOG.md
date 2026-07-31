@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-07-31)
+
 ### New Features
 
 - feat: dark-pinned docked sidebar, so a book-like `website.sidebar` with `style: docked` joins the navbar and the footer as one chrome in both colour schemes. Quarto derives that surface from the page instead, which alongside a navbar leaves the column following the body, and without one falls back to Bootstrap's `$light`, painting a near-white column beside a dark page.
