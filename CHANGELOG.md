@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: dark-pinned docked sidebar, exposed as `--atelier-sidebar-*` custom properties that default to their `--atelier-navbar-*` counterparts, so a book-like sidebar joins the navbar and the footer as one chrome in both colour schemes. A `style: floating` sidebar keeps Quarto's page-coloured treatment, since it has no surface of its own.
+- feat: sidebar detail styling from the same tokens: active item pill, section dividers, collapse chevrons, group labels, header and logo link, sidebar tools, sidebar search, the mobile bar carrying the sidebar toggle and the breadcrumbs, the sidebar scrollbar, and the focus ring.
+
+### Bug Fixes
+
+- fix: repaint the docked sidebar from the sidebar tokens. Quarto derives `$sidebar-bg` from Bootstrap's `$light`, which `_brand.yml` never sets, so a docked sidebar without a navbar painted a near-white column beside a dark page, and every colour derived from it followed the wrong surface.
+- fix: colour sidebar links, hover, and the active item from the sidebar accent instead of `$primary`, which with the default tokens was 3.2:1 against the dark column in the light scheme. The focus ring inside the sidebar takes the accent for the same reason.
+- fix: ink the sidebar search glyph, field, caret, and placeholder. Quarto colours the detached search button only inside `.sidebar-tools-*` and the inline field from `$body-color`, either of which can match the surface it sits on.
+- fix: paint the mobile secondary navigation bar, which Quarto inks for the sidebar surface but renders with no background of its own.
+- fix: draw the footer's top edge with the navbar border token. `page-footer.border: true` sets it to Quarto's baked `#dee2e6` through a `body`-prefixed rule, which outranked the previous selector and left a bright line where the navbar and the sidebar carry a hairline.
+
 ## 0.7.1 (2026-07-27)
 
 ### Bug Fixes
