@@ -52,6 +52,9 @@ The project type sets these under `website`, and any of them can be overridden i
 | `search`                                    | Overlay search in the navbar           |
 | `navbar`, `page-footer`                     | Dark-pinned, with the footer border on |
 
+A `website.sidebar` of your own is styled rather than configured: a `style: docked` sidebar is dark-pinned from the `--atelier-sidebar-*` tokens, which default to the navbar ones, while a `style: floating` sidebar keeps Quarto's page-coloured treatment.
+This site uses a docked sidebar beside the navbar.
+
 ## Format defaults
 
 The project type sets `format: atelier-html`.

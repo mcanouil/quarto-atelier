@@ -14,6 +14,27 @@ $enable-smooth-scroll: true !default;
   @return mix($body-bg, $body-color, $weight);
 }
 
+/*-- scss:mixins --*/
+
+// Dropdown menus render on both dark-pinned bars, each from its own tokens.
+@mixin atelier-dropdown($surface, $border, $fg, $accent, $accent-soft) {
+  .dropdown-menu {
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: $border-radius-sm;
+  }
+
+  .dropdown-item {
+    color: $fg;
+  }
+
+  .dropdown-item:hover,
+  .dropdown-item:focus {
+    background: $accent-soft;
+    color: $accent;
+  }
+}
+
 /*-- scss:rules --*/
 
 // ===========================================================================
@@ -30,6 +51,17 @@ $enable-smooth-scroll: true !default;
   --atelier-navbar-accent: #7fa8c4;
   --atelier-navbar-accent-soft: rgba(127, 168, 196, 0.16);
   --atelier-navbar-border: rgba(232, 237, 242, 0.14);
+
+  // A docked sidebar is the third dark-pinned bar, so its tokens default to
+  // the navbar ones: overriding the navbar palette carries the sidebar with
+  // it, and a project that wants the two to differ re-points these alone.
+  --atelier-sidebar-bg: var(--atelier-navbar-bg);
+  --atelier-sidebar-surface: var(--atelier-navbar-surface);
+  --atelier-sidebar-fg: var(--atelier-navbar-fg);
+  --atelier-sidebar-muted: var(--atelier-navbar-muted);
+  --atelier-sidebar-accent: var(--atelier-navbar-accent);
+  --atelier-sidebar-accent-soft: var(--atelier-navbar-accent-soft);
+  --atelier-sidebar-border: var(--atelier-navbar-border);
 }
 
 // ===========================================================================
@@ -181,20 +213,212 @@ html .panel-tabset > .tab-content {
 }
 
 // ===========================================================================
-// SIDEBAR + TOC
+// TOC
 // ===========================================================================
-// Quarto marks the current page and section with .active but leaves them in
-// the sidebar body colour; surface them with the palette accent, and give the
-// margin TOC's active border the same accent instead of the baked grey.
-#quarto-sidebar .sidebar-item-container .active,
-#quarto-sidebar .sidebar-item-container .sidebar-link:hover,
-.sidebar-navigation .sidebar-item .active,
+// Quarto marks the current section with .active but leaves it in the body
+// colour, and gives its border the baked grey; the margin TOC sits on the page
+// surface, so both take the palette accent.
 #TOC .active {
   color: $primary;
+  border-left-color: $primary;
 }
 
-#TOC .active {
-  border-left-color: $primary;
+// ===========================================================================
+// SIDEBAR (dark-pinned when docked)
+// ===========================================================================
+// Quarto derives every sidebar colour from `theme-contrast($sidebar-fg,
+// $sidebar-bg)`, and that surface never matches the navbar: it falls back to
+// $body-bg when a navbar is present, and to Bootstrap's $light, which brand
+// never overrides, when there is none, so the dark bundle then paints a
+// near-white column beside a dark page. Repaint the whole column from the
+// sidebar tokens instead, so it joins the navbar and the footer as dark-pinned
+// chrome in both schemes.
+//
+// Everything below is scoped to `body.docked`, the class Quarto adds when the
+// sidebar style is `docked`. A floating sidebar has no surface of its own, so
+// dark ink there would be painted straight onto the page background.
+//
+// The `body.docked` scope is also what raises these rules over the Quarto rules
+// they replace, so only the sidebar edge, which Quarto draws with `!important`,
+// needs one of its own.
+body.docked {
+  .sidebar.sidebar-navigation {
+    background-color: var(--atelier-sidebar-bg);
+  }
+
+  // `sidebar.border` defaults to true for a docked sidebar, and Quarto draws
+  // that edge from the baked $table-border-color with `!important`.
+  .sidebar.sidebar-navigation:not(.rollup) {
+    border-right: 1px solid var(--atelier-sidebar-border) !important;
+  }
+
+  #quarto-sidebar,
+  .sidebar-item-container {
+    color: var(--atelier-sidebar-fg);
+  }
+
+  .sidebar-item-container:hover,
+  .sidebar-item-container:focus-within,
+  .sidebar-item-container .active,
+  .sidebar-item-container .sidebar-link > code {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  .sidebar-item-container.disabled {
+    color: var(--atelier-sidebar-muted);
+  }
+
+  // The current page reads as a pill rather than as a colour change alone,
+  // which matches the navbar dropdown treatment.
+  .sidebar-item-container .sidebar-link.active {
+    background: var(--atelier-sidebar-accent-soft);
+    border-radius: $border-radius-sm;
+    padding: 0.15rem 0.4rem;
+    margin: -0.15rem -0.4rem;
+    font-weight: 600;
+  }
+
+  // A sidebar entry with text and no href or contents is a group label; Quarto
+  // renders it as a bare span, in the same colour as a link.
+  .sidebar-item > .menu-text {
+    color: var(--atelier-sidebar-muted);
+  }
+
+  // Bootstrap draws an <hr> from currentColor at 25% opacity, which on the dark
+  // column is all but invisible; use the border token at full strength.
+  .sidebar-navigation .sidebar-divider {
+    border-top-color: var(--atelier-sidebar-border);
+    opacity: 1;
+  }
+
+  .sidebar-item-toggle {
+    color: var(--atelier-sidebar-muted);
+  }
+
+  .sidebar-item-toggle:hover {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  // The header (logo and title) only renders when the project has no navbar.
+  .sidebar-title {
+    color: var(--atelier-sidebar-fg);
+  }
+
+  .sidebar-title > a:hover,
+  .sidebar-title > a:focus-visible {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  // Quarto dims the sidebar tools to 0.7, which on the dark column drops the
+  // colour-scheme toggle and the repo links below the contrast floor.
+  .sidebar-navigation .quarto-navigation-tool {
+    color: var(--atelier-sidebar-fg);
+    opacity: 1;
+  }
+
+  .sidebar-navigation .quarto-navigation-tool:hover,
+  .sidebar-navigation .quarto-navigation-tool:focus-visible {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  // A sidebar tool with a `menu` opens a Bootstrap dropdown on the dark column.
+  .sidebar-navigation {
+    @include atelier-dropdown(
+      var(--atelier-sidebar-surface),
+      var(--atelier-sidebar-border),
+      var(--atelier-sidebar-fg),
+      var(--atelier-sidebar-accent),
+      var(--atelier-sidebar-accent-soft)
+    );
+  }
+
+  // Inline sidebar search (`website.sidebar.search: true` with a textbox
+  // search). Quarto colours the input from $body-color through a four-class
+  // rule, which matches the sidebar surface in one of the two schemes and hides
+  // the text and the caret; the magnifier and the spinner come from
+  // $input-color at half opacity through another. Both chains have to be named
+  // here to be outranked.
+  .sidebar-search .aa-Form {
+    background-color: var(--atelier-sidebar-surface);
+    border-color: var(--atelier-sidebar-border);
+    color: var(--atelier-sidebar-fg);
+  }
+
+  .sidebar-search .aa-Form .aa-InputWrapper .aa-Input {
+    color: var(--atelier-sidebar-fg);
+    caret-color: var(--atelier-sidebar-fg);
+  }
+
+  .sidebar-search .aa-Form .aa-InputWrapper .aa-Input::placeholder {
+    color: var(--atelier-sidebar-muted);
+    opacity: 1;
+  }
+
+  .sidebar-search .aa-Form .aa-InputWrapperPrefix svg {
+    color: var(--atelier-sidebar-muted);
+    opacity: 1;
+  }
+
+  // Overlay search reaches the sidebar as a button rather than as a field.
+  // Quarto inks that button only inside `.sidebar-tools-*`, from a $sidebar-fg
+  // contrasted against the surface it painted rather than against ours, and
+  // through a selector carrying the search id; match the id to outrank it.
+  .sidebar-navigation #quarto-search .aa-DetachedSearchButton svg {
+    color: var(--atelier-sidebar-fg);
+  }
+
+  .sidebar-navigation #quarto-search .aa-DetachedSearchButton:hover svg {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  // The mobile bar carrying the sidebar toggle, the page title, and the search
+  // button. Quarto paints it with $sidebar-bg, the surface this file replaces.
+  .quarto-secondary-nav {
+    background: var(--atelier-sidebar-bg);
+    border-bottom: 1px solid var(--atelier-sidebar-border);
+  }
+
+  .quarto-secondary-nav .quarto-btn-toggle,
+  .quarto-secondary-nav .quarto-search-button,
+  .quarto-secondary-nav-title,
+  .quarto-secondary-nav .quarto-page-breadcrumbs,
+  .quarto-secondary-nav .quarto-page-breadcrumbs a {
+    color: var(--atelier-sidebar-fg);
+  }
+
+  .quarto-secondary-nav .quarto-btn-toggle:hover,
+  .quarto-secondary-nav .quarto-search-button:hover,
+  .quarto-secondary-nav .quarto-page-breadcrumbs a:hover {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  .quarto-secondary-nav .breadcrumb-item::before {
+    color: var(--atelier-sidebar-muted);
+  }
+
+  // The page focus ring is $primary, which on the dark column is far too dim;
+  // keep its geometry and swap the colour for the sidebar accent.
+  :is(#quarto-sidebar, .quarto-secondary-nav) :is(a, button):focus-visible {
+    outline-color: var(--atelier-sidebar-accent);
+  }
+
+  // The page scrollbar rules are unscoped, so without these the dark column
+  // would carry a page-coloured bar.
+  #quarto-sidebar {
+    scrollbar-color: var(--atelier-sidebar-muted) var(--atelier-sidebar-surface);
+
+    &::-webkit-scrollbar-track {
+      background: var(--atelier-sidebar-surface);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--atelier-sidebar-muted);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--atelier-sidebar-accent);
+    }
+  }
 }
 
 // Quarto's floating back-to-top pill has no edge on tinted surfaces; give it
@@ -223,21 +447,14 @@ html .panel-tabset > .tab-content {
   color: var(--atelier-navbar-accent) !important;
 }
 
-.navbar .dropdown-menu {
-  background: var(--atelier-navbar-surface);
-  border: 1px solid var(--atelier-navbar-border);
-  border-radius: $border-radius-sm;
-}
-
-.navbar .dropdown-item {
-  color: var(--atelier-navbar-fg);
-}
-
-.navbar .dropdown-item:hover,
-.navbar .dropdown-item:focus,
-.navbar .dropdown-item:focus-visible {
-  background: var(--atelier-navbar-accent-soft);
-  color: var(--atelier-navbar-accent);
+.navbar {
+  @include atelier-dropdown(
+    var(--atelier-navbar-surface),
+    var(--atelier-navbar-border),
+    var(--atelier-navbar-fg),
+    var(--atelier-navbar-accent),
+    var(--atelier-navbar-accent-soft)
+  );
 }
 
 // The search button and colour-scheme toggle pill styling ships with the
@@ -251,6 +468,16 @@ html .panel-tabset > .tab-content {
   --gitlink-widget-accent-soft: var(--atelier-navbar-accent-soft);
   --gitlink-widget-menu-bg: var(--atelier-navbar-surface);
   --gitlink-widget-menu-fg: var(--atelier-navbar-fg);
+}
+
+// The same widget can render in the sidebar tools, where it takes the sidebar
+// tokens instead.
+body.docked .sidebar-navigation {
+  --gitlink-widget-border: var(--atelier-sidebar-border);
+  --gitlink-widget-accent: var(--atelier-sidebar-accent);
+  --gitlink-widget-accent-soft: var(--atelier-sidebar-accent-soft);
+  --gitlink-widget-menu-bg: var(--atelier-sidebar-surface);
+  --gitlink-widget-menu-fg: var(--atelier-sidebar-fg);
 }
 
 // Structure ships with the extension's widget.css; match the radius of the
@@ -313,7 +540,12 @@ body .navbar .gitlink-widget-dropdown {
 // which need not match the navbar tokens; repaint it so both dark-pinned bars
 // share one surface, and recolour links, which otherwise keep the page link
 // colour on the dark surface.
-.nav-footer {
+//
+// `page-footer.border: true` draws the top edge from Quarto's baked #dee2e6 at
+// `body .nav-footer`, a bright line where the navbar and the sidebar carry a
+// token hairline; the `body` prefix here is what puts all three edges on the
+// same colour.
+body .nav-footer {
   background: var(--atelier-navbar-bg) !important;
   border-top: 1px solid var(--atelier-navbar-border);
 }
@@ -499,6 +731,8 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 $scrollbar-track: body-mix(94%);
 $scrollbar-thumb: body-mix(72%);
 
+// These `::-webkit-scrollbar-*` rules are deliberately unscoped: they style
+// every scrollable element, not just the document.
 :root {
   scrollbar-width: thin;
   scrollbar-color: #{$scrollbar-thumb} #{$scrollbar-track};

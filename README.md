@@ -119,18 +119,74 @@ Override them in a project stylesheet to match your palette:
 
 The theme bridges these tokens onto the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget's `--gitlink-widget-*` custom properties, so the navbar widget matches the navbar with no extra CSS.
 The bridge is inert when the gitlink extension is not installed.
-The page footer surface and its links also follow the navbar tokens, so both dark-pinned bars share one palette.
+The page footer surface and its links also follow the navbar tokens, so both dark-pinned bars share one palette, and the navbar's bottom edge and the footer's top edge are both drawn with `--atelier-navbar-border`.
+
+A docked sidebar is the third dark-pinned bar, and each of its tokens defaults to the navbar token of the same name:
+
+| Property                        | Default                        | Description                        |
+| ------------------------------- | ------------------------------ | ---------------------------------- |
+| `--atelier-sidebar-bg`          | `--atelier-navbar-bg`          | Sidebar background.                |
+| `--atelier-sidebar-surface`     | `--atelier-navbar-surface`     | Search field and button surface.   |
+| `--atelier-sidebar-fg`          | `--atelier-navbar-fg`          | Sidebar text.                      |
+| `--atelier-sidebar-muted`       | `--atelier-navbar-muted`       | Group labels, chevrons, scrollbar. |
+| `--atelier-sidebar-accent`      | `--atelier-navbar-accent`      | Hover, active, and focus accent.   |
+| `--atelier-sidebar-accent-soft` | `--atelier-navbar-accent-soft` | Active item pill.                  |
+| `--atelier-sidebar-border`      | `--atelier-navbar-border`      | Sidebar edge and dividers.         |
+
+The sidebar's right edge is drawn with `--atelier-sidebar-border`, so by default it matches the navbar and footer edges.
+
+Overriding the navbar palette therefore carries the sidebar with it; re-point the sidebar tokens only when the two should differ.
 
 Additional tokens:
 
-| Property                            | Default                            | Description                                             |
-| ----------------------------------- | ---------------------------------- | ------------------------------------------------------- |
-| `--atelier-heading-letter-spacing`  | `0.012em`                          | Heading tracking; use a negative value for tight serifs. |
-| `--atelier-announcement-bg`         | Derived per alert type.            | Announcement banner background.                          |
-| `--atelier-announcement-border`     | Derived per alert type.            | Announcement banner border.                              |
-| `--atelier-announcement-ink`        | Derived per alert type.            | Announcement banner text.                                |
+| Property                           | Default                 | Description                                              |
+| ---------------------------------- | ----------------------- | -------------------------------------------------------- |
+| `--atelier-heading-letter-spacing` | `0.012em`               | Heading tracking; use a negative value for tight serifs. |
+| `--atelier-announcement-bg`        | Derived per alert type. | Announcement banner background.                          |
+| `--atelier-announcement-border`    | Derived per alert type. | Announcement banner border.                              |
+| `--atelier-announcement-ink`       | Derived per alert type. | Announcement banner text.                                |
 
 The announcement tokens are set per `.alert-<type>` (from the Bootstrap theme colours) so the banner reads the same in both schemes; override them on `#quarto-announcement.alert-<type>` to re-pin a single type.
+
+### Book-like sidebar
+
+A `website.sidebar` with `style: docked` gives the book-like layout, with or without a navbar:
+
+```yaml
+website:
+  sidebar:
+    style: docked
+    collapse-level: 2
+    contents:
+      - href: index.qmd
+        text: "Home"
+      - text: "---"
+      - section: "Part 1"
+        contents:
+          - href: chapters/01.qmd
+          - href: chapters/02.qmd
+```
+
+Atelier pins a docked sidebar to the `--atelier-sidebar-*` tokens, so it joins the navbar and the footer as one dark chrome in both colour schemes.
+Quarto derives that surface from the page instead, so alongside a navbar the column follows the body and the chrome does not read as one bar; without a navbar it falls back to Bootstrap's `$light`, which `_brand.yml` never sets, and paints a near-white column beside a dark page.
+The section dividers, the collapse chevrons, the active item, the sidebar edge, the mobile bar that carries the sidebar toggle, the sidebar search field, and the sidebar scrollbar all follow the same tokens.
+
+A `style: floating` sidebar is left to Quarto: it has no surface of its own, so dark ink there would land on the page background.
+
+Because the docked column is repainted, `website.sidebar.background` and `website.sidebar.foreground` have no effect on it; set the tokens instead.
+
+> [!NOTE]
+> The project type puts search in the navbar.
+> A project that sets `navbar: false` therefore renders no search at all until the sidebar asks for it:
+>
+> ```yaml
+> website:
+>   navbar: false
+>   sidebar:
+>     search: true
+> ```
+>
+> The overlay search then reaches the sidebar as a button; `search.type: textbox` gives an input field instead, and both are themed.
 
 ### Icon-only navbar links
 
@@ -190,12 +246,12 @@ extensions:
       dark: "#0B1220"
 ```
 
-| Option             | Description                                                              |
-| ------------------ | ------------------------------------------------------------------------ |
-| `site-url`         | Base URL for `og:url`. See the note below.                               |
-| `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`. |
-| `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.              |
-| `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                 |
+| Option             | Description                                                                         |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| `site-url`         | Base URL for `og:url`. See the note below.                                          |
+| `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`.           |
+| `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.                         |
+| `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
 | `theme-color`      | `light` and `dark` colours, each emitted with a `prefers-color-scheme` media query. |
 
 Paths are relative to the site root.

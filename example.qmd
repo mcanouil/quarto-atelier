@@ -55,7 +55,11 @@ Add that stylesheet under `format.atelier-html.theme`, not `format.html`, which 
 ## Table of contents
 
 Scroll this page and watch the table of contents on the right: the active entry and its left border take the palette accent.
-Sidebar links get the same active and hover treatment on sites that use one.
+
+## Sidebar
+
+The docked sidebar on the left is pinned to the same dark surface as the navbar and the footer in both colour schemes, with the current page on an accent pill, muted collapse chevrons, and dividers between the sections.
+Narrow the window below 992px and it becomes the bar under the navbar that carries the toggle and the breadcrumbs.
 
 {{< lipsum 2 >}}
 

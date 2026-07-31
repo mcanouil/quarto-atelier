@@ -43,6 +43,25 @@ website:
         text: "Example"
       - href: reference/index.qmd
         text: "Reference"
+  # A docked sidebar beside the navbar, which is what exercises the dark-pinned
+  # sidebar chrome, the section collapse, the dividers, and the secondary nav
+  # that Quarto renders below the navbar on small screens.
+  sidebar:
+    style: docked
+    collapse-level: 2
+    contents:
+      - href: index.qmd
+        text: "Home"
+      - text: "---"
+      - section: "Guides"
+        contents:
+          - href: example.qmd
+            text: "Example"
+      - text: "---"
+      - section: "Reference"
+        contents:
+          - href: reference/index.qmd
+            text: "Options"
 
 # Quarto keeps the `website` block out of the metadata it hands to Lua
 # filters, so the social-metadata filter cannot read `website.site-url` to
