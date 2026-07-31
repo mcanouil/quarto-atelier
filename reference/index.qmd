@@ -8,7 +8,8 @@ It is also the site's only page below the root, which is what proves the icon, m
 
 ## Extension options
 
-These go under `extensions.atelier` in `_quarto.yml`, and each tag is emitted only when its key is set.
+These go under `extensions.atelier` in `_quarto.yml`.
+Each icon and manifest tag is emitted only when its key is set, while `theme-color` also follows the brand.
 
 | Option             | Description                                                                         |
 | ------------------ | ----------------------------------------------------------------------------------- |
