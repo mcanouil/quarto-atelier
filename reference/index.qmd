@@ -50,9 +50,11 @@ The project type sets these under `website`, and any of them can be overridden i
 | `page-navigation`, `back-to-top-navigation` | `true`                                 |
 | `llms-txt`                                  | `true`                                 |
 | `search`                                    | Overlay search in the navbar           |
-| `navbar`, `page-footer`                     | Dark-pinned, with the footer border on |
+| `navbar`, `page-footer`                     | On, with the footer border on          |
 
-A `website.sidebar` of your own is styled rather than configured: a `style: docked` sidebar is dark-pinned from the `--atelier-sidebar-*` tokens, which default to the navbar ones, while a `style: floating` sidebar keeps Quarto's page-coloured treatment.
+Neither bar sets `background` or `foreground`: the chrome palette drives both, and `$atelier-chrome` decides whether it follows the colour scheme or is pinned to `light` or `dark`.
+
+A `website.sidebar` of your own is styled rather than configured: a `style: docked` sidebar is painted from the `--atelier-sidebar-*` tokens, which default to the navbar ones, while a `style: floating` sidebar takes the chrome background and foreground alone.
 This site uses a docked sidebar beside the navbar.
 
 ## Format defaults
@@ -64,7 +66,7 @@ Configure it by that name: declaring `format: html` replaces it rather than conf
 | ---------------------------- | --------------------------------------------------- |
 | `lang`                       | `en-GB`                                             |
 | `date-format`                | `dddd[, the] Do [of] MMMM, YYYY`                    |
-| `theme`                      | `brand` plus the Atelier stylesheet, light and dark |
+| `theme`                      | The chrome palette, `brand`, and the Atelier stylesheet, light and dark |
 | `syntax-highlighting`        | `github-light` and `github-dark`                    |
 | `toc`, `toc-depth`           | `true`, `3`                                         |
 | `anchor-sections`            | `true`                                              |

@@ -1,7 +1,8 @@
 # Atelier Extension for Quarto
 
 A Quarto extension that provides an accessible, brand-driven documentation-website project type.
-It packages a website configuration (dark-pinned navbar with search, page footer, repo actions, Open Graph, page navigation, back-to-top, `llms-txt`, and a styled 404 page), an HTML theme derived from your `_brand.yml`, and supporting scripts for accessibility (skip link, focus ring, navbar tooltips, external-link treatment, ordinal dates).
+It packages a website configuration (navbar with search, page footer, repo actions, Open Graph, page navigation, back-to-top, `llms-txt`, and a styled 404 page), an HTML theme derived from your `_brand.yml`, and supporting scripts for accessibility (skip link, focus ring, navbar tooltips, external-link treatment, ordinal dates).
+The navbar, the page footer, and a docked sidebar are treated as one chrome, drawn from a single palette that follows the colour scheme by default and can be pinned light or dark.
 The theme also works around Quarto behaviours that break in dark mode: the baked light-grey code and tabset surfaces and the browser default scrollbar, so the sidebar, table-of-contents, code-copy button, footer, and announcement banner all stay legible in both colour schemes.
 
 ## Installation
@@ -22,8 +23,8 @@ project:
   type: atelier
 ```
 
-The project type applies a website configuration (dark-pinned navbar with search, page footer, repository actions, Open Graph, page navigation, and `llms-txt`), an accessible, dark-mode-correct HTML theme, and the supporting scripts.
-The theme derives its surfaces from the brand background and foreground, so code blocks, tabsets, and scrollbars stay correct in both light and dark schemes.
+The project type applies a website configuration (navbar with search, page footer, repository actions, Open Graph, page navigation, and `llms-txt`), an accessible, dark-mode-correct HTML theme, and the supporting scripts.
+The theme derives its surfaces from the brand background and foreground, so the chrome, code blocks, tabsets, and scrollbars stay correct in both light and dark schemes.
 
 Your own `website:` metadata merges with the defaults:
 
@@ -83,50 +84,86 @@ Both lists are written out because a YAML anchor shared between them is rejected
 Your stylesheet can use the theme's `body-mix()` function and the Sass variables generated from `_brand.yml` (a `midnight` palette entry becomes `$brand-midnight`), which keeps the palette in one place:
 
 ```scss
-/*-- scss:rules --*/
-:root {
-  --atelier-navbar-bg: #{$brand-midnight};
-  --atelier-navbar-accent: #{$brand-amber};
-}
+/*-- scss:defaults --*/
+$atelier-chrome: dark;
 
+/*-- scss:rules --*/
 .my-card {
   border: 1px solid body-mix(85%);
   background: body-mix(97%);
 }
 ```
 
-## Configuration
+## Chrome
 
-The dark-pinned navbar surfaces are exposed as CSS custom properties with neutral-slate defaults.
-Override them in a project stylesheet to match your palette:
+The navbar, the page footer, and the sidebar are the chrome: the bars that frame the page rather than carry it.
+All three are drawn from one palette, so they read as a single surface, and `$atelier-chrome` decides how that palette relates to the colour scheme:
 
-| Property                          | Default                     | Description                              |
-| --------------------------------- | --------------------------- | ---------------------------------------- |
-| `--atelier-navbar-bg`             | `#1b242e`                   | Navbar background.                       |
-| `--atelier-navbar-surface`        | `#223041`                   | Dropdown and tool-pill surface.          |
-| `--atelier-navbar-fg`             | `#e8edf2`                   | Navbar text.                             |
-| `--atelier-navbar-muted`          | `#9db0c0`                   | Muted navbar text.                       |
-| `--atelier-navbar-accent`         | `#7fa8c4`                   | Hover and active accent.                 |
-| `--atelier-navbar-accent-soft`    | `rgba(127, 168, 196, 0.16)` | Accent tint for hover backgrounds.       |
-| `--atelier-navbar-border`         | `rgba(232, 237, 242, 0.14)` | Navbar and dropdown borders.             |
-| `--atelier-navbar-control-border` | `rgba(232, 237, 242, 0.4)`  | Search field and widget pill boundaries. |
+| Value   | Behaviour                                                                       |
+| ------- | ------------------------------------------------------------------------------- |
+| `auto`  | Default. Derived from `_brand.yml`, so the bars follow the colour-scheme toggle. |
+| `light` | Pinned to the light palette below, in both schemes.                             |
+| `dark`  | Pinned to the dark palette below, in both schemes.                              |
+
+Set it in the defaults block of a project stylesheet:
+
+```scss
+/*-- scss:defaults --*/
+$atelier-chrome: dark;
+```
+
+In `auto` the bar is a light tint of the page rather than the page colour itself, so it still reads as a bar without a hard colour break, and the accent is your brand primary.
+The pinned palettes are three colours each, everything else being derived from them:
+
+| Variable                       | Default   |
+| ------------------------------ | --------- |
+| `$atelier-chrome-dark-bg`      | `#1b242e` |
+| `$atelier-chrome-dark-fg`      | `#e8edf2` |
+| `$atelier-chrome-dark-accent`  | `#7fa8c4` |
+| `$atelier-chrome-light-bg`     | `#eef1f5` |
+| `$atelier-chrome-light-fg`     | `#1b242e` |
+| `$atelier-chrome-light-accent` | `#1f5f80` |
+
+The resolved triple is `$atelier-chrome-bg`, `$atelier-chrome-fg`, and `$atelier-chrome-accent`, and setting any of those directly overrides the mode for that colour alone:
+
+```scss
+/*-- scss:defaults --*/
+$atelier-chrome-bg: $brand-midnight;
+$atelier-chrome-accent: $brand-amber;
+```
+
+The two inks are passed through Quarto's `theme-contrast()` at the AA level, which lifts a colour only when it falls under 4.5:1 against the bar and leaves it alone otherwise.
+This matters in `auto`: a brand primary picked against the page can fall under the ratio on a tint of that page.
+Setting `$atelier-chrome-fg` or `$atelier-chrome-accent` yourself skips the correction for that colour.
+
+Prefer these Sass variables over the custom properties below whenever the whole bar is changing.
+Quarto bakes the chrome foreground into markup that CSS cannot reach afterwards, including the collapsed navbar's toggler icon and the reader-mode toggle glyph, and contrasts the sidebar link, hover, and disabled colours against the chrome background; the Sass variables reach all of it, and the custom properties do not.
+
+### Chrome tokens
+
+The resolved palette is republished as CSS custom properties, which is what a project overrides for a single part of a bar:
+
+| Property                          | Description                              |
+| --------------------------------- | ---------------------------------------- |
+| `--atelier-navbar-bg`             | Navbar background.                       |
+| `--atelier-navbar-surface`        | Dropdown and tool-pill surface.          |
+| `--atelier-navbar-fg`             | Navbar text.                             |
+| `--atelier-navbar-muted`          | Muted navbar text.                       |
+| `--atelier-navbar-accent`         | Hover and active accent.                 |
+| `--atelier-navbar-accent-soft`    | Accent tint for hover backgrounds.       |
+| `--atelier-navbar-border`         | Navbar and dropdown borders.             |
+| `--atelier-navbar-control-border` | Search field and widget pill boundaries. |
 
 The two border tokens do different jobs.
-`--atelier-navbar-border` is a hairline between two surfaces, around 1.5:1 against the bar, while `--atelier-navbar-control-border` outlines a boxed control and clears the 3:1 that [WCAG 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) asks of a user-interface component.
-
-```css
-:root {
-  --atelier-navbar-bg: #101a33;
-  --atelier-navbar-accent: #e2854e;
-}
-```
+`--atelier-navbar-border` is a hairline between two surfaces, at 20% of the chrome foreground, while `--atelier-navbar-control-border` outlines a boxed control at 55%, which clears the 3:1 that [WCAG 1.4.11](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html) asks of a user-interface component on a light bar as well as a dark one.
 
 The theme bridges these tokens onto the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget's `--gitlink-widget-*` custom properties, so the navbar widget matches the navbar with no extra CSS.
 The widget's own border comes from `--atelier-navbar-control-border`, since its trigger is a pill rather than a hairline, and from `--atelier-sidebar-control-border` when the widget is a sidebar tool.
+Atelier sizes the navbar controls itself, from the control tokens under [Configuration](#configuration), and the defaults match the widget's own numbers, so the two agree; the widget keeps the pill visuals.
 The bridge is inert when the gitlink extension is not installed.
-The page footer surface and its links also follow the navbar tokens, so both dark-pinned bars share one palette, and the navbar's bottom edge and the footer's top edge are both drawn with `--atelier-navbar-border`.
+The page footer surface and its links also follow the navbar tokens, and the navbar's bottom edge and the footer's top edge are both drawn with `--atelier-navbar-border`.
 
-A docked sidebar is the third dark-pinned bar, and each of its tokens defaults to the navbar token of the same name:
+The sidebar is the third bar, and each of its tokens defaults to the navbar token of the same name:
 
 | Property                           | Default                           | Description                              |
 | ---------------------------------- | --------------------------------- | ---------------------------------------- |
@@ -141,16 +178,26 @@ A docked sidebar is the third dark-pinned bar, and each of its tokens defaults t
 
 The sidebar's right edge is drawn with `--atelier-sidebar-border`, so by default it matches the navbar and footer edges.
 
-Overriding the navbar palette therefore carries the sidebar with it; re-point the sidebar tokens only when the two should differ.
+Overriding the navbar tokens therefore carries the sidebar with it; re-point the sidebar tokens only when the two should differ.
 
-Additional tokens:
+## Configuration
 
-| Property                           | Default                 | Description                                              |
-| ---------------------------------- | ----------------------- | -------------------------------------------------------- |
-| `--atelier-heading-letter-spacing` | `0.012em`               | Heading tracking; use a negative value for tight serifs. |
-| `--atelier-announcement-bg`        | Derived per alert type. | Announcement banner background.                          |
-| `--atelier-announcement-border`    | Derived per alert type. | Announcement banner border.                              |
-| `--atelier-announcement-ink`       | Derived per alert type. | Announcement banner text.                                |
+Tokens outside the chrome:
+
+| Property                             | Default                 | Description                                              |
+| ------------------------------------ | ----------------------- | -------------------------------------------------------- |
+| `--atelier-heading-letter-spacing`   | `0.012em`               | Heading tracking; use a negative value for tight serifs. |
+| `--atelier-navbar-control-size`      | `2rem`                  | Navbar control box: search button, tools, toggle.        |
+| `--atelier-navbar-control-icon-size` | `1rem`                  | Glyph inside that box.                                   |
+| `--atelier-navbar-search-icon-size`  | Icon size times 1.2.    | Search glyph, which underfills its own viewBox.          |
+| `--atelier-navbar-control-gap`       | `0.4rem`                | Space between the navbar-right controls.                 |
+| `--atelier-announcement-bg`          | Derived per alert type. | Announcement banner background.                          |
+| `--atelier-announcement-border`      | Derived per alert type. | Announcement banner border.                              |
+| `--atelier-announcement-ink`         | Derived per alert type. | Announcement banner text.                                |
+
+Quarto gives the overlay search button a 40px box with a 26px glyph, the colour-scheme toggle no height of its own, and a navbar tool the link font size; the control tokens put all three on one box.
+The defaults are the numbers the gitlink widget uses, so the bar reads the same whether or not that extension is installed.
+The search glyph takes a token of its own because it draws in 20 units of a 24-unit viewBox, where the other glyphs paint edge to edge; the 1.2 scale is what makes the ink match rather than the box.
 
 The announcement tokens are set per `.alert-<type>` (from the Bootstrap theme colours) so the banner reads the same in both schemes; override them on `#quarto-announcement.alert-<type>` to re-pin a single type.
 
@@ -173,13 +220,13 @@ website:
           - href: chapters/02.qmd
 ```
 
-Atelier pins a docked sidebar to the `--atelier-sidebar-*` tokens, so it joins the navbar and the footer as one dark chrome in both colour schemes.
+Atelier gives the sidebar the chrome palette, so it joins the navbar and the footer as one surface.
 Quarto derives that surface from the page instead, so alongside a navbar the column follows the body and the chrome does not read as one bar; without a navbar it falls back to Bootstrap's `$light`, which `_brand.yml` never sets, and paints a near-white column beside a dark page.
-The section dividers, the collapse chevrons, the active item, the sidebar edge, the mobile bar that carries the sidebar toggle, the sidebar search field, and the sidebar scrollbar all follow the same tokens.
+The section dividers, the collapse chevrons, the active item, the sidebar edge, the mobile bar that carries the sidebar toggle, the sidebar search field, and the sidebar scrollbar all follow the `--atelier-sidebar-*` tokens.
 
-A `style: floating` sidebar is left to Quarto: it has no surface of its own, so dark ink there would land on the page background.
+A `style: floating` sidebar takes the chrome background and foreground, and nothing else: it has no surface of its own, so the rest of the treatment above would have nowhere to land.
 
-Because the docked column is repainted, `website.sidebar.background` and `website.sidebar.foreground` have no effect on it; set the tokens instead.
+Because the column is repainted, `website.sidebar.background` and `website.sidebar.foreground` have no effect on it; set `$atelier-chrome` or the tokens instead.
 
 > [!NOTE]
 > The project type puts search in the navbar.
