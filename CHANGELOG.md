@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.2 (2026-08-01)
+
 ### Bug Fixes
 
 - fix: keep the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget's menu inside the sidebar, so a docked sidebar carrying it no longer has a permanent horizontal scrollbar. Quarto gives the column `overflow-y: auto` and leaves `overflow-x` at `visible`, which computes to `auto`, so anything wider scrolls it sideways rather than being clipped; the menu is anchored to its trigger's left edge and sized to its content, and the theme centres the tools row, so it ran past the right edge. It raised the scrollbar even while shut, because it is hidden with `visibility` and so still takes part in layout. It is now anchored to the tools row, which spans the column.
