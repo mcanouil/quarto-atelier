@@ -1,10 +1,14 @@
 project:
   type: atelier
+  # Generates changelog.qmd from CHANGELOG.md and removes it afterwards.
+  pre-render: ./_scripts/pre-render.sh
+  post-render: ./_scripts/post-render.sh
   render:
     - index.qmd
     - example.qmd
     - reference/index.qmd
     - 404.qmd
+    - changelog.qmd
   # Quarto copies nothing to the output directory by convention: only these
   # globs, plus files it finds behind an `href` or `src` in the rendered HTML.
   # The manifest names its icons in JSON, which is not scanned, so they are

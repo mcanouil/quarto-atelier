@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Documentation
+
+- docs: Move the website into `docs/`, matching the layout every other extension in the family now uses, so the release workflow detects it and the Pages workflow deploys it from the release tag.
+- docs: Generate a changelog page from `CHANGELOG.md`, through the shared pre-render and post-render scripts.
+- docs: Build the site from the copy of the extension synced from the repository root, so it is rendered by the version being released.
+- docs: Trim `README.md` to a landing page pointing at the website.
+- docs: Add the Pages workflow and the Quarto Extensions Updates workflow.
+
 ## 0.9.0 (2026-07-31)
 
 ### Breaking Changes

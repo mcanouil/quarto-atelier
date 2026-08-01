@@ -21,3 +21,5 @@ website:
     pinned: true
     align: center
     collapse-level: 2
+      - href: changelog.qmd
+        text: "Changelog"
