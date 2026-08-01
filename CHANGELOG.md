@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: keep the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget's menu inside the sidebar, so a docked sidebar carrying it no longer has a permanent horizontal scrollbar. Quarto gives the column `overflow-y: auto` and leaves `overflow-x` at `visible`, which computes to `auto`, so anything wider scrolls it sideways rather than being clipped; the menu is anchored to its trigger's left edge and sized to its content, and the theme centres the tools row, so it ran past the right edge. It raised the scrollbar even while shut, because it is hidden with `visibility` and so still takes part in layout. It is now anchored to the tools row, which spans the column.
+
 ### Documentation
 
 - docs: Move the website into `docs/`, matching the layout every other extension in the family now uses, so the release workflow detects it and the Pages workflow deploys it from the release tag.
