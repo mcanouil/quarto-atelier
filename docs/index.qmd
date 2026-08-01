@@ -1,0 +1,95 @@
+---
+title: "Atelier"
+subtitle: "An accessible, brand-driven documentation-website project type for Quarto."
+description: "What the atelier project type gives a documentation site, how to install it, and the smallest configuration that builds one."
+date: last-modified
+authors:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
+---
+
+A documentation site needs a navbar, a sidebar, a footer, a 404 page, social metadata, and a colour scheme that holds up in both light and dark.
+Assembled by hand they drift apart, and the accessible behaviour is the first thing to go.
+
+`atelier` is a Quarto project type that derives all of it from one `_brand.yml`.
+This site is itself an `atelier` project: its `_quarto.yml` sets `project.type: atelier`, and toggling the colour scheme shows the code, tabset, and scrollbar surfaces stay correct in both.
+
+## Installation
+
+```bash
+quarto add {{< var extension.reference >}}
+```
+
+This will install the extension under the `_extensions` subdirectory.
+If you are using version control, you will want to check in this directory.
+
+Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto-wizard):
+
+::: {.btn-group role="group" aria-label="Quarto Wizard installer options"}
+
+[Visual Studio Code](vscode://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Visual Studio Code using the Quarto Wizard extension."}
+[Positron](positron://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Positron using the Quarto Wizard extension."}
+[VSCodium](vscodium://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in VSCodium using the Quarto Wizard extension."}
+
+:::
+
+## Quick start
+
+Set the project type in your `_quarto.yml`:
+
+```yaml
+project:
+  type: atelier
+website:
+  title: "My Docs"
+  repo-url: https://github.com/owner/repo
+```
+
+The project type sets `format: atelier-html`.
+Configure that format by name when you need to change format options or add a stylesheet:
+
+```yaml
+format:
+  atelier-html:
+    toc-depth: 4
+    theme:
+      light:
+        - brand
+        - assets/stylesheets/theme.scss
+      dark:
+        - brand
+        - assets/stylesheets/theme.scss
+```
+
+::: {.callout-important}
+
+## Configure `atelier-html`, not `html`
+
+Declaring `format: html` replaces `atelier-html` rather than configuring it, and Quarto reports nothing at render time.
+The accessibility scripts, `lang: en-GB`, the syntax-highlighting pair, and the theme are all dropped at once, while the `website:` configuration is untouched, so the site still looks broadly right.
+
+Check a rendered page for the scripts if something seems missing:
+
+```bash
+grep -c 'id="navbar-tooltips"' _site/index.html
+```
+
+:::
+
+Your stylesheet is appended after the extension's, so its rules win the cascade.
+It can use the theme's `body-mix()` function and the Sass variables generated from `_brand.yml`, where a `midnight` palette entry becomes `$brand-midnight`.
+
+See the [Reference](reference.qmd) for every option, and the [Examples](examples.qmd) for each of them rendered.
+
+## Where it works
+
+Websites rendered to HTML.
+The project type sets `format: atelier-html`, and contributes the theme, the bundled scripts, and the social-metadata filter to it, so a project that renders to any other format is left alone.
+
+## Links
+
+- [Reference](reference.qmd) for the full option list.
+- [Examples](examples.qmd) for rendered output.
+- [Changelog](changelog.qmd) for what each release changed.
+- [Source and issues](https://github.com/mcanouil/quarto-atelier) on GitHub.

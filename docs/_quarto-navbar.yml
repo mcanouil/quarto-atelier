@@ -1,0 +1,24 @@
+# Quarto profile demonstrating the layout the project type ships by default:
+# a navbar, with the docked sidebar beside it and the search as an overlay
+# button. The site itself renders without this profile, in the book-like layout
+# the other documentation sites in this family use, so this is the one place
+# the navbar chrome is exercised.
+#
+# Render it with `quarto render docs --profile navbar`.
+website:
+  # A scalar in _quarto.yml switched the navbar off, so it has to be declared
+  # again here rather than merged into: there is nothing left to merge with.
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: reference.qmd
+        text: "Reference"
+      - href: examples.qmd
+        text: "Examples"
+  # The project type puts an overlay search in the navbar, which is what
+  # `location: navbar` restores. `website.sidebar.search` is left as it stands:
+  # with the search back in the navbar, the sidebar field is dropped.
+  search:
+    location: navbar
+    type: overlay
