@@ -52,6 +52,15 @@ Add that stylesheet under `format.atelier-html.theme`, not `format.html`, which 
 
 {{< lipsum 1 >}}
 
+## Framed embeds
+
+`.embed-art` frames an embedded document or an image as a tilted card, centred on its own.
+
+![](assets/social/og-image.png){.embed-art loading="lazy" title="The site's social card, framed" fig-alt="The quarto-atelier social card: the extension name over a one-line description, beside a dark code window showing a _quarto.yml that sets the atelier project type."}
+
+The card here is the site's own social card, wider than the default ratio, so it letterboxes rather than stretches.
+Override the `--atelier-embed-art-*` properties in a project stylesheet to resize or straighten it.
+
 ## Table of contents
 
 Scroll this page and watch the table of contents on the right: the active entry and its left border take the palette accent.
