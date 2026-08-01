@@ -31,6 +31,9 @@ website:
   # with a leading-slash image path, without normalising.
   site-url: &site-url https://m.canouil.dev/quarto-atelier
   repo-url: https://github.com/mcanouil/quarto-atelier
+  # The Quarto project root is docs/, so the edit and issue links need the
+  # subdirectory; without it they point at the repository root and 404.
+  repo-subdir: docs
   favicon: favicon.ico
   page-navigation: true
   # The leading slash marks a project-relative path, which Quarto turns into

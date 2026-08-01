@@ -1,5 +1,6 @@
 ---
 title: "Page not found"
+description: "That page does not exist or has moved."
 toc: false
 sidebar: false
 canonical-url: false

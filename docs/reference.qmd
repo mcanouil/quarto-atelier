@@ -18,6 +18,8 @@ Each icon and manifest tag is emitted only when its key is set, while `theme-col
 | `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
 | `theme-color`      | Browser UI tint (Safari toolbar, Android address bar, installed web app title bar), one colour per scheme, each emitted with a `prefers-color-scheme` media query. Each scheme falls back to `color.background` of the `_brand.yml` for that mode, which is the page background of the matching bundle; set a scheme only to override it. |
 
+: Keys under `extensions.atelier`. {.striped .hover tbl-colwidths="[22,78]"}
+
 Paths are relative to the site root.
 Quarto's website resource resolver prefixes each page's offset to the project root, so the same value resolves at the root, from a subdirectory such as this page, and from the 404 page.
 
@@ -52,6 +54,10 @@ The project type sets these under `website`, and any of them can be overridden i
 | `search`                                    | Overlay search in the navbar           |
 | `navbar`, `page-footer`                     | On, with the footer border on          |
 
+: Keys the project type sets under `website`. {.striped .hover tbl-colwidths="[46,54]"}
+
+It also sets `project.output-dir` to `_site`.
+
 Neither bar sets `background` or `foreground`: the chrome palette drives both, and `$atelier-chrome` decides whether it follows the colour scheme or is pinned to `light` or `dark`.
 
 A `website.sidebar` of your own is styled rather than configured: a `style: docked` sidebar is painted from the `--atelier-sidebar-*` tokens, which default to the navbar ones, while a `style: floating` sidebar takes the chrome background and foreground alone.
@@ -71,9 +77,16 @@ Configure it by that name: declaring `format: html` replaces it rather than conf
 | `toc`, `toc-depth`           | `true`, `3`                                         |
 | `anchor-sections`            | `true`                                              |
 | `code-copy`, `code-overflow` | `true`, `wrap`                                      |
+| `code-link`                  | `false`                                             |
 | `link-external-newwindow`    | `true`                                              |
 | `respect-user-color-scheme`  | `true`                                              |
 | `canonical-url`              | `true`                                              |
+| `grid`                       | 300px sidebar, 1000px body, 300px margin            |
+
+: Keys the project type sets on `atelier-html`. {.striped .hover tbl-colwidths="[30,70]"}
+
+It also bundles six scripts into every page: a skip link before the body, and after it the current year, the external-link marks, the ordinal dates, the accessibility fixes, and the navbar tooltips.
+Replacing the format with `html` drops all six, which is what the `id="navbar-tooltips"` check on the [home page](index.qmd) looks for.
 
 ## Page keys
 
@@ -81,7 +94,14 @@ Configure it by that name: declaring `format: html` replaces it rather than conf
 | ---------------------- | ----------------------------------------------------------------------------------------- |
 | `description`          | Fills `<meta name="description">` and Quarto's `og:description`.                          |
 | `subtitle`             | Used for the description tags when `description` is absent.                               |
+| `description-meta`     | Used as written, in preference to both. |
 | `canonical-url: false` | Drops the canonical link. Set it on a page served from more than one URL, like `404.qmd`. |
+
+: Front matter keys the project type reads. {.striped .hover tbl-colwidths="[24,76]"}
+
+A page with none of the first three gets no description tag at all, so give every page a `description` or a `subtitle`.
+
+`og:url` is emitted for every page except `404.html`, which is served from any URL depth and so claims none of its own.
 
 ## Framed embeds
 
@@ -109,11 +129,15 @@ These two properties are what it falls back to, and they have no effect on an im
 | `--atelier-embed-art-width` | `560px` | Width of an `<embed>` with no `width` of its own. |
 | `--atelier-embed-art-ratio` | `1.5`   | Shape of that fallback, as width over height. |
 
+: Properties that size an `<embed>` with no width of its own. {.striped .hover tbl-colwidths="[34,12,54]"}
+
 One property applies to every card.
 
 | Property                   | Default    | Effect                                              |
 | -------------------------- | ---------- | --------------------------------------------------- |
 | `--atelier-embed-art-tilt` | `-1.25deg` | Resting rotation, relaxed toward straight on hover. |
+
+: The property that applies to every card. {.striped .hover tbl-colwidths="[32,14,54]"}
 
 The frame, the offset shadow, and the card background are drawn from the page ink and paper, so they follow the colour scheme.
 Under `prefers-reduced-motion: reduce`, the card holds its resting angle and does not react to hover at all.
