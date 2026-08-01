@@ -1,14 +1,19 @@
 project:
   type: atelier
-  # Generates changelog.qmd from CHANGELOG.md and removes it afterwards.
+  # Generates changelog.qmd from CHANGELOG.md and removes it afterwards. The
+  # leading ./ is required; a bare name fails to spawn. The scripts live in
+  # _scripts/, whose leading underscore keeps Quarto from treating it as
+  # content.
+  #
+  # The atelier extension itself cannot be staged here. Quarto builds its
+  # extension registry while reading this file, before any pre-render script
+  # runs, and does not follow symlinks, so a project type from a linked or
+  # pre-render-copied extension is reported as unsupported.
+  # ./_scripts/sync-extension.sh copies it from the repository root beforehand
+  # instead: run that script before previewing locally, and note that the
+  # Pages workflow runs it before every render. See _extensions/README.md.
   pre-render: ./_scripts/pre-render.sh
   post-render: ./_scripts/post-render.sh
-  render:
-    - index.qmd
-    - example.qmd
-    - reference/index.qmd
-    - 404.qmd
-    - changelog.qmd
   # Quarto copies nothing to the output directory by convention: only these
   # globs, plus files it finds behind an `href` or `src` in the rendered HTML.
   # The manifest names its icons in JSON, which is not scanned, so they are
@@ -22,58 +27,108 @@ project:
 website:
   title: "Atelier"
   description: "An accessible, brand-driven documentation-website project type for Quarto."
+  # No trailing slash: Quarto builds the social image URL by concatenating this
+  # with a leading-slash image path, without normalising.
   site-url: &site-url https://m.canouil.dev/quarto-atelier
   repo-url: https://github.com/mcanouil/quarto-atelier
   favicon: favicon.ico
+  page-navigation: true
   # The leading slash marks a project-relative path, which Quarto turns into
   # `<site-url>/assets/social/og-image.png` and measures to fill the image
   # width and height tags.
   image: /assets/social/og-image.png
   image-alt: "The quarto-atelier social card: the extension name over a one-line description, beside a dark code window showing a _quarto.yml that sets the atelier project type."
-  page-footer:
-    right: |
-      Licence: [MIT](https://github.com/mcanouil/quarto-atelier?tab=MIT-1-ov-file#readme).
+  # atelier defaults search to an overlay button in the navbar. With no navbar
+  # the search belongs in the sidebar, as a field rather than a button.
+  search:
+    location: sidebar
+    type: textbox
+  # Book-like layout: a docked sidebar carries the navigation and the search,
+  # and there is no navbar. The gitlink widget replaces the sidebar tool
+  # pointing at #gitlink-widget, and atelier themes the docked sidebar from the
+  # same tokens as the navbar it replaces. Render `--profile navbar` for the
+  # layout with the navbar instead; see _quarto-navbar.yml.
+  navbar: false
+  sidebar:
+    # `background` and `foreground` are left out: atelier repaints a docked
+    # sidebar from the chrome palette, so neither has any effect on it.
+    style: docked
+    search: true
+    pinned: true
+    align: center
+    collapse-level: 2
+    tools:
+      - href: "#gitlink-widget"
+        text: "GitHub"
+        icon: github
+    # Plain labels, no icons: Quarto expands no shortcode in a sidebar item's
+    # text, and the raw web component leaks out of the sidebar into the
+    # breadcrumbs, which reuse the same string.
+    contents:
+      - href: index.qmd
+        text: "Home"
+      - href: reference.qmd
+        text: "Reference"
+      - href: examples.qmd
+        text: "Examples"
+      - text: "---"
+      - href: changelog.qmd
+        text: "Changelog"
   announcement:
     icon: info-circle
     dismissable: true
     type: info
     position: below-navbar
     content: "Atelier keeps this banner readable in both colour schemes."
-  navbar:
-    left:
-      - href: index.qmd
-        text: "Home"
-      - href: example.qmd
-        text: "Example"
-      - href: reference/index.qmd
-        text: "Reference"
-  # A docked sidebar beside the navbar, which is what exercises the dark-pinned
-  # sidebar chrome, the section collapse, the dividers, and the secondary nav
-  # that Quarto renders below the navbar on small screens.
-  sidebar:
-    style: docked
-    collapse-level: 2
-    contents:
-      - href: index.qmd
-        text: "Home"
-      - text: "---"
-      - section: "Guides"
-        contents:
-          - href: example.qmd
-            text: "Example"
-      - text: "---"
-      - section: "Reference"
-        contents:
-          - href: reference/index.qmd
-            text: "Options"
+  page-footer:
+    left: |
+      Powered by [{{< iconify simple-icons:quarto title="Quarto" label="Quarto" >}} Quarto](https://quarto.org).
+    center: |
+      &copy; []{#current-year} [Mickaël Canouil](https://mickael.canouil.fr). [{{< iconify octicon:heart-fill-16 title="Heart" label="Heart" >}} Sponsor](https://github.com/sponsors/mcanouil?o=esb).
+    right: |
+      Licence: [MIT](https://github.com/mcanouil/quarto-atelier?tab=MIT-1-ov-file#readme).
 
-# Quarto keeps the `website` block out of the metadata it hands to Lua
-# filters, so the social-metadata filter cannot read `website.site-url` to
-# build the canonical URL. The anchor above republishes the same scalar here,
-# without a second copy of the string.
+# The other documentation sites in this family take the shared pastel brand.
+# This one keeps a brand of its own: the project type derives its whole palette
+# from `_brand.yml`, so the site is the one place that derivation is shown
+# without a second stylesheet layered over it.
+brand: _brand.yml
+
+filters:
+  - at: pre-quarto
+    path: code-window
+  - at: post-quarto
+    path: gitlink
+
 extensions:
+  # Quarto keeps the `website` block out of the metadata it hands to Lua
+  # filters, so the social-metadata filter cannot read `website.site-url` to
+  # build `og:url` and the canonical link. The anchor above republishes the same
+  # scalar here, without a second copy of the string.
   atelier:
     site-url: *site-url
     icon: assets/icons/icon.svg
     apple-touch-icon: assets/icons/apple-touch-icon.png
     manifest: site.webmanifest
+  gitlink:
+    # Widget only: the platform and repository come from `website.repo-url`, and
+    # in-text reference rewriting stays off so prose is left alone.
+    enabled: false
+    widget:
+      enabled: true
+      extra-links:
+        - text: "Ideas / Feature Requests"
+          href: "/discussions/categories/ideas"
+          icon: discussion
+        - text: "Q&A"
+          href: "/discussions/categories/q-a"
+          icon: question
+      sponsor: "mcanouil"
+      # There is no navbar; the widget sits in the docked sidebar instead, so
+      # there are no navbar tools to restyle.
+      style-navbar-tools: false
+  code-window:
+    style: "macos"
+    # Blocks here are configuration to copy rather than files to save, so a
+    # filename derived from the language would only add noise.
+    auto-filename: false

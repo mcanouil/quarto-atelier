@@ -9,6 +9,9 @@
 - docs: Build the site from the copy of the extension synced from the repository root, so it is rendered by the version being released.
 - docs: Trim `README.md` to a landing page pointing at the website.
 - docs: Add the Pages workflow and the Quarto Extensions Updates workflow.
+- docs: Serve the site in the book-like layout the rest of the family uses: no navbar, with the docked sidebar carrying the navigation, the search, and the repository widget, and a three-part footer. `--profile navbar` renders the same pages with the navbar the project type ships by default.
+- docs: Rename `example.qmd` to `examples.qmd` and `reference/index.qmd` to `reference.qmd`, so the pages are named as they are everywhere else.
+- docs: Pin the installs the site offers to the release tag it is built from, and offer them from the editor through Quarto Wizard.
 
 ## 0.10.1 (2026-08-01)
 

@@ -4,7 +4,6 @@ description: "Every option the atelier project type contributes, and the extensi
 ---
 
 This page lists what `project.type: atelier` sets on your behalf and the keys you can set yourself.
-It is also the site's only page below the root, which is what proves the icon, manifest, and URL paths resolve from a subdirectory.
 
 ## Extension options
 
@@ -56,7 +55,7 @@ The project type sets these under `website`, and any of them can be overridden i
 Neither bar sets `background` or `foreground`: the chrome palette drives both, and `$atelier-chrome` decides whether it follows the colour scheme or is pinned to `light` or `dark`.
 
 A `website.sidebar` of your own is styled rather than configured: a `style: docked` sidebar is painted from the `--atelier-sidebar-*` tokens, which default to the navbar ones, while a `style: floating` sidebar takes the chrome background and foreground alone.
-This site uses a docked sidebar beside the navbar.
+This site sets `navbar: false` and gives the docked sidebar the navigation and the search; `--profile navbar` renders the same pages with the navbar instead.
 
 ## Format defaults
 

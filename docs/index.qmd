@@ -1,19 +1,42 @@
 ---
 title: "Atelier"
 subtitle: "An accessible, brand-driven documentation-website project type for Quarto."
+description: "What the atelier project type gives a documentation site, how to install it, and the smallest configuration that builds one."
 date: last-modified
+authors:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    orcid: "0000-0002-3396-4549"
+    url: "https://mickael.canouil.fr"
 ---
 
-This site is itself an `atelier` project: its `_quarto.yml` sets `project.type: atelier`, and a `_brand.yml` drives the palette.
-It packages the navbar, footer, 404 page, and accessibility scripts described below, and toggling the colour scheme in the navbar shows the code, tabset, and scrollbar surfaces stay correct in both light and dark.
+A documentation site needs a navbar, a sidebar, a footer, a 404 page, social metadata, and a colour scheme that holds up in both light and dark.
+Assembled by hand they drift apart, and the accessible behaviour is the first thing to go.
 
-## Getting started
+`atelier` is a Quarto project type that derives all of it from one `_brand.yml`.
+This site is itself an `atelier` project: its `_quarto.yml` sets `project.type: atelier`, and toggling the colour scheme shows the code, tabset, and scrollbar surfaces stay correct in both.
+
+## Installation
 
 ```bash
-quarto add mcanouil/quarto-atelier
+quarto add {{< var extension.reference >}}
 ```
 
-Then set the project type in your `_quarto.yml`:
+This will install the extension under the `_extensions` subdirectory.
+If you are using version control, you will want to check in this directory.
+
+Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto-wizard):
+
+::: {.btn-group role="group" aria-label="Quarto Wizard installer options"}
+
+[Visual Studio Code](vscode://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Visual Studio Code using the Quarto Wizard extension."}
+[Positron](positron://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in Positron using the Quarto Wizard extension."}
+[VSCodium](vscodium://mcanouil.quarto-wizard/install?repo={{< var extension.wizard-reference >}}){.btn .btn-outline-primary title="Install {{< var extension.reference >}} in VSCodium using the Quarto Wizard extension."}
+
+:::
+
+## Quick start
+
+Set the project type in your `_quarto.yml`:
 
 ```yaml
 project:
@@ -57,53 +80,16 @@ grep -c 'id="navbar-tooltips"' _site/index.html
 Your stylesheet is appended after the extension's, so its rules win the cascade.
 It can use the theme's `body-mix()` function and the Sass variables generated from `_brand.yml`, where a `midnight` palette entry becomes `$brand-midnight`.
 
-## Code
+See the [Reference](reference.qmd) for every option, and the [Examples](examples.qmd) for each of them rendered.
 
-Inline `code`, a highlighted block:
+## Where it works
 
-```python
-def greet(name: str) -> str:
-    return f"Hello, {name}!"
-```
+Websites rendered to HTML.
+The project type sets `format: atelier-html`, and contributes the theme, the bundled scripts, and the social-metadata filter to it, so a project that renders to any other format is left alone.
 
-and a plain block with no language:
+## Links
 
-```text
-no language, still readable on the scheme surface
-```
-
-## Tabsets
-
-::: {.panel-tabset}
-
-## Overview
-
-The panel borders adapt to the active scheme instead of Quarto's baked light grey.
-
-## Details
-
-All four edges of the panel are derived from the brand palette.
-
-:::
-
-## Links and dates
-
-External links such as [Quarto](https://quarto.org) open in a new tab with an
-external-link marker, and this page carries an ordinal date in the header.
-
-## Callouts
-
-::: {.callout-note}
-Callouts, tables, and the table of contents inherit the same accessible,
-scheme-aware treatment.
-:::
-
-| Feature             | Light | Dark |
-| ------------------- | ----- | ---- |
-| Code surface        | ✓     | ✓    |
-| Copy button         | ✓     | ✓    |
-| Tabsets             | ✓     | ✓    |
-| Scrollbars          | ✓     | ✓    |
-| Sidebar and TOC     | ✓     | ✓    |
-| Footer              | ✓     | ✓    |
-| Announcement banner | ✓     | ✓    |
+- [Reference](reference.qmd) for the full option list.
+- [Examples](examples.qmd) for rendered output.
+- [Changelog](changelog.qmd) for what each release changed.
+- [Source and issues](https://github.com/mcanouil/quarto-atelier) on GitHub.
