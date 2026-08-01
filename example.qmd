@@ -58,8 +58,8 @@ Add that stylesheet under `format.atelier-html.theme`, not `format.html`, which 
 
 ![](assets/social/og-image.png){.embed-art loading="lazy" title="The site's social card, framed" fig-alt="The quarto-atelier social card: the extension name over a one-line description, beside a dark code window showing a _quarto.yml that sets the atelier project type."}
 
-The card here is the site's own social card, wider than the default ratio, so it letterboxes rather than stretches.
-Override the `--atelier-embed-art-*` properties in a project stylesheet to resize or straighten it.
+The card here is the site's own social card, framed at its own dimensions: the frame carries no shape of its own, so the padding is the same on all four sides whatever it holds.
+Give an `<embed>` a `width` and a `height` to size it, and override the `--atelier-embed-art-*` properties in a project stylesheet to change the fallback or the tilt.
 
 ## Table of contents
 

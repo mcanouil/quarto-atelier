@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: frame an `.embed-art` card at the dimensions of what it holds rather than at a fixed shape. An `<img>` is framed at its own dimensions and an `<embed>` at the `width` and `height` given on the image, so the padding stays the same on all four sides; anything that did not match the old fixed 1.5 was letterboxed inside it, which read as a band of padding down one axis and none on the other. `--atelier-embed-art-width` and `--atelier-embed-art-ratio` now apply only to an `<embed>` given no size of its own, which is the one case with nothing to follow.
+
 ## 0.10.0 (2026-08-01)
 
 ### New Features
