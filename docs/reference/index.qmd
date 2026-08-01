@@ -83,3 +83,25 @@ Configure it by that name: declaring `format: html` replaces it rather than conf
 | `description`          | Fills `<meta name="description">` and Quarto's `og:description`.                          |
 | `subtitle`             | Used for the description tags when `description` is absent.                               |
 | `canonical-url: false` | Drops the canonical link. Set it on a page served from more than one URL, like `404.qmd`. |
+
+## Framed embeds
+
+`.embed-art` frames an embedded document or an image as a tilted card, centred without a wrapper.
+
+```markdown
+![](handout.pdf){.embed-art loading="lazy" title="Typst PDF rendered from the demo source"}
+```
+
+Pandoc writes an image whose target is not an image as a bare `<embed>` carrying the attributes, so the class applies to `<embed>` and `<img>` alike and every declaration lands on the element itself.
+On an `<embed>`, `title` is what gives it an accessible name; `loading="lazy"` is honoured on an `<img>` but has no effect there.
+
+These custom properties adjust the card.
+
+| Property                    | Default    | Effect                              |
+| --------------------------- | ---------- | ----------------------------------- |
+| `--atelier-embed-art-width` | `560px`    | Card width, never wider than the column. |
+| `--atelier-embed-art-ratio` | `1.5`      | Card shape, as width over height.   |
+| `--atelier-embed-art-tilt`  | `-1.25deg` | Resting rotation, relaxed toward straight on hover. |
+
+The frame, the offset shadow, and the card background are drawn from the page ink and paper, so they follow the colour scheme.
+Under `prefers-reduced-motion: reduce`, the card holds its resting angle and does not react to hover at all.
