@@ -879,6 +879,7 @@ $scrollbar-thumb: body-mix(72%);
 @media (prefers-reduced-motion: reduce) {
   .navbar .nav-link,
   .navbar .dropdown-item,
+  .panel-tabset .nav-tabs .nav-link,
   .embed-art {
     transition: none;
   }

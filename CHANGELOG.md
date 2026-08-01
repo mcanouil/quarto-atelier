@@ -6,6 +6,10 @@
 
 - feat: `.embed-art`, a utility class that frames an embedded document or an image as a tilted, centred card. The class goes on the image itself, so no wrapper div is needed. `--atelier-embed-art-width`, `--atelier-embed-art-ratio`, and `--atelier-embed-art-tilt` resize or straighten it, and the card holds its resting angle under `prefers-reduced-motion: reduce`.
 
+### Bug Fixes
+
+- fix: cancel the tabset link colour transition under `prefers-reduced-motion: reduce`. It was the one motion the theme introduced that the guard did not cover.
+
 ## 0.9.0 (2026-07-31)
 
 ### Breaking Changes
