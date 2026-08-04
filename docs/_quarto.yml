@@ -85,9 +85,9 @@ website:
     content: "Atelier keeps this banner readable in both colour schemes."
   page-footer:
     left: |
-      Powered by [{{< iconify simple-icons:quarto title="Quarto" label="Quarto" >}} Quarto](https://quarto.org).
+      Powered by [{{< iconify simple-icons:quarto aria-hidden=true >}} Quarto](https://quarto.org).
     center: |
-      &copy; []{#current-year} [Mickaël Canouil](https://mickael.canouil.fr). [{{< iconify octicon:heart-fill-16 title="Heart" label="Heart" >}} Sponsor](https://github.com/sponsors/mcanouil?o=esb).
+      &copy; []{#current-year} [Mickaël Canouil](https://mickael.canouil.fr). [{{< iconify octicon:heart-fill-16 aria-hidden=true >}} Sponsor](https://github.com/sponsors/mcanouil?o=esb).
     right: |
       Licence: [MIT](https://github.com/mcanouil/quarto-atelier?tab=MIT-1-ov-file#readme).
 
