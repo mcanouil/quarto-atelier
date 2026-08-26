@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- fix: Paint the close button of a modal, an offcanvas, a toast, and a dismissible alert from the text colour around it, so it stays readable in both colour schemes.
+- fix: Paint the close button of a modal, an offcanvas, a toast, and a dismissible alert from the text colour around it, so it stays readable in both colour schemes. (#31)
 
 ## 0.10.2 (2026-08-01)
 
