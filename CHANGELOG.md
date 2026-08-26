@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- fix: Paint the Bootstrap close button from the page text colour, so it reads on the dark surface of a modal or a toast. Bootstrap swaps in the light icon only under `[data-bs-theme="dark"]`, which Quarto never sets.
+- fix: Paint the close button of a modal, an offcanvas, a toast, and a dismissible alert from the page text colour, so it stays readable in both colour schemes.
 
 ## 0.10.2 (2026-08-01)
 
