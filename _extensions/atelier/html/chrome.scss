@@ -132,27 +132,3 @@ $sidebar-fg: $atelier-chrome-fg;
 $footer-bg: $atelier-chrome-bg;
 $footer-fg: $atelier-chrome-fg;
 $footer-border-color: $atelier-chrome-border;
-
-// ===========================================================================
-// DISMISS BUTTON
-// ===========================================================================
-// Not chrome, but it needs the same point in the cascade: the icon of
-// `.btn-close` is an SVG that Bootstrap builds by interpolating
-// $btn-close-color, so the colour has to be set where the page palette is
-// already resolved and Bootstrap's own `!default` has not run yet.
-//
-// Bootstrap bakes black into that icon and lightens it under
-// `[data-bs-theme="dark"]`, which Quarto never sets: it marks the scheme on
-// the body and swaps the whole stylesheet bundle. The icon stayed black on the
-// dark surface of a modal, an offcanvas, a toast, or a dismissible alert.
-// Taking the page foreground gives each bundle the icon that belongs to it.
-$btn-close-color: $atelier-chrome-page-fg !default;
-
-// `.btn-close-white` is the author's way to ask for a light icon on a dark
-// surface, and Bootstrap answers it by inverting the icon. In the dark bundle
-// the icon is already light, so the inversion would turn it dark again.
-$btn-close-white-filter: if(
-  lightness($atelier-chrome-page-fg) > 50%,
-  none,
-  invert(1) grayscale(100%) brightness(200%)
-) !default;

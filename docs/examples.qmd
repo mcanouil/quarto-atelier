@@ -90,6 +90,23 @@ The named links beside them show no tooltip on purpose: an item with visible tex
 
 This page is dated with an ordinal suffix rendered by the bundled script.
 
+## Dismiss buttons
+
+The close button of an alert, a modal, an offcanvas, or a toast is masked from the text colour around it.
+It reads on the page surface, which follows the colour scheme, and on an alert tint, which does not.
+
+```{=html}
+<div class="alert alert-secondary alert-dismissible" role="alert">
+  A dismissible alert on the page surface.
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div class="alert alert-warning alert-dismissible" role="alert">
+  A contextual dismissible alert, on the same light tint in both schemes.
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+```
+
 ## Everything above, in both schemes
 
 | Feature             | Light | Dark |
