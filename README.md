@@ -7,7 +7,7 @@ It derives the navbar, the page footer, and a docked sidebar from one `_brand.ym
 ## Installation
 
 ```bash
-quarto add mcanouil/quarto-atelier@0.10.2
+quarto add mcanouil/quarto-atelier@0.10.3
 ```
 
 This will install the extension under the `_extensions` subdirectory.
