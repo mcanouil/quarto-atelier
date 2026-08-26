@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.3 (2026-08-26)
+
 ### Bug Fixes
 
 - fix: Paint the close button of a modal, an offcanvas, a toast, and a dismissible alert from the text colour around it, so it stays readable in both colour schemes. (#31)
