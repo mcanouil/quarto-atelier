@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Refactoring
+
+- build: Declare the vendored Lua modules in `_extensions/atelier/_dependencies.yml` and move them to `_extensions/atelier/_vendor/`, so each one names the release it came from and can be checked against it.
+
 ## 0.10.3 (2026-08-26)
 
 ### Bug Fixes
