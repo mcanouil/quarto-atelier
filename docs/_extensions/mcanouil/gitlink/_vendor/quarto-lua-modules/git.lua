@@ -1,9 +1,9 @@
 --- MC Git - Git repository utilities for Quarto Lua filters and shortcodes
---- @module git
+--- @module "git"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
---- @version 1.0.0
+--- @version 2.2.0
 
 local M = {}
 
