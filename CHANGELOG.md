@@ -4,7 +4,7 @@
 
 ### Refactoring
 
-- build: Declare the vendored Lua modules in `_extensions/atelier/_dependencies.yml` and move them to `_extensions/atelier/_vendor/`, so each one names the release it came from and can be checked against it.
+- build: Declare the vendored Lua modules in `_extensions/atelier/_dependencies.yml` and move them to `_extensions/atelier/_vendor/`. Each module names the release it came from, so it can be checked against that release. (#33)
 
 ## 0.10.3 (2026-08-26)
 
