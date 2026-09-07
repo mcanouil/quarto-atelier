@@ -28,9 +28,15 @@ website:
   title: "Atelier"
   description: "An accessible, brand-driven documentation-website project type for Quarto."
   # No trailing slash: Quarto builds the social image URL by concatenating this
-  # with a leading-slash image path, without normalising.
+  # with the image path, without normalising.
   site-url: &site-url https://m.canouil.dev/quarto-atelier
   repo-url: https://github.com/mcanouil/quarto-atelier
+  open-graph:
+    image: assets/social/og-image.png
+    image-alt: "The quarto-atelier social card: the extension name and the \"project\" badge over the line \"Accessible, brand-driven documentation sites, ready out of the box\", beside a dark code window showing _quarto.yml."
+  twitter-card:
+    image: assets/social/og-image.png
+    image-alt: "The quarto-atelier social card: the extension name and the \"project\" badge over the line \"Accessible, brand-driven documentation sites, ready out of the box\", beside a dark code window showing _quarto.yml."
   # The Quarto project root is docs/, so the edit and issue links need the
   # subdirectory; without it they point at the repository root and 404.
   repo-subdir: docs
@@ -39,8 +45,6 @@ website:
   # The leading slash marks a project-relative path, which Quarto turns into
   # `<site-url>/assets/social/og-image.png` and measures to fill the image
   # width and height tags.
-  image: /assets/social/og-image.png
-  image-alt: "The quarto-atelier social card: the extension name over a one-line description, beside a dark code window showing a _quarto.yml that sets the atelier project type."
   # atelier defaults search to an overlay button in the navbar. With no navbar
   # the search belongs in the sidebar, as a field rather than a button.
   search:
