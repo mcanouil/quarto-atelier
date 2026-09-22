@@ -36,6 +36,8 @@ website:
   # `<site-url>/assets/social/og-image.png` and measures to fill the image
   # width and height tags. Without it the path is read against the page being
   # rendered, so a page in a subdirectory asks for a card that is not there.
+  # The alt text below describes the same card as the `fig-alt` on the framed
+  # embed in `examples.qmd`. Regenerating the card updates both.
   open-graph:
     image: &og-image /assets/social/og-image.png
     image-alt: &og-alt "The quarto-atelier social card: the extension name and the \"project\" badge over the line \"Accessible, brand-driven documentation sites, ready out of the box\", beside a dark code window showing _quarto.yml."
