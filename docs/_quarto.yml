@@ -27,8 +27,9 @@ project:
 website:
   title: "Atelier"
   description: "An accessible, brand-driven documentation-website project type for Quarto."
-  # Written without a trailing slash, which is the form the rest of the site
-  # configuration assumes.
+  # No trailing slash: the social image path below starts with one, and Quarto
+  # concatenates the two without normalising, so a trailing slash here gives
+  # `<site-url>//assets/social/og-image.png`.
   site-url: &site-url https://m.canouil.dev/quarto-atelier
   repo-url: https://github.com/mcanouil/quarto-atelier
   # The leading slash marks a project-relative path, which Quarto turns into

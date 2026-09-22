@@ -8,7 +8,7 @@
 
 ### Refactoring
 
-- build: Update the vendored Lua modules to 2.5.0. The three modules this project type uses are unchanged between the pinned versions, so the bump keeps the pin current and alters no behaviour. (#39, #40)
+- build: Update the vendored Lua modules to 2.5.0. The three modules this project type uses changed only by dropping the version line from their headers, so their checksums moved and their behaviour did not. (#39, #40)
 
 ## 0.10.4 (2026-09-06)
 
