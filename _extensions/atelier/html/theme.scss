@@ -203,12 +203,18 @@ html pre.sourceCode {
 // surfaces above give to a block inside it. A plain `pre` needs the border
 // reset too: `html pre:not(.sourceCode)` outranks the extension's own reset.
 // The window is a `div`, or a `details` once collapsible, so match the class
-// alone and take the specificity from `html`.
+// alone; both rules outrank the code-surface rules above.
 html .code-with-filename div.sourceCode {
   background-color: transparent;
 }
 
-html .code-with-filename > pre {
+// Quarto greys every `details > summary`, and a collapsible window's title bar
+// is one; the filename mixes from that grey and drops below 4.5:1.
+html .code-with-filename > summary {
+  color: inherit;
+}
+
+html .code-with-filename > pre:not(.sourceCode) {
   background-color: transparent;
   border: none;
   border-radius: 0;
