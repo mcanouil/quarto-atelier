@@ -201,6 +201,15 @@ html pre.sourceCode {
   border: none;
 }
 
+// A filename title bar holds its name in a plain `pre`, which the code surface
+// rules above would frame and pad; Quarto's own bar and the Code Window bar
+// both need it bare.
+html .code-with-filename-file pre {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+}
+
 // Code Window extension: it reads its surfaces from these variables and
 // derives the border, filename and chip colours from --code-window-bg. Its
 // defaults sit in :where(:root), so this rule wins in each scheme bundle.
