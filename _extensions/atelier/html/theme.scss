@@ -191,29 +191,33 @@ html pre.sourceCode {
   border: none;
 }
 
-// Code Window extension: its style.css uses the CSS system colour `Canvas`,
-// which follows the OS scheme rather than the active colour-scheme bundle.
-// Re-skin the container and title bar with body-mix(); a leading `div` keeps
-// these authoritative over the extension's class-only rules.
-div.code-with-filename {
-  background-color: body-mix(95%);
-  border-color: body-mix(85%);
+// Code Window extension: it reads its surfaces from these variables and
+// derives the border, filename and chip colours from --code-window-bg. Its
+// defaults sit in :where(:root), so this rule wins in each scheme bundle.
+:root {
+  --code-window-bg: #{body-mix(95%)};
+  --code-window-title-bg: #{body-mix(90%)};
 }
 
-div.code-with-filename .code-with-filename-file {
-  background-color: body-mix(90%);
-  border-bottom-color: body-mix(85%);
+// The window draws the frame and the surface, so clear the ones the code
+// surfaces above give to a block inside it. A plain `pre` needs the border
+// reset too: `html pre:not(.sourceCode)` outranks the extension's own reset.
+// The window is a `div`, or a `details` once collapsible, so match the class
+// alone; both rules outrank the code-surface rules above.
+html .code-with-filename div.sourceCode {
+  background-color: transparent;
 }
 
-div.code-with-filename .code-with-filename-file pre {
-  color: rgba($body-color, 0.6);
+// Quarto greys every `details > summary`, and a collapsible window's title bar
+// is one; the filename mixes from that grey and drops below 4.5:1.
+html .code-with-filename > summary {
+  color: inherit;
 }
 
-div.code-with-filename div.sourceCode,
-div.code-with-filename pre.sourceCode {
+html .code-with-filename > pre:not(.sourceCode) {
+  background-color: transparent;
   border: none;
   border-radius: 0;
-  background-color: transparent;
 }
 
 // Inline code: Bootstrap/Pandoc leave a near-white patch on dark surfaces.
