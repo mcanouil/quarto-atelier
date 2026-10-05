@@ -187,9 +187,10 @@ html pre:not(.sourceCode) {
 }
 
 // Quarto zeroes the padding of every pre, so a plain block framed above would
-// touch its border; match the inset Quarto gives pre.sourceCode.
+// touch its border; match the inset Quarto gives pre.sourceCode. This stays
+// out of the rule above, where div.sourceCode would pad around a padded pre.
 html pre:not(.sourceCode) {
-  padding: 0.4em;
+  padding: $code-block-bg-padding;
 }
 
 html pre.sourceCode {
