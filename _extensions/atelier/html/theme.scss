@@ -199,11 +199,17 @@ html pre.sourceCode {
   --code-window-title-bg: #{body-mix(90%)};
 }
 
-// The extension resets borders inside the window but not the background, so
-// clear the code surface above to let the window colour show through.
+// The window draws the frame and the surface, so clear the ones the code
+// surfaces above give to a block inside it. A plain `pre` needs the border
+// reset too: `html pre:not(.sourceCode)` outranks the extension's own reset.
 div.code-with-filename div.sourceCode,
-div.code-with-filename pre.sourceCode {
+div.code-with-filename > pre {
   background-color: transparent;
+}
+
+div.code-with-filename > pre {
+  border: none;
+  border-radius: 0;
 }
 
 // Inline code: Bootstrap/Pandoc leave a near-white patch on dark surfaces.
