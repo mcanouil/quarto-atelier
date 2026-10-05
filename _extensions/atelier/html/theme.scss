@@ -202,12 +202,14 @@ html pre.sourceCode {
 // The window draws the frame and the surface, so clear the ones the code
 // surfaces above give to a block inside it. A plain `pre` needs the border
 // reset too: `html pre:not(.sourceCode)` outranks the extension's own reset.
-div.code-with-filename div.sourceCode,
-div.code-with-filename > pre {
+// The window is a `div`, or a `details` once collapsible, so match the class
+// alone and take the specificity from `html`.
+html .code-with-filename div.sourceCode {
   background-color: transparent;
 }
 
-div.code-with-filename > pre {
+html .code-with-filename > pre {
+  background-color: transparent;
   border: none;
   border-radius: 0;
 }
