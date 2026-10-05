@@ -186,6 +186,12 @@ html pre:not(.sourceCode) {
   border-radius: $border-radius-sm;
 }
 
+// Quarto zeroes the padding of every pre, so a plain block framed above would
+// touch its border; match the inset Quarto gives pre.sourceCode.
+html pre:not(.sourceCode) {
+  padding: 0.4em;
+}
+
 html pre.sourceCode {
   background-color: transparent;
   border: none;
