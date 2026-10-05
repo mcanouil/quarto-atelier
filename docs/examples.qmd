@@ -28,6 +28,19 @@ no language, still framed and styled
 
 Hover a block: the copy button takes the palette accent instead of Quarto's fixed grey, in both schemes.
 
+A block with a `filename` shows in a code window, which takes its surfaces from the theme:
+
+```{.yaml filename="_quarto.yml"}
+project:
+  type: atelier
+```
+
+A collapsible window with a plain block in it:
+
+```{.text filename="notes.txt" code-window-collapse="open"}
+no language, inside a collapsible window
+```
+
 ## Tabset
 
 ::: {.panel-tabset}
