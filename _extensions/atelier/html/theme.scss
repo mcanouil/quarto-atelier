@@ -195,9 +195,15 @@ html pre:not(.sourceCode) {
   padding: $code-block-bg-padding;
 }
 
+// With $code-block-bg off, Quarto forces the page colour onto div.sourceCode,
+// so blocks become outlines: clear the plain block's tint to match.
 @if not $code-block-bg {
   html pre.sourceCode {
     padding: $code-block-bg-padding;
+  }
+
+  html pre:not(.sourceCode) {
+    background-color: transparent;
   }
 }
 
