@@ -242,7 +242,8 @@ code:not(.sourceCode):not(pre code) {
 // scaffold's padded top, also sits above the frame: move it down by that
 // padding. In a cell, Quarto pads both the cell and the scaffold inside it at
 // the bottom; keep one. An untitled callout nests its content one level
-// deeper, in .callout-body-container.
+// deeper, in .callout-body-container. A code window at the edge keeps the
+// spacing the Code Window extension gives it.
 html .callout.callout-style-default :is(.callout-body, .callout-body-container)
   > .code-copy-outer-scaffold:first-child
   > .code-copy-button {
