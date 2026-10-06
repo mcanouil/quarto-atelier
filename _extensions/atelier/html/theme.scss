@@ -295,6 +295,15 @@ code:not(.sourceCode):not(pre code) {
   color: $primary;
 }
 
+// Quarto moves the copy button clear of the annotation gutter with
+// `.code-annotated .code-copy-button`, but the button is a sibling of the
+// annotated pre, so that rule never matches and the button covers the
+// markers. The gutter is 20px + 0.5em at the code size (0.875 of the button's),
+// plus the button's usual 5px margin.
+html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
+  margin-right: calc(20px + 0.4375em + 5px);
+}
+
 // ===========================================================================
 // TABSETS
 // ===========================================================================
