@@ -187,29 +187,24 @@ html div.sourceCode {
 
 // Quarto zeroes the padding of every pre, and pads pre.sourceCode only when
 // $code-block-bg is set. The border is drawn either way, so always inset the
-// code inside it.
+// code inside it. With $code-block-bg off, Quarto forces the page colour onto
+// div.sourceCode, so blocks become outlines and a plain block drops its tint.
 html pre:not(.sourceCode) {
-  background-color: body-mix(95%);
+  @if $code-block-bg {
+    background-color: body-mix(95%);
+  } @else {
+    background-color: transparent;
+  }
   border: 1px solid body-mix(85%);
   border-radius: $border-radius-sm;
   padding: $code-block-bg-padding;
 }
 
-// With $code-block-bg off, Quarto forces the page colour onto div.sourceCode,
-// so blocks become outlines: clear the plain block's tint to match.
-@if not $code-block-bg {
-  html pre.sourceCode {
+html pre.sourceCode {
+  background-color: transparent;
+  border: none;
+  @if not $code-block-bg {
     padding: $code-block-bg-padding;
-  }
-
-  html pre:not(.sourceCode) {
-    background-color: transparent;
-  }
-
-  // A code window keeps its own surface; Quarto's page colour is
-  // `!important`, so only an `!important` lets the window show through.
-  html .code-with-filename div.sourceCode {
-    background-color: transparent !important;
   }
 }
 
@@ -225,9 +220,17 @@ html pre.code-annotation-code {
   padding-bottom: 0;
 }
 
-html pre.sourceCode {
+// Quarto paints the annotation gutter from a fixed light grey in both schemes,
+// over a page-coloured backing that hides code scrolled under it; a strip on
+// the code surface. Clear the grey and back the gutter with the code surface.
+html .code-annotation-gutter {
   background-color: transparent;
-  border: none;
+}
+
+@if $code-block-bg {
+  html .code-annotation-gutter-bg {
+    background-color: body-mix(95%);
+  }
 }
 
 // A filename title bar holds its name in a plain `pre`, which the code surface
@@ -252,9 +255,15 @@ html .code-with-filename-file pre {
 // surfaces above give to a block inside it. A plain `pre` needs the border
 // reset too: `html pre:not(.sourceCode)` outranks the extension's own reset.
 // The window is a `div`, or a `details` once collapsible, so match the class
-// alone; both rules outrank the code-surface rules above.
+// alone; both rules outrank the code-surface rules above. With $code-block-bg
+// off, Quarto's page colour on div.sourceCode is `!important`, so only an
+// `!important` lets the window show through.
 html .code-with-filename div.sourceCode {
-  background-color: transparent;
+  @if $code-block-bg {
+    background-color: transparent;
+  } @else {
+    background-color: transparent !important;
+  }
 }
 
 // Quarto greys every `details > summary`, and a collapsible window's title bar
