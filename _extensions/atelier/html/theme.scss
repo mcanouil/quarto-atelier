@@ -180,7 +180,9 @@ embed.embed-art:not([width]) {
 // html prefix (not the never-set data-bs-theme) raises specificity over
 // Quarto's rule; body-mix() derives the surface per bundle, correct in both.
 html div.sourceCode {
-  background-color: body-mix(95%);
+  @if $code-block-bg {
+    background-color: body-mix(95%);
+  }
   border: 1px solid body-mix(85%);
   border-radius: $border-radius-sm;
 }
@@ -259,11 +261,12 @@ html .code-with-filename-file pre {
 // off, Quarto's page colour on div.sourceCode is `!important`, so only an
 // `!important` lets the window show through.
 html .code-with-filename div.sourceCode {
-  @if $code-block-bg {
-    background-color: transparent;
-  } @else {
-    background-color: transparent !important;
-  }
+  background-color: transparent !important;
+}
+
+// The window surface also backs the annotation gutter of code inside it.
+html .code-with-filename .code-annotation-gutter-bg {
+  background-color: var(--code-window-bg);
 }
 
 // Quarto greys every `details > summary`, and a collapsible window's title bar
