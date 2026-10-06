@@ -41,6 +41,26 @@ A collapsible window with a plain block in it:
 no language, inside a collapsible window
 ```
 
+Code in a callout keeps the same inset as code on the page:
+
+::: {.callout-note}
+
+## In a callout
+
+```bash
+quarto preview
+```
+
+:::
+
+Annotated code keeps its rows flush with the annotation markers:
+
+```bash
+quarto render # <1>
+```
+
+1. Render the whole project.
+
 ## Tabset
 
 ::: {.panel-tabset}
