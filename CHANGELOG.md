@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - fix: Theme Code Window through its `--code-window-bg` and `--code-window-title-bg` variables, so its title bar stays distinct in dark mode and a collapsible window's filename stays readable. This needs Code Window 1.6.0 or later. (#43)
+- fix: Space code at the start or end of a callout like text, and keep its copy button inside the frame. (#45)
 
 ## 0.10.5 (2026-09-23)
 
