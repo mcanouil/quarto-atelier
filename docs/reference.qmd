@@ -92,6 +92,7 @@ Code blocks show on a tinted surface, with a border and an inset.
 If you set `code-block-bg: false` under `format.atelier-html`, the tint is not shown and code blocks show as outlines.
 The border and the inset stay, so the code stays separate from the text around it.
 The tint always comes from the brand colours, so a colour value for `code-block-bg` has no effect.
+The same is true for `typography.monospace.background-color` and `typography.monospace-block.background-color` in `_brand.yml`, which set `code-block-bg`.
 
 ## Page keys
 
