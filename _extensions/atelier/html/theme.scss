@@ -205,6 +205,12 @@ html pre:not(.sourceCode) {
   html pre:not(.sourceCode) {
     background-color: transparent;
   }
+
+  // A code window keeps its own surface; Quarto's page colour is
+  // `!important`, so only an `!important` lets the window show through.
+  html .code-with-filename div.sourceCode {
+    background-color: transparent !important;
+  }
 }
 
 // Quarto drops the left inset of highlighted code in a callout; the frame is
