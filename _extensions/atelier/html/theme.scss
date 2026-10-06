@@ -253,15 +253,15 @@ html .code-with-filename-file pre {
   --code-window-title-bg: #{body-mix(90%)};
 }
 
-// The window draws the frame and the surface, so clear the ones the code
-// surfaces above give to a block inside it. A plain `pre` needs the border
-// reset too: `html pre:not(.sourceCode)` outranks the extension's own reset.
-// The window is a `div`, or a `details` once collapsible, so match the class
-// alone; both rules outrank the code-surface rules above. With $code-block-bg
-// off, Quarto's page colour on div.sourceCode is `!important`, so only an
-// `!important` lets the window show through.
+// The window draws the frame and the surface, so code inside it takes the
+// window colour. Quarto's own filename block, without the extension, has no
+// surface of its own and gets the same colour from the variable above. A plain
+// `pre` needs the border reset too: `html pre:not(.sourceCode)` outranks the
+// extension's own reset. The window is a `div`, or a `details` once
+// collapsible, so match the class alone. With $code-block-bg off, Quarto's page
+// colour on div.sourceCode is `!important`, so this needs `!important` too.
 html .code-with-filename div.sourceCode {
-  background-color: transparent !important;
+  background-color: var(--code-window-bg) !important;
 }
 
 // The window surface also backs the annotation gutter of code inside it.
@@ -298,10 +298,10 @@ code:not(.sourceCode):not(pre code) {
 // Quarto moves the copy button clear of the annotation gutter with
 // `.code-annotated .code-copy-button`, but the button is a sibling of the
 // annotated pre, so that rule never matches and the button covers the
-// markers. The gutter is 20px + 0.5em at the code size (0.875 of the button's),
-// plus the button's usual 5px margin.
+// markers. The gutter is 20px + 0.5em at the code size, plus the button's
+// usual 5px margin.
 html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
-  margin-right: calc(20px + 0.4375em + 5px);
+  margin-right: calc(20px + 0.5 * #{$code-block-font-size} + 5px);
 }
 
 // ===========================================================================
