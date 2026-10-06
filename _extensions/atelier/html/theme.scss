@@ -179,18 +179,19 @@ embed.embed-art:not([width]) {
 // body.quarto-dark / .quarto-light and swaps the whole stylesheet bundle, so an
 // html prefix (not the never-set data-bs-theme) raises specificity over
 // Quarto's rule; body-mix() derives the surface per bundle, correct in both.
-html div.sourceCode,
-html pre:not(.sourceCode) {
+html div.sourceCode {
   background-color: body-mix(95%);
   border: 1px solid body-mix(85%);
   border-radius: $border-radius-sm;
 }
 
 // Quarto zeroes the padding of every pre, and pads pre.sourceCode only when
-// $code-block-bg is set. The frame above is always drawn, so always inset the
-// code inside it. This stays out of the rule above, where div.sourceCode would
-// pad around a padded pre.
+// $code-block-bg is set. The border is drawn either way, so always inset the
+// code inside it.
 html pre:not(.sourceCode) {
+  background-color: body-mix(95%);
+  border: 1px solid body-mix(85%);
+  border-radius: $border-radius-sm;
   padding: $code-block-bg-padding;
 }
 
@@ -224,6 +225,7 @@ html .code-with-filename-file pre {
   padding: 0;
   background-color: transparent;
   border: none;
+  border-radius: 0;
 }
 
 // Code Window extension: it reads its surfaces from these variables and
