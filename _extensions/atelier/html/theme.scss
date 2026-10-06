@@ -198,12 +198,18 @@ html pre:not(.sourceCode) {
   html pre.sourceCode {
     padding: $code-block-bg-padding;
   }
+}
 
-  // Annotated code keeps Quarto's flush rows, which the rule above outranks.
-  html pre.code-annotation-code {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
+// Quarto drops the left inset of highlighted code in a callout; the frame is
+// still drawn there, so restore it.
+html .callout pre.sourceCode {
+  padding-left: $code-block-bg-padding;
+}
+
+// Annotated code keeps Quarto's flush rows, which the rules above outrank.
+html pre.code-annotation-code {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 html pre.sourceCode {
