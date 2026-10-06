@@ -186,13 +186,23 @@ html pre:not(.sourceCode) {
   border-radius: $border-radius-sm;
 }
 
-// Quarto zeroes the padding of every pre, so a plain block framed above would
-// touch its border; match the inset Quarto gives pre.sourceCode, under the same
-// $code-block-bg condition. This stays out of the rule above, where
-// div.sourceCode would pad around a padded pre.
-@if $code-block-bg {
-  html pre:not(.sourceCode) {
+// Quarto zeroes the padding of every pre, and pads pre.sourceCode only when
+// $code-block-bg is set. The frame above is always drawn, so always inset the
+// code inside it. This stays out of the rule above, where div.sourceCode would
+// pad around a padded pre.
+html pre:not(.sourceCode) {
+  padding: $code-block-bg-padding;
+}
+
+@if not $code-block-bg {
+  pre.sourceCode {
     padding: $code-block-bg-padding;
+  }
+
+  // Annotated code keeps Quarto's flush rows, which the rule above outranks.
+  pre.code-annotation-code {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }
 
