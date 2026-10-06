@@ -88,6 +88,10 @@ Configure it by that name: declaring `format: html` replaces it rather than conf
 It also bundles six scripts into every page: a skip link before the body, and after it the current year, the external-link marks, the ordinal dates, the accessibility fixes, and the navbar tooltips.
 Replacing the format with `html` drops all six, which is what the `id="navbar-tooltips"` check on the [home page](index.qmd) looks for.
 
+Code blocks show on a tinted surface, with a border and an inset.
+If you set `code-block-bg: false` under `format.atelier-html`, the tint is not shown and code blocks show as outlines.
+The border and the inset stay, so the code stays separate from the text around it.
+
 ## Page keys
 
 | Key                    | Effect                                                                                    |
