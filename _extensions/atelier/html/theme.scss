@@ -195,12 +195,12 @@ html pre:not(.sourceCode) {
 }
 
 @if not $code-block-bg {
-  pre.sourceCode {
+  html pre.sourceCode {
     padding: $code-block-bg-padding;
   }
 
   // Annotated code keeps Quarto's flush rows, which the rule above outranks.
-  pre.code-annotation-code {
+  html pre.code-annotation-code {
     padding-top: 0;
     padding-bottom: 0;
   }
