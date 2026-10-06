@@ -238,7 +238,7 @@ html .code-annotation-gutter {
 // A filename title bar holds its name in a plain `pre`, which the code surface
 // rules above would frame and pad; Quarto's own bar and the Code Window bar
 // both need it bare.
-html .code-with-filename-file pre {
+html .code-with-filename .code-with-filename-file pre {
   padding: 0;
   background-color: transparent;
   border: none;
@@ -263,7 +263,11 @@ html .code-with-filename-file pre {
 // collapsible, so match the class alone. With $code-block-bg off, Quarto's page
 // colour on div.sourceCode is `!important`, so this needs `!important` too.
 html .code-with-filename div.sourceCode {
-  background-color: var(--code-window-bg) !important;
+  @if $code-block-bg {
+    background-color: var(--code-window-bg);
+  } @else {
+    background-color: var(--code-window-bg) !important;
+  }
 }
 
 html .code-with-filename .code-with-filename-file,
@@ -305,11 +309,14 @@ code:not(.sourceCode):not(pre code) {
 // Quarto moves the copy button clear of the annotation gutter with
 // `.code-annotated .code-copy-button`, but the button is a sibling of the
 // annotated pre, so that rule never matches and the button covers the
-// markers. The gutter is 20px + 0.5em at the code size; 0.5em at the
-// button's larger size clears it for any code size, plus the button's usual
-// 5px margin.
+// markers. Apply Quarto's declarations from the scaffold instead. The gutter
+// is 20px + 0.5em at the code size; 0.5em at the button's size clears it while
+// code is no larger than body text, plus the button's usual 5px margin.
 html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
   margin-right: calc(20px + 0.5em + 5px);
+  margin-top: 0;
+  padding-top: 3px;
+  padding-bottom: 0;
 }
 
 // ===========================================================================
