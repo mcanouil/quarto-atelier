@@ -235,23 +235,36 @@ code:not(.sourceCode):not(pre code) {
 }
 
 // Quarto spaces the first and last child of a callout body for a paragraph.
-// With code there, that child is the copy scaffold: its padding keeps the
-// code block's own margin inside it, so the gap grows and the copy button,
-// placed from the scaffold's top, sits above the frame. Drop the block's
-// margin on that side, and move the button down by the default style's top
-// padding.
-html .callout.callout-style-default .callout-body > .code-copy-outer-scaffold:first-child {
-  > div.sourceCode {
-    margin-top: 0;
+// With code there, that child is the copy scaffold, or the cell around it:
+// its padding keeps the code block's own margin inside it, so the gap grows.
+// For a bare scaffold, the copy button, placed from the scaffold's top, also
+// sits above the frame. Drop the block's margin on that side, and move the
+// button down by the default style's top padding.
+html .callout.callout-style-default .callout-body {
+  > .code-copy-outer-scaffold:first-child,
+  > .cell:first-child > .code-copy-outer-scaffold:first-child {
+    > div.sourceCode {
+      margin-top: 0;
+    }
   }
 
-  > .code-copy-button {
+  > .code-copy-outer-scaffold:first-child > .code-copy-button {
     top: 0.5rem;
   }
 }
 
-html .callout .callout-body > .code-copy-outer-scaffold:last-child > div.sourceCode {
-  margin-bottom: 0;
+// In a cell, Quarto pads both the cell and the scaffold inside it; keep one.
+html .callout .callout-body {
+  > .code-copy-outer-scaffold:last-child,
+  > .cell:last-child > .code-copy-outer-scaffold:last-child {
+    > div.sourceCode {
+      margin-bottom: 0;
+    }
+  }
+
+  > .cell:last-child > .code-copy-outer-scaffold:last-child {
+    padding-bottom: 0;
+  }
 }
 
 // ===========================================================================
