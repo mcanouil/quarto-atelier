@@ -91,6 +91,7 @@ Replacing the format with `html` drops all six, which is what the `id="navbar-to
 Code blocks show on a tinted surface, with a border and an inset.
 If you set `code-block-bg: false` under `format.atelier-html`, the tint is not shown and code blocks show as outlines.
 The border and the inset stay, so the code stays separate from the text around it.
+The tint always comes from the brand colours, so a colour value for `code-block-bg` has no effect.
 
 ## Page keys
 
