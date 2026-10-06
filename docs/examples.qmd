@@ -75,6 +75,22 @@ quarto render
 
 :::
 
+The same holds for code in a computational cell:
+
+::: {.callout-note}
+
+## In a cell
+
+::: {.cell}
+
+```bash
+quarto check
+```
+
+:::
+
+:::
+
 ## Typography
 
 Headings carry a slight positive tracking from `--atelier-heading-letter-spacing`.
