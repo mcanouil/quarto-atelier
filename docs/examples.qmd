@@ -61,6 +61,14 @@ quarto render # <1>
 
 1. Render the whole project.
 
+Annotated code in a code window:
+
+```{.bash filename="publish.sh"}
+quarto publish gh-pages # <1>
+```
+
+1. Publish the site to GitHub Pages.
+
 ## Tabset
 
 ::: {.panel-tabset}
