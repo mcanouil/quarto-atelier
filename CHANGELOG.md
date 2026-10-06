@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 - fix: Theme Code Window through its `--code-window-bg` and `--code-window-title-bg` variables, so its title bar stays distinct in dark mode and a collapsible window's filename stays readable. This needs Code Window 1.6.0 or later. (#43)
-- fix: Give a plain code block the same inset as a highlighted one, so its text no longer touches the frame, and keep a filename title bar free of that frame. (#44)
+- fix: Always inset code inside its frame, so a plain block lines up with a highlighted one and code stands apart from prose. A filename title bar no longer picks up that frame. (#44)
 
 ## 0.10.5 (2026-09-23)
 
