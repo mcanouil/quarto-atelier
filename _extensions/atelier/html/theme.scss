@@ -179,16 +179,70 @@ embed.embed-art:not([width]) {
 // body.quarto-dark / .quarto-light and swaps the whole stylesheet bundle, so an
 // html prefix (not the never-set data-bs-theme) raises specificity over
 // Quarto's rule; body-mix() derives the surface per bundle, correct in both.
-html div.sourceCode,
-html pre:not(.sourceCode) {
-  background-color: body-mix(95%);
+html div.sourceCode {
+  @if $code-block-bg {
+    background-color: body-mix(95%);
+  }
   border: 1px solid body-mix(85%);
   border-radius: $border-radius-sm;
+}
+
+// Quarto zeroes the padding of every pre, and pads pre.sourceCode only when
+// $code-block-bg is set. The border is drawn either way, so always inset the
+// code inside it. With $code-block-bg off, Quarto forces the page colour onto
+// div.sourceCode, so blocks become outlines and a plain block drops its tint.
+html pre:not(.sourceCode) {
+  @if $code-block-bg {
+    background-color: body-mix(95%);
+  } @else {
+    background-color: transparent;
+  }
+  border: 1px solid body-mix(85%);
+  border-radius: $border-radius-sm;
+  padding: $code-block-bg-padding;
 }
 
 html pre.sourceCode {
   background-color: transparent;
   border: none;
+  @if not $code-block-bg {
+    padding: $code-block-bg-padding;
+  }
+}
+
+// Quarto drops the left inset of highlighted code in a callout; the frame is
+// still drawn there, so restore it.
+html .callout pre.sourceCode {
+  padding-left: $code-block-bg-padding;
+}
+
+// Annotated code keeps Quarto's flush rows, which the rules above outrank.
+html pre.code-annotation-code {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+// Quarto paints the annotation gutter from a fixed light grey in both schemes,
+// over a page-coloured backing that hides code scrolled under it; a strip on
+// the code surface. Clear the grey and back the gutter with the code surface.
+html .code-annotation-gutter {
+  background-color: transparent;
+}
+
+@if $code-block-bg {
+  html .code-annotation-gutter-bg {
+    background-color: body-mix(95%);
+  }
+}
+
+// A filename title bar holds its name in a plain `pre`, which the code surface
+// rules above would frame and pad; Quarto's own bar and the Code Window bar
+// both need it bare.
+html .code-with-filename .code-with-filename-file pre {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
 }
 
 // Code Window extension: it reads its surfaces from these variables and
@@ -199,13 +253,31 @@ html pre.sourceCode {
   --code-window-title-bg: #{body-mix(90%)};
 }
 
-// The window draws the frame and the surface, so clear the ones the code
-// surfaces above give to a block inside it. A plain `pre` needs the border
-// reset too: `html pre:not(.sourceCode)` outranks the extension's own reset.
-// The window is a `div`, or a `details` once collapsible, so match the class
-// alone; both rules outrank the code-surface rules above.
+// The window draws the frame and the surface, so code inside it takes the
+// window colour. Quarto's own filename block, without the extension, has no
+// surface of its own and gets the same colour from the variable above, while
+// its title bar is a fixed grey (`#555` in dark) that the next rule replaces;
+// the dark selector matches Quarto's. A plain
+// `pre` needs the border reset too: `html pre:not(.sourceCode)` outranks the
+// extension's own reset. The window is a `div`, or a `details` once
+// collapsible, so match the class alone. With $code-block-bg off, Quarto's page
+// colour on div.sourceCode is `!important`, so this needs `!important` too.
 html .code-with-filename div.sourceCode {
-  background-color: transparent;
+  @if $code-block-bg {
+    background-color: var(--code-window-bg);
+  } @else {
+    background-color: var(--code-window-bg) !important;
+  }
+}
+
+html .code-with-filename .code-with-filename-file,
+html .quarto-dark .code-with-filename .code-with-filename-file {
+  background-color: var(--code-window-title-bg);
+}
+
+// The window surface also backs the annotation gutter of code inside it.
+html .code-with-filename .code-annotation-gutter-bg {
+  background-color: var(--code-window-bg);
 }
 
 // Quarto greys every `details > summary`, and a collapsible window's title bar
@@ -232,6 +304,20 @@ code:not(.sourceCode):not(pre code) {
 // body-mix() code surface; use the palette accent in both schemes.
 .code-copy-button {
   color: $primary;
+}
+
+// Quarto moves the copy button clear of the annotation gutter with
+// `.code-annotated .code-copy-button`, but the button is a sibling of the
+// annotated pre, so that rule never matches and the button covers the
+// markers. Apply Quarto's declarations from the scaffold instead. The gutter
+// is 20px + 0.5em at the code size; 0.5em at the button's size clears it while
+// code is no larger than body text, plus the button's usual 5px margin.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13444
+html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
+  margin-right: calc(20px + 0.5em + 5px);
+  margin-top: 0;
+  padding-top: 3px;
+  padding-bottom: 0;
 }
 
 // Quarto spaces the first and last child of a callout body for a paragraph.

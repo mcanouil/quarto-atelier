@@ -5,6 +5,9 @@
 ### Bug Fixes
 
 - fix: Theme Code Window through its `--code-window-bg` and `--code-window-title-bg` variables, so its title bar stays distinct in dark mode and a collapsible window's filename stays readable. This needs Code Window 1.6.0 or later. (#43)
+- fix: Always inset code inside its frame so it stands apart from prose, and show code blocks as outlines when `code-block-bg` is `false`. A filename title bar no longer picks up that frame. (#44)
+- fix: Blend the code annotation gutter into the code surface, so annotated code no longer shows a light strip down its edge. (#44)
+- fix: Keep the copy button clear of the annotation markers on annotated code. (#44)
 - fix: Space code at the start or end of a callout like text, and keep its copy button inside the frame. (#45)
 
 ## 0.10.5 (2026-09-23)
