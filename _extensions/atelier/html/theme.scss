@@ -312,6 +312,7 @@ code:not(.sourceCode):not(pre code) {
 // markers. Apply Quarto's declarations from the scaffold instead. The gutter
 // is 20px + 0.5em at the code size; 0.5em at the button's size clears it while
 // code is no larger than body text, plus the button's usual 5px margin.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13444
 html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
   margin-right: calc(20px + 0.5em + 5px);
   margin-top: 0;
