@@ -244,6 +244,7 @@ code:not(.sourceCode):not(pre code) {
 // the bottom; keep one. An untitled callout nests its content one level
 // deeper, in .callout-body-container. A code window at the edge keeps the
 // spacing the Code Window extension gives it.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13446
 html .callout.callout-style-default :is(.callout-body, .callout-body-container)
   > .code-copy-outer-scaffold:first-child
   > .code-copy-button {
