@@ -83,6 +83,42 @@ Content of the second tab.
 
 :::
 
+## Code in a callout
+
+Code that opens or closes a callout keeps the same spacing as text, and its copy button stays inside the frame:
+
+::: {.callout-tip}
+
+## Preview and render
+
+```bash
+quarto preview
+```
+
+Preview while you write, then render the whole project:
+
+```bash
+quarto render
+```
+
+:::
+
+The same holds for code in a computational cell:
+
+::: {.callout-note}
+
+## In a cell
+
+::: {.cell}
+
+```bash
+quarto check
+```
+
+:::
+
+:::
+
 ## Typography
 
 Headings carry a slight positive tracking from `--atelier-heading-letter-spacing`.
