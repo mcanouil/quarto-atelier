@@ -869,6 +869,16 @@ body .navbar .gitlink-widget-dropdown {
   text-decoration: underline;
 }
 
+// Quarto gives footer text $text-muted, which is held to AA on the page rather
+// than on the bar; use the chrome muted ink instead.
+.nav-footer-contents {
+  color: var(--atelier-navbar-muted);
+}
+
+.sidebar .sidebar-footer {
+  color: var(--atelier-sidebar-muted);
+}
+
 // ===========================================================================
 // ANNOUNCEMENT BANNER
 // ===========================================================================

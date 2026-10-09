@@ -89,7 +89,7 @@ Code that opens or closes a callout keeps the same spacing as text, and its copy
 
 ::: {.callout-tip}
 
-## Preview and render
+## Preview with `quarto preview`
 
 ```bash
 quarto preview
