@@ -1,3 +1,19 @@
+/*-- scss:functions --*/
+
+// Mix $color towards black or white, as Quarto's `theme-contrast()` does, until
+// it reads at 4.5:1 on its own soft tint: $color at $alpha over $bg. The tint
+// darkens with the colour, so it is recomputed at every step.
+@function atelier-contrast-on-tint($color, $bg, $alpha) {
+  $toward: if(tone($bg) == "light", #000, #fff);
+  @for $step from 0 through 100 {
+    $candidate: mix($toward, $color, $step * 1%);
+    @if quarto-contrast($candidate, mix($candidate, $bg, $alpha * 100%)) >= 4.5 {
+      @return $candidate;
+    }
+  }
+  @return $toward;
+}
+
 /*-- scss:defaults --*/
 
 // ===========================================================================
@@ -58,9 +74,8 @@ $atelier-chrome-bg: if(
   )
 ) !default;
 
-// Both inks are run through Quarto's own `theme-contrast()`, which mixes a
-// colour towards black or white only until it clears the ratio asked of it and
-// returns it untouched otherwise. In `auto` that matters for the accent: a
+// Both inks are mixed towards black or white only until they clear 4.5:1, and
+// returned untouched otherwise. In `auto` that matters for the accent: a
 // brand primary is picked against the page, and the bar is a tint of the page,
 // so a primary sitting just above 4.5:1 on the page can fall under it here.
 // Setting either variable in a project skips the correction, since a `!default`
@@ -79,7 +94,10 @@ $atelier-chrome-fg: theme-contrast(
   "AA"
 ) !default;
 
-$atelier-chrome-accent: theme-contrast(
+// The accent is held to the stricter of its two surfaces: the active sidebar
+// item and a hovered dropdown item sit on the accent-soft pill, a tint of the
+// accent over the bar, which is always closer to the accent than the bar is.
+$atelier-chrome-accent: atelier-contrast-on-tint(
   if(
     $atelier-chrome == dark,
     $atelier-chrome-dark-accent,
@@ -90,7 +108,7 @@ $atelier-chrome-accent: theme-contrast(
     )
   ),
   $atelier-chrome-bg,
-  "AA"
+  0.16
 ) !default;
 
 // Everything else follows from that triple, so a project re-points three
@@ -98,6 +116,23 @@ $atelier-chrome-accent: theme-contrast(
 $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !default;
 $atelier-chrome-muted: mix($atelier-chrome-fg, $atelier-chrome-bg, 65%) !default;
 $atelier-chrome-accent-soft: rgba($atelier-chrome-accent, 0.16) !default;
+
+// ===========================================================================
+// PAGE VARIABLES
+// ===========================================================================
+// Bootstrap's muted grey is a fixed #6c757d, which is under 4.5:1 on a light
+// paper and on most dark ones. Derive it from the page like the chrome muted
+// ink, held to AA on the page. Quarto uses it for the previous and next page
+// links, `<details>` summaries, the code tools button, and untyped callouts.
+// The website listing layer sets $text-muted ahead of this file, so it is
+// handed over by plain assignment, like the chrome variables below; a project
+// sets $atelier-text-muted instead.
+$atelier-text-muted: theme-contrast(
+  mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%),
+  $atelier-chrome-page-bg,
+  "AA"
+) !default;
+$text-muted: $atelier-text-muted;
 
 // A hairline between two surfaces, which is what the bar edges and the section
 // dividers want.

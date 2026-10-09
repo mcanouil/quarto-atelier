@@ -293,11 +293,26 @@ html .code-with-filename > pre:not(.sourceCode) {
 }
 
 // Inline code: Bootstrap/Pandoc leave a near-white patch on dark surfaces.
+// The patch is darker than the page, so a primary that passes on the page can
+// fail on it; hold the ink to AA on the patch.
 code:not(.sourceCode):not(pre code) {
-  color: $primary;
+  color: theme-contrast($primary, body-mix(90%), "AA");
   background-color: body-mix(90%);
   padding: 0.1em 0.35em;
   border-radius: 0.3em;
+}
+
+// Quarto fades a callout title with opacity, which also fades the inline code
+// in it below AA. Fade the title text by its colour instead, so code keeps its
+// own ink.
+html .callout.callout-style-default > .callout-header {
+  opacity: 1;
+  color: rgba($body-color, 0.85);
+}
+
+html .callout.callout-style-simple > .callout-header {
+  opacity: 1;
+  color: rgba($body-color, 0.75);
 }
 
 // Quarto bakes a fixed grey into the copy button, which reads poorly on the
