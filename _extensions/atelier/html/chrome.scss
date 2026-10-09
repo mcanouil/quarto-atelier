@@ -75,9 +75,8 @@ $atelier-chrome-bg: if(
 ) !default;
 
 // Both inks are mixed towards black or white only until they clear 4.5:1, and
-// returned untouched otherwise. In `auto` that matters for the accent: a
-// brand primary is picked against the page, and the bar is a tint of the page,
-// so a primary sitting just above 4.5:1 on the page can fall under it here.
+// returned untouched otherwise. In `auto` the bar is a tint of the page, so a
+// brand colour sitting just above 4.5:1 on the page can fall under it here.
 // Setting either variable in a project skips the correction, since a `!default`
 // assignment is not evaluated at all once the variable is set.
 $atelier-chrome-fg: theme-contrast(
@@ -97,6 +96,7 @@ $atelier-chrome-fg: theme-contrast(
 // The accent is held to the stricter of its two surfaces: the active sidebar
 // item and a hovered dropdown item sit on the accent-soft pill, a tint of the
 // accent over the bar, which is always closer to the accent than the bar is.
+$atelier-chrome-accent-soft-alpha: 0.16 !default;
 $atelier-chrome-accent: atelier-contrast-on-tint(
   if(
     $atelier-chrome == dark,
@@ -108,25 +108,22 @@ $atelier-chrome-accent: atelier-contrast-on-tint(
     )
   ),
   $atelier-chrome-bg,
-  0.16
+  $atelier-chrome-accent-soft-alpha
 ) !default;
 
 // Everything else follows from that triple, so a project re-points three
 // colours rather than eight.
 $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !default;
 $atelier-chrome-muted: mix($atelier-chrome-fg, $atelier-chrome-bg, 65%) !default;
-$atelier-chrome-accent-soft: rgba($atelier-chrome-accent, 0.16) !default;
+$atelier-chrome-accent-soft: rgba($atelier-chrome-accent, $atelier-chrome-accent-soft-alpha) !default;
 
 // ===========================================================================
 // PAGE VARIABLES
 // ===========================================================================
-// Bootstrap's muted grey is a fixed #6c757d, which is under 4.5:1 on a light
-// paper and on most dark ones. Derive it from the page like the chrome muted
-// ink, held to AA on the page. Quarto uses it for the previous and next page
-// links, `<details>` summaries, the code tools button, and untyped callouts.
-// The website listing layer sets $text-muted ahead of this file, so it is
-// handed over by plain assignment, like the chrome variables below; a project
-// sets $atelier-text-muted instead.
+// Bootstrap's fixed #6c757d muted grey is under 4.5:1 on most pages; derive it
+// from the page instead, held to AA. The website listing layer sets $text-muted
+// ahead of this file, so it is handed over by plain assignment, like the chrome
+// variables below; a project sets $atelier-text-muted instead.
 $atelier-text-muted: theme-contrast(
   mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%),
   $atelier-chrome-page-bg,
