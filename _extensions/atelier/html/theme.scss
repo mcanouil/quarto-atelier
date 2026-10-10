@@ -315,6 +315,16 @@ html .callout.callout-style-simple > .callout-header {
   color: rgba($body-color, 0.75);
 }
 
+// A callout with no type gets a $text-muted title band, a mid grey that title
+// text cannot clear AA on. Tint it from the page as the typed ones are tinted
+// from their colour.
+div.callout.callout-style-default:where(
+    :not(.callout-note, .callout-tip, .callout-warning, .callout-caution, .callout-important)
+  )
+  > .callout-header {
+  background-color: mix($body-bg, $text-muted, 70%);
+}
+
 // Quarto bakes a fixed grey into the copy button, which reads poorly on the
 // body-mix() code surface; use the palette accent in both schemes.
 .code-copy-button {

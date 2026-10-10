@@ -75,8 +75,9 @@ $atelier-chrome-bg: if(
 ) !default;
 
 // Both inks are mixed towards black or white only until they clear 4.5:1, and
-// returned untouched otherwise. In `auto` the bar is a tint of the page, so a
-// brand colour sitting just above 4.5:1 on the page can fall under it here.
+// returned untouched when they already do; a ratio that cannot be met ends at
+// black or white. In `auto` the bar is a tint of the page, so a brand colour
+// sitting just above 4.5:1 on the page can fall under it here.
 // Setting either variable in a project skips the correction, since a `!default`
 // assignment is not evaluated at all once the variable is set.
 $atelier-chrome-fg: theme-contrast(
@@ -93,9 +94,12 @@ $atelier-chrome-fg: theme-contrast(
   "AA"
 ) !default;
 
-// The accent is held to the stricter of its two surfaces: the active sidebar
-// item and a hovered dropdown item sit on the accent-soft pill, a tint of the
-// accent over the bar, which is always closer to the accent than the bar is.
+// The surface of dropdown menus, a step from the bar towards the ink.
+$atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !default;
+
+// The accent sits on the bar, and on the accent-soft pill of the active sidebar
+// item and of a hovered dropdown item. The pill over the surface is the closest
+// of these to the accent, so holding the accent to AA there covers the rest.
 $atelier-chrome-accent-soft-alpha: 0.16 !default;
 $atelier-chrome-accent: atelier-contrast-on-tint(
   if(
@@ -107,13 +111,12 @@ $atelier-chrome-accent: atelier-contrast-on-tint(
       $atelier-chrome-page-accent
     )
   ),
-  $atelier-chrome-bg,
+  $atelier-chrome-surface,
   $atelier-chrome-accent-soft-alpha
 ) !default;
 
 // Everything else follows from that triple, so a project re-points three
 // colours rather than eight.
-$atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !default;
 $atelier-chrome-muted: theme-contrast(
   mix($atelier-chrome-fg, $atelier-chrome-bg, 65%),
   $atelier-chrome-bg,
