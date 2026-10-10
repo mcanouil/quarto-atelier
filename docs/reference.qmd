@@ -95,7 +95,7 @@ The border and the inset stay, so the code stays separate from the text around i
 The tint always comes from the brand colours, so a colour value for `code-block-bg` has no effect.
 The same is true for `typography.monospace.background-color` and `typography.monospace-block.background-color` in `_brand.yml`, which set `code-block-bg`.
 
-Muted text on the page, such as the previous and next page links, comes from the page colours and has a contrast of at least 4.5:1 against the page.
+The muted text that Quarto styles on the page, such as the previous and next page links, comes from the page colours and has a contrast of at least 4.5:1 against the page.
 To change it, set `$atelier-text-muted` in a project stylesheet under `format.atelier-html.theme`.
 
 ## Page keys

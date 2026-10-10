@@ -114,16 +114,21 @@ $atelier-chrome-accent: atelier-contrast-on-tint(
 // Everything else follows from that triple, so a project re-points three
 // colours rather than eight.
 $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !default;
-$atelier-chrome-muted: mix($atelier-chrome-fg, $atelier-chrome-bg, 65%) !default;
+$atelier-chrome-muted: theme-contrast(
+  mix($atelier-chrome-fg, $atelier-chrome-bg, 65%),
+  $atelier-chrome-bg,
+  "AA"
+) !default;
 $atelier-chrome-accent-soft: rgba($atelier-chrome-accent, $atelier-chrome-accent-soft-alpha) !default;
 
 // ===========================================================================
 // PAGE VARIABLES
 // ===========================================================================
-// Bootstrap's fixed #6c757d muted grey is under 4.5:1 on most pages; derive it
-// from the page instead, held to AA. The website listing layer sets $text-muted
-// ahead of this file, so it is handed over by plain assignment, like the chrome
-// variables below; a project sets $atelier-text-muted instead.
+// The website listing layer pins $text-muted to a fixed #6c757d ahead of this
+// file, which is under 4.5:1 on most pages; derive it from the page instead,
+// held to AA. A `!default` would lose to that layer, so it is handed over by
+// plain assignment, like the chrome variables below; a project sets
+// $atelier-text-muted instead.
 $atelier-text-muted: theme-contrast(
   mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%),
   $atelier-chrome-page-bg,
