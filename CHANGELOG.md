@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.6 (2026-10-11)
+
 ### Bug Fixes
 
 - fix: Theme Code Window through its `--code-window-bg` and `--code-window-title-bg` variables, so its title bar stays distinct in dark mode and a collapsible window's filename stays readable. This needs Code Window 1.6.0 or later. (#43)
