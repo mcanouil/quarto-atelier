@@ -9,6 +9,9 @@
 - fix: Blend the code annotation gutter into the code surface, so annotated code no longer shows a light strip down its edge. (#44)
 - fix: Keep the copy button clear of the annotation markers on annotated code. (#44)
 - fix: Space code at the start or end of a callout like text, and keep its copy button inside the frame. (#45)
+- fix: Hold inline code, the navbar and sidebar accent, and footer text to a 4.5:1 contrast ratio on the surface each one sits on. (#46)
+- fix: Fade callout titles by colour rather than opacity, so code in a title keeps its contrast, and give a callout with no type a light title band. (#46)
+- fix: Derive muted text, such as the previous and next page links, from the page colours at a 4.5:1 contrast ratio or more. Set `$atelier-text-muted` to change it. (#46)
 
 ## 0.10.5 (2026-09-23)
 

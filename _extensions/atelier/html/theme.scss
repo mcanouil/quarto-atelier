@@ -293,11 +293,36 @@ html .code-with-filename > pre:not(.sourceCode) {
 }
 
 // Inline code: Bootstrap/Pandoc leave a near-white patch on dark surfaces.
+// The patch is darker than the page, so a primary that passes on the page can
+// fail on it; hold the ink to AA on the patch.
 code:not(.sourceCode):not(pre code) {
-  color: $primary;
+  color: theme-contrast($primary, body-mix(90%), "AA");
   background-color: body-mix(90%);
   padding: 0.1em 0.35em;
   border-radius: 0.3em;
+}
+
+// Quarto fades a callout title with opacity, which also fades the inline code
+// in it below AA. Fade the title text by its colour instead, so code keeps its
+// own ink.
+html .callout.callout-style-default > .callout-header {
+  opacity: 1;
+  color: rgba($body-color, 0.85);
+}
+
+html .callout.callout-style-simple > .callout-header {
+  opacity: 1;
+  color: rgba($body-color, 0.75);
+}
+
+// A callout with no type gets a $text-muted title band, a mid grey that title
+// text cannot clear AA on. Tint it from the page as the typed ones are tinted
+// from their colour.
+div.callout.callout-style-default:where(
+    :not(.callout-note, .callout-tip, .callout-warning, .callout-caution, .callout-important)
+  )
+  > .callout-header {
+  background-color: mix($body-bg, $text-muted, 70%);
 }
 
 // Quarto bakes a fixed grey into the copy button, which reads poorly on the
@@ -852,6 +877,16 @@ body .navbar .gitlink-widget-dropdown {
 .nav-footer a:focus-visible {
   color: var(--atelier-navbar-accent);
   text-decoration: underline;
+}
+
+// Quarto gives footer text $text-muted, which is held to AA on the page rather
+// than on the bar; use the chrome muted ink instead.
+.nav-footer-contents {
+  color: var(--atelier-navbar-muted);
+}
+
+.sidebar .sidebar-footer {
+  color: var(--atelier-sidebar-muted);
 }
 
 // ===========================================================================
