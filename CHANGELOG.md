@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- fix: Rely on Quarto's own accessible name for the search field instead of overriding it.
+
 ## 0.10.6 (2026-10-11)
 
 ### Bug Fixes
