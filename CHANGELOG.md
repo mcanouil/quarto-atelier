@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- fix: Name the search field "Search the site" for screen readers in every search layout. Quarto names it "Submit" in a text box and gives it no name in the overlay.
+- fix: Give the search field its localised "Search" name for screen readers in every search layout. Quarto names it "Submit" in a text box and gives it no name in the overlay.
 
 ## 0.10.6 (2026-10-11)
 

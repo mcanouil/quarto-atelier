@@ -27,19 +27,27 @@
 
 		// Search input: Quarto labels the field through aria-labelledby, which
 		// names it "Submit" (textbox) or nothing (overlay), and that label wins
-		// over an aria-label on the input. Name the referenced label instead,
-		// and again whenever the search widget renders a new one.
+		// over an aria-label on the input. Name the referenced label with Quarto's
+		// own localised search label, and again when a search host or the overlay
+		// renders a new one.
+		const searchOptions = document.getElementById("quarto-search-options");
+		const searchName =
+			(searchOptions && JSON.parse(searchOptions.textContent).language?.["search-label"]) || "Search";
 		const nameSearchInputs = () => {
 			document.querySelectorAll(".aa-Input").forEach((input) => {
-				const label = document.getElementById(input.getAttribute("aria-labelledby"));
-				const target = label || input;
-				if (target.getAttribute("aria-label") !== "Search the site") {
-					target.setAttribute("aria-label", "Search the site");
+				const labelId = (input.getAttribute("aria-labelledby") || "").trim().split(/\s+/)[0];
+				const target = (labelId && document.getElementById(labelId)) || input;
+				if (target.getAttribute("aria-label") !== searchName) {
+					target.setAttribute("aria-label", searchName);
 				}
 			});
 		};
 		nameSearchInputs();
-		new MutationObserver(nameSearchInputs).observe(document.body, { childList: true, subtree: true });
+		const searchObserver = new MutationObserver(nameSearchInputs);
+		searchObserver.observe(document.body, { childList: true });
+		document.querySelectorAll('[id="quarto-search"]').forEach((host) => {
+			searchObserver.observe(host, { childList: true, subtree: true });
+		});
 
 		// CSL bibliography: Quarto emits role="listitem" without a role="list" parent.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14755
