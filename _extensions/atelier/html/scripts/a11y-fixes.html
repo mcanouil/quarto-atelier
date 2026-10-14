@@ -30,17 +30,26 @@
 		// over an aria-label on the input. Name the referenced label with Quarto's
 		// own localised search label, and again when a search host or the overlay
 		// renders a new one.
-		const searchOptions = document.getElementById("quarto-search-options");
-		const searchName =
-			(searchOptions && JSON.parse(searchOptions.textContent).language?.["search-label"]) || "Search";
+		const searchName = (() => {
+			try {
+				const options = document.getElementById("quarto-search-options");
+				return (options && JSON.parse(options.textContent).language?.["search-label"]) || "Search";
+			} catch {
+				return "Search";
+			}
+		})();
+		const setSearchName = (element) => {
+			if (element.getAttribute("aria-label") !== searchName) {
+				element.setAttribute("aria-label", searchName);
+			}
+		};
 		const nameSearchInputs = () => {
 			document.querySelectorAll(".aa-Input").forEach((input) => {
 				const labelId = (input.getAttribute("aria-labelledby") || "").trim().split(/\s+/)[0];
-				const target = (labelId && document.getElementById(labelId)) || input;
-				if (target.getAttribute("aria-label") !== searchName) {
-					target.setAttribute("aria-label", searchName);
-				}
+				setSearchName((labelId && document.getElementById(labelId)) || input);
 			});
+			// The overlay trigger carries autocomplete's English "Search" title.
+			document.querySelectorAll(".aa-DetachedSearchButton").forEach(setSearchName);
 		};
 		nameSearchInputs();
 		const searchObserver = new MutationObserver(nameSearchInputs);
