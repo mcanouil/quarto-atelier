@@ -25,6 +25,22 @@
 			a.setAttribute("aria-label", a.getAttribute("title") || "Toggle dark mode");
 		});
 
+		// Search input: Quarto labels the field through aria-labelledby, which
+		// names it "Submit" (textbox) or nothing (overlay), and that label wins
+		// over an aria-label on the input. Name the referenced label instead,
+		// and again whenever the search widget renders a new one.
+		const nameSearchInputs = () => {
+			document.querySelectorAll(".aa-Input").forEach((input) => {
+				const label = document.getElementById(input.getAttribute("aria-labelledby"));
+				const target = label || input;
+				if (target.getAttribute("aria-label") !== "Search the site") {
+					target.setAttribute("aria-label", "Search the site");
+				}
+			});
+		};
+		nameSearchInputs();
+		new MutationObserver(nameSearchInputs).observe(document.body, { childList: true, subtree: true });
+
 		// CSL bibliography: Quarto emits role="listitem" without a role="list" parent.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14755
 		document.querySelectorAll('[role="listitem"]').forEach((el) => {
