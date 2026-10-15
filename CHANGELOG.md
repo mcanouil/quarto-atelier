@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.7 (2026-10-15)
+
 ### Bug Fixes
 
 - fix: Keep the current item of a navbar or sidebar dropdown readable. It now takes the hover colours, rather than mixing Bootstrap's active fill with the menu text colour. (#49)
