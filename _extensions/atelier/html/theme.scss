@@ -33,8 +33,12 @@ $btn-close-white-filter: none !default;
     color: $fg;
   }
 
+  // The colour above outranks Bootstrap's colour for the active item but not
+  // its fill, so the active item takes the hover pair too, which stays AA.
   .dropdown-item:hover,
-  .dropdown-item:focus {
+  .dropdown-item:focus,
+  .dropdown-item.active,
+  .dropdown-item:active {
     background: $accent-soft;
     color: $accent;
   }
