@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+- fix: Keep the current item of a navbar or sidebar dropdown readable. It now takes the hover colours, rather than mixing Bootstrap's active fill with the menu text colour. (#49)
 - fix: Give the search field its localised "Search" name for screen readers in every search layout. Quarto names it "Submit" in a text box and gives it no name in the overlay. (#48)
 
 ## 0.10.6 (2026-10-11)
