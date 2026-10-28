@@ -217,6 +217,7 @@ html pre.sourceCode {
 // Quarto drops the left inset of highlighted code in a callout; the frame is
 // still drawn there, so restore it.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15058
+// Remove when: the minimum Quarto version includes the fix.
 html .callout pre.sourceCode {
   padding-left: $code-block-bg-padding;
 }
@@ -231,6 +232,7 @@ html pre.code-annotation-code {
 // over a page-coloured backing that hides code scrolled under it; a strip on
 // the code surface. Clear the grey and back the gutter with the code surface.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15059
+// Remove when: the minimum Quarto version includes the fix.
 html .code-annotation-gutter {
   background-color: transparent;
 }
@@ -343,7 +345,8 @@ div.callout.callout-style-default:where(
 // markers. Apply Quarto's declarations from the scaffold instead. The gutter
 // is 20px + 0.5em at the code size; 0.5em at the button's size clears it while
 // code is no larger than body text, plus the button's usual 5px margin.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13444
+// Fixed upstream in Quarto 1.11: https://github.com/quarto-dev/quarto-cli/issues/13444
+// Remove when: the minimum Quarto version is 1.11 or later.
 html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
   margin-right: calc(20px + 0.5em + 5px);
   margin-top: 0;
@@ -361,7 +364,8 @@ html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
 // the bottom; keep one. An untitled callout nests its content one level
 // deeper, in .callout-body-container. A code window at the edge keeps the
 // spacing the Code Window extension gives it.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13446
+// Fixed upstream in Quarto 1.11: https://github.com/quarto-dev/quarto-cli/issues/13446
+// Remove when: the minimum Quarto version is 1.11 or later.
 html .callout.callout-style-default :is(.callout-body, .callout-body-container)
   > .code-copy-outer-scaffold:first-child
   > .code-copy-button {
@@ -944,6 +948,7 @@ body .navbar .gitlink-widget-dropdown {
 // masked from the text colour around it instead, so it follows the surface it
 // sits on, whichever bundle is active.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15060
+// Remove when: the minimum Quarto version includes the fix.
 .btn-close,
 .btn-close:hover {
   color: inherit;
