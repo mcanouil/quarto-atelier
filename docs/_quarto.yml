@@ -30,12 +30,17 @@ website:
   # No trailing slash: the social image path below starts with one, and Quarto
   # concatenates the two without normalising, so a trailing slash here gives
   # `<site-url>//assets/social/og-image.png`.
+  # quarto-dev/quarto-cli#15053 normalises this join. Drop this note once the
+  # minimum Quarto version is the first release after 1.11.6.
   site-url: &site-url https://m.canouil.dev/quarto-atelier
   repo-url: https://github.com/mcanouil/quarto-atelier
   # The leading slash marks a project-relative path, which Quarto turns into
   # `<site-url>/assets/social/og-image.png` and measures to fill the image
   # width and height tags. Without it the path is read against the page being
   # rendered, so a page in a subdirectory asks for a card that is not there.
+  # quarto-dev/quarto-cli#15053 resolves site-level images against the
+  # project. Drop the leading slash and this note once the minimum Quarto
+  # version is the first release after 1.11.6.
   # The alt text below describes the same card as the `fig-alt` on the framed
   # embed in `examples.qmd`. Regenerating the card updates both.
   open-graph:
