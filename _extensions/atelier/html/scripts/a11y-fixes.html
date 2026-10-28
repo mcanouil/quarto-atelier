@@ -37,7 +37,7 @@
 		// renders a new one.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15062
 		// Remove when: the minimum Quarto version includes the fix.
-		// Not SCSS: the name is set on a label and on inputs that the search host renders, which CSS cannot name.
+		// Not SCSS: the name sits on a label and on host-rendered inputs, which CSS cannot name.
 		const searchName = (() => {
 			try {
 				const options = document.getElementById("quarto-search-options");
@@ -78,7 +78,7 @@
 		// Disambiguate landmarks. The page title-block is also a <header>, which is a
 		// duplicate banner alongside the site navbar; demote it and label the rest.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14375 (banner)
-		// Fixed upstream in Quarto 1.11: https://github.com/quarto-dev/quarto-cli/issues/14376 (nav labels)
+		// Fixed upstream in Quarto 1.11.4: https://github.com/quarto-dev/quarto-cli/issues/14376 (nav labels)
 		// Remove when: the minimum Quarto version includes the fix for the banner (#14375).
 		// Not SCSS: ARIA roles and labels are attributes, which CSS cannot set.
 		const siteHeader = document.getElementById("quarto-header");
