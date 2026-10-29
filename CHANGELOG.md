@@ -24,6 +24,7 @@
 - fix: Keep the highlight of a selected code annotation inside the code block, level with the gutter highlight. (#56)
 - fix: Show the current page by more than its colour. It is bold in every sidebar style, and underlined in the navbar of a page without a sidebar.
 - fix: Make sidebar section toggles 24 by 24 px, and space the sidebar links so that each one meets the 24 px target size.
+- fix: Let keyboard users open the "On this page" and sidebar toggles that replace a side column when wide content overlaps it. The toggles now say whether they are open, and their hidden links leave the tab order.
 
 ## 0.10.7 (2026-10-15)
 
