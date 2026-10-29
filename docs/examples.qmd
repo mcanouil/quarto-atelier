@@ -323,7 +323,7 @@ A callout title reads as "Note Title" to a screen reader, with a space between t
 Body text.
 :::
 
-A link in a callout title keeps the contrast of a link in the body:
+A link in a callout title takes the colour of the title and keeps its underline:
 
 ::: {.callout-tip}
 
