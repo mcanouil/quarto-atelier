@@ -276,6 +276,22 @@
 				// Space would scroll the page.
 				event.preventDefault();
 				if (!event.repeat) control.click();
+		});
+
+		// The bar that replaces the sidebar on narrow screens is a nav element,
+		// but its links, if any, are in the breadcrumbs nav inside it. Remove its
+		// landmark role and its label. Quarto 1.11.1 and earlier also make the
+		// click area around the bar title a named navigation landmark; remove
+		// that role and the attributes that go with it, as Quarto 1.11.2 does.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14868
+		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/pull/14826 (click area)
+		// Remove when: the minimum Quarto version includes the fix for the bar (#14868).
+		// Not SCSS: ARIA roles are attributes, which CSS cannot set.
+		document.querySelectorAll("nav.quarto-secondary-nav").forEach((bar) => {
+			bar.setAttribute("role", "none");
+			bar.removeAttribute("aria-label");
+			bar.querySelectorAll('a[role="navigation"]:not([href])').forEach((area) => {
+				["role", "aria-label", "aria-controls", "aria-expanded"].forEach((name) => area.removeAttribute(name));
 			});
 		});
 
