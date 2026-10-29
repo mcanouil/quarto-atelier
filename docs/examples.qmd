@@ -216,7 +216,7 @@ Secondary text and a folded code block are included to check that they stay read
 A margin note in secondary text.
 :::
 
-![The extension icon, with a caption in secondary text.](assets/icons/icon.svg){width=64}
+![The extension icon, with a caption in secondary text.](assets/icons/icon.svg){width=64 fig-alt="The Atelier extension icon."}
 
 ```{.python .code-fold}
 print("A folded code block")
