@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
+- fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
+
 ## 0.10.7 (2026-10-15)
 
 ### Bug Fixes

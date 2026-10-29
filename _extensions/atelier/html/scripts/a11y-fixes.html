@@ -144,6 +144,37 @@
 		});
 		document.querySelectorAll(".quarto-title-meta").forEach((el) => labelOnce(el, "region", "Page metadata"));
 
+		// Listing categories: Quarto emits <div> elements with a click handler, so
+		// Tab never reaches them and a screen reader does not call them controls.
+		// Give them a button role, a place in the Tab order and Enter or Space.
+		// Quarto re-renders listing items after a filter or a page change, so the
+		// attributes are set only on elements that do not have them yet.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15067
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: a role and a tab stop are attributes, which CSS cannot set.
+		const categorySelector = ".quarto-listing-category .category, .listing-category";
+		const makeCategoriesButtons = (root) => {
+			root.querySelectorAll(categorySelector).forEach((el) => {
+				if (el.hasAttribute("role")) return;
+				el.setAttribute("role", "button");
+				el.setAttribute("tabindex", "0");
+			});
+		};
+		makeCategoriesButtons(document);
+		document.querySelectorAll(".quarto-listing").forEach((listing) => {
+			new MutationObserver(() => makeCategoriesButtons(listing)).observe(listing, {
+				childList: true,
+				subtree: true,
+			});
+		});
+		document.addEventListener("keydown", (event) => {
+			if (event.key !== "Enter" && event.key !== " ") return;
+			const target = event.target instanceof Element ? event.target.closest(categorySelector) : null;
+			if (!target) return;
+			event.preventDefault();
+			target.click();
+		});
+
 		// Quarto clones labelled landmarks into a mobile-only container after our
 		// handlers run; suffix the clones so axe sees them as unique.
 		const dedupeCloneLandmarks = () => {

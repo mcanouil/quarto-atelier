@@ -442,6 +442,17 @@ html .panel-tabset > .tab-content {
 }
 
 // ===========================================================================
+// LISTINGS
+// ===========================================================================
+// Quarto removes the underline from every link in a table listing, including
+// links in running text, so colour alone marks them. Underline them again.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15173
+// Remove when: the minimum Quarto version includes the fix.
+html table.quarto-listing-table a {
+  text-decoration: underline;
+}
+
+// ===========================================================================
 // SIDEBAR
 // ===========================================================================
 // `html/chrome.scss` hands the palette to `$sidebar-bg` and `$sidebar-fg`, so

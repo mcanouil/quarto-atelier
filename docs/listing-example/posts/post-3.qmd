@@ -1,0 +1,8 @@
+---
+title: "Example post 3"
+description: "A short page for the listing example."
+date: "2026-10-03"
+categories: [tips]
+---
+
+Short page 3.
