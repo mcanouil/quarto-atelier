@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+- fix: Default to the `arrow-light` and `arrow-dark` highlighting themes, with every token colour at 4.5:1 or more on the code surface. Many `github-light` tokens failed that ratio.
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
 - fix: Give the author email link in the title block an accessible name, taken from the address. (#53)

@@ -64,8 +64,8 @@ contributes:
           - brand
           - html/theme.scss
       syntax-highlighting:
-        light: github-light
-        dark: github-dark
+        light: arrow-light
+        dark: arrow-dark
       toc: true
       toc-depth: 3
       anchor-sections: true

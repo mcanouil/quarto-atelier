@@ -358,6 +358,34 @@ code:not(.sourceCode):not(pre code) {
   border-radius: 0.3em;
 }
 
+// Token colours of the default highlighting themes, arrow-light and arrow-dark.
+// Quarto passes the Comment and Function colours of the active theme as the
+// copy button variables, which tells these rules which theme is in use, so a
+// different theme keeps its own colours. The light bundle stays active under
+// the dark one, so each rule names its scheme.
+// arrow-light gives its Import and Attribute tokens 4.47:1 and 4.48:1 on the
+// code surface of the documentation palette, just under AA. Raise those two
+// colours to AA on the code surface.
+@if $btn-code-copy-color == #5e5e5e and $btn-code-copy-color-active == #4758ab {
+  body.quarto-light code span.im {
+    color: theme-contrast(#00769e, body-mix(95%), "AA");
+  }
+
+  body.quarto-light code span.at {
+    color: theme-contrast(#657422, body-mix(95%), "AA");
+  }
+}
+
+// arrow-dark puts its RegionMarker token, #00e0e0, on a #f8f8f2 band, which
+// gives 1.54:1. Remove the band, so the token sits on the code surface.
+// Upstream: pending (draft arrow-dark-region-marker-contrast)
+// Remove when: the minimum Quarto version includes the fix.
+@if $btn-code-copy-color == #f8f8f2 and $btn-code-copy-color-active == #ffa07a {
+  body.quarto-dark code span.re {
+    background-color: transparent;
+  }
+}
+
 // Quarto fades a callout title with opacity, which also fades the inline code
 // in it below AA. Fade the title text by its colour instead, so code keeps its
 // own ink.

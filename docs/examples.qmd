@@ -76,6 +76,59 @@ quarto publish gh-pages # <1>
 
 1. Publish the site to GitHub Pages.
 
+## Syntax highlighting
+
+These blocks hold every token type that Pandoc marks, so each colour of the highlighting theme shows on the code surface:
+
+```cpp
+//BEGIN scale
+#include <cstdio>
+
+/// Scale a value.
+/** @param x The input. @note Pure. @warning No bounds check. */
+template <typename T>
+T scale(T x) {
+  const char tab = '\t';
+  const float k = 1.5f;
+  unsigned mask = 0x1F;
+  int bad = 08;
+  // TODO: clamp the result.
+  if (x > 0) {
+    std::printf("%d\n", mask);
+    return x * k;
+  }
+  return 0;
+}
+//END
+```
+
+```r
+#' Scale a vector.
+#' @param x A numeric vector.
+scale_by <- function(x, k = 2L) {
+  stopifnot(is.numeric(x), !is.null(NULL), TRUE)
+  x * k
+}
+```
+
+```python
+import re
+
+pattern = re.compile(r"\d+")
+label = f"{pattern.pattern} matches"
+```
+
+```php
+<?php
+/** @var int $length */
+$length = strlen("atelier");
+```
+
+```bash
+export SITE="${1:-docs}"
+quarto render "$SITE" --to html
+```
+
 ## Tabset
 
 ::: {.panel-tabset}
