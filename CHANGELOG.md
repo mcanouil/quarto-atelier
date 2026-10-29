@@ -29,6 +29,7 @@
 - fix: Name the sidebar and page navigation landmarks, so that each landmark has its own name on Quarto 1.11.3 and earlier.
 - fix: Let keyboard users open and close sidebar sections on Quarto 1.11.1 and earlier.
 - fix: Start the names of the previous and next page links with "Previous" or "Next", so that screen readers say which way each link goes.
+- fix: Start the page outline with the page title, rather than with the "On this page" heading of a side table of contents.
 
 ## 0.10.7 (2026-10-15)
 

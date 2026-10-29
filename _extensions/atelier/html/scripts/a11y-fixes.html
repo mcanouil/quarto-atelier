@@ -368,6 +368,18 @@
 			});
 		});
 
+		// A table of contents in a side column comes before the page title in the
+		// document, so the page starts with its "On this page" h2 and not with
+		// the h1. The TOC nav keeps its name, so remove the heading role only.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/12568
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: the heading role is part of the element, which CSS cannot change.
+		const tocTitle = document.querySelector("nav#TOC > h2#toc-title");
+		const pageTitle = document.querySelector("h1");
+		if (tocTitle && pageTitle && tocTitle.compareDocumentPosition(pageTitle) & Node.DOCUMENT_POSITION_FOLLOWING) {
+			tocTitle.setAttribute("role", "presentation");
+		}
+
 		// When content overlaps a side column, Quarto replaces the column with a
 		// toggle whose title is a div with a click handler only: it has no role,
 		// no tab stop, no keyboard action and no expanded state. Give the title
