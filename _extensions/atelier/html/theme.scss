@@ -842,6 +842,26 @@ body.docked {
   font-weight: 600;
 }
 
+// Quarto sizes a section toggle to its 0.7rem icon, about 20 by 18 px, and
+// puts page links 23.8 px apart, so both miss the 24 px target size of WCAG
+// 2.5.8. Give the toggle a 24 px box, with negative margins that keep the row
+// height, and add enough space between items to put links 24 px apart.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15096
+// Remove when: the minimum Quarto version includes the fix.
+.sidebar-navigation .sidebar-item .sidebar-item-toggle:not(.sidebar-item-text) {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  margin-block: -3px;
+}
+
+.sidebar-navigation .sidebar-item {
+  margin-top: 0.45rem;
+}
+
 // Quarto's floating back-to-top pill has no edge on tinted surfaces; give it
 // the same hairline as the code surfaces.
 #quarto-back-to-top {
