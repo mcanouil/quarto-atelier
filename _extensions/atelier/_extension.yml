@@ -82,7 +82,6 @@ contributes:
       # own shortcodes replace the embedded ones.
       shortcodes:
         - iconify
-        - badge
       filters:
         - social-metadata.lua
         - iconify

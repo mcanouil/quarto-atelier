@@ -20,7 +20,7 @@ project:
 
 ## Embedded extensions
 
-Atelier ships with six extensions inside it, so you don't install them yourself: [iconify](https://github.com/mcanouil/quarto-iconify), [gitlink](https://github.com/mcanouil/quarto-gitlink), [code-window](https://github.com/mcanouil/quarto-code-window), [badge](https://github.com/mcanouil/quarto-badge), [toc-depth](https://github.com/mcanouil/quarto-toc-depth) and [collapse-output](https://github.com/mcanouil/quarto-collapse-output).
+Atelier ships with five extensions inside it, so you don't install them yourself: [iconify](https://github.com/mcanouil/quarto-iconify), [gitlink](https://github.com/mcanouil/quarto-gitlink), [code-window](https://github.com/mcanouil/quarto-code-window), [toc-depth](https://github.com/mcanouil/quarto-toc-depth) and [collapse-output](https://github.com/mcanouil/quarto-collapse-output).
 They live in `_extensions/atelier/_extensions/mcanouil/`, and each `_extension.yml` records the release it came from.
 Atelier's minimum Quarto version follows theirs: it is the highest version any of them needs.
 
