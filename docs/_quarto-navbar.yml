@@ -48,3 +48,14 @@ website:
   search:
     location: navbar
     type: overlay
+  # A sidebar section is the one sidebar item Quarto writes with a toggle of its
+  # own; Atelier repairs it. Quarto appends these items to the flat list of the
+  # site, so the section holds the pages that list leaves out.
+  sidebar:
+    contents:
+      - section: "More examples"
+        contents:
+          - href: numbered-sections.qmd
+            text: "Numbered sections"
+          - href: listing-example/index.qmd
+            text: "Listing example"
