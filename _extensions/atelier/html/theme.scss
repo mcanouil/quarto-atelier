@@ -292,6 +292,23 @@ html pre.code-annotation-code {
   padding-bottom: 0;
 }
 
+// Quarto measures the line highlight of selected annotated code from the
+// `code` element, but puts it in the `pre`, which is not positioned. The band
+// then takes the copy scaffold as its containing block: it sits one border
+// width above the gutter highlight, and a -4em margin moves it out past the
+// left edge of the block. Make the `pre` the containing block and remove the
+// margin, so that the band fills the block and lines up with the gutter.
+// Fixed upstream in Quarto 1.11, after 1.11.7: https://github.com/quarto-dev/quarto-cli/issues/13448
+// Remove when: the minimum Quarto version is the first release after 1.11.7.
+html pre.code-annotation-code {
+  position: relative;
+}
+
+html #code-annotation-line-highlight {
+  margin-left: 0;
+  width: 100%;
+}
+
 // Quarto paints the annotation gutter from a fixed light grey in both schemes,
 // over a page-coloured backing that hides code scrolled under it; a strip on
 // the code surface. Clear the grey and back the gutter with the code surface.

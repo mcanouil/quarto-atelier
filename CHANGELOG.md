@@ -20,6 +20,7 @@
 - fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one. (#55)
 - fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode.
 - fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or leaves a scrollable box that the keyboard cannot reach.
+- fix: Keep the highlight of a selected code annotation inside the code block, level with the gutter highlight.
 
 ## 0.10.7 (2026-10-15)
 
