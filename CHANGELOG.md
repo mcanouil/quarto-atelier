@@ -13,6 +13,8 @@
 - fix: Hide the title block metadata container when the page has no metadata. (#53)
 - fix: Name each footnote back-link for screen readers and give it a 24 pixel target. The name is in English, because Quarto offers no translated string for it. (#54)
 - fix: Draw the appendix at full opacity, so its back-links and licence link keep a 4.5:1 contrast ratio. (#54)
+- fix: Apply the theme corner radius in website projects, where Quarto reset it to 0.25rem. A project theme that sets `$border-radius` or `$border-radius-sm` still wins. 
+- fix: Remove the lightbox link of an image made for the other colour scheme from the tab order.
 
 ## 0.10.7 (2026-10-15)
 
