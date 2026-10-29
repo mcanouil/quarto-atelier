@@ -21,6 +21,15 @@
 - fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode and in a link. (#56)
 - fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or a copy button, or leaves a scrollable box that the keyboard cannot reach. (#56)
 - fix: Keep the highlight of a selected code annotation inside the code block, level with the gutter highlight. (#56)
+- fix: Mark the current page in the sidebar for screen readers, as the navbar already does. (#57)
+- fix: Show the current page by more than its colour. It is bold in every sidebar style, and underlined in the navbar of a page without a sidebar. (#57)
+- fix: Make sidebar section toggles 24 by 24 px, and space the sidebar links so that each one meets the 24 px target size. (#57)
+- fix: Let keyboard users open the "On this page" and sidebar toggles that replace a side column when wide content overlaps it. The toggles now say whether they are open, and their hidden links leave the tab order. (#57)
+- fix: Stop announcing the bar above the page on narrow screens as a navigation landmark, because its links are in the breadcrumbs. (#57)
+- fix: Name the sidebar and page navigation landmarks, so that each landmark has its own name on Quarto 1.11.3 and earlier. (#57)
+- fix: Let keyboard users open and close sidebar sections on Quarto 1.11.1 and earlier. (#57)
+- fix: Start the names of the previous and next page links with "Previous" or "Next", so that screen readers say which way each link goes. (#57)
+- fix: Start the page outline with the page title, rather than with the "On this page" heading of a side table of contents. (#57)
 
 ## 0.10.7 (2026-10-15)
 
