@@ -76,6 +76,108 @@
 			searchObserver.observe(host, { childList: true, subtree: true });
 		});
 
+		// Search overlay: Quarto opens it as a plain <div> over the page. Screen
+		// readers and Tab still reach the page behind it, the result count is not
+		// announced, the magnifier is a Tab stop that only closes the overlay, and
+		// Esc or Cancel drops focus on <body>. Make the overlay a modal dialog:
+		// set the page behind it inert, add a status region that repeats the
+		// result header, and give focus back to the search button on close.
+		// The autocomplete library renders the overlay again on each key, so
+		// every step checks the current value before it writes.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15189
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: roles, inert, focus and a live region are DOM changes, which CSS cannot make.
+		let overlayTrigger = null;
+		let overlayObserver = null;
+		document.addEventListener(
+			"click",
+			(event) => {
+				const trigger = event.target.closest(".aa-DetachedSearchButton");
+				if (trigger) overlayTrigger = trigger;
+			},
+			true,
+		);
+		// The selection highlight follows the arrow keys only, so a result that
+		// Tab reaches looks inactive beside the highlighted one. Move the
+		// selection to the focused result with the event the library already
+		// selects on, and again when the library resets the selection.
+		const selectFocusedResult = () => {
+			const focused = document.activeElement;
+			const item = focused && focused.closest(".aa-DetachedOverlay .aa-Item");
+			if (item && item.getAttribute("aria-selected") !== "true") {
+				item.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+			}
+		};
+		document.addEventListener("focusin", selectFocusedResult);
+		const setAttributeOnce = (element, name, value) => {
+			if (element.getAttribute(name) !== value) element.setAttribute(name, value);
+		};
+		const syncOverlay = (overlay) => {
+			const container = overlay.querySelector(".aa-DetachedContainer");
+			if (!container) return;
+			setAttributeOnce(container, "role", "dialog");
+			setAttributeOnce(container, "aria-modal", "true");
+			setAttributeOnce(container, "aria-label", searchName);
+			overlay.querySelectorAll(".aa-SubmitButton").forEach((button) => {
+				setAttributeOnce(button, "tabindex", "-1");
+			});
+			let status = container.querySelector(":scope > .atelier-search-status");
+			if (!status) {
+				status = document.createElement("div");
+				status.className = "atelier-search-status visually-hidden";
+				status.setAttribute("role", "status");
+				container.appendChild(status);
+			}
+			const header = overlay.querySelector(".aa-Panel .search-result-header, .aa-Panel .quarto-search-no-results");
+			const message = header ? header.textContent.trim() : "";
+			if (status.textContent !== message) status.textContent = message;
+			nameSearchInputs();
+			selectFocusedResult();
+		};
+		const openOverlay = (overlay) => {
+			Array.from(document.body.children).forEach((child) => {
+				if (child === overlay || child.inert || child.tagName === "SCRIPT") return;
+				child.inert = true;
+				child.dataset.atelierInert = "";
+			});
+			syncOverlay(overlay);
+			overlayObserver = new MutationObserver(() => syncOverlay(overlay));
+			overlayObserver.observe(overlay, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ["aria-selected", "aria-label"],
+			});
+		};
+		const closeOverlay = () => {
+			if (overlayObserver) overlayObserver.disconnect();
+			overlayObserver = null;
+			document.querySelectorAll("[data-atelier-inert]").forEach((child) => {
+				child.inert = false;
+				delete child.dataset.atelierInert;
+			});
+			const focusLost = !document.activeElement || document.activeElement === document.body;
+			// The keyboard shortcut opens the overlay without a click, so fall
+			// back to the search button that is on screen.
+			const trigger =
+				overlayTrigger && overlayTrigger.isConnected
+					? overlayTrigger
+					: Array.from(document.querySelectorAll(".aa-DetachedSearchButton")).find(
+							(button) => button.offsetParent !== null,
+						);
+			if (focusLost && trigger) trigger.focus();
+		};
+		new MutationObserver((records) => {
+			records.forEach((record) => {
+				record.addedNodes.forEach((node) => {
+					if (node.classList && node.classList.contains("aa-DetachedOverlay")) openOverlay(node);
+				});
+				record.removedNodes.forEach((node) => {
+					if (node.classList && node.classList.contains("aa-DetachedOverlay")) closeOverlay();
+				});
+			});
+		}).observe(document.body, { childList: true });
+
 		// CSL bibliography: Quarto emits role="listitem" without a role="list" parent.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14755 (bibliography)
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15171 (appendix cite as)
@@ -424,5 +526,103 @@
 		new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => mutation.addedNodes.forEach(enhanceTogglesIn));
 		}).observe(document.body, { childList: true, subtree: true });
+
+		// A link with role="button" does not react to Space as a button does.
+		// The back-to-top and dropdown toggle blocks below rely on this handler.
+		const pressOnSpace = (element) => {
+			element.addEventListener("keydown", (event) => {
+				if (event.key !== " ") return;
+				event.preventDefault();
+				element.click();
+			});
+		};
+
+		// Back to top: Quarto writes an <a> with no href and no tabindex, so the
+		// keyboard cannot reach it. Put it in the Tab order, and after it scrolls
+		// the page, start the next Tab from the top of the page. The theme keeps
+		// it visible while it has focus.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15187
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: tabindex and focus are DOM changes, which CSS cannot make.
+		const backToTop = document.getElementById("quarto-back-to-top");
+		if (backToTop && !backToTop.hasAttribute("href") && !backToTop.hasAttribute("tabindex")) {
+			backToTop.setAttribute("tabindex", "0");
+			backToTop.dataset.atelierFocusable = "";
+			backToTop.addEventListener("keydown", (event) => {
+				if (event.key === "Enter") backToTop.click();
+			});
+			pressOnSpace(backToTop);
+			backToTop.addEventListener("click", () => {
+				if (document.activeElement !== backToTop) return;
+				document.body.setAttribute("tabindex", "-1");
+				document.body.focus({ preventScroll: true });
+				document.body.removeAttribute("tabindex");
+			});
+		}
+
+		// Navbar menus: Quarto gives each dropdown toggle role="link", but the
+		// control opens a menu and goes to no page. Use the button role, as
+		// Bootstrap does.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15188
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: an ARIA role is an attribute, which CSS cannot set.
+		document.querySelectorAll('.dropdown-toggle[role="link"]').forEach((toggle) => {
+			toggle.setAttribute("role", "button");
+			pressOnSpace(toggle);
+		});
+
+		// Collapsed navbar: Quarto gives the menu <button> role="menu", which a
+		// button cannot take. Remove it, so that the element is a button again.
+		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/14615
+		// Remove when: the minimum Quarto version is 1.11.2 or later.
+		// Not SCSS: an ARIA role is an attribute, which CSS cannot remove.
+		document.querySelectorAll('.navbar-toggler[role="menu"]').forEach((toggler) => {
+			toggler.removeAttribute("role");
+		});
+
+		// Navigation icons: in the navbar, the sidebar and the footer, Quarto
+		// writes each `icon:` as <i role="img"> with no name, and writes empty
+		// title and aria-label attributes on a tool with no `text:`. Hide the icon when the link has text. Otherwise name the
+		// link from the icon, and hide the icon.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15123 (icon beside text)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14828 (icon-only tools)
+		// Remove when: the minimum Quarto version includes both fixes.
+		// Not SCSS: roles and names are attributes, which CSS cannot set.
+		const iconName = (icon) => {
+			const glyph = Array.from(icon.classList).find((name) => name.startsWith("bi-"));
+			if (!glyph) return "";
+			const words = glyph.slice(3).replace(/-/g, " ");
+			return words.charAt(0).toUpperCase() + words.slice(1);
+		};
+		document.querySelectorAll("#quarto-header a i.bi, #quarto-sidebar a i.bi, .nav-footer a i.bi").forEach((icon) => {
+			const link = icon.closest("a");
+			["title", "aria-label"].forEach((name) => {
+				if (link.getAttribute(name) === "") link.removeAttribute(name);
+			});
+			const hasText = link.textContent.trim() !== "";
+			const name = hasText ? "" : icon.getAttribute("aria-label") || link.getAttribute("title") || iconName(icon);
+			if (!hasText && !link.getAttribute("aria-label")) {
+				if (!name) return;
+				link.setAttribute("aria-label", name);
+			}
+			if (icon.getAttribute("role") === "img") icon.removeAttribute("role");
+			icon.setAttribute("aria-hidden", "true");
+		});
+
+		// Floating colour scheme toggle: on a page with no navbar and no sidebar
+		// tools, Quarto appends the toggle, or from Quarto 1.11 its container, to
+		// the end of <body>. It is drawn at the top right, but focus reaches it
+		// last. Move it after the skip links, still as a direct child of <body>,
+		// so its drawn position does not change.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: focus order follows the DOM order, which CSS cannot change.
+		const floatingToggle = document.querySelector(".top-right.quarto-color-scheme-toggle")?.closest("body > *");
+		if (floatingToggle) {
+			const skipLinks = document.body.querySelectorAll(":scope > .skip-link, :scope > #quarto-skip-link");
+			const anchor = skipLinks[skipLinks.length - 1];
+			if (anchor) anchor.after(floatingToggle);
+			else document.body.prepend(floatingToggle);
+		}
 	});
 </script>

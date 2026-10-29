@@ -105,7 +105,8 @@ button:focus-visible,
 
 // Quarto/Bootstrap ships the skip link visually-hidden-focusable but unstyled,
 // so it is near-invisible when focused; give it a visible chip on focus.
-.skip-link:focus {
+.skip-link:focus,
+#quarto-skip-link:focus {
   position: fixed;
   top: 0.5rem;
   left: 0.5rem;
@@ -116,6 +117,17 @@ button:focus-visible,
   color: var(--atelier-navbar-bg);
   font-weight: 600;
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+}
+
+// Quarto 1.11 writes its own skip link as the first element of the page, so
+// the one from `html/scripts/skip-link.html` is a second Tab stop to the same
+// place. Hide Atelier's link when Quarto's link is there.
+// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/14684
+// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14686
+// Remove when: the minimum Quarto version is 1.11.2 or later; remove
+// `html/scripts/skip-link.html` and its include at the same time.
+body:has(> #quarto-skip-link) .skip-link {
+  display: none;
 }
 
 // Quarto renders dates as plain text; the ordinal-dates script wraps the
@@ -868,6 +880,23 @@ body.docked {
   border: 1px solid body-mix(85%);
 }
 
+// Quarto hides the back-to-top pill with its stylesheet before the first
+// scroll, and with an inline `display: none` after it, and focus cannot reach
+// a hidden element. Keep the pill in the layout, but transparent and out of
+// reach of the pointer, until it has focus. The rule matches only these two
+// hidden states, and only after `html/scripts/a11y-fixes.html` has put the
+// pill in the Tab order, so any other display that Quarto sets wins.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15187
+// Remove when: the minimum Quarto version includes the fix.
+#quarto-back-to-top[data-atelier-focusable]:is(:not([style*="display"]), [style*="display: none"]) {
+  display: inline-block !important;
+
+  &:not(:focus-visible) {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 // ===========================================================================
 // NAVBAR
 // ===========================================================================
@@ -1296,6 +1325,16 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
     mask-image: $atelier-icon-moon;
     -webkit-mask-image: $atelier-icon-moon;
   }
+}
+
+// In the sidebar tools row, Quarto sizes the tool icons from the font size of
+// the row, but the toggle glyph from the root font size, so the toggle is
+// larger than the icons beside it. Size the glyph from the row instead.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15179
+// Remove when: the minimum Quarto version includes the fix.
+.sidebar-navigation .quarto-color-scheme-toggle .bi::before {
+  width: 1em;
+  height: 1em;
 }
 
 // ===========================================================================

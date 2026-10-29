@@ -4,6 +4,13 @@
 
 ### Bug Fixes
 
+- fix: Put the back-to-top button in the Tab order and show it while it has focus, so keyboard users can reach it and press it with Enter or Space. (#58)
+- fix: Announce navbar menus as buttons rather than links, and drop the invalid `menu` role from the collapsed navbar button. (#58)
+- fix: Hide navigation icons that sit beside text from screen readers, and name icon-only tools from their icon. (#58)
+- fix: Make the search overlay a modal dialog. Tab stays inside it, the result count is announced, the highlighted result follows focus, and closing it puts focus back on the search button. (#58)
+- fix: Size the colour scheme toggle in the sidebar tools like the icons beside it. (#58)
+- fix: Move the floating colour scheme toggle to the start of the focus order, next to where it is drawn. (#58)
+- fix: Show one skip link with Quarto 1.11.2 or later, which adds its own. (#58)
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
 - fix: Give the author email link in the title block an accessible name, taken from the address. (#53)
