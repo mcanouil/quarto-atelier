@@ -18,6 +18,7 @@
 - fix: Remove the lightbox link of an image made for the other colour scheme from the tab order.
 - fix: Make the header of a collapsible callout a button that exposes whether it is open, and keep a link in the title working.
 - fix: Separate the callout type from the title for screen readers, so "Note Title" no longer reads as one word.
+- fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one.
 
 ## 0.10.7 (2026-10-15)
 

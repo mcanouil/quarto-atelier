@@ -1227,6 +1227,18 @@ $scrollbar-thumb: body-mix(72%);
 }
 
 // ===========================================================================
+// MERMAID
+// ===========================================================================
+// Quarto paints a subgraph with `--mermaid-fg-color--lightest`, a lightened
+// text colour, which is a dark grey on a light page and white on a dark one.
+// Paint it from the page surface instead.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/9178
+// Remove when: the minimum Quarto version includes the fix.
+:root {
+  --mermaid-fg-color--lightest: #{body-mix(92%)};
+}
+
+// ===========================================================================
 // LIGHTBOX
 // ===========================================================================
 // Quarto hides the image made for the other colour scheme but keeps its
