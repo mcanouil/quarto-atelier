@@ -196,28 +196,6 @@
 		// handlers run; suffix the clones so axe sees them as unique.
 		});
 
-		// When content overlaps a side column, Quarto clones the column, with the
-		// landmarks labelled above, into a toggle after these handlers run. Suffix
-		// the labels of the clones so that each landmark name stays unique.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14969
-		// Remove when: the minimum Quarto version includes the fix.
-		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
-		const dedupeCloneLandmarks = () => {
-			document
-				.querySelectorAll(
-					'.quarto-sidebar-toggle-contents [role="complementary"], .quarto-sidebar-toggle-contents [role="region"], .quarto-sidebar-toggle-contents aside',
-				)
-				.forEach((el) => {
-					const label = el.getAttribute("aria-label");
-					if (label && !/\(mobile\)$/.test(label)) {
-						el.setAttribute("aria-label", `${label} (mobile)`);
-					}
-				});
-		};
-		dedupeCloneLandmarks();
-		setTimeout(dedupeCloneLandmarks, 50);
-		setTimeout(dedupeCloneLandmarks, 250);
-
 		// Footnote back-links: Quarto renders only an arrow glyph, which a screen
 		// reader reads as "return" or nothing. Name each one after its note.
 		// Quarto exposes no localised string for this link in the page, so the
