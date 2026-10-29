@@ -1167,6 +1167,31 @@ $scrollbar-thumb: body-mix(72%);
 }
 
 // ===========================================================================
+// FOOTNOTES AND APPENDIX
+// ===========================================================================
+// The back-link of a footnote is a 15px glyph, below the 24px target size.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15064
+// Remove when: the minimum Quarto version includes the fix.
+.footnote-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+// Quarto fades the appendix to opacity 0.9, which pulls the back-links and the
+// licence link below 4.5:1. The selectors match the specificity of Quarto's
+// and come later.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14679
+// Remove when: the minimum Quarto version includes the fix.
+#quarto-appendix.default .quarto-appendix-heading,
+#quarto-appendix.default section *[role="doc-endnotes"],
+#quarto-appendix.default section > *:not(a) {
+  opacity: 1;
+}
+
+// ===========================================================================
 // MOTION GUARD
 // ===========================================================================
 // Every motion the theme owns or inherits is cancelled here, in one place. The
