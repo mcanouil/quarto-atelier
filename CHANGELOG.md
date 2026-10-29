@@ -19,6 +19,11 @@
 - fix: Make the header of a collapsible callout a button that exposes whether it is open, and keep a link in the title working.
 - fix: Separate the callout type from the title for screen readers, so "Note Title" no longer reads as one word.
 - fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one.
+- fix: Apply the theme corner radius in website projects, where Quarto reset it to 0.25rem. A project theme that sets `$border-radius` or `$border-radius-sm` still wins. (#55)
+- fix: Remove the lightbox link of an image made for the other colour scheme from the tab order. (#55)
+- fix: Make the header of a collapsible callout a button that exposes whether it is open, and keep a link in the title working. (#55)
+- fix: Separate the callout type from the title for screen readers, so "Note Title" no longer reads as one word. (#55)
+- fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one. (#55)
 
 ## 0.10.7 (2026-10-15)
 
