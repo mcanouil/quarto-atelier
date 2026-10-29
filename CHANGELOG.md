@@ -4,8 +4,6 @@
 
 ### Bug Fixes
 
-- fix: Name each footnote back-link for screen readers and give it a 24 pixel target. The name is in English, because Quarto offers no translated string for it.
-- fix: Draw the appendix at full opacity, so its back-links and licence link keep a 4.5:1 contrast ratio.
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
 - fix: Give the author email link in the title block an accessible name, taken from the address. (#53)
