@@ -24,6 +24,9 @@
 - fix: Default to the `arrow-light` and `arrow-dark` highlighting themes, with every token colour at 4.5:1 or more on the code surface. Many `github-light` tokens failed that ratio. (#56)
 - fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode. (#56)
 - fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or leaves a scrollable box that the keyboard cannot reach. (#56)
+- fix: Default to the `arrow-light` and `arrow-dark` highlighting themes, with every token colour at 4.5:1 or more on the default code surface. Many `github-light` tokens failed that ratio. (#56)
+- fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode and in a link. (#56)
+- fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or a copy button, or leaves a scrollable box that the keyboard cannot reach. (#56)
 - fix: Keep the highlight of a selected code annotation inside the code block, level with the gutter highlight. (#56)
 
 ## 0.10.7 (2026-10-15)
