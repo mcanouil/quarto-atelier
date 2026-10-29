@@ -4,8 +4,8 @@
 
 ### New Features
 
-- feat: Style blockquotes with an inset bar, a decorative opening quote that screen readers skip, and a quieter attribution for `footer`, `cite` and `.attribution`.
-- feat: Set section numbers smaller, in tabular numerals and in the primary colour. Listing and appendix headings keep the default look.
+- feat: Style blockquotes with an inset bar, a decorative opening quote that screen readers skip, and a quieter attribution for `footer`, `cite` and `.attribution`. (#61)
+- feat: Set section numbers smaller, in tabular numerals and in the primary colour. Listing and appendix headings keep the default look. (#61)
 
 ### Bug Fixes
 
