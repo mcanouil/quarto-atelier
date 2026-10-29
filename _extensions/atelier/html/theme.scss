@@ -447,7 +447,7 @@ a code.sourceCode:not(pre code) {
 
 // arrow-dark puts its RegionMarker token, #00e0e0, on a #f8f8f2 band, which
 // gives 1.54:1. Remove the band, so the token sits on the code surface.
-// Upstream: pending (draft arrow-dark-region-marker-contrast)
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15222
 // Remove when: the minimum Quarto version includes the fix.
 @if $btn-code-copy-color == #f8f8f2 and $btn-code-copy-color-active == #ffa07a {
   body.quarto-dark code span.re {
