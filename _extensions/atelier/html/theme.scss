@@ -436,6 +436,31 @@ html .quarto-dark .code-with-filename .code-with-filename-file {
   background-color: var(--code-window-title-bg);
 }
 
+// Code Window draws its frame with an 8px radius, a 1.5em margin and a border
+// mixed from the text colour. Use the frame of a plain code block for all
+// three, so that a window and a plain block look the same in both schemes. The
+// title bar divider uses the same border colour.
+html .code-with-filename {
+  margin: 1rem 0;
+  border-color: body-mix(85%);
+  border-radius: $border-radius-sm;
+}
+
+html .code-with-filename .code-with-filename-file {
+  border-bottom-color: body-mix(85%);
+}
+
+html .code-with-filename .code-copy-outer-scaffold {
+  border-radius: 0 0 $border-radius-sm $border-radius-sm;
+}
+
+// A closed collapsible window sets its 8px radius again, on the window and on
+// its title bar, with a more specific selector.
+html .code-with-filename.code-window-collapsible:not([open]),
+html .code-with-filename.code-window-collapsible:not([open]) > summary.code-with-filename-file {
+  border-radius: $border-radius-sm;
+}
+
 // The window surface also backs the annotation gutter of code inside it.
 html .code-with-filename .code-annotation-gutter-bg {
   background-color: var(--code-window-bg);

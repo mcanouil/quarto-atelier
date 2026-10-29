@@ -4,7 +4,7 @@
 # is listed here.
 
 # The documentation website. Quarto's built-in `_extensions` exclude matches
-# the repository root only, so docs/_extensions/mcanouil/ is not covered by it.
+# the repository root only, so docs/_extensions/ is not covered by it.
 docs
 
 # The repository's own citation metadata, not the new project's.

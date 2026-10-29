@@ -8,6 +8,5 @@
 /_variables.yml
 
 # The extension this repository publishes, copied from the root by
-# _scripts/sync-extension.sh under a `local` owner. Everything else under
-# _extensions/ is a committed dependency. See _extensions/README.md.
+# _scripts/sync-extension.sh under a `local` owner. See _extensions/README.md.
 /_extensions/local/

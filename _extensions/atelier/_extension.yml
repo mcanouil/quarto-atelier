@@ -1,7 +1,7 @@
 title: Atelier
 author: Mickaël Canouil
 version: 0.10.7
-quarto-required: ">=1.9.36"
+quarto-required: ">=1.9.38"
 contributes:
   project:
     project:
@@ -74,8 +74,35 @@ contributes:
         sidebar-width: 300px
         body-width: 1000px
         margin-width: 300px
+      # The embedded extensions under `_extensions/mcanouil/` are named here,
+      # and Quarto resolves each name to the filters or shortcodes of the
+      # embedded copy. A project resolves the names in its own `filters` list
+      # against its own `_extensions/` only. A project that keeps its own copy
+      # of one of these extensions and names it there runs both copies, and its
+      # own shortcodes replace the embedded ones.
+      shortcodes:
+        - iconify
+        - badge
       filters:
         - social-metadata.lua
+        - iconify
+        - code-window
+        - gitlink
+        - toc-depth
+        - collapse-output
+      # Each embedded extension keeps its own defaults, set per site under
+      # `extensions:`, with two exceptions. gitlink shows its repository widget,
+      # but does not rewrite references in prose. The widget shows only where a
+      # navbar item or sidebar tool has the href `#gitlink-widget`. Code Window
+      # draws a window only where a block has a `filename`, and does not make a
+      # label from the language of every other block.
+      extensions:
+        gitlink:
+          enabled: false
+          widget:
+            enabled: true
+        code-window:
+          auto-filename: false
       include-before-body:
         - file: html/scripts/skip-link.html
       include-after-body:
