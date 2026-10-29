@@ -924,6 +924,10 @@ html .callout.callout-style-simple > .callout-header {
 // title takes the title colour, and its underline marks it as a link.
 html .callout > .callout-header a {
   color: inherit;
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
 }
 
 // With a link in the title, the script for the collapsible callout moves the

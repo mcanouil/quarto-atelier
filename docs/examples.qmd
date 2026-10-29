@@ -312,6 +312,7 @@ A collapsed callout is a button that announces whether it is open:
 ## A closed callout
 
 Its toggle exposes `aria-expanded`.
+
 :::
 
 A callout title reads as "Note Title" to a screen reader, with a space between the type and the title.
@@ -321,15 +322,17 @@ A callout title reads as "Note Title" to a screen reader, with a space between t
 ## A titled callout
 
 Body text.
+
 :::
 
 A link in a callout title takes the colour of the title and keeps its underline:
 
-::: {.callout-tip}
+::: {.callout-tip collapse="false"}
 
 ## A title with [a link](https://quarto.org)
 
 Body text.
+
 :::
 
 An image for one colour scheme only keeps no empty tab stop for the other scheme:
