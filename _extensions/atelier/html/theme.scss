@@ -924,6 +924,7 @@ html .callout.callout-style-simple > .callout-header {
 // title takes the title colour, and its underline marks it as a link.
 html .callout > .callout-header a {
   color: inherit;
+  text-decoration: underline;
 
   &:hover {
     text-decoration-thickness: 2px;
