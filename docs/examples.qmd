@@ -2,6 +2,10 @@
 title: "Examples"
 description: "Every element the atelier project type styles, rendered by the project type itself."
 date: today
+author:
+  - name: "Mickaël CANOUIL, _Ph.D._"
+    email: "claude@mickael.canouil.fr"
+categories: [Atelier, Accessibility]
 ---
 
 Set `project.type: atelier` in your `_quarto.yml`, provide a `_brand.yml`, then author pages as usual.
@@ -129,6 +133,15 @@ Add that stylesheet under `format.atelier-html.theme`, not `format.html`, which 
 ### A nested heading
 
 {{< lipsum 1 >}}
+
+#### A heading with a [link](https://quarto.org)
+
+##### A fifth-level heading with a [link](https://quarto.org)
+
+###### A sixth-level heading with a [link](https://quarto.org)
+
+Quarto fades the title block categories and the headings from the third level down.
+Atelier keeps their text readable in both schemes, and names the author email link for screen readers.
 
 ## Framed embeds
 
