@@ -8,6 +8,9 @@
 		// Logo link: Quarto emits <a class="navbar-brand"> with an inner <img alt>,
 		// but the accessible name is lost when the image is styled away.
 		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14660
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15165
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
 		const siteName = (
 			document.querySelector(".navbar-title")?.textContent ||
 			document.title ||
@@ -21,6 +24,8 @@
 
 		// Colour scheme toggle: Quarto adds title= but no aria-label.
 		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/13463
+		// Remove when: the minimum Quarto version is 1.11.2 or later.
+		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
 		document.querySelectorAll("a.quarto-color-scheme-toggle:not([aria-label])").forEach((a) => {
 			a.setAttribute("aria-label", a.getAttribute("title") || "Toggle dark mode");
 		});
@@ -31,6 +36,8 @@
 		// own localised search label, and again when a search host or the overlay
 		// renders a new one.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15062
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: the name sits on a label and on host-rendered inputs, which CSS cannot name.
 		const searchName = (() => {
 			try {
 				const options = document.getElementById("quarto-search-options");
@@ -60,14 +67,20 @@
 		});
 
 		// CSL bibliography: Quarto emits role="listitem" without a role="list" parent.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14755
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14755 (bibliography)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15171 (appendix cite as)
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: removing an ARIA role is a DOM change, which CSS cannot make.
 		document.querySelectorAll('[role="listitem"]').forEach((el) => {
 			el.removeAttribute("role");
 		});
 
 		// Disambiguate landmarks. The page title-block is also a <header>, which is a
 		// duplicate banner alongside the site navbar; demote it and label the rest.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14375 (banner), closed https://github.com/quarto-dev/quarto-cli/issues/14376 (nav labels)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14375 (banner)
+		// Fixed upstream in Quarto 1.11.4: https://github.com/quarto-dev/quarto-cli/issues/14376 (nav labels)
+		// Remove when: the minimum Quarto version includes the fix for the banner (#14375).
+		// Not SCSS: ARIA roles and labels are attributes, which CSS cannot set.
 		const siteHeader = document.getElementById("quarto-header");
 		if (siteHeader && !siteHeader.getAttribute("aria-label")) {
 			siteHeader.setAttribute("aria-label", "Site banner");
@@ -88,6 +101,8 @@
 		// Listing category sidebar: Quarto emits <h5>Categories</h5> after the page
 		// <h1>, breaking heading order. Re-tag to <h2> so the outline stays monotonic.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14384
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: changing the heading level is a change of tag name, which CSS cannot make.
 		document.querySelectorAll("h5.quarto-listing-category-title").forEach((h5) => {
 			const h2 = document.createElement("h2");
 			for (const attr of h5.attributes) h2.setAttribute(attr.name, attr.value);
@@ -98,6 +113,8 @@
 		// Wrap orphan listing landmarks so the region rule passes; skip nodes already
 		// inside a landmark, and the mobile sidebar-toggle clones (non-unique).
 		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14377
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: adding a wrapper element and a role is a DOM change, which CSS cannot make.
 		const insideLandmark = (el) =>
 			el &&
 			el.closest(
