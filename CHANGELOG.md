@@ -12,6 +12,8 @@
 - fix: Keep the text of title block category badges at full strength, so it passes the contrast check. (#53)
 - fix: Fade h3 to h6 headings by their colour rather than their opacity, so links inside them keep their contrast. (#53)
 - fix: Hide the title block metadata container when the page has no metadata. (#53)
+- fix: Name each footnote back-link for screen readers and give it a 24 pixel target. The name is in English, because Quarto offers no translated string for it. (#54)
+- fix: Draw the appendix at full opacity, so its back-links and licence link keep a 4.5:1 contrast ratio. (#54)
 
 ## 0.10.7 (2026-10-15)
 
@@ -75,8 +77,6 @@
 ### New Features
 
 - feat: `.embed-art`, a utility class that frames an embedded document or an image as a tilted, centred card. The class goes on the image itself, so no wrapper div is needed. `--atelier-embed-art-width`, `--atelier-embed-art-ratio`, and `--atelier-embed-art-tilt` resize or straighten it, and the card holds its resting angle under `prefers-reduced-motion: reduce`.
-
-### Bug Fixes
 
 - fix: cancel the tabset link colour transition under `prefers-reduced-motion: reduce`. It was the one motion the theme introduced that the guard did not cover.
 
