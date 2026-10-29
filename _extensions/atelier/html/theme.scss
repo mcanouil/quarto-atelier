@@ -1383,7 +1383,8 @@ blockquote:not(.twitter-tweet),
 .blockquote:not(.twitter-tweet) {
   position: relative;
   margin: 1.5rem 0;
-  padding: 0.125rem 0 0.125rem 2.5rem;
+  padding: 0.125rem 0;
+  padding-inline-start: 2.5rem;
   border: 0;
   background: none;
   font-style: normal;
@@ -1394,7 +1395,7 @@ blockquote:not(.twitter-tweet),
     position: absolute;
     top: 0.5rem;
     bottom: 0.5rem;
-    left: 0.375rem;
+    inset-inline-start: 0.375rem;
     width: 0.25rem;
     border-radius: 0.125rem;
     background: $primary;
@@ -1405,7 +1406,7 @@ blockquote:not(.twitter-tweet),
     content: "\201C" / "";
     position: absolute;
     top: -0.1rem;
-    left: 1rem;
+    inset-inline-start: 1rem;
     font-family: Georgia, serif;
     font-size: 2rem;
     line-height: 1;
@@ -1422,13 +1423,22 @@ blockquote:not(.twitter-tweet),
   }
 
   footer,
-  cite,
+  > cite,
   .attribution {
     display: block;
     margin-top: 0.25rem;
     font-size: 0.85em;
     font-style: normal;
     color: theme-contrast($text-muted, $body-bg, "AA");
+  }
+
+  // A `cite` inside an attribution is part of its line: keep it inline, at the
+  // size of the line.
+  footer cite,
+  .attribution cite {
+    display: inline;
+    margin-top: 0;
+    font-size: inherit;
   }
 }
 

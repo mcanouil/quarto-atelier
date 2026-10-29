@@ -361,3 +361,13 @@ A blockquote has an inset bar and a decorative opening quote that a screen reade
 > <cite>A. Reader, An example book</cite>
 
 The section number style is shown on the [numbered sections page](numbered-sections.qmd), which turns on `number-sections` for that page only.
+
+A footer that holds a `cite` keeps both on one line, in the size of the footer:
+
+> A quotation with an attribution in a footer.
+>
+> <footer>A. Reader, <cite>An example book</cite></footer>
+
+A quotation can also hold an inline cite in a sentence:
+
+> The quoted sentence names <cite>a cited title</cite> in the middle of its line.
