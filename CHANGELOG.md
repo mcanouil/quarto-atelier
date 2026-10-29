@@ -9,6 +9,9 @@
 
 ### Bug Fixes
 
+- fix: Show one focus ring on every control, including form fields, search, sidebar toggles, navigation tools, the copy button, the colour scheme toggle and pagination, and use the system highlight colour in forced colours mode. (#62)
+- fix: Keep a focused control clear of the fixed navbar, including the secondary bar on narrow screens. (#62)
+- fix: Cut every animation and transition to a blink, and stop smooth scrolling, when the reader prefers reduced motion. (#62)
 - fix: Put the back-to-top button in the Tab order and show it while it has focus, so keyboard users can reach it and press it with Enter or Space. (#58)
 - fix: Announce navbar menus as buttons rather than links, and drop the invalid `menu` role from the collapsed navbar button. (#58)
 - fix: Hide navigation icons that sit beside text from screen readers, and name icon-only tools from their icon. (#58)

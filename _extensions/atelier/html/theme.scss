@@ -2,6 +2,14 @@
 
 $enable-smooth-scroll: true !default;
 
+// Space that a focused control keeps clear at the top of the page, for the
+// fixed navbar. The first value fits the navbar alone (about 42px). The second
+// fits the navbar with the secondary bar below it, as on a page with a sidebar
+// below the `lg` breakpoint (up to about 104px, when the navbar wraps).
+// Jumps to an anchor are not affected: Quarto offsets those itself.
+$atelier-focus-scroll-margin: 3.5rem !default;
+$atelier-focus-scroll-margin-narrow: 7.25rem !default;
+
 // `.btn-close-white` asks Bootstrap to invert the dismiss icon to force a light
 // one. The icon follows the text around it instead, see DISMISS BUTTON below,
 // so there is nothing left for the class to invert.
@@ -92,15 +100,61 @@ $border-radius-sm: null;
 // ===========================================================================
 // ACCESSIBILITY (focus, skip link, ordinal dates)
 // ===========================================================================
-// Quarto leaves interactive controls with only the browser default focus ring;
-// give every control a visible outline.
+// The focus ring, shared by every control.
+$atelier-focus-ring-color: $primary !default;
+$atelier-focus-ring-width: 2px !default;
+
+// Quarto draws focus in four different ways: the browser ring, a `currentColor`
+// outline on sidebar toggles, a pale Bootstrap halo and a thin search box
+// shadow. Two of them have too little contrast, and forced colours removes the
+// shadows altogether. One ring covers every control instead.
+// Bootstrap and Quarto remove the outline on the controls below with selectors
+// stronger than `:focus-visible`. Each selector here has the same specificity
+// as the rule it overrides, and comes later in the cascade.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15139
+// Fixed upstream in Quarto 1.11.7: https://github.com/quarto-dev/quarto-cli/pull/15163
+// Remove when: the minimum Quarto version is 1.11.7 or later, and `--quarto-focus-ring-shadow: none` below is removed with the list.
+$atelier-focus-controls: ".btn:focus-visible, .btn-close:focus-visible, .nav-link:focus-visible, .navbar-brand:focus-visible, .navbar-toggler:focus-visible, .dropdown-item:focus-visible, .form-control:focus-visible, .form-select:focus-visible, .aa-Autocomplete .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-DetachedSearchButton:focus-visible, .sidebar-item .sidebar-item-toggle:focus-visible, .sidebar-item button.sidebar-item-text:focus-visible, .quarto-navigation-tool:focus-visible, .code-copy-button:focus-visible, .quarto-color-scheme-toggle:focus-visible, .page-link:focus-visible";
+
+:focus-visible,
+#{$atelier-focus-controls} {
+  outline: $atelier-focus-ring-width solid $atelier-focus-ring-color;
+  outline-offset: 2px;
+}
+
+// Quarto 1.11.7 adds an inner shadow ring of its own to the same controls.
+:root {
+  --quarto-focus-ring-shadow: none;
+}
+
+#{$atelier-focus-controls} {
+  box-shadow: none;
+}
+
 a:focus-visible,
 button:focus-visible,
 .btn:focus-visible,
 .nav-link:focus-visible {
-  outline: 2px solid $primary;
-  outline-offset: 2px;
   border-radius: 2px;
+}
+
+@media (forced-colors: active) {
+  :focus-visible,
+  #{$atelier-focus-controls} {
+    outline-color: Highlight;
+  }
+}
+
+// The navbar is fixed, so keep focused controls below it when the browser
+// scrolls them into view.
+:is(a[href], button, input, select, textarea, summary, [tabindex]) {
+  scroll-margin-top: $atelier-focus-scroll-margin;
+
+  @media (max-width: 991.98px) {
+    html:has(.quarto-secondary-nav) & {
+      scroll-margin-top: $atelier-focus-scroll-margin-narrow;
+    }
+  }
 }
 
 // Quarto/Bootstrap ships the skip link visually-hidden-focusable but unstyled,
@@ -1502,14 +1556,20 @@ body.quarto-dark a.lightbox:has(> img.light-content) {
 // ===========================================================================
 // MOTION GUARD
 // ===========================================================================
-// Every motion the theme owns or inherits is cancelled here, in one place. The
-// navbar selectors carry no transition from this file: they cancel Bootstrap's.
+// Every motion the theme owns or inherits is cancelled here, in one place.
+// The `!important` flags are needed: the guard must beat every component rule,
+// including the ones that Bootstrap and Quarto write.
 @media (prefers-reduced-motion: reduce) {
-  .navbar .nav-link,
-  .navbar .dropdown-item,
-  .panel-tabset .nav-tabs .nav-link,
-  .embed-art {
-    transition: none;
+  // The durations are near zero rather than `none`: GLightbox and Tippy wait
+  // for `animationend` and `transitionend` before they close, and those events
+  // do not fire when the animation or transition is removed.
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 
   // Dropping the transition alone would leave the tilt change as an instant
