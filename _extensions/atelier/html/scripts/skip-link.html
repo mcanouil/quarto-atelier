@@ -11,7 +11,7 @@
 	// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/14684
 	// Remove when: the minimum Quarto version is 1.11.2 or later.
 	// Not SCSS: focus order follows the DOM order, which CSS cannot change.
-	if (!document.getElementById("quarto-skip-link")) {
+	if (!document.querySelector("body > #quarto-skip-link")) {
 		document.body.prepend(document.currentScript.previousElementSibling);
 	}
 </script>
