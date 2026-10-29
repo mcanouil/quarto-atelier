@@ -18,6 +18,8 @@
 ### Bug Fixes
 
 - fix: Keep `aria-expanded` off the click area of the narrow-screen bar and the backdrop of the open sidebar, which have no role to carry it. (#74)
+- fix: Derive the small and large corner radii from `$border-radius`, so a brand that sets only the base radius keeps the three in proportion. (#73)
+- fix: Remove the copy button of a `.visually-hidden` code block, which covered the text below when it had focus. (#73)
 - fix: Leave Ctrl, Alt and Meta shortcuts alone on a listing category, and filter once when Enter or Space is held down. (#72)
 - fix: Give a link in a callout title the colour of the title and an underline, so it keeps a 4.5:1 contrast ratio on the tinted title band. (#71)
 - fix: Make the skip link the first Tab stop on Quarto before 1.11.2, ahead of the navbar, the sidebar and the floating colour scheme toggle. (#70)

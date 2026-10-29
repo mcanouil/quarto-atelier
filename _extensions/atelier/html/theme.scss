@@ -113,7 +113,8 @@ $atelier-focus-ring-width: 2px !default;
 // as the rule it overrides, and comes later in the cascade.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15139
 // Fixed upstream in Quarto 1.11.7: https://github.com/quarto-dev/quarto-cli/pull/15163
-// Remove when: the minimum Quarto version is 1.11.7 or later, and `--quarto-focus-ring-shadow: none` below is removed with the list.
+// Remove when: the minimum Quarto version is 1.11.7 or later, and
+// `--quarto-focus-ring-shadow: none` below is removed with the list.
 $atelier-focus-controls: ".btn:focus-visible, .btn-close:focus-visible, .nav-link:focus-visible, .navbar-brand:focus-visible, .navbar-toggler:focus-visible, .dropdown-item:focus-visible, .form-control:focus-visible, .form-select:focus-visible, .aa-Autocomplete .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-DetachedSearchButton:focus-visible, .sidebar-item .sidebar-item-toggle:focus-visible, .sidebar-item button.sidebar-item-text:focus-visible, .quarto-navigation-tool:focus-visible, .code-copy-button:focus-visible, .quarto-color-scheme-toggle:focus-visible, .page-link:focus-visible";
 
 :focus-visible,
@@ -718,9 +719,9 @@ html div.sourceCode:has(> pre.visually-hidden) {
 }
 
 // The copy button of a hidden block is outside the hidden `pre`, so it would
-// float over the text. Clip it too, but show it when it has keyboard focus.
+// float over the text, and a Tab stop for code that is not on screen. Remove it.
 html .code-copy-outer-scaffold:has(> div.sourceCode > pre.visually-hidden) > .code-copy-button {
-  @include visually-hidden-focusable();
+  display: none;
 }
 
 // Quarto drops the left inset of highlighted code in a callout; the frame is
