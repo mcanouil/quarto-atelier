@@ -374,6 +374,30 @@ html .callout.callout-style-simple > .callout-header {
   color: rgba($body-color, 0.75);
 }
 
+// With a link in the title, the script for the collapsible callout moves the
+// toggle to the chevron, and Quarto's rules keyed on the header's aria-expanded
+// miss it. Repeat them for the chevron.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/4934
+// Remove when: the minimum Quarto version includes the fix.
+html .callout > .callout-header:has(> .callout-btn-toggle[aria-expanded]) {
+  align-items: center;
+}
+
+html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
+  min-width: 24px;
+  min-height: 24px;
+  text-align: center;
+  cursor: pointer;
+
+  &[aria-expanded="false"] .callout-toggle::before {
+    transform: rotate(-90deg);
+  }
+
+  &[aria-expanded="true"] .callout-toggle::before {
+    transform: none;
+  }
+}
+
 // A callout with no type gets a $text-muted title band, a mid grey that title
 // text cannot clear AA on. Tint it from the page as the typed ones are tinted
 // from their colour.
