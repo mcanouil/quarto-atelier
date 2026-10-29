@@ -288,10 +288,11 @@
 		});
 		document.addEventListener("keydown", (event) => {
 			if (event.key !== "Enter" && event.key !== " ") return;
+			if (event.ctrlKey || event.altKey || event.metaKey) return;
 			const target = event.target instanceof Element ? event.target.closest(categorySelector) : null;
 			if (!target) return;
 			event.preventDefault();
-			target.click();
+			if (!event.repeat) target.click();
 		});
 
 		// Footnote back-links: Quarto renders only an arrow glyph, which a screen

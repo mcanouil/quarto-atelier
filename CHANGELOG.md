@@ -17,8 +17,9 @@
 
 ### Bug Fixes
 
-- fix: Make the skip link the first Tab stop on Quarto before 1.11.2, ahead of the navbar, the sidebar and the floating colour scheme toggle. (#70)
+- fix: Leave Ctrl, Alt and Meta shortcuts alone on a listing category, and filter once when Enter or Space is held down. (#72)
 - fix: Give a link in a callout title the colour of the title and an underline, so it keeps a 4.5:1 contrast ratio on the tinted title band. (#71)
+- fix: Make the skip link the first Tab stop on Quarto before 1.11.2, ahead of the navbar, the sidebar and the floating colour scheme toggle. (#70)
 - fix: Update the embedded gitlink to 1.12.0, so a site with no repository no longer gets a gitlink warning on every page. (#68)
 - fix: Print a filled button, such as `.btn-primary`, with a readable label and a border, because browsers print without background colours. (#65)
 - fix: Show one focus ring on every control, including form fields, search, sidebar toggles, navigation tools, the copy button, the colour scheme toggle and pagination, and use the system highlight colour in forced colours mode. (#62)
