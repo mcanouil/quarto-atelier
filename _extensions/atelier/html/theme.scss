@@ -298,8 +298,8 @@ html pre.code-annotation-code {
 // width above the gutter highlight, and a -4em margin moves it out past the
 // left edge of the block. Make the `pre` the containing block and remove the
 // margin, so that the band fills the block and lines up with the gutter.
-// Fixed upstream in Quarto 1.11, after 1.11.7: https://github.com/quarto-dev/quarto-cli/issues/13448
-// Remove when: the minimum Quarto version is the first release after 1.11.7.
+// Fixed upstream on main (unreleased): https://github.com/quarto-dev/quarto-cli/issues/13448
+// Remove when: the minimum Quarto version includes the fix.
 html pre.code-annotation-code {
   position: relative;
 }
