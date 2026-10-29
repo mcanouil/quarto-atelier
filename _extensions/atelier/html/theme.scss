@@ -135,7 +135,10 @@ h6 {
 
 // Quarto fades h3 to h6 with opacity, which also fades the links inside them
 // below AA (3.97:1 on an h4 link in light mode). Fade the heading text by its
-// colour instead, so a link keeps its own ink.
+// colour instead, so a link keeps its own ink. The ink is the theme heading
+// colour (`$headings-color`, which a brand sets) or, when there is none, the
+// body colour, because `currentcolor` here would resolve to the parent's colour
+// and drop a heading colour that a brand sets.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15169
 // Remove when: the minimum Quarto version includes the fix.
 h3,
@@ -143,7 +146,7 @@ h4,
 h5,
 h6 {
   opacity: 1;
-  color: color-mix(in srgb, currentcolor 90%, transparent);
+  color: rgba(if(type-of($headings-color) == color, $headings-color, $body-color), 0.9);
 }
 
 // ===========================================================================
