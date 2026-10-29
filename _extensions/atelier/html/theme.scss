@@ -179,8 +179,7 @@ button:focus-visible,
 // Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/14684
 // Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14686
 // Remove when: the minimum Quarto version is 1.11.2 or later; remove
-// `html/scripts/skip-link.html`, its include, and the skip link move in
-// `html/scripts/a11y-fixes.html` at the same time.
+// `html/scripts/skip-link.html` and its include at the same time.
 body:has(> #quarto-skip-link) .skip-link {
   display: none;
 }
