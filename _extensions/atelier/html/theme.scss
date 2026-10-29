@@ -920,6 +920,18 @@ html .callout.callout-style-simple > .callout-header {
   color: rgba($body-color, 0.75);
 }
 
+// The link colour can fall below AA on the tinted title band. A link in the
+// title takes the title colour, and its underline marks it as a link.
+html .callout > .callout-header a {
+  color: inherit;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-thickness: 2px;
+  }
+}
+
 // With a link in the title, the script for the collapsible callout moves the
 // toggle to the chevron, and Quarto's rules keyed on the header's aria-expanded
 // miss it. Repeat them for the chevron.
