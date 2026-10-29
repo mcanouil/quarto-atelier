@@ -14,6 +14,8 @@ website:
         text: "Home"
       - href: reference.qmd
         text: "Reference"
+      - href: landing.qmd
+        text: "Landing page"
       - href: examples.qmd
         text: "Examples"
       # An icon beside text, and a menu, are the two navbar item shapes Quarto

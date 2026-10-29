@@ -85,6 +85,8 @@ website:
         text: "Home"
       - href: reference.qmd
         text: "Reference"
+      - href: landing.qmd
+        text: "Landing page"
       - href: examples.qmd
         text: "Examples"
       - text: "---"

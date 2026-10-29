@@ -397,3 +397,8 @@ A code window with a title bar, framed like a plain code block:
 ```{.bash filename="terminal"}
 quarto render docs
 ```
+
+## Landing page
+
+The [home page](index.qmd) of this site is a landing page, made with the hero, feature row and card grid blocks.
+The [Landing page](landing.qmd) guide shows each block and each modifier, with the Markdown to copy.
