@@ -262,6 +262,22 @@ html pre.sourceCode {
   }
 }
 
+// Quarto's `overflow-y: visible !important` on pre.sourceCode outranks the
+// `overflow: hidden !important` of `.visually-hidden`. A hidden code block then
+// stays a 1px box that scrolls and that the keyboard cannot reach. Clip it on
+// both axes again.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15174
+// Remove when: the minimum Quarto version includes the fix.
+html pre.sourceCode.visually-hidden {
+  overflow: hidden !important;
+}
+
+// The div.sourceCode around a hidden block is not hidden, so the frame above
+// would show as a thin line. Remove it.
+html div.sourceCode:has(> pre.visually-hidden) {
+  border: none;
+}
+
 // Quarto drops the left inset of highlighted code in a callout; the frame is
 // still drawn there, so restore it.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15058
