@@ -27,7 +27,8 @@ Atelier's minimum Quarto version follows theirs: it is the highest version any o
 If your project already has its own copy of one of them, remove it from `_extensions/` and drop its name from your `filters` list.
 Otherwise both copies run, and your copy's shortcodes replace the embedded ones.
 
-To bring them up to date, run the [Quarto Wizard](https://github.com/mcanouil/quarto-wizard) updater from a checkout of that repository:
+A monthly workflow opens a pull request when one of them has a new release.
+To bring them up to date by hand, run the [Quarto Wizard](https://github.com/mcanouil/quarto-wizard) updater from a checkout of that repository:
 
 ```bash
 npm run extensions:update -- /path/to/quarto-atelier/_extensions/atelier --apply
