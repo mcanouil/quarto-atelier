@@ -371,3 +371,17 @@ A footer that holds a `cite` keeps both on one line, in the size of the footer:
 A quotation can also hold an inline cite in a sentence:
 
 > The quoted sentence names <cite>a cited title</cite> in the middle of its line.
+
+## Focus and motion
+
+Press Tab to move through the controls on this page: the search box, the sidebar links and toggles, the copy button, the colour scheme toggle and the links.
+Each one shows the same 2 pixel ring, in the primary colour on the page and in the sidebar accent colour inside the sidebar and the secondary bar.
+In a forced colours mode, the ring uses the system highlight colour.
+
+<input type="text" class="form-control" placeholder="A text field with the same ring" aria-label="Example text field">
+
+<a id="scroll-target"></a>
+
+[A link to this section](#scroll-target) lands where Quarto puts it, below the fixed navbar.
+A focused control keeps clear of the navbar too.
+With a reduced motion preference, transitions, animations and smooth scrolling are cut to a blink, so widgets that wait for them still close.
