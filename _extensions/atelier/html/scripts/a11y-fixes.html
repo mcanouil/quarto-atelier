@@ -202,5 +202,19 @@
 		dedupeCloneLandmarks();
 		setTimeout(dedupeCloneLandmarks, 50);
 		setTimeout(dedupeCloneLandmarks, 250);
+
+		// Footnote back-links: Quarto renders only an arrow glyph, which a screen
+		// reader reads as "return" or nothing. Name each one after its note.
+		// Quarto exposes no localised string for this link in the page, so the
+		// name is in English.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15064
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
+		document.querySelectorAll("section.footnotes .footnote-back:not([aria-label])").forEach((a) => {
+			const number = (a.closest("li[id^='fn']")?.id || "").replace("fn", "");
+			if (/^\d+$/.test(number)) {
+				a.setAttribute("aria-label", `Back to note ${number} in the text`);
+			}
+		});
 	});
 </script>
