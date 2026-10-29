@@ -583,8 +583,9 @@
 
 		// Navigation icons: in the navbar, the sidebar and the footer, Quarto
 		// writes each `icon:` as <i role="img"> with no name, and writes empty
-		// title and aria-label attributes on a tool with no `text:`. Hide the icon when the link has text. Otherwise name the
-		// link from the icon, and hide the icon.
+		// title and aria-label attributes on a tool with no `text:`. Hide the icon
+		// when the link has text. Otherwise name the link from the icon, and hide
+		// the icon.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15123 (icon beside text)
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14828 (icon-only tools)
 		// Remove when: the minimum Quarto version includes both fixes.
