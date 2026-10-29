@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+- fix: Give a link in a callout title the colour of the title and an underline, so it keeps a 4.5:1 contrast ratio on the tinted title band. (#71)
 - fix: Update the embedded gitlink to 1.12.0, so a site with no repository no longer gets a gitlink warning on every page. (#68)
 - fix: Print a filled button, such as `.btn-primary`, with a readable label and a border, because browsers print without background colours. (#65)
 - fix: Show one focus ring on every control, including form fields, search, sidebar toggles, navigation tools, the copy button, the colour scheme toggle and pagination, and use the system highlight colour in forced colours mode. (#62)
