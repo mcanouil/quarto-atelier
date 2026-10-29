@@ -140,12 +140,5 @@ extensions:
       # There is no navbar; the widget sits in the docked sidebar instead, so
       # there are no navbar tools to restyle.
       style-navbar-tools: false
-  # The badges the examples page shows with the badge shortcode.
-  badge:
-    badges:
-      # A badge with no class and no colour has white text on no background.
-      - key: licence
-        class: text-bg-primary
-        title: "Licence: {{value}}"
   code-window:
     style: "macos"

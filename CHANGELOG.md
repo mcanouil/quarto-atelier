@@ -5,13 +5,13 @@
 ### Breaking Changes
 
 - Atelier needs Quarto 1.9.38 or later, the highest version its embedded extensions need. (#63)
-- If your project has its own copy of iconify, gitlink, code-window, badge, toc-depth or collapse-output, remove it and its `filters` entry. Otherwise both copies run. (#63)
+- If your project has its own copy of iconify, gitlink, code-window, toc-depth or collapse-output, remove it and its `filters` entry. Otherwise both copies run. (#63)
 
 ### New Features
 
 - feat: Style blockquotes with an inset bar, a decorative opening quote that screen readers skip, and a quieter attribution for `footer`, `cite` and `.attribution`. (#61)
 - feat: Set section numbers smaller, in tabular numerals and in the primary colour. Listing and appendix headings keep the default look. (#61)
-- feat: Include the iconify, gitlink, code-window, badge, toc-depth and collapse-output extensions, so installing Atelier is enough for a documentation website. gitlink shows only its repository widget, and Code Window frames only blocks with a `filename`. (#63)
+- feat: Include the iconify, gitlink, code-window, toc-depth and collapse-output extensions, so installing Atelier is enough for a documentation website. gitlink shows only its repository widget, and Code Window frames only blocks with a `filename`. (#63)
 - feat: Draw a Code Window with the border, corner radius and spacing of a plain code block, in both colour schemes. (#63)
 
 ### Bug Fixes

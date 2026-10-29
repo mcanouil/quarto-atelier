@@ -101,7 +101,7 @@ To change it, set `$atelier-text-muted` in a project stylesheet under `format.at
 
 ## Embedded extensions
 
-Atelier contains six extensions, so you do not install them yourself.
+Atelier contains five extensions, so you do not install them yourself.
 The `atelier-html` format runs their filters and shortcodes on each HTML page.
 The shortcodes work on HTML pages only: on a page in another format, such as Typst, Quarto stops with "Shortcode 'iconify' not found".
 Atelier needs the highest Quarto version that its embedded extensions need, so its own minimum version follows theirs.
@@ -111,7 +111,6 @@ Atelier needs the highest Quarto version that its embedded extensions need, so i
 | [iconify](https://github.com/mcanouil/quarto-iconify)                 | Adds the `{{{< iconify >}}}` shortcode, for icons from the Iconify sets.                             | `extensions.iconify`         |
 | [gitlink](https://github.com/mcanouil/quarto-gitlink)                 | Shows a repository widget in place of a navbar item or sidebar tool with the href `#gitlink-widget`. | `extensions.gitlink`         |
 | [code-window](https://github.com/mcanouil/quarto-code-window)         | Shows a code block that has a `filename` in a window frame with a title bar.                         | `extensions.code-window`     |
-| [badge](https://github.com/mcanouil/quarto-badge)                     | Adds the `{{{< badge >}}}` shortcode, for badges that you define in the options.                     | `extensions.badge`           |
 | [toc-depth](https://github.com/mcanouil/quarto-toc-depth)             | Sets the table of contents depth below a heading, with the `toc-depth` attribute.                    | `extensions.toc-depth`       |
 | [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option.                         | `extensions.collapse-output` |
 
@@ -133,7 +132,7 @@ extensions:
 
 ### Upgrade from separate copies
 
-If your project has its own copy of one of these six extensions, remove it from `_extensions/` and remove its name from your `filters` list.
+If your project has its own copy of one of these five extensions, remove it from `_extensions/` and remove its name from your `filters` list.
 Quarto looks up the names in your `filters` list in your own `_extensions/` only, so it then runs your copy and the embedded copy, and your copy's shortcodes replace the embedded ones.
 Keep your options under `extensions:`: the embedded copies read them.
 
