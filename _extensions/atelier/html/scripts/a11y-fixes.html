@@ -270,5 +270,16 @@
 				if (!event.repeat) control.click();
 			});
 		});
+
+		// Quarto marks the sidebar link to the current page with a class only, so
+		// a screen reader cannot tell which page is current. The copy of the
+		// sidebar that Quarto shows when content overlaps it is cloned later, and
+		// keeps the attribute.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: aria-current is an attribute, which CSS cannot set.
+		document.querySelectorAll("#quarto-sidebar .sidebar-link.active:not([aria-current])").forEach((link) => {
+			link.setAttribute("aria-current", "page");
+		});
 	});
 </script>

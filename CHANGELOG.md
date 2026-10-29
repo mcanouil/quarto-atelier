@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+- fix: Mark the current page in the sidebar for screen readers, as the navbar already does.
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
 - fix: Give the author email link in the title block an accessible name, taken from the address. (#53)
