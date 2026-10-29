@@ -718,9 +718,9 @@ html div.sourceCode:has(> pre.visually-hidden) {
 }
 
 // The copy button of a hidden block is outside the hidden `pre`, so it would
-// float over the text. Clip it too, but show it when it has keyboard focus.
+// float over the text, and a Tab stop for code that is not on screen. Remove it.
 html .code-copy-outer-scaffold:has(> div.sourceCode > pre.visually-hidden) > .code-copy-button {
-  @include visually-hidden-focusable();
+  display: none;
 }
 
 // Quarto drops the left inset of highlighted code in a callout; the frame is
