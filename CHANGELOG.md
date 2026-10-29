@@ -12,6 +12,11 @@
 - fix: Hide the title block metadata container when the page has no metadata. (#53)
 - fix: Name each footnote back-link for screen readers and give it a 24 pixel target. The name is in English, because Quarto offers no translated string for it. (#54)
 - fix: Draw the appendix at full opacity, so its back-links and licence link keep a 4.5:1 contrast ratio. (#54)
+- fix: Apply the theme corner radius in website projects, where Quarto reset it to 0.25rem. A project theme that sets `$border-radius` or `$border-radius-sm` still wins. (#55)
+- fix: Remove the lightbox link of an image made for the other colour scheme from the tab order. (#55)
+- fix: Make the header of a collapsible callout a button that exposes whether it is open, and keep a link in the title working. (#55)
+- fix: Separate the callout type from the title for screen readers, so "Note Title" no longer reads as one word. (#55)
+- fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one. (#55)
 
 ## 0.10.7 (2026-10-15)
 
@@ -125,8 +130,6 @@
 - fix: keep a small gap between the colour-scheme toggle and the search button once they are grouped at the right edge of the collapsed navbar. Cancelling Quarto's automatic margin also removed every space between the two controls.
 
 ## 0.7.0 (2026-07-27)
-
-### Bug Fixes
 
 - fix: group the colour-scheme toggle with the search button at the right edge of the collapsed navbar and centre the brand. Quarto hands all the free space to the search button alone, which left the toggle stranded beside the brand and the search on its own at the far right.
 

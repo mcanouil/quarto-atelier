@@ -8,6 +8,7 @@ author:
 categories: [Atelier, Accessibility]
 license: "CC BY"
 citation: true
+lightbox: true
 ---
 
 Set `project.type: atelier` in your `_quarto.yml`, provide a `_brand.yml`, then author pages as usual.
@@ -223,6 +224,43 @@ print("A folded code block")
 ```
 
 [^note]: The note text, with a back-link.
+
+## Theme tokens, media and callouts
+
+The corner radius of the page, the cards and the inputs follows `$border-radius`, which a project theme or the brand can set.
+
+A collapsed callout is a button that announces whether it is open:
+
+::: {.callout-note collapse="true"}
+## A closed callout
+
+Its toggle exposes `aria-expanded`.
+:::
+
+A callout title reads as "Note Title" to a screen reader, with a space between the type and the title.
+
+::: {.callout-warning}
+## A titled callout
+
+Body text.
+:::
+
+An image for one colour scheme only keeps no empty tab stop for the other scheme:
+
+![A square icon, shown in the light scheme only.](assets/icons/icon-192.png){.lightbox .light-content group="schemes" width=96}
+
+![A square icon, shown in the dark scheme only.](assets/icons/icon-192.png){.lightbox .dark-content group="schemes" width=96}
+
+```{mermaid}
+flowchart LR
+  subgraph one [A subgraph]
+    a[First] --> b[Second]
+  end
+  subgraph two [Another subgraph]
+    c[Third] --> d[Fourth]
+  end
+  b --> c
+```
 
 ## Everything above, in both schemes
 

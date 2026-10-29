@@ -1,8 +1,5 @@
 /*-- scss:defaults --*/
 
-$border-radius: 0.5rem !default;
-$border-radius-sm: 0.375rem !default;
-$border-radius-lg: 0.75rem !default;
 $enable-smooth-scroll: true !default;
 
 // `.btn-close-white` asks Bootstrap to invert the dismiss icon to force a light
@@ -11,6 +8,17 @@ $enable-smooth-scroll: true !default;
 $btn-close-white-filter: none !default;
 
 /*-- scss:functions --*/
+
+// Quarto's website listing file sets `$border-radius` and `$border-radius-sm`
+// with `!default` in the functions layer, which is written before every
+// defaults layer, so the `!default` of this theme or of a project theme would
+// find them taken. A `null` counts as unset for `!default`, so clearing them
+// here lets the first defaults layer set them: the project's own value, or the
+// brand's, when it has one, otherwise the radius from `html/chrome.scss`.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15176
+// Remove when: the minimum Quarto version includes the fix.
+$border-radius: null;
+$border-radius-sm: null;
 
 // Mix the page background and foreground. brand injects different
 // $body-bg / $body-color into the light and dark compiles, so body-mix()
@@ -361,6 +369,37 @@ html .callout.callout-style-default > .callout-header {
 html .callout.callout-style-simple > .callout-header {
   opacity: 1;
   color: rgba($body-color, 0.75);
+}
+
+// With a link in the title, the script for the collapsible callout moves the
+// toggle to the chevron, and Quarto's rules keyed on the header's aria-expanded
+// miss it. Repeat them for the chevron.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/4934
+// Remove when: the minimum Quarto version includes the fix.
+html .callout > .callout-header:has(> .callout-btn-toggle[aria-expanded]) {
+  align-items: center;
+}
+
+// Bootstrap toggles the `collapsed` class on the chevron, so the header keeps
+// the class it was rendered with and Quarto's rounded corner for a closed
+// callout stays on an open one.
+html .callout > .callout-header.collapsed:has(> .callout-btn-toggle[aria-expanded="true"]) {
+  border-bottom-right-radius: 0;
+}
+
+html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
+  min-width: 24px;
+  min-height: 24px;
+  text-align: center;
+  cursor: pointer;
+
+  &[aria-expanded="false"] .callout-toggle::before {
+    transform: rotate(-90deg);
+  }
+
+  &[aria-expanded="true"] .callout-toggle::before {
+    transform: none;
+  }
 }
 
 // A callout with no type gets a $text-muted title band, a mid grey that title
@@ -1189,6 +1228,19 @@ $scrollbar-thumb: body-mix(72%);
 #quarto-appendix.default section *[role="doc-endnotes"],
 #quarto-appendix.default section > *:not(a) {
   opacity: 1;
+}
+
+// ===========================================================================
+// LIGHTBOX
+// ===========================================================================
+// Quarto hides the image made for the other colour scheme but keeps its
+// lightbox link, which leaves an empty tab stop of 0 by 0 pixels. Hide the
+// link together with its image.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15170
+// Remove when: the minimum Quarto version includes the fix.
+body.quarto-light a.lightbox:has(> img.dark-content),
+body.quarto-dark a.lightbox:has(> img.light-content) {
+  display: none !important;
 }
 
 // ===========================================================================
