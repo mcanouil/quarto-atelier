@@ -28,6 +28,7 @@
 - fix: Stop announcing the bar above the page on narrow screens as a navigation landmark, because its links are in the breadcrumbs.
 - fix: Name the sidebar and page navigation landmarks, so that each landmark has its own name on Quarto 1.11.3 and earlier.
 - fix: Let keyboard users open and close sidebar sections on Quarto 1.11.1 and earlier.
+- fix: Start the names of the previous and next page links with "Previous" or "Next", so that screen readers say which way each link goes.
 
 ## 0.10.7 (2026-10-15)
 

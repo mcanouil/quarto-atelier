@@ -350,6 +350,24 @@
 			link.setAttribute("aria-current", "page");
 		});
 
+		// The accessible name of the previous and next page links is the page
+		// title alone; only the arrow icons show the direction. Add the direction
+		// to the name, before the title so the visible text stays in the name.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14804
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
+		[
+			[".nav-page-previous", "Previous"],
+			[".nav-page-next", "Next"],
+		].forEach(([side, direction]) => {
+			document.querySelectorAll(`.page-navigation ${side} a.pagination-link`).forEach((link) => {
+				const title = (link.getAttribute("aria-label") || link.textContent).trim();
+				if (!title.startsWith(`${direction}:`)) {
+					link.setAttribute("aria-label", `${direction}: ${title}`);
+				}
+			});
+		});
+
 		// When content overlaps a side column, Quarto replaces the column with a
 		// toggle whose title is a div with a click handler only: it has no role,
 		// no tab stop, no keyboard action and no expanded state. Give the title
