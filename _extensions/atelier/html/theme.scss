@@ -403,6 +403,12 @@ code.sourceCode:not(pre code) {
   border-radius: 0.3em;
 }
 
+// In a link, the text of highlighted inline code that has no token colour
+// takes the link colour, which can fail AA on the code surface. Hold it to AA.
+a code.sourceCode:not(pre code) {
+  color: theme-contrast($link-color, body-mix(95%), "AA");
+}
+
 // Token colours of the default highlighting themes, arrow-light and arrow-dark.
 // Quarto passes the Comment and Function colours of the active theme as the
 // copy button variables, which tells these rules which theme is in use, so a

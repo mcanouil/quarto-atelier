@@ -131,6 +131,8 @@ quarto render "$SITE" --to html
 
 Highlighted inline code, such as `scale_by(x, k = 2L)`{.r}, takes the same token colours.
 
+In a link, such as [`scale_by(x, k = 2L)`{.r}](#syntax-highlighting), it keeps its contrast too.
+
 A code block with the `.visually-hidden` class is for screen readers only, so it does not show here:
 
 ```{.bash .visually-hidden}
