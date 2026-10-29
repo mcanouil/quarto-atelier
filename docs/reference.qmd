@@ -189,3 +189,96 @@ One property applies to every card.
 
 The frame, the offset shadow, and the card background are drawn from the page ink and paper, so they follow the colour scheme.
 Under `prefers-reduced-motion: reduce`, the card holds its resting angle and does not react to hover at all.
+
+## Landing page
+
+Atelier has opt-in classes for a landing page: a hero, feature rows and a card grid.
+Write each block as a fenced div, on a page with `page-layout: full` and `title-block-style: none`.
+
+```markdown
+::: {.atelier-landing}
+
+::: {.atelier-hero .gradient}
+
+::: {.atelier-hero-text}
+
+# Project name
+
+[One sentence that says what the project does.]{.atelier-lead}
+
+:::
+
+:::
+
+:::
+```
+
+| Block        | Classes                                                                                                                 | Modifiers                                                |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Container    | `.atelier-landing`                                                                                                      | None.                                                    |
+| Hero         | `.atelier-hero`, with the parts `.atelier-hero-text`, `.atelier-hero-figure`, `.atelier-eyebrow`, `.atelier-lead` and `.atelier-actions` | `.split`, `.centred`, `.banner`, `.gradient` and `.glow` |
+| Feature row  | `.atelier-feature`, with the parts `.atelier-feature-text` and `.atelier-feature-figure`                                 | `.reverse`                                               |
+| Legend       | `.atelier-legend` around an ordered list, with `.atelier-detail` spans                                                  | None.                                                    |
+| Cards        | `.atelier-cards`, which holds `.atelier-card` divs                                                                       | `.compact`                                               |
+
+: Classes and modifiers of the landing page blocks. {.striped .hover tbl-colwidths="[16,56,28]"}
+
+| Modifier    | Effect                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| `.split`    | Puts the text part and the figure part side by side. A hero has this layout when it has no other layout modifier. |
+| `.centred`  | Centres the text part, in one column. A centred hero has no figure part.                                  |
+| `.banner`   | Puts the hero on a tinted surface with a border.                                                          |
+| `.gradient` | Fills the hero title (the h1 or the h2) with a gradient that starts at the primary colour.               |
+| `.glow`     | Puts a soft glow of the primary colour behind the figure.                                                 |
+| `.reverse`  | Puts the figure part of a feature row on the left.                                                        |
+| `.compact`  | Makes smaller cards, with the icon and the heading on one line.                                           |
+
+: Modifiers of the landing page blocks. {.striped .hover tbl-colwidths="[16,84]"}
+
+The container sets the width of the blocks.
+On a page that has the container, Atelier hides the title block, because the hero shows the h1.
+The title of the hero is an h1, or an h2 on a page that has its own h1.
+Each block stacks into one column below the `md` breakpoint, and a reversed feature row shows its text part first.
+
+Each colour of the gradient has a contrast of 4.5:1 or more against the page, in each colour scheme.
+If a colour cannot have this contrast, the hero title uses the primary colour only.
+In print and in forced colours mode, the hero title is plain text and the glow is removed.
+Nothing in the blocks moves, so the reduced motion setting has no effect on them.
+
+A card holds an icon, a heading, one sentence and one link.
+The link covers the whole card, and the focus ring of the link goes around the card.
+Put only one link in a card, and write link text that says where the link goes.
+A compact card has no sentence: put its link in the heading.
+
+These Sass variables set the geometry.
+Set them in the `defaults` layer of a project stylesheet.
+
+| Variable                         | Default                    | Effect                                                     |
+| -------------------------------- | -------------------------- | ---------------------------------------------------------- |
+| `$atelier-landing-max-width`     | `1140px`                   | Maximum width of the container.                            |
+| `$atelier-landing-gap`           | `3rem`                     | Space between the two parts of a hero or a feature row.    |
+| `$atelier-hero-title-size`       | `clamp(2.2rem, 5vw, 3.4rem)` | Font size of the hero title.                             |
+| `$atelier-hero-figure-max-width` | `320px`                    | Maximum width of the image in the hero figure.             |
+| `$atelier-hero-gradient-shift`   | `40deg`                    | Hue difference between the first and the last gradient colour. |
+| `$atelier-card-min-width`        | `13rem`                    | Minimum width of a card column.                            |
+
+: Sass variables of the landing page blocks. {.striped .hover tbl-colwidths="[34,26,40]"}
+
+These Sass variables set the colours.
+Atelier calculates each default from the brand for each colour scheme.
+The gradient check above also applies to gradient colours that you set.
+
+| Variable                         | Default                                                 | Effect                                 |
+| -------------------------------- | ------------------------------------------------------- | -------------------------------------- |
+| `$atelier-landing-accent`        | `$primary`, moved to 4.5:1 against the page             | Eyebrow, legend numbers, card hover.   |
+| `$atelier-landing-muted`         | `$text-muted`, moved to 4.5:1 against the page          | Lead and legend detail text.           |
+| `$atelier-landing-surface`       | `body-mix(95%)`                                         | Card and banner surface.               |
+| `$atelier-landing-border`        | `body-mix(85%)`                                         | Card, banner and feature row borders.  |
+| `$atelier-card-muted`            | `$text-muted`, moved to 4.5:1 against the card surface  | Card text.                             |
+| `$atelier-card-link`             | `$link-color`, moved to 4.5:1 against the card surface  | Card link.                             |
+| `$atelier-hero-gradient-start`   | `$atelier-landing-accent`                               | First colour of the title gradient.    |
+| `$atelier-hero-gradient-middle`  | The mix of the first and last colours, moved to 4.5:1   | Middle colour of the title gradient.   |
+| `$atelier-hero-gradient-end`     | `$primary` with the hue shift, moved to 4.5:1           | Last colour of the title gradient.     |
+| `$atelier-hero-glow-color`       | `$primary` at 25% opacity                               | Colour of the glow behind the figure.  |
+
+: Colour variables of the landing page blocks. {.striped .hover tbl-colwidths="[34,40,26]"}

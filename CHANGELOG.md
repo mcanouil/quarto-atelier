@@ -13,10 +13,12 @@
 - feat: Set section numbers smaller, in tabular numerals and in the primary colour. Listing and appendix headings keep the default look. (#61)
 - feat: Include the iconify, gitlink, code-window, toc-depth and collapse-output extensions, so installing Atelier is enough for a documentation website. gitlink shows only its repository widget, and Code Window frames only blocks with a `filename`. (#63)
 - feat: Draw a Code Window with the border, corner radius and spacing of a plain code block, in both colour schemes. (#63)
+- feat: Add opt-in classes for a landing page: a hero, feature rows with an optional numbered legend, and a card grid whose cards are links. Modifiers change the layout, and add a title gradient and a figure glow from the primary colour. (#65)
 
 ### Bug Fixes
 
 - fix: Update the embedded gitlink to 1.12.0, so a site with no repository no longer gets a gitlink warning on every page. (#68)
+- fix: Print a filled button, such as `.btn-primary`, with a readable label and a border, because browsers print without background colours. (#65)
 - fix: Show one focus ring on every control, including form fields, search, sidebar toggles, navigation tools, the copy button, the colour scheme toggle and pagination, and use the system highlight colour in forced colours mode. (#62)
 - fix: Keep a focused control clear of the fixed navbar, including the secondary bar on narrow screens. (#62)
 - fix: Cut every animation and transition to a blink, and stop smooth scrolling, when the reader prefers reduced motion. (#62)
