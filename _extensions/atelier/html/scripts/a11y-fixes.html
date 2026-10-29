@@ -609,6 +609,19 @@
 			icon.setAttribute("aria-hidden", "true");
 		});
 
+		// Skip link: before Quarto 1.11.2, the link from `html/scripts/skip-link.html`
+		// comes through include-before-body, which Quarto writes inside
+		// #quarto-document-content, the target of the link. The navbar, the sidebar
+		// and the floating toggle come before it in focus order. Move it to the
+		// start of <body>, so that it is the first Tab stop.
+		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/14684
+		// Remove when: the minimum Quarto version is 1.11.2 or later.
+		// Not SCSS: focus order follows the DOM order, which CSS cannot change.
+		if (!document.getElementById("quarto-skip-link")) {
+			const skipLink = document.querySelector(".skip-link");
+			if (skipLink) document.body.prepend(skipLink);
+		}
+
 		// Floating colour scheme toggle: on a page with no navbar and no sidebar
 		// tools, Quarto appends the toggle, or from Quarto 1.11 its container, to
 		// the end of <body>. It is drawn at the top right, but focus reaches it
