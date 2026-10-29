@@ -129,6 +129,8 @@ export SITE="${1:-docs}"
 quarto render "$SITE" --to html
 ```
 
+Highlighted inline code, such as `scale_by(x, k = 2L)`{.r}, takes the same token colours.
+
 ## Tabset
 
 ::: {.panel-tabset}

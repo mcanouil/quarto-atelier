@@ -358,6 +358,18 @@ code:not(.sourceCode):not(pre code) {
   border-radius: 0.3em;
 }
 
+// Quarto gives highlighted inline code Bootstrap's grey code background, not
+// the surface of a code block, and in dark mode that grey is so light that the
+// token colours fail. Put it on the code block surface, which the token colours
+// are checked against.
+// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14135
+// Remove when: never, because Atelier sets its own code surface.
+code.sourceCode:not(pre code) {
+  background-color: body-mix(95%);
+  padding: 0.1em 0.35em;
+  border-radius: 0.3em;
+}
+
 // Token colours of the default highlighting themes, arrow-light and arrow-dark.
 // Quarto passes the Comment and Function colours of the active theme as the
 // copy button variables, which tells these rules which theme is in use, so a

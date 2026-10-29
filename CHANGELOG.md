@@ -18,6 +18,7 @@
 - fix: Make the header of a collapsible callout a button that exposes whether it is open, and keep a link in the title working. (#55)
 - fix: Separate the callout type from the title for screen readers, so "Note Title" no longer reads as one word. (#55)
 - fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one. (#55)
+- fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode.
 
 ## 0.10.7 (2026-10-15)
 
