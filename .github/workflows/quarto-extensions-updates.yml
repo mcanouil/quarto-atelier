@@ -1,7 +1,9 @@
 name: Quarto Extensions Updates
 
-# Keeps the documentation website's own dependencies current: iconify, gitlink,
-# and code-window under docs/_extensions/.
+# Scans docs/, which has no committed extensions now: the website uses the
+# extensions embedded in _extensions/atelier/_extensions/. The updater action
+# does not support a nested _extensions/ yet, so update the embedded extensions
+# with the local Quarto Wizard command in the README until it does.
 on:
   workflow_dispatch:
   schedule:

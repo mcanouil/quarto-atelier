@@ -110,10 +110,8 @@ website:
 # without a second stylesheet layered over it.
 brand: _brand.yml
 
-filters:
-  - code-window
-  - gitlink
-
+# There is no `filters` list: atelier runs the code-window and gitlink filters
+# from its embedded copies. The options below set them up for this site.
 extensions:
   # Quarto keeps the `website` block out of the metadata it hands to Lua
   # filters, so the social-metadata filter cannot read `website.site-url` to
@@ -125,8 +123,9 @@ extensions:
     apple-touch-icon: assets/icons/apple-touch-icon.png
     manifest: site.webmanifest
   gitlink:
-    # Widget only: the platform and repository come from `website.repo-url`, and
-    # in-text reference rewriting stays off so prose is left alone.
+    # Widget only, as atelier sets it: the platform and repository come from
+    # `website.repo-url`, and in-text reference rewriting stays off so prose is
+    # left alone.
     enabled: false
     widget:
       enabled: true
@@ -141,8 +140,12 @@ extensions:
       # There is no navbar; the widget sits in the docked sidebar instead, so
       # there are no navbar tools to restyle.
       style-navbar-tools: false
+  # The badges the examples page shows with the badge shortcode.
+  badge:
+    badges:
+      # A badge with no class and no colour has white text on no background.
+      - key: licence
+        class: text-bg-primary
+        title: "Licence: {{value}}"
   code-window:
     style: "macos"
-    # Blocks here are configuration to copy rather than files to save, so a
-    # filename derived from the language would only add noise.
-    auto-filename: false

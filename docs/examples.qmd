@@ -385,3 +385,17 @@ In a forced colours mode, the ring uses the system highlight colour.
 [A link to this section](#scroll-target) lands where Quarto puts it, below the fixed navbar.
 A focused control keeps clear of the navbar too.
 With a reduced motion preference, transitions, animations and smooth scrolling are cut to a blink, so widgets that wait for them still close.
+
+## Embedded extensions
+
+Atelier runs these extensions itself, so this site installs none of them.
+
+An icon from the iconify shortcode: {{< iconify octicon:mark-github-16 label="GitHub" >}}.
+
+A badge from the badge shortcode: {{< badge licence MIT >}}.
+
+A code window with a title bar, framed like a plain code block:
+
+```{.bash filename="terminal"}
+quarto render docs
+```
