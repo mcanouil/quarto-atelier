@@ -109,7 +109,7 @@
 		}
 		const sidebarNav = document.querySelector("nav#quarto-sidebar");
 		if (sidebarNav && !sidebarNav.getAttribute("aria-label")) {
-			sidebarNav.setAttribute("aria-label", "Section");
+			sidebarNav.setAttribute("aria-label", document.querySelector(".navbar") ? "Section" : "Site");
 		}
 		document.querySelectorAll("nav.page-navigation:not([aria-label])").forEach((nav) => {
 			nav.setAttribute("aria-label", "Page");
@@ -373,7 +373,7 @@
 		const toggleNames = {
 			"quarto-toc-toggle": "On this page",
 			"quarto-lefttoc-toggle": "On this page",
-			"quarto-sidebarnav-toggle": "Section",
+			"quarto-sidebarnav-toggle": sidebarNav?.getAttribute("aria-label") || "Site",
 		};
 		const enhanceToggle = (title) => {
 			if (enhancedToggles.has(title)) return;
