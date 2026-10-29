@@ -16,6 +16,30 @@ website:
         text: "Reference"
       - href: examples.qmd
         text: "Examples"
+      # An icon beside text, and a menu, are the two navbar item shapes Quarto
+      # writes with markup of its own; Atelier repairs both. See the "Navbar and
+      # search" section of examples.qmd.
+      - text: "More"
+        icon: three-dots
+        menu:
+          - href: changelog.qmd
+            text: "Changelog"
+          - href: https://quarto.org
+            text: "Quarto"
+    # A tool with only an icon, and a tool with a menu. Each one has an
+    # `aria-label`, which names it for screen readers; without one, Atelier
+    # names the tool from its icon.
+    tools:
+      - icon: github
+        href: https://github.com/mcanouil/quarto-atelier
+        aria-label: "Repository"
+      - icon: chat-square-text
+        aria-label: "Discussions"
+        menu:
+          - text: "Ideas"
+            href: https://github.com/mcanouil/quarto-atelier/discussions/categories/ideas
+          - text: "Q&A"
+            href: https://github.com/mcanouil/quarto-atelier/discussions/categories/q-a
   # The project type puts an overlay search in the navbar, which is what
   # `location: navbar` restores. `website.sidebar.search` is left as it stands:
   # with the search back in the navbar, the sidebar field is dropped.
