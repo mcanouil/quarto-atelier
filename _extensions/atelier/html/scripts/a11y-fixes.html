@@ -192,10 +192,6 @@
 			target.click();
 		});
 
-		// Quarto clones labelled landmarks into a mobile-only container after our
-		// handlers run; suffix the clones so axe sees them as unique.
-		});
-
 		// Footnote back-links: Quarto renders only an arrow glyph, which a screen
 		// reader reads as "return" or nothing. Name each one after its note.
 		// Quarto exposes no localised string for this link in the page, so the
@@ -261,6 +257,7 @@
 				// Space would scroll the page.
 				event.preventDefault();
 				if (!event.repeat) control.click();
+			});
 		});
 
 		// The bar that replaces the sidebar on narrow screens is a nav element,
