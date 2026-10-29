@@ -1,8 +1,5 @@
 /*-- scss:defaults --*/
 
-$border-radius: 0.5rem !default;
-$border-radius-sm: 0.375rem !default;
-$border-radius-lg: 0.75rem !default;
 $enable-smooth-scroll: true !default;
 
 // `.btn-close-white` asks Bootstrap to invert the dismiss icon to force a light
@@ -16,8 +13,8 @@ $btn-close-white-filter: none !default;
 // with `!default` in the functions layer, which is written before every
 // defaults layer, so the `!default` of this theme or of a project theme would
 // find them taken. A `null` counts as unset for `!default`, so clearing them
-// here lets the first defaults layer set them: the project's own value when it
-// has one, otherwise the radius from this theme.
+// here lets the first defaults layer set them: the project's own value, or the
+// brand's, when it has one, otherwise the radius from `html/chrome.scss`.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15176
 // Remove when: the minimum Quarto version includes the fix.
 $border-radius: null;
@@ -381,6 +378,13 @@ html .callout.callout-style-simple > .callout-header {
 // Remove when: the minimum Quarto version includes the fix.
 html .callout > .callout-header:has(> .callout-btn-toggle[aria-expanded]) {
   align-items: center;
+}
+
+// Bootstrap toggles the `collapsed` class on the chevron, so the header keeps
+// the class it was rendered with and Quarto's rounded corner for a closed
+// callout stays on an open one.
+html .callout > .callout-header.collapsed:has(> .callout-btn-toggle[aria-expanded="true"]) {
+  border-bottom-right-radius: 0;
 }
 
 html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
@@ -1224,18 +1228,6 @@ $scrollbar-thumb: body-mix(72%);
 #quarto-appendix.default section *[role="doc-endnotes"],
 #quarto-appendix.default section > *:not(a) {
   opacity: 1;
-}
-
-// ===========================================================================
-// MERMAID
-// ===========================================================================
-// Quarto paints a subgraph with `--mermaid-fg-color--lightest`, a lightened
-// text colour, which is a dark grey on a light page and white on a dark one.
-// Paint it from the page surface instead.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/9178
-// Remove when: the minimum Quarto version includes the fix.
-:root {
-  --mermaid-fg-color--lightest: #{body-mix(92%)};
 }
 
 // ===========================================================================

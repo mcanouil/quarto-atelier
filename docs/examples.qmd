@@ -227,7 +227,7 @@ print("A folded code block")
 
 ## Theme tokens, media and callouts
 
-The corner radius of the page, the cards and the inputs follows `$border-radius`, whichever layer sets it.
+The corner radius of the page, the cards and the inputs follows `$border-radius`, which a project theme or the brand can set.
 
 A collapsed callout is a button that announces whether it is open:
 

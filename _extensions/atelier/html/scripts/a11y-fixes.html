@@ -218,10 +218,11 @@
 		});
 
 		// Callout type label: in a titled callout the hidden type label runs into
-		// the title, so a screen reader reads "NoteTitle". Add the missing space.
+		// the title, so the DOM text reads "NoteTitle". Add the missing space.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15177
 		// Remove when: the minimum Quarto version includes the fix.
-		// Not SCSS: the space belongs to the text of the page, which CSS cannot change.
+		// Not SCSS: generated content does not change the DOM text, and Chrome already
+		// spaces the accessible name, because the label is absolutely positioned.
 		document.querySelectorAll(".callout .callout-title-container > .screen-reader-only").forEach((label) => {
 			if (!/\s$/.test(label.textContent)) label.append(" ");
 		});
