@@ -133,6 +133,46 @@ h6 {
   letter-spacing: var(--atelier-heading-letter-spacing, 0.012em);
 }
 
+// Quarto fades h3 to h6 with opacity, which also fades the links inside them
+// below AA (3.97:1 on an h4 link in light mode). Fade the heading text by its
+// colour instead, so a link keeps its own ink. The ink is the theme heading
+// colour (`$headings-color`, which a brand sets) or, when there is none, the
+// body colour, because `currentcolor` here would resolve to the parent's colour
+// and drop a heading colour that a brand sets.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15169
+// Remove when: the minimum Quarto version includes the fix.
+h3,
+h4,
+h5,
+h6 {
+  opacity: 1;
+  color: rgba(if(type-of($headings-color) == color, $headings-color, $body-color), 0.9);
+}
+
+// ===========================================================================
+// TITLE BLOCK
+// ===========================================================================
+// Quarto fades a category badge with opacity 0.6, which puts its text below AA
+// (4.34:1 in light mode). Fade the border by its colour and keep the text at
+// full strength.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15167
+// Remove when: the minimum Quarto version includes the fix.
+.quarto-title .quarto-categories .quarto-category {
+  opacity: 1;
+  border-color: color-mix(in srgb, currentcolor 60%, transparent);
+}
+
+// Quarto writes blank lines between the conditionals of the metadata block, so
+// a page with no author, date or other metadata still gets a
+// <div class="quarto-title-meta"> that holds only whitespace. `:empty` does not
+// match it, but `:has(*)` can tell that it has no element inside. The selector
+// repeats Quarto's own, whose id would otherwise win over it.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13537
+// Remove when: the minimum Quarto version includes the fix.
+#title-block-header.quarto-title-block.default .quarto-title-meta:not(:has(*)) {
+  display: none;
+}
+
 // ===========================================================================
 // FRAMED EMBEDS
 // ===========================================================================

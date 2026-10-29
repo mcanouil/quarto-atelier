@@ -22,6 +22,16 @@
 				a.setAttribute("aria-label", `${siteName} — home`);
 			});
 
+		// Author email link: Quarto emits <a class="quarto-title-author-email"> around an
+		// icon only, so the link has no accessible name. Use the address as the name.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15166
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
+		document.querySelectorAll("a.quarto-title-author-email:not([aria-label])").forEach((a) => {
+			const address = decodeURIComponent((a.getAttribute("href") || "").replace(/^mailto:/i, "").split("?")[0]);
+			if (address) a.setAttribute("aria-label", address);
+		});
+
 		// Colour scheme toggle: Quarto adds title= but no aria-label.
 		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/13463
 		// Remove when: the minimum Quarto version is 1.11.2 or later.

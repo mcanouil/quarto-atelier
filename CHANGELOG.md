@@ -2,12 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
+- fix: Give the author email link in the title block an accessible name, taken from the address. (#53)
+- fix: Keep the text of title block category badges at full strength, so it passes the contrast check. (#53)
+- fix: Fade h3 to h6 headings by their colour rather than their opacity, so links inside them keep their contrast. (#53)
+- fix: Hide the title block metadata container when the page has no metadata. (#53)
 
 ## 0.10.7 (2026-10-15)
-
-### Bug Fixes
 
 - fix: Keep the current item of a navbar or sidebar dropdown readable. It now takes the hover colours, rather than mixing Bootstrap's active fill with the menu text colour. (#49)
 - fix: Give the search field its localised "Search" name for screen readers in every search layout. Quarto names it "Submit" in a text box and gives it no name in the overlay. (#48)
@@ -43,8 +47,6 @@
 
 ## 0.10.3 (2026-08-26)
 
-### Bug Fixes
-
 - fix: Paint the close button of a modal, an offcanvas, a toast, and a dismissible alert from the text colour around it, so it stays readable in both colour schemes. (#31)
 
 ## 0.10.2 (2026-08-01)
@@ -65,8 +67,6 @@
 - docs: Pin the installs the site offers to the release tag it is built from, and offer them from the editor through Quarto Wizard.
 
 ## 0.10.1 (2026-08-01)
-
-### Bug Fixes
 
 - fix: frame an `.embed-art` card at the dimensions of what it holds rather than at a fixed shape. An `<img>` is framed at its own dimensions and an `<embed>` at the `width` and `height` given on the image, so the padding stays the same on all four sides; anything that did not match the old fixed 1.5 was letterboxed inside it, which read as a band of padding down one axis and none on the other. `--atelier-embed-art-width` and `--atelier-embed-art-ratio` now apply only to an `<embed>` given no size of its own, which is the one case with nothing to follow.
 
@@ -94,8 +94,6 @@
 - feat: `--atelier-navbar-control-border` and `--atelier-sidebar-control-border`, the boundary of a boxed control, at 55% of the chrome foreground. The existing border tokens stay the hairline between two surfaces, which is what the sidebar edge, the section dividers, and the navbar and footer edges want.
 - feat: `--atelier-navbar-control-size`, `--atelier-navbar-control-icon-size`, `--atelier-navbar-search-icon-size`, and `--atelier-navbar-control-gap`, the one box the navbar-right controls are drawn in. The defaults are the numbers the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget uses, so the bar reads the same whether or not that extension is installed.
 - feat: fall back per scheme to the brand background for `extensions.atelier.theme-color`, so a site with a `_brand.yml` gets both `<meta name="theme-color">` tags without restating colours it has already declared. The value is the one Quarto compiles into `$body-bg` for that bundle, which is the colour the page is painted with; an explicit `theme-color` still wins, scheme by scheme, and a site with neither still emits nothing.
-
-### Bug Fixes
 
 - fix: ink the reader-mode toggle from the chrome foreground. Quarto bakes `$sidebar-fg` into the glyph's SVG markup, which on the sidebar was the page ink and could match the column it sat on.
 - fix: run the chrome foreground and accent through Quarto's `theme-contrast()` at the AA level, which lifts either only when it falls under 4.5:1 against the bar. A brand primary picked against the page can fall under the ratio on a tint of that page.
@@ -128,8 +126,6 @@
 
 ## 0.7.1 (2026-07-27)
 
-### Bug Fixes
-
 - fix: keep a small gap between the colour-scheme toggle and the search button once they are grouped at the right edge of the collapsed navbar. Cancelling Quarto's automatic margin also removed every space between the two controls.
 
 ## 0.7.0 (2026-07-27)
@@ -139,8 +135,6 @@
 - fix: group the colour-scheme toggle with the search button at the right edge of the collapsed navbar and centre the brand. Quarto hands all the free space to the search button alone, which left the toggle stranded beside the brand and the search on its own at the far right.
 
 ## 0.6.0 (2026-07-26)
-
-### Bug Fixes
 
 - fix: build `og:url` from the page's output file rather than from its input name, so a page setting `output-file` no longer advertises a URL that does not exist and that disagrees with its own canonical link.
 - fix: emit the canonical link through Quarto's own `canonical-url`, now on by default, instead of from the bundled filter. `canonical-url` is a render key and never reaches a Lua filter, so a project that set it shipped two `<link rel="canonical">` tags. Quarto builds the same directory URL for a directory index, so the tag itself is unchanged; set `canonical-url: false` on a page served from more than one URL, as the bundled 404 front matter now does.
@@ -179,8 +173,6 @@
 - docs: document which controls receive a tooltip, and that a navbar item with visible text is given an `aria-label` instead.
 
 ## 0.2.0 (2026-07-26)
-
-### Bug Fixes
 
 - fix: give icon-only navbar links a themed tooltip and an accessible name when the glyph is not an `iconify-icon`, such as an inline SVG or a CSS `mask-image` mark; the link previously kept the browser's unstyled tooltip and gained no label.
 
