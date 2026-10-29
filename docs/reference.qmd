@@ -194,6 +194,7 @@ Under `prefers-reduced-motion: reduce`, the card holds its resting angle and doe
 
 Atelier has opt-in classes for a landing page: a hero, feature rows and a card grid.
 Write each block as a fenced div, on a page with `page-layout: full` and `title-block-style: none`.
+The [Landing page](landing.qmd) guide shows each block and its Markdown, and the [home page](index.qmd) of this site uses them.
 
 ```markdown
 ::: {.atelier-landing}

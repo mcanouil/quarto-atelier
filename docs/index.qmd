@@ -7,22 +7,43 @@ authors:
   - name: "Mickaël CANOUIL, _Ph.D._"
     orcid: "0000-0002-3396-4549"
     url: "https://mickael.canouil.fr"
+page-layout: full
+title-block-style: none
+toc: false
+anchor-sections: false
 ---
 
-A documentation site needs a navbar, a sidebar, a footer, a 404 page, social metadata, and a colour scheme that holds up in both light and dark.
-Assembled by hand they drift apart, and the accessible behaviour is the first thing to go.
+::: {.atelier-landing}
 
-`atelier` is a Quarto project type that derives all of it from one `_brand.yml`.
-This site is itself an `atelier` project: its `_quarto.yml` sets `project.type: atelier`, and toggling the colour scheme shows the code, tabset, and scrollbar surfaces stay correct in both.
+::: {.atelier-hero .gradient .glow}
 
-## Installation
+::: {.atelier-hero-text}
 
-```bash
+[Quarto project type]{.atelier-eyebrow}
+
+# Atelier
+
+[An accessible, brand-driven documentation-website project type for Quarto.]{.atelier-lead}
+
+::: {.atelier-actions}
+
+[Get started](#quick-start){.btn .btn-primary .btn-lg}
+[See the examples](examples.qmd){.btn .btn-outline-primary .btn-lg}
+
+:::
+
+::: {.panel-tabset}
+
+## Terminal
+
+```{.bash filename="Terminal"}
 quarto add {{< var extension.reference >}}
 ```
 
 This will install the extension under the `_extensions` subdirectory.
 If you are using version control, you will want to check in this directory.
+
+## Quarto Wizard
 
 Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto-wizard):
 
@@ -34,11 +55,73 @@ Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto
 
 :::
 
-## Quick start
+:::
+
+:::
+
+::: {.atelier-hero-figure}
+
+[![The Atelier mark: a page frame with a pinned navbar.](assets/icons/icon-512.png){width="320" height="320"}]{}
+
+:::
+
+:::
+
+::: {.atelier-feature}
+
+::: {.atelier-feature-text}
+
+[Brand]{.atelier-eyebrow}
+
+## One brand file, every surface
+
+A documentation site needs a navbar, a sidebar, a footer, a 404 page, social metadata, and a colour scheme that holds up in both light and dark.
+Assembled by hand they drift apart, and the accessible behaviour is the first thing to go.
+
+`atelier` is a Quarto project type that derives all of it from one `_brand.yml`.
+This site is itself an `atelier` project: its `_quarto.yml` sets `project.type: atelier`, and toggling the colour scheme shows the code, tabset, and scrollbar surfaces stay correct in both.
+
+### Where it works
+
+Websites rendered to HTML.
+The project type sets `format: atelier-html`, and contributes the theme, the bundled scripts, and the social-metadata filter to it, so a project that renders to any other format is left alone.
+
+:::
+
+::: {.atelier-feature-figure}
+
+[![The quarto-atelier social card: the extension name and the "project" badge over the line "Accessible, brand-driven documentation sites, ready out of the box", beside a dark code window showing `_quarto.yml`.](assets/social/og-image.png){width="1200" height="630"}]{}
+
+:::
+
+:::
+
+::: {.atelier-feature .reverse}
+
+::: {.atelier-feature-text}
+
+[Quick start]{.atelier-eyebrow}
+
+## Quick start {#quick-start}
+
+::: {.atelier-legend}
+
+1. Set the project type.
+   [Put `project.type: atelier` in your `_quarto.yml`.]{.atelier-detail}
+2. Name the repository.
+   [`website.repo-url` gives the edit and issue links.]{.atelier-detail}
+3. Render the site.
+   [Run `quarto render`, then publish the `_site` directory.]{.atelier-detail}
+
+:::
+
+:::
+
+::: {.atelier-feature-figure}
 
 Set the project type in your `_quarto.yml`:
 
-```yaml
+```{.yaml filename="_quarto.yml"}
 project:
   type: atelier
 website:
@@ -46,10 +129,31 @@ website:
   repo-url: https://github.com/owner/repo
 ```
 
-The project type sets `format: atelier-html`.
-Configure that format by name when you need to change format options or add a stylesheet:
+:::
 
-```yaml
+:::
+
+::: {.atelier-feature}
+
+::: {.atelier-feature-text}
+
+[Configure]{.atelier-eyebrow}
+
+## Configure `atelier-html`
+
+The project type sets `format: atelier-html`.
+Configure that format by name when you need to change format options or add a stylesheet.
+
+Your stylesheet is appended after the extension's, so its rules win the cascade.
+It can use the theme's `body-mix()` function and the Sass variables generated from `_brand.yml`, where a `midnight` palette entry becomes `$brand-midnight`.
+
+See the [Reference](reference.qmd) for every option, and the [Examples](examples.qmd) for each of them rendered.
+
+:::
+
+::: {.atelier-feature-figure}
+
+```{.yaml filename="_quarto.yml"}
 format:
   atelier-html:
     toc-depth: 4
@@ -77,19 +181,70 @@ grep -c 'id="navbar-tooltips"' _site/index.html
 
 :::
 
-Your stylesheet is appended after the extension's, so its rules win the cascade.
-It can use the theme's `body-mix()` function and the Sass variables generated from `_brand.yml`, where a `midnight` palette entry becomes `$brand-midnight`.
+:::
 
-See the [Reference](reference.qmd) for every option, and the [Examples](examples.qmd) for each of them rendered.
+:::
 
-## Where it works
+## Where next
 
-Websites rendered to HTML.
-The project type sets `format: atelier-html`, and contributes the theme, the bundled scripts, and the social-metadata filter to it, so a project that renders to any other format is left alone.
+::: {.atelier-cards}
 
-## Links
+::: {.atelier-card}
 
-- [Reference](reference.qmd) for the full option list.
-- [Examples](examples.qmd) for rendered output.
-- [Changelog](changelog.qmd) for what each release changed.
-- [Source and issues](https://github.com/mcanouil/quarto-atelier) on GitHub.
+{{< iconify octicon:book-24 aria-hidden='true' >}}
+
+### Reference
+
+Every option the project type and its format set.
+
+[Read the reference](reference.qmd)
+
+:::
+
+::: {.atelier-card}
+
+{{< iconify octicon:browser-24 aria-hidden='true' >}}
+
+### Landing page
+
+The hero, feature rows and cards of this page, ready to copy.
+
+[Build a landing page](landing.qmd)
+
+:::
+
+::: {.atelier-card}
+
+{{< iconify octicon:paintbrush-24 aria-hidden='true' >}}
+
+### Examples
+
+Each element Atelier styles, in both colour schemes.
+
+[See the examples](examples.qmd)
+
+:::
+
+:::
+
+::: {.atelier-cards .compact}
+
+::: {.atelier-card}
+
+{{< iconify octicon:history-24 aria-hidden='true' >}}
+
+### [Changelog: what each release changed](changelog.qmd)
+
+:::
+
+::: {.atelier-card}
+
+{{< iconify octicon:mark-github-24 aria-hidden='true' >}}
+
+### [Source, issues and discussions on GitHub](https://github.com/mcanouil/quarto-atelier)
+
+:::
+
+:::
+
+:::
