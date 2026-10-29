@@ -12,6 +12,17 @@ $btn-close-white-filter: none !default;
 
 /*-- scss:functions --*/
 
+// Quarto's website listing file sets `$border-radius` and `$border-radius-sm`
+// with `!default` in the functions layer, which is written before every
+// defaults layer, so the `!default` of this theme or of a project theme would
+// find them taken. A `null` counts as unset for `!default`, so clearing them
+// here lets the first defaults layer set them: the project's own value when it
+// has one, otherwise the radius from this theme.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15176
+// Remove when: the minimum Quarto version includes the fix.
+$border-radius: null;
+$border-radius-sm: null;
+
 // Mix the page background and foreground. brand injects different
 // $body-bg / $body-color into the light and dark compiles, so body-mix()
 // resolves to the correct per-scheme surface from a single source of truth.

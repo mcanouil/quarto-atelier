@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+- fix: Apply the theme corner radius in website projects, where Quarto reset it to 0.25rem. A project theme that sets `$border-radius` or `$border-radius-sm` still wins. (#15176)
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
 - fix: Give the author email link in the title block an accessible name, taken from the address. (#53)
@@ -125,8 +126,6 @@
 - fix: keep a small gap between the colour-scheme toggle and the search button once they are grouped at the right edge of the collapsed navbar. Cancelling Quarto's automatic margin also removed every space between the two controls.
 
 ## 0.7.0 (2026-07-27)
-
-### Bug Fixes
 
 - fix: group the colour-scheme toggle with the search button at the right edge of the collapsed navbar and centre the brand. Quarto hands all the free space to the search button alone, which left the toggle stranded beside the brand and the search on its own at the far right.
 
