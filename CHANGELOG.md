@@ -26,6 +26,7 @@
 - fix: Make sidebar section toggles 24 by 24 px, and space the sidebar links so that each one meets the 24 px target size.
 - fix: Let keyboard users open the "On this page" and sidebar toggles that replace a side column when wide content overlaps it. The toggles now say whether they are open, and their hidden links leave the tab order.
 - fix: Stop announcing the bar above the page on narrow screens as a navigation landmark, because its links are in the breadcrumbs.
+- fix: Name the sidebar and page navigation landmarks, so that each landmark has its own name on Quarto 1.11.3 and earlier.
 
 ## 0.10.7 (2026-10-15)
 
