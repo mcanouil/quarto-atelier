@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+- fix: Update the embedded gitlink to 1.12.0, so a site with no repository no longer gets a gitlink warning on every page. (#68)
 - fix: Show one focus ring on every control, including form fields, search, sidebar toggles, navigation tools, the copy button, the colour scheme toggle and pagination, and use the system highlight colour in forced colours mode. (#62)
 - fix: Keep a focused control clear of the fixed navbar, including the secondary bar on narrow screens. (#62)
 - fix: Cut every animation and transition to a blink, and stop smooth scrolling, when the reader prefers reduced motion. (#62)
