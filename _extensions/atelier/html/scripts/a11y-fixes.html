@@ -302,6 +302,43 @@
 			});
 		});
 
+		// Quarto 1.11.1 and earlier render a sidebar section toggle as an <a> with
+		// no href and a navigation role: it is a landmark with no links, and the
+		// keyboard cannot reach it. Give it the role, tab stop and keys of a
+		// button. A section with no page of its own has two toggles side by side,
+		// its label and its chevron; keep only the label, as Quarto 1.11.2 does.
+		// The key handler is on the document, so it also works in the copy of the
+		// sidebar that Quarto shows when content overlaps the column.
+		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/12116 (keyboard)
+		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/4935 (role)
+		// Remove when: the minimum Quarto version is 1.11.2 or later.
+		// Not SCSS: roles, tab stops and key handlers are DOM changes, which CSS cannot make.
+		const sectionToggles = [
+			...document.querySelectorAll(
+				'.sidebar-item-container a[role="navigation"][data-bs-toggle="collapse"]:not([href])',
+			),
+		];
+		sectionToggles.forEach((toggle) => {
+			if (sectionToggles.includes(toggle.previousElementSibling)) {
+				toggle.removeAttribute("role");
+				toggle.setAttribute("aria-hidden", "true");
+				return;
+			}
+			toggle.setAttribute("role", "button");
+			toggle.setAttribute("tabindex", "0");
+		});
+		if (sectionToggles.length > 0) {
+			document.addEventListener("keydown", (event) => {
+				if (event.key !== "Enter" && event.key !== " ") return;
+				const toggle = event.target.closest?.(
+					'.sidebar-item-container a[role="button"][data-bs-toggle="collapse"]:not([href])',
+				);
+				if (!toggle) return;
+				event.preventDefault();
+				if (!event.repeat) toggle.click();
+			});
+		}
+
 		// Quarto marks the sidebar link to the current page with a class only, so
 		// a screen reader cannot tell which page is current. The copy of the
 		// sidebar that Quarto shows when content overlaps it is cloned later, and
