@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-10-29)
+
 ### Breaking Changes
 
 - Atelier needs Quarto 1.9.38 or later, the highest version its embedded extensions need. (#63)
