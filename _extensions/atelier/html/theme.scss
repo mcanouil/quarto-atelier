@@ -278,6 +278,12 @@ html div.sourceCode:has(> pre.visually-hidden) {
   border: none;
 }
 
+// The copy button of a hidden block is outside the hidden `pre`, so it would
+// float over the text. Clip it too, but show it when it has keyboard focus.
+html .code-copy-outer-scaffold:has(> div.sourceCode > pre.visually-hidden) > .code-copy-button {
+  @include visually-hidden-focusable();
+}
+
 // Quarto drops the left inset of highlighted code in a callout; the frame is
 // still drawn there, so restore it.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15058
