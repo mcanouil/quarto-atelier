@@ -262,6 +262,28 @@ html pre.sourceCode {
   }
 }
 
+// Quarto's `overflow-y: visible !important` on pre.sourceCode outranks the
+// `overflow: hidden !important` of `.visually-hidden`. A hidden code block then
+// stays a 1px box that scrolls and that the keyboard cannot reach. Clip it on
+// both axes again.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15174
+// Remove when: the minimum Quarto version includes the fix.
+html pre.sourceCode.visually-hidden {
+  overflow: hidden !important;
+}
+
+// The div.sourceCode around a hidden block is not hidden, so the frame above
+// would show as a thin line. Remove it.
+html div.sourceCode:has(> pre.visually-hidden) {
+  border: none;
+}
+
+// The copy button of a hidden block is outside the hidden `pre`, so it would
+// float over the text. Clip it too, but show it when it has keyboard focus.
+html .code-copy-outer-scaffold:has(> div.sourceCode > pre.visually-hidden) > .code-copy-button {
+  @include visually-hidden-focusable();
+}
+
 // Quarto drops the left inset of highlighted code in a callout; the frame is
 // still drawn there, so restore it.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15058
@@ -274,6 +296,23 @@ html .callout pre.sourceCode {
 html pre.code-annotation-code {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+// Quarto measures the line highlight of selected annotated code from the
+// `code` element, but puts it in the `pre`, which is not positioned. The band
+// then takes the copy scaffold as its containing block: it sits one border
+// width above the gutter highlight, and a -4em margin moves it out past the
+// left edge of the block. Make the `pre` the containing block and remove the
+// margin, so that the band fills the block and lines up with the gutter.
+// Fixed upstream on main (unreleased): https://github.com/quarto-dev/quarto-cli/issues/13448
+// Remove when: the minimum Quarto version includes the fix.
+html pre.code-annotation-code {
+  position: relative;
+}
+
+html #code-annotation-line-highlight {
+  margin-left: 0;
+  width: 100%;
 }
 
 // Quarto paints the annotation gutter from a fixed light grey in both schemes,
@@ -356,6 +395,52 @@ code:not(.sourceCode):not(pre code) {
   background-color: body-mix(90%);
   padding: 0.1em 0.35em;
   border-radius: 0.3em;
+}
+
+// Quarto gives highlighted inline code Bootstrap's grey code background, not
+// the surface of a code block, and in dark mode that grey is so light that the
+// token colours fail. Put it on the code block surface, which the token colours
+// are checked against.
+// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14135
+// Remove when: never, because Atelier sets its own code surface.
+code.sourceCode:not(pre code) {
+  background-color: body-mix(95%);
+  padding: 0.1em 0.35em;
+  border-radius: 0.3em;
+}
+
+// In a link, the text of highlighted inline code that has no token colour
+// takes the link colour, which can fail AA on the code surface. Hold it to AA.
+a code.sourceCode:not(pre code) {
+  color: theme-contrast($link-color, body-mix(95%), "AA");
+}
+
+// Token colours of the default highlighting themes, arrow-light and arrow-dark.
+// Quarto passes the Comment and Function colours of the active theme as the
+// copy button variables, which tells these rules which theme is in use, so a
+// different theme keeps its own colours. The light bundle stays active under
+// the dark one, so each rule names its scheme.
+// arrow-light gives its Import and Attribute tokens 4.47:1 and 4.48:1 on the
+// code surface of the documentation palette, just under AA. Raise those two
+// colours to AA on the code surface.
+@if $btn-code-copy-color == #5e5e5e and $btn-code-copy-color-active == #4758ab {
+  body.quarto-light code span.im {
+    color: theme-contrast(#00769e, body-mix(95%), "AA");
+  }
+
+  body.quarto-light code span.at {
+    color: theme-contrast(#657422, body-mix(95%), "AA");
+  }
+}
+
+// arrow-dark puts its RegionMarker token, #00e0e0, on a #f8f8f2 band, which
+// gives 1.54:1. Remove the band, so the token sits on the code surface.
+// Upstream: pending (draft arrow-dark-region-marker-contrast)
+// Remove when: the minimum Quarto version includes the fix.
+@if $btn-code-copy-color == #f8f8f2 and $btn-code-copy-color-active == #ffa07a {
+  body.quarto-dark code span.re {
+    background-color: transparent;
+  }
 }
 
 // Quarto fades a callout title with opacity, which also fades the inline code

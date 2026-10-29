@@ -17,6 +17,10 @@
 - fix: Make the header of a collapsible callout a button that exposes whether it is open, and keep a link in the title working. (#55)
 - fix: Separate the callout type from the title for screen readers, so "Note Title" no longer reads as one word. (#55)
 - fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one. (#55)
+- fix: Default to the `arrow-light` and `arrow-dark` highlighting themes, with every token colour at 4.5:1 or more on the default code surface. Many `github-light` tokens failed that ratio. (#56)
+- fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode and in a link. (#56)
+- fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or a copy button, or leaves a scrollable box that the keyboard cannot reach. (#56)
+- fix: Keep the highlight of a selected code annotation inside the code block, level with the gutter highlight. (#56)
 
 ## 0.10.7 (2026-10-15)
 
@@ -24,8 +28,6 @@
 - fix: Give the search field its localised "Search" name for screen readers in every search layout. Quarto names it "Submit" in a text box and gives it no name in the overlay. (#48)
 
 ## 0.10.6 (2026-10-11)
-
-### Bug Fixes
 
 - fix: Theme Code Window through its `--code-window-bg` and `--code-window-title-bg` variables, so its title bar stays distinct in dark mode and a collapsible window's filename stays readable. This needs Code Window 1.6.0 or later. (#43)
 - fix: Always inset code inside its frame so it stands apart from prose, and show code blocks as outlines when `code-block-bg` is `false`. A filename title bar no longer picks up that frame. (#44)
