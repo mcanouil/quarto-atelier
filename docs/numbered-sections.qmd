@@ -1,0 +1,27 @@
+---
+title: "Numbered sections"
+description: "A page with numbered headings, to check the section number style and the blockquote."
+number-sections: true
+toc: true
+---
+
+This page exists so that `number-sections: true` is tested without renumbering every heading of the examples page.
+It is not in the navigation.
+
+## First section
+
+> A short quotation, set with the inset bar and the opening quote.
+>
+> <footer>A. Reader, <cite>An example book</cite></footer>
+
+### A subsection
+
+Text under a subsection.
+
+## Second section
+
+Text under the second section.
+
+### Another subsection
+
+More text.

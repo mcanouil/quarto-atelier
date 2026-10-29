@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: Style blockquotes with an inset bar, a decorative opening quote that screen readers skip, and a quieter attribution for `footer`, `cite` and `.attribution`. (#61)
+- feat: Set section numbers smaller, in tabular numerals and in the primary colour. Listing and appendix headings keep the default look. (#61)
+
 ### Bug Fixes
 
 - fix: Put the back-to-top button in the Tab order and show it while it has focus, so keyboard users can reach it and press it with Enter or Space. (#58)

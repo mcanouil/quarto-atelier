@@ -1372,6 +1372,96 @@ $scrollbar-thumb: body-mix(72%);
 }
 
 // ===========================================================================
+// BLOCKQUOTES AND SECTION NUMBERS
+// ===========================================================================
+// A blockquote has an inset bar in the primary colour and a decorative opening
+// quote. The alternative text after the slash in `content` is empty, so a
+// screen reader does not read the quote character. Quarto sets the padding and
+// the size on the `.blockquote` class, so the selector list matches its
+// specificity and comes later.
+blockquote:not(.twitter-tweet),
+.blockquote:not(.twitter-tweet) {
+  position: relative;
+  margin: 1.5rem 0;
+  padding: 0.125rem 0;
+  padding-inline-start: 2.5rem;
+  border: 0;
+  background: none;
+  font-style: normal;
+  font-size: 1.0625em;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    inset-inline-start: 0.375rem;
+    width: 0.25rem;
+    border-radius: 0.125rem;
+    background: $primary;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: "\201C" / "";
+    position: absolute;
+    top: -0.1rem;
+    inset-inline-start: 1rem;
+    font-family: Georgia, serif;
+    font-size: 2rem;
+    line-height: 1;
+    color: $primary;
+    pointer-events: none;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  footer,
+  > cite,
+  .attribution {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.85em;
+    font-style: normal;
+    color: theme-contrast($text-muted, $body-bg, "AA");
+  }
+
+  // A `cite` inside an attribution is part of its line: keep it inline, at the
+  // size of the line.
+  footer cite,
+  .attribution cite {
+    display: inline;
+    margin-top: 0;
+    font-size: inherit;
+  }
+}
+
+// Section numbers are smaller, use tabular numerals, and take the primary
+// colour, held to AA on the page. Listing headings and appendix headings keep
+// the default look.
+h1.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)),
+h2.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)),
+h3.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)),
+h4.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)),
+h5.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)),
+h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
+  .header-section-number {
+    margin-right: 0.55em;
+    font-size: 0.82em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums lining-nums;
+    color: theme-contrast($primary, $body-bg, "AA");
+  }
+}
+
+// ===========================================================================
 // FOOTNOTES AND APPENDIX
 // ===========================================================================
 // The back-link of a footnote is a 15px glyph, below the 24px target size.
