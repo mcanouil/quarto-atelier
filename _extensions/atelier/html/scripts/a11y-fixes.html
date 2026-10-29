@@ -380,6 +380,24 @@
 			});
 		});
 
+		// The click area of the narrow-screen bar and the backdrop of the open
+		// sidebar are also collapse triggers for the sidebar, and Bootstrap writes
+		// aria-expanded on every trigger when it opens or closes. Neither element
+		// has a role, which does not allow the attribute. The sidebar button next
+		// to the click area keeps it. Remove it from the other two each time.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15229
+		// Remove when: the minimum Quarto version includes the fix.
+		// Not SCSS: removing an attribute is a DOM change, which CSS cannot make.
+		const expandedObserver = new MutationObserver((records) => {
+			records.forEach((record) => record.target.removeAttribute("aria-expanded"));
+		});
+		document
+			.querySelectorAll('nav.quarto-secondary-nav a[data-bs-toggle="collapse"]:not([href]), #quarto-sidebar-glass')
+			.forEach((element) => {
+				element.removeAttribute("aria-expanded");
+				expandedObserver.observe(element, { attributes: true, attributeFilter: ["aria-expanded"] });
+			});
+
 		// Quarto 1.11.1 and earlier render a sidebar section toggle as an <a> with
 		// no href and a navigation role: it is a landmark with no links, and the
 		// keyboard cannot reach it. Give it the role, tab stop and keys of a
