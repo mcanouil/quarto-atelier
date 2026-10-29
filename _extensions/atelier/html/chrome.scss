@@ -66,8 +66,9 @@ $atelier-chrome-page-accent: if(variable-exists(primary), $primary, #0d6efd);
 // These sit in this file because it is listed first, so its defaults are
 // evaluated after those of the project theme and of `brand`, which therefore
 // win. The `null` reset in `html/theme.scss` is what leaves them free to apply.
-// The small and large radii follow `$border-radius` at Bootstrap's ratios, so
-// a brand that sets only `$border-radius` keeps the three in proportion.
+// The small and large radii follow `$border-radius` at the ratios of these
+// defaults, so a brand that sets only `$border-radius` keeps the three in
+// proportion.
 $border-radius: 0.5rem !default;
 $border-radius-sm: $border-radius * 0.75 !default;
 $border-radius-lg: $border-radius * 1.5 !default;
