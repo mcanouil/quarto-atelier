@@ -22,6 +22,7 @@
 - fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode and in a link. (#56)
 - fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or a copy button, or leaves a scrollable box that the keyboard cannot reach. (#56)
 - fix: Keep the highlight of a selected code annotation inside the code block, level with the gutter highlight. (#56)
+- fix: Show the current page by more than its colour. It is bold in every sidebar style, and underlined in the navbar of a page without a sidebar.
 
 ## 0.10.7 (2026-10-15)
 

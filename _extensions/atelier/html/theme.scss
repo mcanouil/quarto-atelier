@@ -656,14 +656,13 @@ body.docked {
     color: var(--atelier-sidebar-muted);
   }
 
-  // The current page reads as a pill rather than as a colour change alone,
-  // which matches the navbar dropdown treatment.
+  // On the docked column, the current page also sits on a pill, which matches
+  // the navbar dropdown treatment.
   .sidebar-item-container .sidebar-link.active {
     background: var(--atelier-sidebar-accent-soft);
     border-radius: $border-radius-sm;
     padding: 0.15rem 0.4rem;
     margin: -0.15rem -0.4rem;
-    font-weight: 600;
   }
 
   // A sidebar entry with text and no href or contents is a group label; Quarto
@@ -833,6 +832,16 @@ body.docked {
   }
 }
 
+// Quarto marks the current page in the sidebar by colour alone, which fails
+// WCAG 1.4.1 when the two colours are close. Make the current page bold as
+// well, in every sidebar style and in the copy that Quarto shows when content
+// overlaps the column.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
+// Remove when: the minimum Quarto version includes the fix.
+.sidebar-navigation .sidebar-item-container .sidebar-link.active {
+  font-weight: 600;
+}
+
 // Quarto's floating back-to-top pill has no edge on tinted surfaces; give it
 // the same hairline as the code surfaces.
 #quarto-back-to-top {
@@ -855,6 +864,19 @@ body.docked {
     var(--atelier-navbar-accent),
     var(--atelier-navbar-accent-soft)
   );
+}
+
+// Quarto marks the current page in the navbar by colour alone, which fails
+// WCAG 1.4.1 when the two colours are close. Underline the current page too.
+// On a page with a sidebar, Quarto can mark the wrong navbar link, so the
+// underline is only for pages without one.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
+// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
+// Remove when: the minimum Quarto version includes the fix.
+body:not(.nav-sidebar) .navbar .navbar-nav .nav-link.active {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.4em;
 }
 
 // The pill visuals on the search button and the colour-scheme toggle, the
