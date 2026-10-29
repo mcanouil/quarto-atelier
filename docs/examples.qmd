@@ -351,3 +351,13 @@ flowchart LR
 | Announcement banner | ✓     | ✓    |
 
 : Elements the project type styles for both colour schemes. {.striped .hover tbl-colwidths="[60,20,20]"}
+
+## Content styling
+
+A blockquote has an inset bar and a decorative opening quote that a screen reader does not read.
+
+> A quotation that runs over a few words, so that the bar and the quote can be seen against the text.
+>
+> <cite>A. Reader, An example book</cite>
+
+The section number style is shown on the [numbered sections page](numbered-sections.qmd), which turns on `number-sections` for that page only.
