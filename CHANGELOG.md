@@ -4,7 +4,6 @@
 
 ### Bug Fixes
 
-- fix: Default to the `arrow-light` and `arrow-dark` highlighting themes, with every token colour at 4.5:1 or more on the code surface. Many `github-light` tokens failed that ratio.
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
 - fix: Give the author email link in the title block an accessible name, taken from the address. (#53)
@@ -18,9 +17,6 @@
 - fix: Make the header of a collapsible callout a button that exposes whether it is open, and keep a link in the title working. (#55)
 - fix: Separate the callout type from the title for screen readers, so "Note Title" no longer reads as one word. (#55)
 - fix: Paint Mermaid subgraphs from the page surface, so they are no longer dark grey on a light page and white on a dark one. (#55)
-- fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode.
-- fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or leaves a scrollable box that the keyboard cannot reach.
-- fix: Keep the highlight of a selected code annotation inside the code block, level with the gutter highlight.
 - fix: Default to the `arrow-light` and `arrow-dark` highlighting themes, with every token colour at 4.5:1 or more on the code surface. Many `github-light` tokens failed that ratio. (#56)
 - fix: Put highlighted inline code on the code block surface, so its token colours stay readable in dark mode. (#56)
 - fix: Keep a `.visually-hidden` code block hidden. It no longer shows a thin frame or leaves a scrollable box that the keyboard cannot reach. (#56)
