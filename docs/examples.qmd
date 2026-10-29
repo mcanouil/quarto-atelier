@@ -308,6 +308,7 @@ The corner radius of the page, the cards and the inputs follows `$border-radius`
 A collapsed callout is a button that announces whether it is open:
 
 ::: {.callout-note collapse="true"}
+
 ## A closed callout
 
 Its toggle exposes `aria-expanded`.
@@ -316,7 +317,17 @@ Its toggle exposes `aria-expanded`.
 A callout title reads as "Note Title" to a screen reader, with a space between the type and the title.
 
 ::: {.callout-warning}
+
 ## A titled callout
+
+Body text.
+:::
+
+A link in a callout title keeps the contrast of a link in the body:
+
+::: {.callout-tip}
+
+## A title with [a link](https://quarto.org)
 
 Body text.
 :::

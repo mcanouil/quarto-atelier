@@ -959,6 +959,30 @@ div.callout.callout-style-default:where(
   )
   > .callout-header {
   background-color: mix($body-bg, $text-muted, 70%);
+
+  a {
+    color: theme-contrast($link-color, mix($body-bg, $text-muted, 70%), "AA");
+  }
+}
+
+// A link in a callout title keeps the body link colour, which can fall below
+// AA on the tinted title band. Pick it against each band, which Quarto shifts
+// from the type colour as below.
+@each $name, $color in (
+    "note": $callout-color-note,
+    "tip": $callout-color-tip,
+    "warning": $callout-color-warning,
+    "caution": $callout-color-caution,
+    "important": $callout-color-important
+  ) {
+  $band: shift-color($color, -90%);
+  @if quarto-color.blackness($body-bg) > $code-block-theme-dark-threshhold {
+    $band: shift-color($color, 70%);
+  }
+
+  div.callout-#{$name}.callout-style-default > .callout-header a {
+    color: theme-contrast($link-color, $band, "AA");
+  }
 }
 
 // Quarto bakes a fixed grey into the copy button, which reads poorly on the
