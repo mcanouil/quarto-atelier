@@ -6,6 +6,8 @@ author:
   - name: "Mickaël CANOUIL, _Ph.D._"
     email: "claude@mickael.canouil.fr"
 categories: [Atelier, Accessibility]
+license: "CC BY"
+citation: true
 ---
 
 Set `project.type: atelier` in your `_quarto.yml`, provide a `_brand.yml`, then author pages as usual.
@@ -199,6 +201,28 @@ It reads on the page surface, which follows the colour scheme, and on an alert t
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 ```
+
+## Footnotes and appendix
+
+A footnote sits at the end of the page.[^note]
+The back-link of each note has a name and a 24 pixel target, and the appendix keeps its contrast.
+Secondary text and a folded code block are included to check that they stay readable.
+
+> A blockquote with an attribution.
+>
+> <footer>A. Reader</footer>
+
+::: {.column-margin}
+A margin note in secondary text.
+:::
+
+![The extension icon, with a caption in secondary text.](assets/icons/icon.svg){width=64}
+
+```{.python .code-fold}
+print("A folded code block")
+```
+
+[^note]: The note text, with a back-link.
 
 ## Everything above, in both schemes
 

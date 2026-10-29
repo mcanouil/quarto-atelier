@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 
+- fix: Name each footnote back-link for screen readers and give it a 24 pixel target. The name is in English, because Quarto offers no translated string for it.
+- fix: Draw the appendix at full opacity, so its back-links and licence link keep a 4.5:1 contrast ratio.
 - fix: Underline links in table listings again. Quarto removes the underline, so colour alone marked links in running text. (#52)
 - fix: Make listing categories reachable with Tab and usable with Enter or Space. Quarto renders them as plain `div` elements. (#52)
 - fix: Give the author email link in the title block an accessible name, taken from the address. (#53)
@@ -50,8 +52,6 @@
 - fix: Paint the close button of a modal, an offcanvas, a toast, and a dismissible alert from the text colour around it, so it stays readable in both colour schemes. (#31)
 
 ## 0.10.2 (2026-08-01)
-
-### Bug Fixes
 
 - fix: keep the [gitlink](https://github.com/mcanouil/quarto-gitlink) widget's menu inside the sidebar, so a docked sidebar carrying it no longer has a permanent horizontal scrollbar. Quarto gives the column `overflow-y: auto` and leaves `overflow-x` at `visible`, which computes to `auto`, so anything wider scrolls it sideways rather than being clipped; the menu is anchored to its trigger's left edge and sized to its content, and the theme centres the tools row, so it ran past the right edge. It raised the scrollbar even while shut, because it is hidden with `visibility` and so still takes part in layout. It is now anchored to the tools row, which spans the column.
 
@@ -113,8 +113,6 @@
 - feat: dark-pinned docked sidebar, so a book-like `website.sidebar` with `style: docked` joins the navbar and the footer as one chrome in both colour schemes. Quarto derives that surface from the page instead, which alongside a navbar leaves the column following the body, and without one falls back to Bootstrap's `$light`, painting a near-white column beside a dark page.
 - feat: `--atelier-sidebar-*` custom properties, each defaulting to its `--atelier-navbar-*` counterpart, driving the whole column: item ink, active item pill, section dividers, collapse chevrons, group labels, header and logo link, sidebar tools and their dropdown menus, sidebar search, the mobile bar carrying the sidebar toggle and the breadcrumbs, the sidebar edge, the sidebar scrollbar, and the focus ring. A `style: floating` sidebar keeps Quarto's page-coloured treatment, since it has no surface of its own.
 
-### Bug Fixes
-
 - fix: colour sidebar links, hover, and the active item from the sidebar accent instead of `$primary`, which with the default tokens was 3.2:1 against the dark column in the light scheme. The focus ring inside the sidebar takes the accent for the same reason.
 - fix: ink the sidebar search field, caret, placeholder, and magnifier, and the overlay search button beside them. Quarto colours the field from `$body-color` and the button only inside `.sidebar-tools-*`, either of which can match the surface it sits on.
 - fix: paint the mobile secondary navigation bar, which Quarto paints with the sidebar surface this theme replaces.
@@ -146,8 +144,6 @@
 - docs: note that `sitemap.xml` lists a directory index as `index.html` while the canonical link uses the directory URL, that both serve the same page, and that the canonical is the stronger signal.
 
 ## 0.5.0 (2026-07-26)
-
-### Bug Fixes
 
 - fix: write the icon, Apple touch icon, and manifest `href` exactly as configured. Quarto's website resource resolver already prefixes each page's offset to the project root onto every `link[href]` it finds, so adding one in the filter doubled it and broke every icon on pages below the site root.
 - fix: point `og:url` and `<link rel="canonical">` of a directory index at its directory rather than at `index.html`, since that is the URL the site serves and the one a scraper de-duplicates against.
