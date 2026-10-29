@@ -1,0 +1,31 @@
+---
+title: "Listing example"
+description: "Two listings that show the listing defects Atelier works around."
+toc: false
+listing:
+  - id: table-listing
+    contents: posts
+    type: table
+    fields: [title, date, categories]
+    sort: "date desc"
+    page-size: 2
+  - id: default-listing
+    contents: posts
+    type: default
+    categories: true
+    fields: [title, date, categories]
+    sort: "date desc"
+---
+
+This page exists to check listing styles.
+It has a table listing and a default listing with categories.
+
+## Table listing
+
+:::{#table-listing}
+:::
+
+## Default listing
+
+:::{#default-listing}
+:::
