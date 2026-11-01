@@ -16,6 +16,8 @@
   `appearance="minimal"` gives a dashed outline.
 - feat: Lay out the title block with authors and affiliations in two columns and the dates and DOI in one strip.
   The abstract takes the callout frame, and categories and keywords are chips.
+- feat: Show the language beside the file name of a code window and keep the copy button visible.
+  Lines named in `code-line-numbers` get a tinted band and an accent marker.
 
 ## 0.11.0 (2026-10-29)
 

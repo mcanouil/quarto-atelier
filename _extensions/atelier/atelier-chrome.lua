@@ -73,6 +73,23 @@ local function publish_options(meta)
   return nil
 end
 
+--- Copy a line spec in `code-line-numbers` to `atelier-highlight`.
+--- Quarto documents line highlighting for Reveal.js only, so in HTML it keeps
+--- just the `number-lines` class. The code-blocks script marks the lines.
+--- @param block table The code block
+--- @return table|nil The block with the attribute, or nil when it has no line spec
+local function copy_line_spec(block)
+  if not quarto.doc.is_format('html') then
+    return nil
+  end
+  local spec = block.attributes['code-line-numbers']
+  if spec == nil or spec == '' or spec == 'true' or spec == 'false' then
+    return nil
+  end
+  block.attributes['atelier-highlight'] = spec
+  return block
+end
+
 return {
-  { Meta = publish_options },
+  { Meta = publish_options, CodeBlock = copy_line_spec },
 }
