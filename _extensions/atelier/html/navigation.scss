@@ -228,16 +228,26 @@ body.docked .sidebar-navigation {
     }
 
     // Quarto marks the current page by colour alone, which fails WCAG 1.4.1
-    // when the two colours are close. Add weight and a 3 px marker.
+    // when the two colours are close. Add weight and a 3 px marker. Quarto
+    // writes the class, and the script adds aria-current, so the rule keys on
+    // both and holds without JavaScript.
     // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
     // Remove when: the minimum Quarto version includes the fix.
-    &[aria-current="page"] {
+    &:is(.active, [aria-current="page"]) {
       background: var(--atelier-sidebar-accent-soft);
       color: var(--atelier-sidebar-accent);
       font-weight: 650;
       box-shadow: inset 3px 0 0 var(--atelier-sidebar-accent-mark);
     }
   }
+}
+
+// A floating sidebar does not take the docked menu style, so the current page
+// gets the weight cue on its own.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
+// Remove when: the minimum Quarto version includes the fix.
+.sidebar-navigation .sidebar-link:is(.active, [aria-current="page"]) {
+  font-weight: 650;
 }
 
 // ===========================================================================
@@ -385,6 +395,12 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
 
   ul ul .nav-link {
     padding-left: 1.3rem;
+  }
+
+  // The page focus ring is held to the page, and a pinned card can be far from
+  // it, so the ring takes the card accent.
+  :is(a, button):focus-visible {
+    outline-color: var(--atelier-toc-accent);
   }
 
   // Quarto sets the current entry colour with !important and adds a left
