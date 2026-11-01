@@ -30,6 +30,59 @@
 
 /*-- scss:defaults --*/
 
+// Quarto sets the Bootstrap colour names from `color.palette` only when the
+// brand also has `defaults.bootstrap` (see quarto-cli#11108 for the intended
+// mapping). Atelier sets them for every brand, so that palette names always
+// colour the callouts.
+// Remove when: Quarto maps the palette names without defaults.bootstrap.
+@if variable-exists("brand-black") and not variable-exists("black") {
+  $black: $brand-black !global;
+}
+
+@if variable-exists("brand-white") and not variable-exists("white") {
+  $white: $brand-white !global;
+}
+
+@if variable-exists("brand-blue") and not variable-exists("blue") {
+  $blue: $brand-blue !global;
+}
+
+@if variable-exists("brand-indigo") and not variable-exists("indigo") {
+  $indigo: $brand-indigo !global;
+}
+
+@if variable-exists("brand-purple") and not variable-exists("purple") {
+  $purple: $brand-purple !global;
+}
+
+@if variable-exists("brand-pink") and not variable-exists("pink") {
+  $pink: $brand-pink !global;
+}
+
+@if variable-exists("brand-red") and not variable-exists("red") {
+  $red: $brand-red !global;
+}
+
+@if variable-exists("brand-orange") and not variable-exists("orange") {
+  $orange: $brand-orange !global;
+}
+
+@if variable-exists("brand-yellow") and not variable-exists("yellow") {
+  $yellow: $brand-yellow !global;
+}
+
+@if variable-exists("brand-green") and not variable-exists("green") {
+  $green: $brand-green !global;
+}
+
+@if variable-exists("brand-teal") and not variable-exists("teal") {
+  $teal: $brand-teal !global;
+}
+
+@if variable-exists("brand-cyan") and not variable-exists("cyan") {
+  $cyan: $brand-cyan !global;
+}
+
 // ===========================================================================
 // CHROME PALETTE
 // ===========================================================================
