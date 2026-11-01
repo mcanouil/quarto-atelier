@@ -1097,17 +1097,6 @@ html .panel-tabset > .tab-content {
 }
 
 // ===========================================================================
-// TOC
-// ===========================================================================
-// Quarto marks the current section with .active but leaves it in the body
-// colour, and gives its border the baked grey; the margin TOC sits on the page
-// surface, so both take the palette accent.
-#TOC .active {
-  color: $primary;
-  border-left-color: $primary;
-}
-
-// ===========================================================================
 // LISTINGS
 // ===========================================================================
 // Quarto removes the underline from every link in a table listing, including

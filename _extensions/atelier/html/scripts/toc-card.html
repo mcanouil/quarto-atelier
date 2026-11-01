@@ -1,0 +1,106 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-toc-card" type="text/javascript">
+	(function () {
+		var toc = document.querySelector("#quarto-margin-sidebar #TOC");
+		if (!toc) return;
+
+		var options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+		var labels = options.labels || {};
+		var readingTime = labels["toc-reading-time"] || "{n} min read";
+		var updated = labels["toc-updated"] || "Updated {date}";
+		var copyLabel = labels["toc-copy-link"] || "Copy link";
+		var copiedLabel = labels["toc-link-copied"] || "Link copied";
+
+		// The meta row sits between the title and the entries. Reading time
+		// counts 200 words a minute, at least one minute.
+		var meta = document.createElement("div");
+		meta.className = "atelier-toc-meta";
+		var content = document.getElementById("quarto-document-content");
+		var words = ((content && content.innerText) || "").split(/\s+/).filter(Boolean).length;
+		var time = document.createElement("span");
+		time.className = "atelier-toc-reading-time";
+		time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
+		meta.appendChild(time);
+		var modified = document.querySelector(".quarto-title-meta .date-modified");
+		var modifiedDate = modified && modified.textContent.trim();
+		if (modifiedDate) {
+			var stamp = document.createElement("span");
+			stamp.className = "atelier-toc-updated";
+			stamp.textContent = updated.replace("{date}", modifiedDate);
+			meta.appendChild(stamp);
+		}
+		var title = toc.querySelector("#toc-title");
+		if (title) {
+			title.after(meta);
+		} else {
+			toc.prepend(meta);
+		}
+
+		// Quarto writes the actions list only when the site has actions.
+		var actions = toc.querySelector(".toc-actions");
+		if (!actions) {
+			actions = document.createElement("div");
+			actions.className = "toc-actions";
+			toc.appendChild(actions);
+		}
+		var list = actions.querySelector("ul");
+		if (!list) {
+			list = document.createElement("ul");
+			actions.appendChild(list);
+		}
+		var button = document.createElement("button");
+		button.type = "button";
+		button.className = "toc-action atelier-copy-link";
+		button.innerHTML = '<i class="bi bi-link-45deg" aria-hidden="true"></i>';
+		var text = document.createTextNode(copyLabel);
+		button.appendChild(text);
+		var item = document.createElement("li");
+		item.appendChild(button);
+		list.appendChild(item);
+
+		var status = document.createElement("span");
+		status.className = "visually-hidden";
+		status.setAttribute("aria-live", "polite");
+		toc.appendChild(status);
+
+		var timer;
+		button.addEventListener("click", function () {
+			navigator.clipboard.writeText(location.href.split("#")[0]).then(
+				function () {
+					status.textContent = copiedLabel;
+					text.nodeValue = copiedLabel;
+					clearTimeout(timer);
+					timer = setTimeout(function () {
+						text.nodeValue = copyLabel;
+						status.textContent = "";
+					}, 2000);
+				},
+				function (error) {
+					console.warn("Atelier: copying the page link failed.", error);
+				}
+			);
+		});
+
+		// Quarto marks the current entry with a class only. Mirror it in
+		// aria-current so assistive technology announces it.
+		var links = toc.querySelectorAll(".nav-link");
+		function syncCurrent() {
+			links.forEach(function (link) {
+				if (link.classList.contains("active")) {
+					link.setAttribute("aria-current", "location");
+				} else {
+					link.removeAttribute("aria-current");
+				}
+			});
+		}
+		syncCurrent();
+		var observer = new MutationObserver(syncCurrent);
+		links.forEach(function (link) {
+			observer.observe(link, { attributes: true, attributeFilter: ["class"] });
+		});
+	})();
+</script>

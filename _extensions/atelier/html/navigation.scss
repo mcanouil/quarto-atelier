@@ -328,3 +328,104 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     text-transform: uppercase;
   }
 }
+
+// ===========================================================================
+// T2 table of contents card
+// ===========================================================================
+#quarto-margin-sidebar #TOC {
+  padding: 0.9rem;
+  border: 1px solid var(--atelier-toc-border);
+  border-radius: $border-radius;
+  background: var(--atelier-toc-bg);
+  color: var(--atelier-toc-fg);
+  font-size: 0.84rem;
+
+  #toc-title {
+    margin: 0 0 0.6rem;
+    color: var(--atelier-toc-muted);
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .atelier-toc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 0.7rem;
+    color: var(--atelier-toc-muted);
+    font-size: 0.78rem;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  ul ul {
+    margin: 0;
+  }
+
+  .nav-link,
+  .toc-action {
+    display: block;
+    padding: 0.22rem 0.5rem;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--atelier-toc-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--atelier-toc-fg);
+    }
+  }
+
+  ul ul .nav-link {
+    padding-left: 1.3rem;
+  }
+
+  // Quarto sets the current entry colour with !important and adds a left
+  // border, so both are overridden here.
+  .nav-link.active {
+    border-left: 0;
+    background: var(--atelier-toc-accent-soft);
+    color: var(--atelier-toc-accent) !important;
+    font-weight: 650;
+  }
+
+  .toc-actions {
+    margin-top: 0.9rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--atelier-toc-border);
+
+    ul {
+      display: grid;
+      gap: 0.1rem;
+    }
+
+    .toc-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      min-height: 28px;
+      font: inherit;
+      text-align: left;
+    }
+
+    .bi {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+    }
+
+    .bi::before {
+      width: 14px;
+      height: 14px;
+      font-size: 14px;
+    }
+  }
+}
