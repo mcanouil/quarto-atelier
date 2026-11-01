@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- feat: Derive the page surfaces, muted text, control border, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA, and use `color.secondary` for muted text when the brand sets it.
+
 ## 0.11.0 (2026-10-29)
 
 ### Breaking Changes

@@ -72,6 +72,17 @@ $border-radius-sm: null;
 // a bar; re-point the Sass variables instead when the change should also reach
 // the colours Quarto bakes into its own markup.
 :root {
+  --atelier-bg: #{$atelier-chrome-page-bg};
+  --atelier-fg: #{$atelier-chrome-page-fg};
+  --atelier-surface: #{$atelier-surface};
+  --atelier-surface-strong: #{$atelier-surface-strong};
+  --atelier-border: #{$atelier-border};
+  --atelier-control-border: #{$atelier-control-border};
+  --atelier-muted: #{$atelier-text-muted};
+  --atelier-accent-soft: #{$atelier-accent-soft};
+  --atelier-accent-ink: #{$atelier-accent-ink};
+  --atelier-accent-mark: #{$atelier-accent-mark};
+
   --atelier-navbar-bg: #{$atelier-chrome-bg};
   --atelier-navbar-surface: #{$atelier-chrome-surface};
   --atelier-navbar-fg: #{$atelier-chrome-fg};
@@ -83,6 +94,7 @@ $border-radius-sm: null;
   // A boxed control (a search field, a widget pill) needs a boundary that can
   // be seen, where the hairline above only has to separate two surfaces.
   --atelier-navbar-control-border: #{$atelier-chrome-control-border};
+  --atelier-navbar-accent-mark: #{$atelier-chrome-accent-mark};
 
   // A docked sidebar is the third bar, so its tokens default to the navbar
   // ones: overriding the navbar palette carries the sidebar with it, and a
@@ -95,13 +107,25 @@ $border-radius-sm: null;
   --atelier-sidebar-accent-soft: var(--atelier-navbar-accent-soft);
   --atelier-sidebar-border: var(--atelier-navbar-border);
   --atelier-sidebar-control-border: var(--atelier-navbar-control-border);
+  --atelier-sidebar-accent-mark: var(--atelier-navbar-accent-mark);
+
+  // The table of contents is a fourth panel, so its tokens default to the
+  // sidebar ones in the same way.
+  --atelier-toc-bg: var(--atelier-sidebar-bg);
+  --atelier-toc-surface: var(--atelier-sidebar-surface);
+  --atelier-toc-fg: var(--atelier-sidebar-fg);
+  --atelier-toc-muted: var(--atelier-sidebar-muted);
+  --atelier-toc-accent: var(--atelier-sidebar-accent);
+  --atelier-toc-accent-soft: var(--atelier-sidebar-accent-soft);
+  --atelier-toc-accent-mark: var(--atelier-sidebar-accent-mark);
+  --atelier-toc-border: var(--atelier-sidebar-border);
 }
 
 // ===========================================================================
 // ACCESSIBILITY (focus, skip link, ordinal dates)
 // ===========================================================================
 // The focus ring, shared by every control.
-$atelier-focus-ring-color: $primary !default;
+$atelier-focus-ring-color: $atelier-accent-ink !default;
 $atelier-focus-ring-width: 2px !default;
 
 // Quarto draws focus in four different ways: the browser ring, a `currentColor`
@@ -125,6 +149,7 @@ $atelier-focus-controls: ".btn:focus-visible, .btn-close:focus-visible, .nav-lin
 
 // Quarto 1.11.7 adds an inner shadow ring of its own to the same controls.
 :root {
+  --atelier-focus: #{$atelier-focus-ring-color};
   --quarto-focus-ring-shadow: none;
 }
 
