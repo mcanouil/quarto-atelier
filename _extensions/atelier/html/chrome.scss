@@ -14,20 +14,6 @@
   @return $toward;
 }
 
-// Mix $color towards black or white until it reads at $ratio on a fixed $bg,
-// and return it untouched when it already does. A ratio that cannot be met ends
-// at black or white.
-@function atelier-contrast($color, $bg, $ratio) {
-  $toward: if(tone($bg) == "light", #000, #fff);
-  @for $step from 0 through 100 {
-    $candidate: mix($toward, $color, $step * 1%);
-    @if quarto-contrast($candidate, $bg) >= $ratio {
-      @return $candidate;
-    }
-  }
-  @return $toward;
-}
-
 // The same as atelier-contrast(), but the colour must reach $ratio on every
 // background in the $bgs list. The backgrounds must share one tone.
 @function atelier-contrast-all($color, $bgs, $ratio) {
@@ -45,6 +31,24 @@
     }
   }
   @return $toward;
+}
+
+// Mix $color towards black or white until it reads at $ratio on a fixed $bg,
+// and return it untouched when it already does. A ratio that cannot be met ends
+// at black or white.
+@function atelier-contrast($color, $bg, $ratio) {
+  @return atelier-contrast-all($color, ($bg,), $ratio);
+}
+
+// The border of a hue over a background, and its ink: the hue mixed into the
+// foreground, then held at $ratio on $bg. Callouts and the announcement bar use
+// both, so the two mix weights live here.
+@function atelier-hue-border($hue, $bg) {
+  @return mix($hue, $bg, 60%);
+}
+
+@function atelier-hue-ink($hue, $fg, $bg, $ratio: 4.5) {
+  @return atelier-contrast(mix($hue, $fg, 62%), $bg, $ratio);
 }
 
 /*-- scss:defaults --*/

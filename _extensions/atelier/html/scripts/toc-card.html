@@ -8,17 +8,11 @@
 		var toc = document.querySelector("#quarto-margin-sidebar #TOC");
 		if (!toc) return;
 
-		var options = {};
-		try {
-			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
-		} catch (error) {
-			console.warn("Atelier: the options block is not valid JSON.", error);
-		}
-		var labels = options.labels || {};
-		var readingTime = labels["toc-reading-time"] || "{n} min read";
-		var updated = labels["toc-updated"] || "Updated {date}";
-		var copyLabel = labels["toc-copy-link"] || "Copy link";
-		var copiedLabel = labels["toc-link-copied"] || "Link copied";
+		var labels = (window.atelierOptions || {}).labels || {};
+		var readingTime = labels["toc-reading-time"];
+		var updated = labels["toc-updated"];
+		var copyLabel = labels["toc-copy-link"];
+		var copiedLabel = labels["toc-link-copied"];
 
 		// The meta row sits between the title and the entries. Reading time
 		// counts 200 words a minute, at least one minute.
@@ -26,16 +20,18 @@
 		meta.className = "atelier-toc-meta";
 		var content = document.getElementById("quarto-document-content");
 		function countWords(element) {
-			return element ? element.innerText.split(/\s+/).filter(Boolean).length : 0;
+			return element ? element.textContent.split(/\s+/).filter(Boolean).length : 0;
 		}
 		var words = countWords(content) - countWords(document.getElementById("title-block-header"));
-		var time = document.createElement("span");
-		time.className = "atelier-toc-reading-time";
-		time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
-		meta.appendChild(time);
+		if (readingTime) {
+			var time = document.createElement("span");
+			time.className = "atelier-toc-reading-time";
+			time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
+			meta.appendChild(time);
+		}
 		var modified = document.querySelector(".quarto-title-meta .date-modified");
 		var modifiedDate = modified && modified.textContent.trim();
-		if (modifiedDate) {
+		if (updated && modifiedDate) {
 			var stamp = document.createElement("span");
 			stamp.className = "atelier-toc-updated";
 			stamp.textContent = updated.replace("{date}", modifiedDate);
@@ -64,7 +60,7 @@
 		button.type = "button";
 		button.className = "toc-action atelier-copy-link";
 		button.innerHTML = '<i class="bi bi-link-45deg" aria-hidden="true"></i>';
-		var text = document.createTextNode(copyLabel);
+		var text = document.createTextNode(copyLabel || "");
 		button.appendChild(text);
 		var item = document.createElement("li");
 		item.appendChild(button);
@@ -93,11 +89,11 @@
 			}
 			written.then(
 				function () {
-					status.textContent = copiedLabel;
-					text.nodeValue = copiedLabel;
+					status.textContent = copiedLabel || "";
+					text.nodeValue = copiedLabel || "";
 					clearTimeout(timer);
 					timer = setTimeout(function () {
-						text.nodeValue = copyLabel;
+						text.nodeValue = copyLabel || "";
 						status.textContent = "";
 					}, 2000);
 				},
@@ -118,9 +114,6 @@
 			});
 		}
 		syncCurrent();
-		var observer = new MutationObserver(syncCurrent);
-		links.forEach(function (link) {
-			observer.observe(link, { attributes: true, attributeFilter: ["class"] });
-		});
+		new MutationObserver(syncCurrent).observe(toc, { subtree: true, attributes: true, attributeFilter: ["class"] });
 	})();
 </script>

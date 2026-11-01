@@ -5,12 +5,15 @@
 -->
 <script id="atelier-chrome" type="text/javascript">
 	(function () {
+		// The other Atelier scripts read the options from here, so the block is
+		// parsed once. This script runs first.
 		var options = {};
 		try {
 			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
 		} catch (error) {
 			console.warn("Atelier: the options block is not valid JSON.", error);
 		}
+		window.atelierOptions = options;
 		var labels = options.labels || {};
 
 		// The version pill follows the brand in the navbar and the title link in
@@ -18,18 +21,11 @@
 		// has two brand links in one container, so the pill goes once after the
 		// container's last child.
 		if (options.version) {
-			var hosts = [];
-			document.querySelectorAll(".navbar-brand-container").forEach(function (container) {
-				if (container.lastElementChild) hosts.push(container.lastElementChild);
-			});
-			document.querySelectorAll(".sidebar-title > a").forEach(function (anchor) {
-				hosts.push(anchor);
-			});
-			hosts.forEach(function (host) {
+			document.querySelectorAll(".navbar-brand-container > :last-child, .sidebar-title > a").forEach(function (brand) {
 				var pill = document.createElement("span");
 				pill.className = "atelier-version";
 				pill.textContent = options.version;
-				host.after(pill);
+				brand.after(pill);
 			});
 		}
 
@@ -59,20 +55,23 @@
 		// The search button keeps Quarto's own accessible name. The label and the
 		// shortcut are decoration for sighted users, so both are hidden from
 		// assistive technology.
+		var searchOptions = {};
+		try {
+			searchOptions = JSON.parse(document.getElementById("quarto-search-options")?.textContent || "{}");
+		} catch (error) {
+			console.warn("Atelier: the search options block is not valid JSON.", error);
+		}
+		var shortcut = [].concat(searchOptions["keyboard-shortcut"] || [])[0];
+
 		function decorate(button) {
 			if (button.querySelector(".atelier-search-label")) return;
-			var label = document.createElement("span");
-			label.className = "atelier-search-label";
-			label.setAttribute("aria-hidden", "true");
-			label.textContent = labels.search || "Search";
-			button.appendChild(label);
-			var searchOptions = {};
-			try {
-				searchOptions = JSON.parse(document.getElementById("quarto-search-options")?.textContent || "{}");
-			} catch (error) {
-				console.warn("Atelier: the search options block is not valid JSON.", error);
+			if (labels.search) {
+				var label = document.createElement("span");
+				label.className = "atelier-search-label";
+				label.setAttribute("aria-hidden", "true");
+				label.textContent = labels.search;
+				button.appendChild(label);
 			}
-			var shortcut = [].concat(searchOptions["keyboard-shortcut"] || [])[0];
 			if (shortcut) {
 				var key = document.createElement("kbd");
 				key.setAttribute("aria-hidden", "true");
@@ -81,20 +80,20 @@
 			}
 		}
 
-		var host = document.querySelector(".navbar #quarto-search");
-		if (!host) return;
+		var searchHost = document.querySelector(".navbar #quarto-search");
+		if (!searchHost) return;
 		var selector = ".aa-DetachedSearchButton";
-		var found = host.querySelector(selector);
+		var found = searchHost.querySelector(selector);
 		if (found) {
 			decorate(found);
 		} else {
 			var observer = new MutationObserver(function () {
-				var button = host.querySelector(selector);
+				var button = searchHost.querySelector(selector);
 				if (!button) return;
 				observer.disconnect();
 				decorate(button);
 			});
-			observer.observe(host, { childList: true, subtree: true });
+			observer.observe(searchHost, { childList: true, subtree: true });
 		}
 	})();
 </script>

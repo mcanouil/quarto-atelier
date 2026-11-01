@@ -30,7 +30,7 @@
   }
 }
 
-@media (min-width: 992px) {
+@include media-breakpoint-up(lg) {
   // Quarto pads the bar through `#quarto-header > nav`, which this has to match.
   #quarto-header > .navbar.navbar-expand-lg {
     padding-inline: 0;
@@ -50,8 +50,10 @@
     }
 
     // The collapse stops being a box, so its tab list and any other list
-    // become flex items of the bar and can be ordered. !important is required:
-    // Bootstrap sets `display: flex !important` on the expanded collapse.
+    // become flex items of the bar and can be ordered. The !important flags
+    // below beat !important rules: Bootstrap's `display: flex` on the expanded
+    // collapse and its `.me-auto` margin, Quarto's brand container margins, and
+    // the control padding in `html/theme.scss`.
     .navbar-collapse {
       display: contents !important;
     }
@@ -101,6 +103,7 @@
 
       .atelier-search-label {
         display: inline;
+        color: var(--atelier-navbar-muted);
       }
 
       kbd {
@@ -113,10 +116,6 @@
         color: var(--atelier-navbar-muted);
         font-size: 0.72rem;
       }
-    }
-
-    #quarto-search .aa-DetachedSearchButton .atelier-search-label {
-      color: var(--atelier-navbar-muted);
     }
   }
 }
@@ -227,23 +226,20 @@ body.docked .sidebar-navigation {
       color: var(--atelier-sidebar-fg);
     }
 
-    // Quarto marks the current page by colour alone, which fails WCAG 1.4.1
-    // when the two colours are close. Add weight and a 3 px marker. Quarto
-    // writes the class, and the script adds aria-current, so the rule keys on
-    // both and holds without JavaScript.
-    // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
-    // Remove when: the minimum Quarto version includes the fix.
+    // Quarto writes the class, and the script adds aria-current, so the rule
+    // keys on both and holds without JavaScript. The weight is set below.
     &:is(.active, [aria-current="page"]) {
       background: var(--atelier-sidebar-accent-soft);
       color: var(--atelier-sidebar-accent);
-      font-weight: 650;
       box-shadow: inset 3px 0 0 var(--atelier-sidebar-accent-mark);
     }
   }
 }
 
-// A floating sidebar does not take the docked menu style, so the current page
-// gets the weight cue on its own.
+// Quarto marks the current page by colour alone, which fails WCAG 1.4.1 when
+// the two colours are close. Add weight, and a 3 px marker in the docked menu.
+// A floating sidebar does not take the docked menu style, so the weight is set
+// here for both.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
 // Remove when: the minimum Quarto version includes the fix.
 .sidebar-navigation .sidebar-link:is(.active, [aria-current="page"]) {
@@ -404,7 +400,7 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
   }
 
   // Quarto sets the current entry colour with !important and adds a left
-  // border, so both are overridden here.
+  // border, so both are overridden here. Only !important beats !important.
   .nav-link.active {
     border-left: 0;
     background: var(--atelier-toc-accent-soft);
@@ -459,8 +455,8 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     &.alert-#{$name} {
       $tint: mix($value, $body-bg, 6%);
       --atelier-announcement-bg: #{$tint};
-      --atelier-announcement-border: #{mix($value, $body-bg, 60%)};
-      --atelier-announcement-ink: #{atelier-contrast(mix($value, $body-color, 62%), $tint, 4.5)};
+      --atelier-announcement-border: #{atelier-hue-border($value, $body-bg)};
+      --atelier-announcement-ink: #{atelier-hue-ink($value, $body-color, $tint)};
       --atelier-announcement-hover: #{mix($value, $body-bg, 22%)};
     }
   }

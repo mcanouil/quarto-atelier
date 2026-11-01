@@ -113,12 +113,10 @@ $border-radius-sm: null;
   // The table of contents is a fourth panel, so its tokens default to the
   // sidebar ones in the same way.
   --atelier-toc-bg: var(--atelier-sidebar-bg);
-  --atelier-toc-surface: var(--atelier-sidebar-surface);
   --atelier-toc-fg: var(--atelier-sidebar-fg);
   --atelier-toc-muted: var(--atelier-sidebar-muted);
   --atelier-toc-accent: var(--atelier-sidebar-accent);
   --atelier-toc-accent-soft: var(--atelier-sidebar-accent-soft);
-  --atelier-toc-accent-mark: var(--atelier-sidebar-accent-mark);
   --atelier-toc-border: var(--atelier-sidebar-border);
 }
 

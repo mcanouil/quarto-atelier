@@ -1,16 +1,33 @@
 /*-- scss:mixins --*/
 
 // The C3 frame: a tinted outline that a label can sit on. The abstract takes
-// the same frame as a callout.
+// the same frame as a callout. The padding and the border width are custom
+// properties, so the label margins below read the same numbers.
 @mixin atelier-c3-frame($border) {
+  --atelier-c3-pad: 1.15rem;
+  --atelier-c3-border: 1.5px;
+
   position: relative;
-  border: 1.5px solid $border;
+  border: var(--atelier-c3-border) solid $border;
   border-radius: $border-radius;
-  padding: 1.15rem 1rem 0.8rem;
+  padding: var(--atelier-c3-pad) 1rem 0.8rem;
   margin-top: 1.5rem;
 }
 
+// The label stays in the flow, so a title that wraps pushes the body down. The
+// negative top margin puts the centre of the label's first line, $half high, on
+// the middle of the border, and the bottom margin gives back the frame padding.
+@mixin atelier-c3-label($half) {
+  $_edge: calc(var(--atelier-c3-pad) + var(--atelier-c3-border) / 2);
+  margin: calc(-1 * (#{$_edge} + #{$half})) 0 calc(#{$_edge} - #{$half}) -0.2rem;
+}
+
 /*-- scss:rules --*/
+
+// Quarto shifts each numbered code line left by 4em, so that its number hangs
+// into the 3em margin of the pre, or out of a code window.
+$_atelier-number-shift: 4em;
+$_atelier-pre-margin: 3em;
 
 // ===========================================================================
 // CALLOUTS
@@ -28,24 +45,27 @@ $_atelier-callout-hues: (
 );
 
 @function atelier-callout-ink($hue) {
-  @return theme-contrast(mix($hue, $body-color, 62%), $body-bg, "AA");
+  @return atelier-hue-ink($hue, $body-color, $body-bg);
 }
 
 @function atelier-callout-border($hue) {
-  @return mix($hue, $body-bg, 60%);
+  @return atelier-hue-border($hue, $body-bg);
 }
 
 // Quarto draws the icons with a fixed fill, so each one is drawn again in the
 // ink, from the same icon as Quarto's.
-@function atelier-callout-icon($name, $ink) {
-  $svg: map-get(map-get($callouts, $name), "icon");
+@function atelier-svg-fill($svg, $ink) {
   @return url("data:image/svg+xml," + str-replace($svg, 'fill="currentColor"', 'fill="#{str-replace(#{$ink}, "#", "%23")}"'));
+}
+
+@function atelier-callout-icon($name, $ink) {
+  @return atelier-svg-fill(map-get(map-get($callouts, $name), "icon"), $ink);
 }
 
 $_atelier-callout-chevron: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>';
 
 @function atelier-callout-chevron($ink) {
-  @return url("data:image/svg+xml," + str-replace($_atelier-callout-chevron, 'fill="currentColor"', 'fill="#{str-replace(#{$ink}, "#", "%23")}"'));
+  @return atelier-svg-fill($_atelier-callout-chevron, $ink);
 }
 
 html div.callout.callout {
@@ -57,17 +77,19 @@ html div.callout.callout {
 }
 
 @each $name, $hue in $_atelier-callout-hues {
+  $ink: atelier-callout-ink($hue);
+
   html div.callout-#{$name}.callout {
     --atelier-callout-border: #{atelier-callout-border($hue)};
-    --atelier-callout-ink: #{atelier-callout-ink($hue)};
+    --atelier-callout-ink: #{$ink};
   }
 
   html div.callout-#{$name}.callout .callout-icon::before {
-    background-image: atelier-callout-icon($name, atelier-callout-ink($hue));
+    background-image: atelier-callout-icon($name, $ink);
   }
 
   html div.callout-#{$name}.callout .callout-toggle::before {
-    background-image: atelier-callout-chevron(atelier-callout-ink($hue));
+    background-image: atelier-callout-chevron($ink);
   }
 }
 
@@ -85,16 +107,13 @@ html div.callout.callout .callout-toggle::before {
 // The label sits on the page background, so the border breaks behind it. It
 // has no tint band and no fade: Quarto fades a title with opacity, which also
 // fades the inline code in it below AA.
-// The label stays in the flow, so a title that wraps on a narrow screen pushes
-// the body down. The negative top margin puts the centre of its first line on
-// the border, and the bottom margin gives back the frame padding.
 html div.callout.callout > .callout-header {
   position: relative;
   width: fit-content;
   max-width: calc(100% + 0.4rem);
   align-items: center;
   gap: 0.4rem;
-  margin: calc(-1 * (1.15rem + 0.75px + 0.5lh)) 0 calc(1.15rem + 0.75px - 0.5lh) -0.2rem;
+  @include atelier-c3-label(0.5lh);
   padding: 0 0.45rem;
   border: 0;
   border-radius: 0;
@@ -112,8 +131,7 @@ html div.callout.callout > .callout-header {
 // it, so its margins use half of that height.
 html div.callout.callout > .callout-header[data-bs-toggle="collapse"] {
   min-height: 24px;
-  margin-top: calc(-1 * (1.15rem + 0.75px + 12px));
-  margin-bottom: calc(1.15rem + 0.75px - 12px);
+  @include atelier-c3-label(12px);
 }
 
 html div.callout.callout > .callout-header .callout-icon-container,
@@ -205,6 +223,8 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     margin-bottom: 0.6rem;
   }
 
+  // Quarto fades these labels and the email icon with opacity. The muted ink
+  // is already held to AA, and a fade puts it below that.
   .quarto-title-meta-heading,
   .abstract .block-title,
   .keywords .block-title,
@@ -214,14 +234,9 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--atelier-muted);
+    opacity: 1;
   }
 
-  // Quarto fades these labels and the email icon with opacity. The muted ink
-  // is already held to AA, and a fade puts it below that.
-  .quarto-title-meta-heading,
-  .abstract .block-title,
-  .keywords .block-title,
-  .description .block-title,
   .quarto-title-author-email {
     opacity: 1;
   }
@@ -296,22 +311,18 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     border-top: 1px solid var(--atelier-border);
     border-bottom: 1px solid var(--atelier-border);
 
+    // On a narrow screen the items stack, so a divider would only end a line.
     > div {
-      padding-right: 1.4rem;
-      margin-right: 1.4rem;
-      border-right: 1px solid var(--atelier-border);
+      @media (min-width: 640px) {
+        padding-right: 1.4rem;
+        margin-right: 1.4rem;
+        border-right: 1px solid var(--atelier-border);
 
-      &:last-child {
-        padding-right: 0;
-        margin-right: 0;
-        border-right: 0;
-      }
-
-      // On a narrow screen the items stack, so a divider would only end a line.
-      @media (max-width: 639.98px) {
-        padding-right: 0;
-        margin-right: 0;
-        border-right: 0;
+        &:last-child {
+          padding-right: 0;
+          margin-right: 0;
+          border-right: 0;
+        }
       }
     }
 
@@ -328,7 +339,7 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     .block-title {
       position: relative;
       width: fit-content;
-      margin: calc(-1 * (1.15rem + 0.5lh)) 0 calc(1.15rem - 0.5lh) -0.2rem;
+      @include atelier-c3-label(0.5lh);
       padding: 0 0.45rem;
       background: var(--atelier-bg);
     }
@@ -478,21 +489,20 @@ html pre.sourceCode code > span.atelier-line-highlight {
   box-shadow: inset 3px 0 0 var(--atelier-code-accent-mark);
 }
 
-// Quarto shifts each numbered line left by 4em, so that its number hangs into
-// the 3em margin of the pre, or out of a code window. The frame clips what
-// hangs out, so the marker is drawn from the frame edge, 3em left of the pre
-// or at the pre in a code window, and the text stays where it is.
+// The frame clips what hangs out, so the marker is drawn from the frame edge,
+// left of the pre by its margin or at the pre in a code window, and the text
+// stays where it is.
 html pre.numberSource code > span.atelier-line-highlight {
-  width: calc(100% + 4em + #{$code-block-bg-padding});
-  margin-inline: 0 calc(-4em - #{$code-block-bg-padding});
+  width: calc(100% + #{$_atelier-number-shift} + #{$code-block-bg-padding});
+  margin-inline: 0 calc(-#{$_atelier-number-shift} - #{$code-block-bg-padding});
   padding-inline: 0;
   background-image: linear-gradient(var(--atelier-code-accent-mark), var(--atelier-code-accent-mark));
   background-repeat: no-repeat;
   background-size: 3px 100%;
-  background-position-x: calc(1em - #{$code-block-bg-padding});
+  background-position-x: calc(#{$_atelier-number-shift - $_atelier-pre-margin} - #{$code-block-bg-padding});
   box-shadow: none;
 }
 
 html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
-  background-position-x: calc(4em - #{$code-block-bg-padding});
+  background-position-x: calc(#{$_atelier-number-shift} - #{$code-block-bg-padding});
 }

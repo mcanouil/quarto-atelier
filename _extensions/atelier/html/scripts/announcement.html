@@ -8,35 +8,17 @@
 		var bar = document.getElementById("quarto-announcement");
 		if (!bar) return;
 
-		var options = {};
-		try {
-			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
-		} catch (error) {
-			console.warn("Atelier: the options block is not valid JSON.", error);
-		}
-		var labels = options.labels || {};
+		var labels = (window.atelierOptions || {}).labels || {};
 
 		bar.setAttribute("role", "region");
-		bar.setAttribute("aria-label", labels["announcement-region"] || "Announcement");
+		if (labels["announcement-region"]) bar.setAttribute("aria-label", labels["announcement-region"]);
 
 		// The label names the type. The theme colours map to the notice label.
-		var types = {
-			info: "announcement-info",
-			warning: "announcement-warning",
-			danger: "announcement-danger",
-			success: "announcement-success",
-		};
-		var fallbacks = {
-			"announcement-info": "Info",
-			"announcement-warning": "Warning",
-			"announcement-danger": "Danger",
-			"announcement-success": "Success",
-			"announcement-notice": "Notice",
-		};
 		var typeClass = Array.prototype.find.call(bar.classList, function (name) {
 			return name.indexOf("alert-") === 0;
 		});
-		var key = types[(typeClass || "").slice(6)] || "announcement-notice";
+		var type = (typeClass || "").slice(6);
+		var key = "announcement-" + (["info", "warning", "danger", "success"].includes(type) ? type : "notice");
 		var label = document.createElement("span");
 		label.className = "atelier-announcement-label";
 		var icon = bar.querySelector(".quarto-announcement-icon");
@@ -44,7 +26,7 @@
 			icon.setAttribute("aria-hidden", "true");
 			label.appendChild(icon);
 		}
-		label.appendChild(document.createTextNode(labels[key] || fallbacks[key]));
+		if (labels[key]) label.appendChild(document.createTextNode(labels[key]));
 		bar.insertBefore(label, bar.firstChild);
 
 		// Quarto draws the dismiss control as an <i>, which the keyboard cannot
@@ -57,7 +39,7 @@
 			var button = document.createElement("button");
 			button.type = "button";
 			button.className = "quarto-announcement-action atelier-announcement-dismiss";
-			button.setAttribute("aria-label", labels["announcement-dismiss"] || "Dismiss the announcement");
+			if (labels["announcement-dismiss"]) button.setAttribute("aria-label", labels["announcement-dismiss"]);
 			var cross = document.createElement("i");
 			cross.className = "bi bi-x-lg";
 			cross.setAttribute("aria-hidden", "true");
