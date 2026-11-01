@@ -59,25 +59,15 @@
 // brand. $red and the others also feed the theme colours that Bootstrap
 // derives from them, such as $danger, so a palette name reaches those too.
 // Remove when: Quarto maps the palette names without defaults.bootstrap.
-@if variable-exists("brand-blue") and not variable-exists("blue") {
-  $blue: $brand-blue !global;
-}
+$blue: if(variable-exists("brand-blue"), $brand-blue, null) !default;
 
-@if variable-exists("brand-red") and not variable-exists("red") {
-  $red: $brand-red !global;
-}
+$red: if(variable-exists("brand-red"), $brand-red, null) !default;
 
-@if variable-exists("brand-orange") and not variable-exists("orange") {
-  $orange: $brand-orange !global;
-}
+$orange: if(variable-exists("brand-orange"), $brand-orange, null) !default;
 
-@if variable-exists("brand-yellow") and not variable-exists("yellow") {
-  $yellow: $brand-yellow !global;
-}
+$yellow: if(variable-exists("brand-yellow"), $brand-yellow, null) !default;
 
-@if variable-exists("brand-green") and not variable-exists("green") {
-  $green: $brand-green !global;
-}
+$green: if(variable-exists("brand-green"), $brand-green, null) !default;
 
 // ===========================================================================
 // CHROME PALETTE
