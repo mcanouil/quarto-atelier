@@ -435,8 +435,9 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
 // ===========================================================================
 // The bar takes a faint tint of its type, mixed into the page background of
 // each colour scheme. A rule in the hue closes it, and an outlined upper-case
-// label names the type. The message keeps the page text colour. A project can
-// pin one type through the custom properties.
+// label names the type. The message keeps the page text colour. A project pins
+// one type with a `#quarto-announcement.alert-<type>` rule that sets the custom
+// properties, as a `:root` value does not win.
 #quarto-announcement {
   @each $name, $value in $theme-colors {
     &.alert-#{$name} {
@@ -522,4 +523,3 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     }
   }
 }
-

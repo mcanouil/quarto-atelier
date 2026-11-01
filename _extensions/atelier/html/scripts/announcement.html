@@ -63,6 +63,25 @@
 			cross.setAttribute("aria-hidden", "true");
 			button.appendChild(cross);
 			action.replaceWith(button);
+
+			// Quarto removes the bar on dismissal, so a keyboard user would lose
+			// focus to the body. This runs before Quarto's handler and only moves focus.
+			button.addEventListener("click", function () {
+				if (document.activeElement !== button) return;
+				var focusable = "a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex='-1'])";
+				var next = Array.prototype.find.call(document.querySelectorAll(focusable), function (element) {
+					return (
+						!bar.contains(element) &&
+						Boolean(bar.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) &&
+						element.getClientRects().length > 0
+					);
+				});
+				if (!next) {
+					next = document.querySelector("main");
+					if (next && !next.hasAttribute("tabindex")) next.setAttribute("tabindex", "-1");
+				}
+				if (next) next.focus();
+			});
 		}
 	})();
 </script>
