@@ -266,11 +266,14 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
       font-weight: 650;
     }
 
+    // The version is a plain line under the title, not the navbar pill.
     .atelier-version {
-      margin-inline-start: 0;
-      margin-block-start: 0.35rem;
-      background: var(--atelier-sidebar-accent-soft);
-      color: var(--atelier-sidebar-accent);
+      display: block;
+      margin: 0.2rem 0 0;
+      padding: 0;
+      background: none;
+      color: var(--atelier-sidebar-muted);
+      font-size: 0.72rem;
     }
   }
 
@@ -295,10 +298,20 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     // Quarto orders the tools after the menu; the document order puts them
     // under the search field.
     order: 0;
+    // The gitlink widget stacks the row into a column from an id selector.
+    // One row in document order is the L1 layout; it wraps only when the
+    // column is too narrow.
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: auto;
 
     > * {
       min-width: 32px;
       min-height: 32px;
+    }
+
+    .gitlink-widget {
+      order: 0;
     }
   }
 
