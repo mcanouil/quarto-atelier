@@ -135,13 +135,18 @@ $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !defau
 // item and of a hovered dropdown item. The pill over the surface is the closest
 // of these to the accent, so holding the accent to AA there covers the rest.
 $atelier-chrome-accent-soft-alpha: 0.16 !default;
+// A project or brand that sets $atelier-chrome-accent wins, so the mark follows it.
 $atelier-chrome-accent-source: if(
-  $atelier-chrome == dark,
-  $atelier-chrome-dark-accent,
+  variable-exists(atelier-chrome-accent),
+  $atelier-chrome-accent,
   if(
-    $atelier-chrome == light,
-    $atelier-chrome-light-accent,
-    $atelier-chrome-page-accent
+    $atelier-chrome == dark,
+    $atelier-chrome-dark-accent,
+    if(
+      $atelier-chrome == light,
+      $atelier-chrome-light-accent,
+      $atelier-chrome-page-accent
+    )
   )
 );
 $atelier-chrome-accent: atelier-contrast-on-tint(
@@ -201,14 +206,14 @@ $atelier-accent-mark: atelier-contrast($atelier-chrome-page-accent, $atelier-chr
 // file, which is under 4.5:1 on most pages; derive it from the page instead,
 // held to AA on the strong surface, where muted text sits at its lowest
 // contrast. When the brand sets `color.secondary`, that is the starting point.
-// Quarto has no `$brand-secondary`; it maps the colour to `$secondary`, which
-// stays at the Bootstrap grey when the brand sets nothing.
+// Quarto's brand layer defines `$secondary` only when the brand sets the
+// colour, and this file is evaluated before the Bootstrap layer.
 // A `!default` would lose to that layer, so it is handed over by plain
 // assignment, like the chrome variables below; a project sets
 // $atelier-text-muted instead.
 $atelier-text-muted: theme-contrast(
   if(
-    variable-exists(secondary) and $secondary != #6c757d,
+    variable-exists(secondary),
     $secondary,
     mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%)
   ),
