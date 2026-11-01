@@ -42,9 +42,9 @@
 		// The window header shows the language beside the file name. The language
 		// is the first class of the code that is not a Quarto or Pandoc class.
 		var ignored = ["sourceCode", "numberSource", "number-lines", "code-with-copy", "code-annotation-code"];
-		document.querySelectorAll(".code-with-filename").forEach(function (window) {
-			var header = window.querySelector(".code-with-filename-file");
-			var pre = window.querySelector("pre.sourceCode");
+		document.querySelectorAll(".code-with-filename").forEach(function (codeWindow) {
+			var header = codeWindow.querySelector(".code-with-filename-file");
+			var pre = codeWindow.querySelector("pre.sourceCode");
 			if (!header || !pre || header.querySelector(".atelier-code-language")) {
 				return;
 			}

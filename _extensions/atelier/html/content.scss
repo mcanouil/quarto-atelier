@@ -129,7 +129,7 @@ html div.callout.callout > .callout-header {
 
 // A collapsible label is 24px high for its target, with the line centred in
 // it, so its margins use half of that height.
-html div.callout.callout > .callout-header[data-bs-toggle="collapse"] {
+html div.callout.callout > .callout-header:has(> .callout-btn-toggle) {
   min-height: 24px;
   @include atelier-c3-label(12px);
 }
