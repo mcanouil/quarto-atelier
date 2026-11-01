@@ -131,15 +131,20 @@
     color: var(--atelier-navbar-fg);
   }
 
-  // Quarto marks the current page by colour alone, which fails WCAG 1.4.1
-  // when the two colours are close. Add weight and a 3 px marker.
-  // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
-  // Remove when: the minimum Quarto version includes the fix.
   &.active {
-    color: var(--atelier-navbar-fg);
-    font-weight: 650;
     border-bottom-color: var(--atelier-navbar-accent-mark);
   }
+}
+
+// Quarto marks the current page by colour alone, which fails WCAG 1.4.1
+// when the two colours are close. Add weight and a bottom marker in every
+// list, including the right-hand one.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
+// Remove when: the minimum Quarto version includes the fix.
+.navbar .navbar-nav .nav-link.active {
+  color: var(--atelier-navbar-fg);
+  font-weight: 650;
+  border-bottom: 3px solid var(--atelier-navbar-accent-mark);
 }
 
 // One 2px ring, in the bar's accent so that it holds 3:1 on a pinned dark bar.
@@ -338,6 +343,15 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
 // ===========================================================================
 // T2 table of contents card
 // ===========================================================================
+// The current entry keeps an accent and a weight outside the card too: a left
+// table of contents and the clone in the narrow toggle. The card rules below
+// are more specific and keep their own tokens. Quarto sets its own colour
+// with !important, so this one needs it as well.
+#TOC .nav-link.active {
+  color: var(--atelier-accent-ink) !important;
+  font-weight: 650;
+}
+
 #quarto-margin-sidebar #TOC {
   padding: 0.9rem;
   border: 1px solid var(--atelier-toc-border);

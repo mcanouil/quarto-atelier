@@ -42,22 +42,27 @@
 		// The window header shows the language beside the file name. The language
 		// is the first class of the code that is not a Quarto or Pandoc class.
 		var ignored = ["sourceCode", "numberSource", "number-lines", "code-with-copy", "code-annotation-code"];
-		document.querySelectorAll(".code-with-filename").forEach(function (codeWindow) {
-			var header = codeWindow.querySelector(".code-with-filename-file");
-			var pre = codeWindow.querySelector("pre.sourceCode");
-			if (!header || !pre || header.querySelector(".atelier-code-language")) {
-				return;
-			}
-			var language = Array.prototype.find.call(pre.classList, function (name) {
-				return ignored.indexOf(name) === -1;
+		function labelWindows() {
+			document.querySelectorAll(".code-with-filename").forEach(function (codeWindow) {
+				var header = codeWindow.querySelector(".code-with-filename-file");
+				var pre = codeWindow.querySelector("pre.sourceCode");
+				if (!header || !pre || header.querySelector(".atelier-code-language")) {
+					return;
+				}
+				var language = Array.prototype.find.call(pre.classList, function (name) {
+					return ignored.indexOf(name) === -1;
+				});
+				if (!language) {
+					return;
+				}
+				var label = document.createElement("span");
+				label.className = "atelier-code-language";
+				label.textContent = language;
+				header.append(label);
 			});
-			if (!language) {
-				return;
-			}
-			var label = document.createElement("span");
-			label.className = "atelier-code-language";
-			label.textContent = language;
-			header.append(label);
-		});
+		}
+		labelWindows();
+		// Code Window builds the wrappers for auto-filename blocks on DOMContentLoaded.
+		document.addEventListener("DOMContentLoaded", labelWindows);
 	})();
 </script>

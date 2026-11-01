@@ -60,8 +60,7 @@
 		button.type = "button";
 		button.className = "toc-action atelier-copy-link";
 		button.innerHTML = '<i class="bi bi-link-45deg" aria-hidden="true"></i>';
-		var text = document.createTextNode(copyLabel || "");
-		button.appendChild(text);
+		button.appendChild(document.createTextNode(copyLabel || ""));
 		var item = document.createElement("li");
 		item.appendChild(button);
 		list.appendChild(item);
@@ -71,8 +70,16 @@
 		status.setAttribute("aria-live", "polite");
 		toc.appendChild(status);
 
-		var timer;
-		button.addEventListener("click", function () {
+		// Quarto clones the margin table of contents into a toggle on narrow
+		// pages, and a clone has no listeners. Delegate from the document so
+		// that the original and the clone both work.
+		var timers = new WeakMap();
+		document.addEventListener("click", function (event) {
+			var target = event.target;
+			var copy = target && target.closest && target.closest(".atelier-copy-link");
+			if (!copy) {
+				return;
+			}
 			function failed(error) {
 				console.warn("Atelier: copying the page link failed.", error);
 			}
@@ -87,15 +94,22 @@
 				failed(error);
 				return;
 			}
+			var scope = copy.closest("#TOC, .quarto-sidebar-toggle-contents") || document;
+			var live = scope.querySelector('[aria-live="polite"]');
+			var label = copy.lastChild;
 			written.then(
 				function () {
-					status.textContent = copiedLabel || "";
-					text.nodeValue = copiedLabel || "";
-					clearTimeout(timer);
-					timer = setTimeout(function () {
-						text.nodeValue = copyLabel || "";
-						status.textContent = "";
-					}, 2000);
+					if (live) {
+						live.textContent = copiedLabel || "";
+					}
+					label.nodeValue = copiedLabel || "";
+					clearTimeout(timers.get(copy));
+					timers.set(copy, setTimeout(function () {
+						label.nodeValue = copyLabel || "";
+						if (live) {
+							live.textContent = "";
+						}
+					}, 2000));
 				},
 				failed
 			);
