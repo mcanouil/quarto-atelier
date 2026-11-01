@@ -64,8 +64,14 @@
 			button.appendChild(cross);
 			action.replaceWith(button);
 
-			// Quarto removes the bar on dismissal, so a keyboard user would lose
-			// focus to the body. This runs before Quarto's handler and only moves focus.
+			// Quarto removes the bar on dismissal, and the focused button goes with it,
+			// so focus would fall to the body. This runs before Quarto's handler and only moves focus.
+			function isVisible(element) {
+				if (typeof element.checkVisibility === "function") {
+					return element.checkVisibility({ visibilityProperty: true });
+				}
+				return element.getClientRects().length > 0;
+			}
 			button.addEventListener("click", function () {
 				if (document.activeElement !== button) return;
 				var focusable = "a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex='-1'])";
@@ -73,7 +79,9 @@
 					return (
 						!bar.contains(element) &&
 						Boolean(bar.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) &&
-						element.getClientRects().length > 0
+						!element.disabled &&
+						!element.closest("[inert]") &&
+						isVisible(element)
 					);
 				});
 				if (!next) {
