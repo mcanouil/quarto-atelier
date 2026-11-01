@@ -5,28 +5,28 @@
 ### New Features
 
 - feat: Derive the page surfaces, muted text, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA.
-  Use `color.secondary` for muted text when the brand sets it.
+  Use `color.secondary` for muted text when the brand sets it. (#76)
 - feat: Split the navbar into two rows, with the brand, the `atelier: version` pill, the search pill with its keyboard shortcut, and the tools on top, and the section tabs below.
-  The current tab has a 3 px accent underline, and the `atelier-search` language key sets the search label.
+  The current tab has a 3 px accent underline, and the `atelier-search` language key sets the search label. (#76)
 - feat: Restyle the docked sidebar with the brand, search, and tools on top and filled section headers.
-  The current page sits on a tinted band with a 3 px accent marker.
+  The current page sits on a tinted band with a 3 px accent marker. (#76)
 - feat: Show the table of contents as a card with the reading time, the modified date, and a tinted current entry.
-  The repository actions gain a "Copy link" button, and the `atelier-toc-*` language keys set the labels.
+  The repository actions gain a "Copy link" button, and the `atelier-toc-*` language keys set the labels. (#76)
 - feat: Draw callouts as a tinted outline with the title set into the top border as an upper-case label.
-  `appearance="minimal"` gives a dashed outline.
+  `appearance="minimal"` gives a dashed outline. (#76)
 - feat: Lay out the title block with authors and affiliations in two columns and the dates and DOI in one strip.
-  The abstract takes the callout frame, and categories and keywords are chips.
+  The abstract takes the callout frame, and categories and keywords are chips. (#76)
 - feat: Show the language beside the file name of a code window and keep the copy button visible.
-  Lines named in `code-window-lines` or `code-line-numbers` get a tinted band and an accent marker.
+  Lines named in `code-window-lines` or `code-line-numbers` get a tinted band and an accent marker. (#76)
 - feat: Restyle the announcement bar with a faint tint of its type that follows the colour scheme, an upper-case type label, and a rule below.
-  The `atelier-announcement-*` language keys set the label text.
+  The `atelier-announcement-*` language keys set the label text. (#76)
 
 ### Bug Fixes
 
-- fix: Make the announcement dismiss control a named button that the keyboard can reach, and mark the bar as a landmark.
+- fix: Make the announcement dismiss control a named button that the keyboard can reach, and mark the bar as a landmark. (#76)
 - fix: Map the `color.palette` names `blue`, `green`, `red`, `orange`, and `yellow` to the Bootstrap colours for every brand, not only for a brand with `defaults.bootstrap`.
-  The callouts and the theme colours that Bootstrap derives from them follow the palette.
-- fix: Keep the "Back to home" link of the 404 page readable when the primary colour is very pale or very deep.
+  The callouts and the theme colours that Bootstrap derives from them follow the palette. (#76)
+- fix: Keep the "Back to home" link of the 404 page readable when the primary colour is very pale or very deep. (#76)
 
 ## 0.11.0 (2026-10-29)
 
