@@ -18,6 +18,12 @@
   The abstract takes the callout frame, and categories and keywords are chips.
 - feat: Show the language beside the file name of a code window and keep the copy button visible.
   Lines named in `code-line-numbers` get a tinted band and an accent marker.
+- feat: Restyle the announcement bar with a faint tint of its type that follows the colour scheme, an upper-case type label, and a rule below.
+  The label text can be changed with a `language` key such as `atelier-announcement-info`.
+
+### Bug Fixes
+
+- fix: Make the announcement dismiss control a named button that the keyboard can reach, and mark the bar as a landmark.
 
 ## 0.11.0 (2026-10-29)
 

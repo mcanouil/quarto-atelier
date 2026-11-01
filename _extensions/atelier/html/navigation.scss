@@ -429,3 +429,97 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     }
   }
 }
+
+// ===========================================================================
+// ANNOUNCEMENT BAR
+// ===========================================================================
+// The bar takes a faint tint of its type, mixed into the page background of
+// each colour scheme. A rule in the hue closes it, and an outlined upper-case
+// label names the type. The message keeps the page text colour. A project can
+// pin one type through the custom properties.
+#quarto-announcement {
+  @each $name, $value in $theme-colors {
+    &.alert-#{$name} {
+      $tint: mix($value, $body-bg, 6%);
+      --atelier-announcement-bg: #{$tint};
+      --atelier-announcement-border: #{mix($value, $body-bg, 60%)};
+      --atelier-announcement-ink: #{atelier-contrast(mix($value, $body-color, 62%), $tint, 4.5)};
+      --atelier-announcement-hover: #{mix($value, $body-bg, 22%)};
+    }
+  }
+
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-bottom: 1.5px solid var(--atelier-announcement-border);
+  border-radius: 0;
+  background: var(--atelier-announcement-bg);
+  color: var(--atelier-fg);
+  font-size: 0.88rem;
+
+  .atelier-announcement-label {
+    display: inline-flex;
+    flex: none;
+    gap: 0.35rem;
+    align-items: center;
+    padding: 0.12rem 0.5rem;
+    border: 1.5px solid var(--atelier-announcement-border);
+    border-radius: $border-radius-sm;
+    background: var(--atelier-bg);
+    color: var(--atelier-announcement-ink);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .quarto-announcement-icon {
+    width: 13px;
+    height: 13px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1;
+    color: inherit;
+  }
+
+  .quarto-announcement-content {
+    flex: 1;
+    color: var(--atelier-fg);
+
+    p {
+      margin: 0;
+      color: var(--atelier-fg);
+    }
+
+    a {
+      color: var(--atelier-fg);
+      text-decoration-color: var(--atelier-announcement-border);
+      text-underline-offset: 3px;
+    }
+  }
+
+  .atelier-announcement-dismiss {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: $border-radius-sm;
+    background: transparent;
+    color: var(--atelier-fg);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--atelier-announcement-hover);
+    }
+  }
+}
+

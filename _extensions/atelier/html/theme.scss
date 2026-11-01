@@ -1493,40 +1493,6 @@ body .navbar .gitlink-widget-dropdown {
 }
 
 // ===========================================================================
-// ANNOUNCEMENT BANNER
-// ===========================================================================
-// Bootstrap 5.3 alert tokens flip on scheme change, which can leave the
-// banner text at poor contrast on a bright tint. Pin each alert type to a
-// light tint of its theme colour with a contrast-picked ink so the banner
-// reads the same in both schemes; inert when no announcement is configured,
-// and each type re-pinnable per .alert-<type> via the custom properties.
-#quarto-announcement {
-  @each $name, $value in $theme-colors {
-    &.alert-#{$name} {
-      --atelier-announcement-bg: #{mix($value, $white, 20%)};
-      --atelier-announcement-border: #{$value};
-      --atelier-announcement-ink: #{color-contrast(mix($value, $white, 20%))};
-    }
-  }
-
-  background: var(--atelier-announcement-bg) !important;
-  border-color: var(--atelier-announcement-border) !important;
-
-  &,
-  .quarto-announcement-content,
-  .quarto-announcement-content p,
-  .quarto-announcement-content a,
-  .quarto-announcement-icon,
-  .quarto-announcement-action {
-    color: var(--atelier-announcement-ink) !important;
-  }
-
-  .quarto-announcement-content a {
-    text-decoration-color: var(--atelier-announcement-ink);
-  }
-}
-
-// ===========================================================================
 // DISMISS BUTTON
 // ===========================================================================
 // Bootstrap bakes black into the .btn-close icon and lightens it under

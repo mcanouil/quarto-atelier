@@ -1,0 +1,68 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-announcement" type="text/javascript">
+	(function () {
+		var bar = document.getElementById("quarto-announcement");
+		if (!bar) return;
+
+		var options = {};
+		try {
+			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+		} catch (error) {
+			console.warn("Atelier: the options block is not valid JSON.", error);
+		}
+		var labels = options.labels || {};
+
+		bar.setAttribute("role", "region");
+		bar.setAttribute("aria-label", labels["announcement-region"] || "Announcement");
+
+		// The label names the type. The theme colours map to the notice label.
+		var types = {
+			info: "announcement-info",
+			warning: "announcement-warning",
+			danger: "announcement-danger",
+			success: "announcement-success",
+		};
+		var fallbacks = {
+			"announcement-info": "Info",
+			"announcement-warning": "Warning",
+			"announcement-danger": "Danger",
+			"announcement-success": "Success",
+			"announcement-notice": "Notice",
+		};
+		var typeClass = Array.prototype.find.call(bar.classList, function (name) {
+			return name.indexOf("alert-") === 0;
+		});
+		var key = types[(typeClass || "").slice(6)] || "announcement-notice";
+		var label = document.createElement("span");
+		label.className = "atelier-announcement-label";
+		var icon = bar.querySelector(".quarto-announcement-icon");
+		if (icon) {
+			icon.setAttribute("aria-hidden", "true");
+			label.appendChild(icon);
+		}
+		label.appendChild(document.createTextNode(labels[key] || fallbacks[key]));
+		bar.insertBefore(label, bar.firstChild);
+
+		// Quarto draws the dismiss control as an <i>, which the keyboard cannot
+		// reach and which has no name. The button keeps the class that Quarto
+		// binds its handler to when the DOM is ready, and this script runs before.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15235
+		// Remove when: the minimum Quarto version includes the fix.
+		var action = bar.querySelector(".quarto-announcement-action");
+		if (action) {
+			var button = document.createElement("button");
+			button.type = "button";
+			button.className = "quarto-announcement-action atelier-announcement-dismiss";
+			button.setAttribute("aria-label", labels["announcement-dismiss"] || "Dismiss the announcement");
+			var cross = document.createElement("i");
+			cross.className = "bi bi-x-lg";
+			cross.setAttribute("aria-hidden", "true");
+			button.appendChild(cross);
+			action.replaceWith(button);
+		}
+	})();
+</script>
