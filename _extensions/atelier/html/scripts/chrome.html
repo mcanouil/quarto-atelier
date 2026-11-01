@@ -38,7 +38,12 @@
 			label.setAttribute("aria-hidden", "true");
 			label.textContent = labels.search || "Search";
 			button.appendChild(label);
-			var searchOptions = JSON.parse(document.getElementById("quarto-search-options")?.textContent || "{}");
+			var searchOptions = {};
+			try {
+				searchOptions = JSON.parse(document.getElementById("quarto-search-options")?.textContent || "{}");
+			} catch (error) {
+				searchOptions = {};
+			}
 			var shortcut = [].concat(searchOptions["keyboard-shortcut"] || [])[0];
 			if (shortcut) {
 				var key = document.createElement("kbd");
@@ -48,18 +53,20 @@
 			}
 		}
 
-		var selector = ".navbar #quarto-search .aa-DetachedSearchButton";
-		var found = document.querySelector(selector);
+		var host = document.querySelector(".navbar #quarto-search");
+		if (!host) return;
+		var selector = ".aa-DetachedSearchButton";
+		var found = host.querySelector(selector);
 		if (found) {
 			decorate(found);
 		} else {
 			var observer = new MutationObserver(function () {
-				var button = document.querySelector(selector);
+				var button = host.querySelector(selector);
 				if (!button) return;
 				observer.disconnect();
 				decorate(button);
 			});
-			observer.observe(document.documentElement, { childList: true, subtree: true });
+			observer.observe(host, { childList: true, subtree: true });
 		}
 	})();
 </script>

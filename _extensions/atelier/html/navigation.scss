@@ -37,8 +37,7 @@
   }
 
   .navbar.navbar-expand-lg {
-    // Both rows draw the same bottom edge as one: the bar's own border sits
-    // under the tab row.
+    // The tab row is the last row, so the bar's own bottom border closes it.
     // The bar gives its side padding to the container, so the tab row can run
     // to both edges with a negative margin of the same size.
     --atelier-navbar-pad: 1.75rem;
@@ -123,7 +122,7 @@
 }
 
 // The tabs, in the second row at lg and wider and inside the collapse below it.
-.navbar .navbar-nav .nav-link {
+.navbar .navbar-nav.me-auto .nav-link {
   padding: 0.55rem 0.6rem;
   border-bottom: 3px solid transparent;
   font-size: 0.86rem;
