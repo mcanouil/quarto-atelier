@@ -4,10 +4,14 @@
 
 ### New Features
 
-- feat: Derive the page surfaces, muted text, control border, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA, and use `color.secondary` for muted text when the brand sets it.
-- feat: Split the navbar into two rows: the brand, an optional version pill from `atelier: version`, a search pill with its shortcut, and the tools on top, and the section tabs below with a 3 px accent underline on the current one.
-- feat: Restyle the docked sidebar: the brand, search, and centred tools on top without a navbar, filled section headers, and the current page on a tinted band with a 3 px accent marker.
-- feat: Show the table of contents as a card with the reading time, the modified date, the current entry on a tinted band, and the repository actions with a new "Copy link" button.
+- feat: Derive the page surfaces, muted text, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA.
+  Use `color.secondary` for muted text when the brand sets it.
+- feat: Split the navbar into two rows, with the brand, version pill, search pill, and tools on top and the section tabs below.
+  The current tab has a 3 px accent underline.
+- feat: Restyle the docked sidebar with the brand, search, and tools on top and filled section headers.
+  The current page sits on a tinted band with a 3 px accent marker.
+- feat: Show the table of contents as a card with the reading time, the modified date, and a tinted current entry.
+  The repository actions gain a "Copy link" button.
 
 ## 0.11.0 (2026-10-29)
 
