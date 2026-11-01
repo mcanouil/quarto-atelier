@@ -1,0 +1,65 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-chrome" type="text/javascript">
+	(function () {
+		var options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+		var labels = options.labels || {};
+
+		// The version pill follows the brand in the navbar and the title link in
+		// the sidebar. Without a version, neither is added.
+		if (options.version) {
+			document.querySelectorAll(".navbar-brand, .sidebar-title > a").forEach(function (anchor) {
+				var pill = document.createElement("span");
+				pill.className = "atelier-version";
+				pill.textContent = options.version;
+				anchor.after(pill);
+			});
+		}
+
+		// Quarto marks the current navbar link with a class, and sets
+		// aria-current only on some pages. The sidebar link is handled in
+		// a11y-fixes.html.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190
+		// Remove when: the minimum Quarto version includes the fix.
+		document.querySelectorAll(".navbar .nav-link.active:not([aria-current])").forEach(function (link) {
+			link.setAttribute("aria-current", "page");
+		});
+
+		// The search button keeps Quarto's own accessible name. The label and the
+		// shortcut are decoration for sighted users, so both are hidden from
+		// assistive technology.
+		function decorate(button) {
+			if (button.querySelector(".atelier-search-label")) return;
+			var label = document.createElement("span");
+			label.className = "atelier-search-label";
+			label.setAttribute("aria-hidden", "true");
+			label.textContent = labels.search || "Search";
+			button.appendChild(label);
+			var searchOptions = JSON.parse(document.getElementById("quarto-search-options")?.textContent || "{}");
+			var shortcut = [].concat(searchOptions["keyboard-shortcut"] || [])[0];
+			if (shortcut) {
+				var key = document.createElement("kbd");
+				key.setAttribute("aria-hidden", "true");
+				key.textContent = shortcut;
+				button.appendChild(key);
+			}
+		}
+
+		var selector = ".navbar #quarto-search .aa-DetachedSearchButton";
+		var found = document.querySelector(selector);
+		if (found) {
+			decorate(found);
+		} else {
+			var observer = new MutationObserver(function () {
+				var button = document.querySelector(selector);
+				if (!button) return;
+				observer.disconnect();
+				decorate(button);
+			});
+			observer.observe(document.documentElement, { childList: true, subtree: true });
+		}
+	})();
+</script>

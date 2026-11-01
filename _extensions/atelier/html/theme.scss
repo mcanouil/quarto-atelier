@@ -1405,43 +1405,6 @@ body.docked {
   );
 }
 
-// Quarto marks the current page in the navbar by colour alone, which fails
-// WCAG 1.4.1 when the two colours are close. Underline the current page too.
-// On a page with a sidebar, Quarto can mark the wrong navbar link, so the
-// underline is only for pages without one.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
-// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
-// Remove when: the minimum Quarto version includes the fix.
-body:not(.nav-sidebar) .navbar .navbar-nav .nav-link.active {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.4em;
-}
-
-// The pill visuals on the search button and the colour-scheme toggle, the
-// border and its hover fill, ship with the gitlink widget
-// (widget-navbar-tools.css via `widget.style-navbar-tools`); their geometry
-// comes from the control tokens below. Bridge the navbar tokens onto the
-// widget's own custom properties so the pill, trigger, and dropdown match the
-// bar they sit on. Inert when the gitlink extension is not installed.
-.navbar {
-  --gitlink-widget-border: var(--atelier-navbar-control-border);
-  --gitlink-widget-accent: var(--atelier-navbar-accent);
-  --gitlink-widget-accent-soft: var(--atelier-navbar-accent-soft);
-  --gitlink-widget-menu-bg: var(--atelier-navbar-surface);
-  --gitlink-widget-menu-fg: var(--atelier-navbar-fg);
-}
-
-// The same widget can render in the sidebar tools, where it takes the sidebar
-// tokens instead.
-body.docked .sidebar-navigation {
-  --gitlink-widget-border: var(--atelier-sidebar-control-border);
-  --gitlink-widget-accent: var(--atelier-sidebar-accent);
-  --gitlink-widget-accent-soft: var(--atelier-sidebar-accent-soft);
-  --gitlink-widget-menu-bg: var(--atelier-sidebar-surface);
-  --gitlink-widget-menu-fg: var(--atelier-sidebar-fg);
-}
-
 // Quarto gives the sidebar `overflow-y: auto` and leaves `overflow-x` at
 // `visible`, which computes to `auto`, so anything wider than the column
 // scrolls it sideways rather than being clipped. The widget's menu is anchored

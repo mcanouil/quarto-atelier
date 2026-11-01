@@ -1,0 +1,78 @@
+--- Atelier - Chrome Options Filter
+--- @module "atelier-chrome"
+--- @license MIT
+--- @copyright 2026 Mickaël Canouil
+--- @author Mickaël Canouil
+--- @brief Publish the page options that the chrome scripts read.
+--- @description Writes one JSON block into the head of each HTML page. It
+--- holds the version from `atelier.version` and the translated labels. A label
+--- is the default text, or the `language` key `atelier-<key>` when the project
+--- or the page sets one.
+
+--- Labels and their default text, in output order.
+--- @type table<integer, { key: string, default: string }>
+local LABELS = {
+  { key = 'search', default = 'Search' },
+  { key = 'announcement-info', default = 'Info' },
+  { key = 'announcement-warning', default = 'Warning' },
+  { key = 'announcement-danger', default = 'Danger' },
+  { key = 'announcement-success', default = 'Success' },
+  { key = 'announcement-notice', default = 'Notice' },
+  { key = 'announcement-region', default = 'Announcement' },
+  { key = 'announcement-dismiss', default = 'Dismiss the announcement' },
+  { key = 'toc-reading-time', default = '{n} min read' },
+  { key = 'toc-updated', default = 'Updated {date}' },
+  { key = 'toc-copy-link', default = 'Copy link' },
+  { key = 'toc-link-copied', default = 'Link copied' },
+}
+
+--- Read the version from `atelier.version`.
+--- @param meta table The document metadata
+--- @return string|nil The version, or nil when it is unset or empty
+local function read_version(meta)
+  local options = meta.atelier
+  if type(options) ~= 'table' or options.version == nil then
+    return nil
+  end
+  local version = pandoc.utils.stringify(options.version)
+  if version == '' then
+    return nil
+  end
+  return version
+end
+
+--- Resolve every label, taking a non-empty `language` override over the default.
+--- @return table<string, string> The label text by key
+local function resolve_labels()
+  local language = quarto.doc.language or {}
+  local labels = {}
+  for _, label in ipairs(LABELS) do
+    local value = language['atelier-' .. label.key]
+    if type(value) == 'string' and value ~= '' then
+      labels[label.key] = value
+    else
+      labels[label.key] = label.default
+    end
+  end
+  return labels
+end
+
+--- Add the options block to the head.
+--- @param meta table The document metadata
+--- @return nil
+local function publish_options(meta)
+  if not quarto.doc.is_format('html') then
+    return nil
+  end
+  local options = { labels = resolve_labels(), version = read_version(meta) }
+  local json = quarto.json.encode(options):gsub('</', '<\\/')
+  quarto.doc.include_text(
+    'in-header',
+    '<script type="application/json" id="atelier-options">' .. json .. '</script>'
+  )
+  return nil
+end
+
+return {
+  { Meta = publish_options },
+}

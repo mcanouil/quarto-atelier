@@ -59,10 +59,14 @@ contributes:
           - html/chrome.scss
           - brand
           - html/theme.scss
+          - html/navigation.scss
+          - html/content.scss
         dark:
           - html/chrome.scss
           - brand
           - html/theme.scss
+          - html/navigation.scss
+          - html/content.scss
       syntax-highlighting:
         light: arrow-light
         dark: arrow-dark
@@ -83,6 +87,7 @@ contributes:
       shortcodes:
         - iconify
       filters:
+        - atelier-chrome.lua
         - social-metadata.lua
         - iconify
         - code-window
@@ -110,3 +115,4 @@ contributes:
         - file: html/scripts/ordinal-dates.html
         - file: html/scripts/a11y-fixes.html
         - file: html/scripts/navbar-tooltips.html
+        - file: html/scripts/chrome.html
