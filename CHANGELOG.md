@@ -12,6 +12,8 @@
   The current page sits on a tinted band with a 3 px accent marker.
 - feat: Show the table of contents as a card with the reading time, the modified date, and a tinted current entry.
   The repository actions gain a "Copy link" button.
+- feat: Draw callouts as a tinted outline with the title set into the top border as an upper-case label.
+  `appearance="minimal"` gives a dashed outline.
 
 ## 0.11.0 (2026-10-29)
 

@@ -1,1 +1,171 @@
+/*-- scss:mixins --*/
+
+// The C3 frame: a tinted outline that a label can sit on. The abstract takes
+// the same frame as a callout.
+@mixin atelier-c3-frame($border) {
+  position: relative;
+  border: 1.5px solid $border;
+  border-radius: $border-radius;
+  padding: 1.15rem 1rem 0.8rem;
+  margin-top: 1.5rem;
+}
+
 /*-- scss:rules --*/
+
+// ===========================================================================
+// CALLOUTS
+// ===========================================================================
+// A callout is a tinted outline with the title set into the top border as an
+// upper-case label. The border and the ink come from the callout colour, mixed
+// with the page background and foreground of this bundle, so each scheme gets
+// its own pair. The ink is held to AA on the page background.
+$atelier-callout-hues: (
+  "note": $callout-color-note,
+  "tip": $callout-color-tip,
+  "warning": $callout-color-warning,
+  "caution": $callout-color-caution,
+  "important": $callout-color-important,
+);
+
+@function atelier-callout-ink($hue) {
+  @return theme-contrast(mix($hue, $body-color, 62%), $body-bg, "AA");
+}
+
+@function atelier-callout-border($hue) {
+  @return mix($hue, $body-bg, 60%);
+}
+
+// Quarto draws the icons with a fixed fill, so each one is drawn again in the
+// ink, from the same icon as Quarto's.
+@function atelier-callout-icon($name, $ink) {
+  $svg: map-get(map-get($callouts, $name), "icon");
+  @return url("data:image/svg+xml," + str-replace($svg, 'fill="currentColor"', 'fill="#{str-replace(#{$ink}, "#", "%23")}"'));
+}
+
+$atelier-callout-chevron: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>';
+
+@function atelier-callout-chevron($ink) {
+  @return url("data:image/svg+xml," + str-replace($atelier-callout-chevron, 'fill="currentColor"', 'fill="#{str-replace(#{$ink}, "#", "%23")}"'));
+}
+
+html div.callout.callout {
+  --atelier-callout-border: #{atelier-callout-border($text-muted)};
+  --atelier-callout-ink: #{atelier-callout-ink($text-muted)};
+
+  @include atelier-c3-frame(var(--atelier-callout-border));
+  margin-bottom: 1rem;
+}
+
+@each $name, $hue in $atelier-callout-hues {
+  html div.callout-#{$name}.callout {
+    --atelier-callout-border: #{atelier-callout-border($hue)};
+    --atelier-callout-ink: #{atelier-callout-ink($hue)};
+  }
+
+  html div.callout-#{$name}.callout .callout-icon::before {
+    background-image: atelier-callout-icon($name, atelier-callout-ink($hue));
+  }
+
+  html div.callout-#{$name}.callout .callout-toggle::before {
+    background-image: atelier-callout-chevron(atelier-callout-ink($hue));
+  }
+}
+
+html div.callout.callout .callout-icon::before,
+html div.callout.callout .callout-toggle::before {
+  width: 15px;
+  height: 15px;
+  background-size: 15px 15px;
+}
+
+html div.callout.callout .callout-toggle::before {
+  margin-top: 0;
+}
+
+// The label sits on the page background, so the border breaks behind it. It
+// has no tint band and no fade: Quarto fades a title with opacity, which also
+// fades the inline code in it below AA.
+html div.callout.callout > .callout-header {
+  position: absolute;
+  top: -0.75px;
+  left: 0.8rem;
+  max-width: calc(100% - 1.6rem);
+  transform: translateY(-50%);
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0 0.45rem;
+  border: 0;
+  border-radius: 0;
+  background: $body-bg;
+  opacity: 1;
+  color: var(--atelier-callout-ink);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+html div.callout.callout > .callout-header[data-bs-toggle="collapse"] {
+  min-height: 24px;
+}
+
+html div.callout.callout > .callout-header .callout-icon-container,
+html div.callout.callout > .callout-header .callout-title-container {
+  padding: 0;
+  margin: 0;
+}
+
+html div.callout.callout > .callout-header .callout-icon-container {
+  display: flex;
+  align-items: center;
+}
+
+html div.callout.callout .callout-body {
+  padding-inline: 0;
+}
+
+html div.callout.callout-style-simple.callout .callout-body {
+  margin-block: 0;
+  padding-left: 0;
+}
+
+// A minimal callout drops the icon and keeps a dashed frame.
+html div.callout.callout-style-simple.no-icon {
+  border-style: dashed;
+}
+
+// The link colour can fall below AA on the page background. A link in the
+// title takes the title ink, and its underline marks it as a link.
+html .callout > .callout-header a {
+  color: inherit;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-thickness: 2px;
+  }
+}
+
+// With a link in the title, the script for the collapsible callout moves the
+// toggle to the chevron, and Quarto's rules keyed on the header's aria-expanded
+// miss it. Repeat them for the chevron.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/4934
+// Remove when: the minimum Quarto version includes the fix.
+html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  cursor: pointer;
+
+  &[aria-expanded="false"] .callout-toggle::before {
+    transform: rotate(-90deg);
+  }
+
+  &[aria-expanded="true"] .callout-toggle::before {
+    transform: none;
+  }
+}
