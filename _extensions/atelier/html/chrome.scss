@@ -28,35 +28,35 @@
   @return $toward;
 }
 
+// The same as atelier-contrast(), but the colour must reach $ratio on every
+// background in the $bgs list. The backgrounds must share one tone.
+@function atelier-contrast-all($color, $bgs, $ratio) {
+  $toward: if(tone(nth($bgs, 1)) == "light", #000, #fff);
+  @for $step from 0 through 100 {
+    $candidate: mix($toward, $color, $step * 1%);
+    $passes: true;
+    @each $bg in $bgs {
+      @if quarto-contrast($candidate, $bg) < $ratio {
+        $passes: false;
+      }
+    }
+    @if $passes {
+      @return $candidate;
+    }
+  }
+  @return $toward;
+}
+
 /*-- scss:defaults --*/
 
 // Quarto sets the Bootstrap colour names from `color.palette` only when the
 // brand also has `defaults.bootstrap` (see quarto-cli#11108 for the intended
-// mapping). Atelier sets them for every brand, so that palette names always
-// colour the callouts.
+// mapping). Atelier sets the five names that colour the callouts for every
+// brand. $red and the others also feed the theme colours that Bootstrap
+// derives from them, such as $danger, so a palette name reaches those too.
 // Remove when: Quarto maps the palette names without defaults.bootstrap.
-@if variable-exists("brand-black") and not variable-exists("black") {
-  $black: $brand-black !global;
-}
-
-@if variable-exists("brand-white") and not variable-exists("white") {
-  $white: $brand-white !global;
-}
-
 @if variable-exists("brand-blue") and not variable-exists("blue") {
   $blue: $brand-blue !global;
-}
-
-@if variable-exists("brand-indigo") and not variable-exists("indigo") {
-  $indigo: $brand-indigo !global;
-}
-
-@if variable-exists("brand-purple") and not variable-exists("purple") {
-  $purple: $brand-purple !global;
-}
-
-@if variable-exists("brand-pink") and not variable-exists("pink") {
-  $pink: $brand-pink !global;
 }
 
 @if variable-exists("brand-red") and not variable-exists("red") {
@@ -73,14 +73,6 @@
 
 @if variable-exists("brand-green") and not variable-exists("green") {
   $green: $brand-green !global;
-}
-
-@if variable-exists("brand-teal") and not variable-exists("teal") {
-  $teal: $brand-teal !global;
-}
-
-@if variable-exists("brand-cyan") and not variable-exists("cyan") {
-  $cyan: $brand-cyan !global;
 }
 
 // ===========================================================================
@@ -189,7 +181,7 @@ $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !defau
 // of these to the accent, so holding the accent to AA there covers the rest.
 $atelier-chrome-accent-soft-alpha: 0.16 !default;
 // A project or brand that sets $atelier-chrome-accent wins, so the mark follows it.
-$atelier-chrome-accent-source: if(
+$_atelier-chrome-accent-source: if(
   variable-exists(atelier-chrome-accent),
   $atelier-chrome-accent,
   if(
@@ -203,7 +195,7 @@ $atelier-chrome-accent-source: if(
   )
 );
 $atelier-chrome-accent: atelier-contrast-on-tint(
-  $atelier-chrome-accent-source,
+  $_atelier-chrome-accent-source,
   $atelier-chrome-surface,
   $atelier-chrome-accent-soft-alpha
 ) !default;
@@ -221,7 +213,7 @@ $atelier-chrome-accent-soft: rgba($atelier-chrome-accent, $atelier-chrome-accent
 // The accent as a mark (a bar, a ring, a dot) needs 3:1 on the surface, not the
 // 4.5:1 of text, so it stays closer to the brand colour.
 $atelier-chrome-accent-mark: atelier-contrast(
-  $atelier-chrome-accent-source,
+  $_atelier-chrome-accent-source,
   $atelier-chrome-surface,
   3
 ) !default;
@@ -254,6 +246,14 @@ $atelier-accent-ink: atelier-contrast(
   4.5
 ) !default;
 $atelier-accent-mark: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 3) !default;
+
+// The marker of a highlighted code line sits on the code surface and on the
+// accent-soft band, not on the page, so it is held at 3:1 against both.
+$atelier-code-accent-mark: atelier-contrast-all(
+  $atelier-chrome-page-accent,
+  (mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 95%), $atelier-accent-soft),
+  3
+) !default;
 
 // The website listing layer pins $text-muted to a fixed #6c757d ahead of this
 // file, which is under 4.5:1 on most pages; derive it from the page instead,

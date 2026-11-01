@@ -82,6 +82,7 @@ $border-radius-sm: null;
   --atelier-accent-soft: #{$atelier-accent-soft};
   --atelier-accent-ink: #{$atelier-accent-ink};
   --atelier-accent-mark: #{$atelier-accent-mark};
+  --atelier-code-accent-mark: #{$atelier-code-accent-mark};
 
   --atelier-navbar-bg: #{$atelier-chrome-bg};
   --atelier-navbar-surface: #{$atelier-chrome-surface};
@@ -143,7 +144,7 @@ $atelier-focus-controls: ".btn:focus-visible, .btn-close:focus-visible, .nav-lin
 
 :focus-visible,
 #{$atelier-focus-controls} {
-  outline: $atelier-focus-ring-width solid $atelier-focus-ring-color;
+  outline: $atelier-focus-ring-width solid var(--atelier-focus);
   outline-offset: 2px;
 }
 
@@ -616,7 +617,7 @@ main:has(> .atelier-landing) > #title-block-header {
     }
 
     &:focus-visible::after {
-      outline: $atelier-focus-ring-width solid $atelier-focus-ring-color;
+      outline: $atelier-focus-ring-width solid var(--atelier-focus);
       outline-offset: 2px;
       border-radius: $border-radius-lg;
     }
@@ -1213,8 +1214,9 @@ body.docked {
     color: var(--atelier-sidebar-muted);
   }
 
-  // The page focus ring is $primary, which on the dark column is far too dim;
-  // keep its geometry and swap the colour for the sidebar accent.
+  // The page focus ring is the page accent ink, which is held to the page and
+  // not to the sidebar column. Keep its geometry and swap the colour for the
+  // sidebar accent.
   :is(#quarto-sidebar, .quarto-secondary-nav) :is(a, button):focus-visible {
     outline-color: var(--atelier-sidebar-accent);
   }
@@ -1546,15 +1548,17 @@ body .navbar .gitlink-widget-dropdown {
 .atelier-404 .atelier-404-home {
   display: inline-block;
   padding: 0.45rem 1.1rem;
-  border: 1px solid $primary;
+  border: 1px solid var(--atelier-accent-mark);
   border-radius: $border-radius;
-  color: $primary;
+  color: var(--atelier-accent-ink);
   text-decoration: none;
 }
 
+// The accent ink is held to AA on the accent-soft tint, and the mark to 3:1 on
+// the page, so a pale or deep primary keeps the link readable.
 .atelier-404 .atelier-404-home:hover,
 .atelier-404 .atelier-404-home:focus-visible {
-  background: body-mix(92%);
+  background: var(--atelier-accent-soft);
   text-decoration: underline;
 }
 
