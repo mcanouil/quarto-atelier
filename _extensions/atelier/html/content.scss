@@ -169,3 +169,184 @@ html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
     transform: none;
   }
 }
+
+// ===========================================================================
+// TITLE BLOCK
+// ===========================================================================
+// The rules restyle Quarto's own markup. Quarto keys its rules on the id of the
+// header, so each selector repeats it to win.
+$atelier-title-block: "#title-block-header.quarto-title-block.default";
+
+#{$atelier-title-block} {
+  .quarto-title .title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 0.35rem;
+  }
+
+  .quarto-title .subtitle {
+    color: var(--atelier-muted);
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .quarto-title-meta-heading,
+  .abstract .block-title,
+  .keywords .block-title {
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--atelier-muted);
+  }
+
+  .quarto-title-meta-heading {
+    margin-bottom: 0.2rem;
+  }
+
+  .quarto-title-meta-contents p {
+    margin: 0;
+  }
+
+  // Authors on the left, affiliations on the right, one author on each row.
+  .quarto-title-meta-author {
+    display: grid;
+    grid-template-columns: minmax(12rem, max-content) minmax(0, 1fr);
+    column-gap: 2rem;
+    row-gap: 0.45rem;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--atelier-border);
+
+    @media (max-width: 639.98px) {
+      grid-template-columns: 1fr;
+
+      .quarto-title-meta-heading:nth-child(2) {
+        display: none;
+      }
+    }
+  }
+
+  p.author {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem 0.3rem;
+    font-weight: 650;
+  }
+
+  p.affiliation {
+    color: var(--atelier-muted);
+  }
+
+  .quarto-title-author-email,
+  .quarto-title-author-orcid {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    color: var(--atelier-muted);
+
+    &:hover {
+      background: var(--atelier-surface-strong);
+    }
+
+    img,
+    .bi {
+      width: 15px;
+      height: 15px;
+      font-size: 15px;
+    }
+  }
+
+  // The dates and the DOI in one strip between two hairlines.
+  .quarto-title-meta {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--atelier-border);
+    border-bottom: 1px solid var(--atelier-border);
+
+    > div {
+      padding-right: 1.4rem;
+      margin-right: 1.4rem;
+      border-right: 1px solid var(--atelier-border);
+
+      &:last-child {
+        padding-right: 0;
+        margin-right: 0;
+        border-right: 0;
+      }
+    }
+
+    .quarto-title-meta-contents p {
+      font-size: 0.92rem;
+    }
+  }
+
+  .abstract {
+    @include atelier-c3-frame(var(--atelier-border));
+    margin-bottom: 0;
+
+    .block-title {
+      position: absolute;
+      top: 0;
+      left: 0.8rem;
+      margin: 0;
+      padding: 0 0.45rem;
+      background: var(--atelier-bg);
+      transform: translateY(-50%);
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  // Quarto fades a category badge with opacity 0.6, which puts its text below AA
+  // (4.34:1 in light mode). Fade the border by its colour and keep the text at
+  // full strength.
+  // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15167
+  // Remove when: the minimum Quarto version includes the fix.
+  .quarto-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+
+    .quarto-category {
+      opacity: 1;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.76rem;
+      border: 1px solid color-mix(in srgb, currentcolor 60%, transparent);
+      border-radius: 999px;
+    }
+  }
+
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+
+    .block-title {
+      margin: 0;
+    }
+
+    p {
+      display: contents;
+    }
+
+    .atelier-keyword {
+      padding: 0.1rem 0.55rem;
+      font-size: 0.8rem;
+      background: var(--atelier-surface-strong);
+      border-radius: 999px;
+    }
+  }
+}

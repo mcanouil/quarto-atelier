@@ -117,3 +117,4 @@ contributes:
         - file: html/scripts/navbar-tooltips.html
         - file: html/scripts/chrome.html
         - file: html/scripts/toc-card.html
+        - file: html/scripts/title-block.html

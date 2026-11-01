@@ -14,6 +14,8 @@
   The repository actions gain a "Copy link" button.
 - feat: Draw callouts as a tinted outline with the title set into the top border as an upper-case label.
   `appearance="minimal"` gives a dashed outline.
+- feat: Lay out the title block with authors and affiliations in two columns and the dates and DOI in one strip.
+  The abstract takes the callout frame, and categories and keywords are chips.
 
 ## 0.11.0 (2026-10-29)
 
