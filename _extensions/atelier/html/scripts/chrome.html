@@ -28,6 +28,15 @@
 			link.setAttribute("aria-current", "page");
 		});
 
+		// With a search field in the sidebar header, the tools follow the field
+		// instead of sitting under the title. The field sits in a wrapper, so the
+		// tools become the wrapper's next sibling.
+		var sidebarSearch = document.querySelector("#quarto-sidebar .sidebar-search");
+		var sidebarTools = document.querySelector("#quarto-sidebar .sidebar-tools-main");
+		if (sidebarSearch && sidebarTools && sidebarSearch.parentElement) {
+			sidebarSearch.parentElement.after(sidebarTools);
+		}
+
 		// The search button keeps Quarto's own accessible name. The label and the
 		// shortcut are decoration for sighted users, so both are hidden from
 		// assistive technology.

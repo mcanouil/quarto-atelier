@@ -175,3 +175,143 @@ body.docked .sidebar-navigation {
   --gitlink-widget-accent: var(--atelier-sidebar-accent);
   --gitlink-widget-accent-soft: var(--atelier-sidebar-accent-soft);
 }
+
+// ===========================================================================
+// SIDEBAR MENU
+// ===========================================================================
+// Section headers are filled buttons, and the current page sits on a tinted
+// band with a marker at its start.
+body.docked .sidebar-navigation {
+  .sidebar-item-section > .sidebar-item-container > .sidebar-item-text.sidebar-item-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 24px;
+    padding: 0.35rem 0.55rem;
+    border-radius: $border-radius-sm;
+    color: var(--atelier-sidebar-fg);
+    font-weight: 650;
+    text-align: start;
+
+    &:hover {
+      background: var(--atelier-sidebar-surface);
+    }
+
+    > .bi:not(.bi-chevron-right) {
+      width: 15px;
+      height: 15px;
+      font-size: 15px;
+      color: var(--atelier-sidebar-muted);
+    }
+
+    > .menu-text {
+      flex: 1 1 auto;
+    }
+
+    // Quarto turns the chevron 90 degrees from `aria-expanded`, and its
+    // transition falls under the reduced-motion guard.
+    > .bi-chevron-right {
+      margin-inline-start: auto;
+      color: var(--atelier-sidebar-muted);
+    }
+  }
+
+  .sidebar-link {
+    padding: 0.32rem 0.6rem;
+    border-radius: $border-radius-sm;
+    color: var(--atelier-sidebar-muted);
+
+    &:hover {
+      background: var(--atelier-sidebar-surface);
+      color: var(--atelier-sidebar-fg);
+    }
+
+    // Quarto marks the current page by colour alone, which fails WCAG 1.4.1
+    // when the two colours are close. Add weight and a 3 px marker.
+    // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
+    // Remove when: the minimum Quarto version includes the fix.
+    &[aria-current="page"] {
+      background: var(--atelier-sidebar-accent-soft);
+      color: var(--atelier-sidebar-accent);
+      font-weight: 650;
+      box-shadow: inset 3px 0 0 var(--atelier-sidebar-accent-mark);
+    }
+  }
+}
+
+// ===========================================================================
+// SIDEBAR SHELL
+// ===========================================================================
+// Without a navbar the sidebar carries the brand, the search field, the
+// tools, and the menu. The tools are moved below the field in
+// `html/scripts/chrome.html`.
+body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
+  // Quarto pads the column on one side only. Each block takes its own side
+  // padding instead, so the tools centre on the column.
+  padding-inline: 0;
+
+  .sidebar-header {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 1rem 0.9rem 0.8rem;
+    border-bottom: 1px solid var(--atelier-sidebar-border);
+  }
+
+  .sidebar-title {
+    margin: 0;
+
+    > a {
+      font-weight: 650;
+    }
+
+    .atelier-version {
+      margin-inline-start: 0;
+      margin-block-start: 0.35rem;
+      background: var(--atelier-sidebar-accent-soft);
+      color: var(--atelier-sidebar-accent);
+    }
+  }
+
+  .sidebar-search {
+    margin: 0;
+    padding-inline: 0.9rem;
+
+    .aa-Form {
+      min-height: 32px;
+      border-radius: $border-radius-sm;
+      background-color: var(--atelier-bg);
+    }
+  }
+
+  .sidebar-tools-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    margin: 0;
+    padding-inline: 0.9rem;
+    // Quarto orders the tools after the menu; the document order puts them
+    // under the search field.
+    order: 0;
+
+    > * {
+      min-width: 32px;
+      min-height: 32px;
+    }
+  }
+
+  .sidebar-menu-container {
+    padding-inline: 0.75rem;
+  }
+
+  // Top-level sections read as group labels. They keep their toggle.
+  .sidebar-menu-container > ul > .sidebar-item-section > .sidebar-item-container > .sidebar-item-text.sidebar-item-toggle {
+    padding: 0.9rem 0.6rem 0.35rem;
+    color: var(--atelier-sidebar-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}

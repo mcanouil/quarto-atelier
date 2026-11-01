@@ -1158,15 +1158,6 @@ body.docked {
     color: var(--atelier-sidebar-muted);
   }
 
-  // On the docked column, the current page also sits on a pill, which matches
-  // the navbar dropdown treatment.
-  .sidebar-item-container .sidebar-link.active {
-    background: var(--atelier-sidebar-accent-soft);
-    border-radius: $border-radius-sm;
-    padding: 0.15rem 0.4rem;
-    margin: -0.15rem -0.4rem;
-  }
-
   // A sidebar entry with text and no href or contents is a group label; Quarto
   // renders it as a bare span, in the same colour as a link.
   .sidebar-item > .menu-text {
@@ -1332,16 +1323,6 @@ body.docked {
       background: var(--atelier-sidebar-accent);
     }
   }
-}
-
-// Quarto marks the current page in the sidebar by colour alone, which fails
-// WCAG 1.4.1 when the two colours are close. Make the current page bold as
-// well, in every sidebar style and in the copy that Quarto shows when content
-// overlaps the column.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
-// Remove when: the minimum Quarto version includes the fix.
-.sidebar-navigation .sidebar-item-container .sidebar-link.active {
-  font-weight: 600;
 }
 
 // Quarto sizes a section toggle to its 0.7rem icon, about 20 by 18 px, and

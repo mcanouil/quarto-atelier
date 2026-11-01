@@ -6,6 +6,7 @@
 
 - feat: Derive the page surfaces, muted text, control border, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA, and use `color.secondary` for muted text when the brand sets it.
 - feat: Split the navbar into two rows: the brand, an optional version pill from `atelier: version`, a search pill with its shortcut, and the tools on top, and the section tabs below with a 3 px accent underline on the current one.
+- feat: Restyle the docked sidebar: the brand, search, and centred tools on top without a navbar, filled section headers, and the current page on a tinted band with a 3 px accent marker.
 
 ## 0.11.0 (2026-10-29)
 
