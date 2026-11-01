@@ -8,7 +8,9 @@
 		// Quarto writes the keywords as one comma-separated paragraph by design.
 		// The chip design needs one element for each keyword, so the paragraph is
 		// split here. Without JavaScript the paragraph stays as Quarto wrote it.
-		var paragraph = document.querySelector(".keywords > p");
+		// The split is on each comma, so a keyword that holds a comma becomes two
+		// chips.
+		var paragraph = document.querySelector("#title-block-header .keywords > p");
 		if (!paragraph) {
 			return;
 		}

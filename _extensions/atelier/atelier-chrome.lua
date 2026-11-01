@@ -73,7 +73,24 @@ local function publish_options(meta)
   return nil
 end
 
---- Copy a line spec in `code-line-numbers` to `atelier-highlight`.
+--- Read the line spec of a block as Code Window reads it.
+--- `code-window-lines` comes first. `code-line-numbers` is used when it holds
+--- a line spec and not `true` or `false`.
+--- @param block table The code block
+--- @return string|nil The line spec, or nil when the block has none
+local function read_line_spec(block)
+  local spec = block.attributes['code-window-lines']
+  if spec ~= nil and spec ~= '' then
+    return spec
+  end
+  spec = block.attributes['code-line-numbers']
+  if spec == nil or spec == '' or spec == 'true' or spec == 'false' then
+    return nil
+  end
+  return spec
+end
+
+--- Copy the line spec of a block to `atelier-highlight`.
 --- Quarto documents line highlighting for Reveal.js only, so in HTML it keeps
 --- just the `number-lines` class. The code-blocks script marks the lines.
 --- @param block table The code block
@@ -82,8 +99,8 @@ local function copy_line_spec(block)
   if not quarto.doc.is_format('html') then
     return nil
   end
-  local spec = block.attributes['code-line-numbers']
-  if spec == nil or spec == '' or spec == 'true' or spec == 'false' then
+  local spec = read_line_spec(block)
+  if spec == nil then
     return nil
   end
   block.attributes['atelier-highlight'] = spec

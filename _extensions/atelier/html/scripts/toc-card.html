@@ -12,7 +12,7 @@
 		try {
 			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
 		} catch (error) {
-			console.warn("Atelier: reading the options block failed, using English labels.", error);
+			console.warn("Atelier: the options block is not valid JSON.", error);
 		}
 		var labels = options.labels || {};
 		var readingTime = labels["toc-reading-time"] || "{n} min read";

@@ -5,27 +5,46 @@
 -->
 <script id="atelier-chrome" type="text/javascript">
 	(function () {
-		var options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+		var options = {};
+		try {
+			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+		} catch (error) {
+			console.warn("Atelier: the options block is not valid JSON.", error);
+		}
 		var labels = options.labels || {};
 
 		// The version pill follows the brand in the navbar and the title link in
-		// the sidebar. Without a version, neither is added.
+		// the sidebar. Without a version, neither is added. A navbar with a logo
+		// has two brand links in one container, so the pill goes once after the
+		// container's last child.
 		if (options.version) {
-			document.querySelectorAll(".navbar-brand, .sidebar-title > a").forEach(function (anchor) {
+			var hosts = [];
+			document.querySelectorAll(".navbar-brand-container").forEach(function (container) {
+				if (container.lastElementChild) hosts.push(container.lastElementChild);
+			});
+			document.querySelectorAll(".sidebar-title > a").forEach(function (anchor) {
+				hosts.push(anchor);
+			});
+			hosts.forEach(function (host) {
 				var pill = document.createElement("span");
 				pill.className = "atelier-version";
 				pill.textContent = options.version;
-				anchor.after(pill);
+				host.after(pill);
 			});
 		}
 
 		// Quarto marks the current navbar link with a class, and sets
-		// aria-current only on some pages. The sidebar link is handled in
-		// a11y-fixes.html.
+		// aria-current only on some pages. It can also mark a tab whose page is
+		// not the current page, so "page" is kept for a tab whose link is the
+		// current page, and any other marked tab gets "true". The sidebar link is
+		// handled in a11y-fixes.html.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190
-		// Remove when: the minimum Quarto version includes the fix.
-		document.querySelectorAll(".navbar .nav-link.active:not([aria-current])").forEach(function (link) {
-			link.setAttribute("aria-current", "page");
+		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
+		// Remove when: the minimum Quarto version includes both fixes.
+		var here = location.pathname.replace(/index\.html$/, "");
+		document.querySelectorAll(".navbar .nav-link.active").forEach(function (link) {
+			var target = new URL(link.href, location.href).pathname.replace(/index\.html$/, "");
+			link.setAttribute("aria-current", target === here ? "page" : "true");
 		});
 
 		// With a search field in the sidebar header, the tools follow the field
@@ -51,7 +70,7 @@
 			try {
 				searchOptions = JSON.parse(document.getElementById("quarto-search-options")?.textContent || "{}");
 			} catch (error) {
-				searchOptions = {};
+				console.warn("Atelier: the search options block is not valid JSON.", error);
 			}
 			var shortcut = [].concat(searchOptions["keyboard-shortcut"] || [])[0];
 			if (shortcut) {
