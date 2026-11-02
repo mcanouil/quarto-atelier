@@ -953,6 +953,11 @@ table.quarto-listing-table {
     padding: 0.55rem 0.75rem;
     border-bottom: 1px solid var(--atelier-border);
     color: var(--atelier-fg);
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    overflow-wrap: anywhere;
   }
 
   > thead {

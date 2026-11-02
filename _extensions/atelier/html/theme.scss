@@ -886,6 +886,7 @@ code:not(.sourceCode):not(pre code) {
   color: var(--atelier-code-ink);
   background-color: body-mix(90%);
   padding: 0.1em 0.35em;
+  white-space: pre-wrap;
   border-radius: 0.3em;
 }
 
