@@ -698,8 +698,10 @@ div.quarto-post {
     font-weight: 700;
     color: var(--atelier-fg);
 
+    // The bundle gives every link its own weight, so the link would not follow the heading.
     a {
       color: var(--atelier-fg);
+      font-weight: inherit;
     }
 
     a:hover {
