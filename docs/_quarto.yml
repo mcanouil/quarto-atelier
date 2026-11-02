@@ -89,6 +89,10 @@ website:
         text: "Landing page"
       - href: examples.qmd
         text: "Examples"
+      - href: listing-example/index.qmd
+        text: "Listing example"
+      - href: about.qmd
+        text: "About"
       - text: "---"
       - href: changelog.qmd
         text: "Changelog"
