@@ -14,7 +14,75 @@
   @return $toward;
 }
 
+// The same as atelier-contrast(), but the colour must reach $ratio on every
+// background in the $bgs list. The backgrounds must share one tone.
+@function atelier-contrast-all($color, $bgs, $ratio) {
+  $toward: if(tone(nth($bgs, 1)) == "light", #000, #fff);
+  @for $step from 0 through 100 {
+    $candidate: mix($toward, $color, $step * 1%);
+    $passes: true;
+    @each $bg in $bgs {
+      @if quarto-contrast($candidate, $bg) < $ratio {
+        $passes: false;
+      }
+    }
+    @if $passes {
+      @return $candidate;
+    }
+  }
+  @return $toward;
+}
+
+// Mix $color towards black or white until it reads at $ratio on a fixed $bg,
+// and return it untouched when it already does. A ratio that cannot be met ends
+// at black or white.
+@function atelier-contrast($color, $bg, $ratio) {
+  @return atelier-contrast-all($color, ($bg,), $ratio);
+}
+
+// The border of a hue over a background, and its ink: the hue mixed into the
+// foreground, then held at $ratio on $bg. Callouts and the announcement bar use
+// both, so the two mix weights live here.
+@function atelier-hue-border($hue, $bg) {
+  @return mix($hue, $bg, 60%);
+}
+
+@function atelier-hue-ink($hue, $fg, $bg, $ratio: 4.5) {
+  @return atelier-contrast(mix($hue, $fg, 62%), $bg, $ratio);
+}
+
 /*-- scss:defaults --*/
+
+// Quarto sets the Bootstrap colour names from `color.palette` only when the
+// brand also has `defaults.bootstrap` (see quarto-cli#11108 for the intended
+// mapping). Atelier sets the five names that colour the callouts for every
+// brand. $red and the others also feed the theme colours that Bootstrap
+// derives from them, such as $danger, so a palette name reaches those too.
+// Remove when: Quarto maps the palette names without defaults.bootstrap.
+$blue: null !default;
+@if variable-exists("brand-blue") {
+  $blue: $brand-blue !default;
+}
+
+$red: null !default;
+@if variable-exists("brand-red") {
+  $red: $brand-red !default;
+}
+
+$orange: null !default;
+@if variable-exists("brand-orange") {
+  $orange: $brand-orange !default;
+}
+
+$yellow: null !default;
+@if variable-exists("brand-yellow") {
+  $yellow: $brand-yellow !default;
+}
+
+$green: null !default;
+@if variable-exists("brand-green") {
+  $green: $brand-green !default;
+}
 
 // ===========================================================================
 // CHROME PALETTE
@@ -121,7 +189,10 @@ $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !defau
 // item and of a hovered dropdown item. The pill over the surface is the closest
 // of these to the accent, so holding the accent to AA there covers the rest.
 $atelier-chrome-accent-soft-alpha: 0.16 !default;
-$atelier-chrome-accent: atelier-contrast-on-tint(
+// A project or brand that sets $atelier-chrome-accent wins, so the mark follows it.
+$_atelier-chrome-accent-source: if(
+  variable-exists(atelier-chrome-accent),
+  $atelier-chrome-accent,
   if(
     $atelier-chrome == dark,
     $atelier-chrome-dark-accent,
@@ -130,31 +201,85 @@ $atelier-chrome-accent: atelier-contrast-on-tint(
       $atelier-chrome-light-accent,
       $atelier-chrome-page-accent
     )
-  ),
+  )
+);
+$atelier-chrome-accent: atelier-contrast-on-tint(
+  $_atelier-chrome-accent-source,
   $atelier-chrome-surface,
   $atelier-chrome-accent-soft-alpha
 ) !default;
 
 // Everything else follows from that triple, so a project re-points three
 // colours rather than eight.
+// The muted text also sits on the surface, in the tab row, so it is held there.
 $atelier-chrome-muted: theme-contrast(
   mix($atelier-chrome-fg, $atelier-chrome-bg, 65%),
-  $atelier-chrome-bg,
+  $atelier-chrome-surface,
   "AA"
 ) !default;
 $atelier-chrome-accent-soft: rgba($atelier-chrome-accent, $atelier-chrome-accent-soft-alpha) !default;
 
+// The accent as a mark (a bar, a ring, a dot) needs 3:1 on the surface, not the
+// 4.5:1 of text, so it stays closer to the brand colour.
+$atelier-chrome-accent-mark: atelier-contrast(
+  $_atelier-chrome-accent-source,
+  $atelier-chrome-surface,
+  3
+) !default;
+
 // ===========================================================================
 // PAGE VARIABLES
 // ===========================================================================
+// Steps from the page towards its ink: a quiet panel, and a stronger one for
+// wells, tabs, and headers. They are opaque, so the inks below are held against
+// what is painted.
+$atelier-surface: mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 96%) !default;
+$atelier-surface-strong: mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 90%) !default;
+
+// A hairline between two page surfaces.
+$atelier-border: mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 14%) !default;
+
+// The boundary of a boxed control, which WCAG 1.4.11 asks 3:1 of.
+$atelier-control-border: atelier-contrast(
+  mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 55%),
+  $atelier-chrome-page-bg,
+  3
+) !default;
+
+// The accent on the page. The soft tint is opaque. The ink is text on that tint
+// and the mark is a bar or a ring on the page.
+$atelier-accent-soft: mix($atelier-chrome-page-accent, $atelier-chrome-page-bg, 13%) !default;
+$atelier-accent-ink: atelier-contrast(
+  mix($atelier-chrome-page-accent, $atelier-chrome-page-fg, 72%),
+  $atelier-accent-soft,
+  4.5
+) !default;
+$atelier-accent-mark: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 3) !default;
+
+// The marker of a highlighted code line sits on the code surface and on the
+// accent-soft band, not on the page, so it is held at 3:1 against both.
+$atelier-code-accent-mark: atelier-contrast-all(
+  $atelier-chrome-page-accent,
+  (mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 95%), $atelier-accent-soft),
+  3
+) !default;
+
 // The website listing layer pins $text-muted to a fixed #6c757d ahead of this
 // file, which is under 4.5:1 on most pages; derive it from the page instead,
-// held to AA. A `!default` would lose to that layer, so it is handed over by
-// plain assignment, like the chrome variables below; a project sets
+// held to AA on the strong surface, where muted text sits at its lowest
+// contrast. When the brand sets `color.secondary`, that is the starting point.
+// Quarto's brand layer defines `$secondary` only when the brand sets the
+// colour, and this file is evaluated before the Bootstrap layer.
+// A `!default` would lose to that layer, so it is handed over by plain
+// assignment, like the chrome variables below; a project sets
 // $atelier-text-muted instead.
 $atelier-text-muted: theme-contrast(
-  mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%),
-  $atelier-chrome-page-bg,
+  if(
+    variable-exists(secondary),
+    $secondary,
+    mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%)
+  ),
+  $atelier-surface-strong,
   "AA"
 ) !default;
 $text-muted: $atelier-text-muted;

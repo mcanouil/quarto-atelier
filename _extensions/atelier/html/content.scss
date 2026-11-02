@@ -1,0 +1,516 @@
+/*-- scss:mixins --*/
+
+// The C3 frame: a tinted outline that a label can sit on. The abstract takes
+// the same frame as a callout. The padding and the border width are custom
+// properties, so the label margins below read the same numbers.
+@mixin atelier-c3-frame($border) {
+  --atelier-c3-pad: 1.15rem;
+  --atelier-c3-border: 1.5px;
+
+  position: relative;
+  border: var(--atelier-c3-border) solid $border;
+  border-radius: $border-radius;
+  padding: var(--atelier-c3-pad) 1rem 0.8rem;
+  margin-top: 1.5rem;
+}
+
+// The label stays in the flow, so a title that wraps pushes the body down. The
+// negative top margin puts the centre of the label's first line, $half high, on
+// the middle of the border, and the bottom margin gives back the frame padding.
+@mixin atelier-c3-label($half) {
+  $_edge: calc(var(--atelier-c3-pad) + var(--atelier-c3-border) / 2);
+  margin: calc(-1 * (#{$_edge} + #{$half})) 0 calc(#{$_edge} - #{$half}) -0.2rem;
+}
+
+/*-- scss:rules --*/
+
+// Quarto shifts each numbered code line left by 4em, so that its number hangs
+// into the 3em margin of the pre, or out of a code window.
+$_atelier-number-shift: 4em;
+$_atelier-pre-margin: 3em;
+
+// ===========================================================================
+// CALLOUTS
+// ===========================================================================
+// A callout is a tinted outline with the title set into the top border as an
+// upper-case label. The border and the ink come from the callout colour, mixed
+// with the page background and foreground of this bundle, so each scheme gets
+// its own pair. The ink is held to AA on the page background.
+$_atelier-callout-hues: (
+  "note": $callout-color-note,
+  "tip": $callout-color-tip,
+  "warning": $callout-color-warning,
+  "caution": $callout-color-caution,
+  "important": $callout-color-important,
+);
+
+@function atelier-callout-ink($hue) {
+  @return atelier-hue-ink($hue, $body-color, $body-bg);
+}
+
+@function atelier-callout-border($hue) {
+  @return atelier-hue-border($hue, $body-bg);
+}
+
+// Quarto draws the icons with a fixed fill, so each one is drawn again in the
+// ink, from the same icon as Quarto's.
+@function atelier-svg-fill($svg, $ink) {
+  @return url("data:image/svg+xml," + str-replace($svg, 'fill="currentColor"', 'fill="#{str-replace(#{$ink}, "#", "%23")}"'));
+}
+
+@function atelier-callout-icon($name, $ink) {
+  @return atelier-svg-fill(map-get(map-get($callouts, $name), "icon"), $ink);
+}
+
+$_atelier-callout-chevron: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>';
+
+@function atelier-callout-chevron($ink) {
+  @return atelier-svg-fill($_atelier-callout-chevron, $ink);
+}
+
+html div.callout.callout {
+  --atelier-callout-border: #{atelier-callout-border($text-muted)};
+  --atelier-callout-ink: #{atelier-callout-ink($text-muted)};
+
+  @include atelier-c3-frame(var(--atelier-callout-border));
+  margin-bottom: 1rem;
+}
+
+@each $name, $hue in $_atelier-callout-hues {
+  $ink: atelier-callout-ink($hue);
+
+  html div.callout-#{$name}.callout {
+    --atelier-callout-border: #{atelier-callout-border($hue)};
+    --atelier-callout-ink: #{$ink};
+  }
+
+  html div.callout-#{$name}.callout .callout-icon::before {
+    background-image: atelier-callout-icon($name, $ink);
+  }
+
+  html div.callout-#{$name}.callout .callout-toggle::before {
+    background-image: atelier-callout-chevron($ink);
+  }
+}
+
+html div.callout.callout .callout-icon::before,
+html div.callout.callout .callout-toggle::before {
+  width: 15px;
+  height: 15px;
+  background-size: 15px 15px;
+}
+
+html div.callout.callout .callout-toggle::before {
+  margin-top: 0;
+}
+
+// The label sits on the page background, so the border breaks behind it. It
+// has no tint band and no fade: Quarto fades a title with opacity, which also
+// fades the inline code in it below AA.
+html div.callout.callout > .callout-header {
+  position: relative;
+  width: fit-content;
+  max-width: calc(100% + 0.4rem);
+  align-items: center;
+  gap: 0.4rem;
+  @include atelier-c3-label(0.5lh);
+  padding: 0 0.45rem;
+  border: 0;
+  border-radius: 0;
+  background: var(--atelier-bg);
+  opacity: 1;
+  color: var(--atelier-callout-ink);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+// A collapsible label is 24px high for its target, with the line centred in
+// it, so its margins use half of that height.
+html div.callout.callout > .callout-header:has(> .callout-btn-toggle) {
+  min-height: 24px;
+  @include atelier-c3-label(12px);
+}
+
+html div.callout.callout > .callout-header .callout-icon-container,
+html div.callout.callout > .callout-header .callout-title-container {
+  padding: 0;
+  margin: 0;
+}
+
+// The label margins assume a label one line high. Quarto pads the caution icon
+// lower than the others, and the icon box adds a baseline gap, so both go.
+html div.callout.callout:not(.no-icon) > .callout-header div.callout-icon-container {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+html div.callout.callout > .callout-header .callout-icon,
+html div.callout.callout > .callout-header .callout-toggle {
+  display: flex;
+}
+
+html div.callout.callout .callout-body {
+  padding-inline: 0;
+}
+
+html div.callout.callout-style-simple.callout .callout-body {
+  margin-block: 0;
+  padding-left: 0;
+}
+
+// A minimal callout drops the icon and keeps a dashed frame.
+html div.callout.callout-style-simple.no-icon {
+  border-style: dashed;
+}
+
+// The link colour can fall below AA on the page background. A link in the
+// title takes the title ink, and its underline marks it as a link.
+html .callout > .callout-header a {
+  color: inherit;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration-thickness: 2px;
+  }
+}
+
+// With a link in the title, the script for the collapsible callout moves the
+// toggle to the chevron, and Quarto's rules keyed on the header's aria-expanded
+// miss it. Repeat them for the chevron.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/4934
+// Remove when: the minimum Quarto version includes the fix.
+html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  cursor: pointer;
+
+  &[aria-expanded="false"] .callout-toggle::before {
+    transform: rotate(-90deg);
+  }
+
+  &[aria-expanded="true"] .callout-toggle::before {
+    transform: none;
+  }
+}
+
+// ===========================================================================
+// TITLE BLOCK
+// ===========================================================================
+// The rules restyle Quarto's own markup. Quarto keys its rules on the id of the
+// header, so each selector repeats it to win.
+$_atelier-title-block: "#title-block-header.quarto-title-block.default";
+
+#{$_atelier-title-block} {
+  .quarto-title .title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 0.35rem;
+  }
+
+  .quarto-title .subtitle {
+    color: var(--atelier-muted);
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  // Quarto fades these labels and the email icon with opacity. The muted ink
+  // is already held to AA, and a fade puts it below that.
+  .quarto-title-meta-heading,
+  .abstract .block-title,
+  .keywords .block-title,
+  .description .block-title {
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--atelier-muted);
+    opacity: 1;
+  }
+
+  .quarto-title-author-email {
+    opacity: 1;
+  }
+
+  .quarto-title-meta-heading {
+    margin-bottom: 0.2rem;
+  }
+
+  .quarto-title-meta-contents p {
+    margin: 0;
+  }
+
+  // Authors on the left, affiliations on the right, one author on each row.
+  .quarto-title-meta-author {
+    display: grid;
+    grid-template-columns: minmax(12rem, max-content) minmax(0, 1fr);
+    column-gap: 2rem;
+    row-gap: 0.45rem;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--atelier-border);
+
+    @media (max-width: 639.98px) {
+      grid-template-columns: 1fr;
+
+      .quarto-title-meta-heading:nth-child(2) {
+        display: none;
+      }
+    }
+  }
+
+  p.author {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem 0.3rem;
+    font-weight: 650;
+  }
+
+  p.affiliation {
+    color: var(--atelier-muted);
+  }
+
+  .quarto-title-author-email,
+  .quarto-title-author-orcid {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    color: var(--atelier-muted);
+
+    &:hover {
+      background: var(--atelier-surface-strong);
+    }
+
+    // Quarto and Bootstrap Icons nudge the icons to sit on a text baseline.
+    // The grid centres them, so the nudges put them off centre.
+    img,
+    .bi {
+      width: 15px;
+      height: 15px;
+      margin: 0;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .bi::before {
+      vertical-align: top;
+    }
+  }
+
+  // The dates and the DOI in one strip between two hairlines.
+  .quarto-title-meta {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.7rem 0;
+    border-top: 1px solid var(--atelier-border);
+    border-bottom: 1px solid var(--atelier-border);
+
+    // On a narrow screen the items stack, so a divider would only end a line.
+    > div {
+      @media (min-width: 640px) {
+        padding-right: 1.4rem;
+        margin-right: 1.4rem;
+        border-right: 1px solid var(--atelier-border);
+
+        &:last-child {
+          padding-right: 0;
+          margin-right: 0;
+          border-right: 0;
+        }
+      }
+    }
+
+    .quarto-title-meta-contents p {
+      font-size: 0.92rem;
+    }
+  }
+
+  .abstract {
+    @include atelier-c3-frame(var(--atelier-border));
+    margin-bottom: 0;
+
+    // The label stays in the flow, as the callout label does.
+    .block-title {
+      position: relative;
+      width: fit-content;
+      @include atelier-c3-label(0.5lh);
+      padding: 0 0.45rem;
+      background: var(--atelier-bg);
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  // Quarto fades a category badge with opacity 0.6, which puts its text below AA
+  // (4.34:1 in light mode). Fade the border by its colour and keep the text at
+  // full strength.
+  // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15167
+  // Remove when: the minimum Quarto version includes the fix.
+  .quarto-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+
+    .quarto-category {
+      opacity: 1;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.76rem;
+      text-transform: none;
+      border: 1px solid color-mix(in srgb, currentcolor 60%, transparent);
+      border-radius: 999px;
+    }
+  }
+
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+
+    .block-title {
+      margin: 0;
+    }
+
+    p {
+      display: contents;
+    }
+
+    .atelier-keyword {
+      padding: 0.1rem 0.55rem;
+      font-size: 0.8rem;
+      background: var(--atelier-surface-strong);
+      border-radius: 999px;
+    }
+  }
+}
+
+// ===========================================================================
+// CODE BLOCKS
+// ===========================================================================
+// The Code Window header holds the file name, with the language pushed to the
+// right by the code-blocks script, and the copy button sits in the same row.
+html .code-with-filename .code-with-filename-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.25rem;
+  padding-right: 4.5rem;
+  font-family: var(--bs-font-monospace);
+  font-size: 0.78rem;
+  color: var(--atelier-muted);
+  border-bottom: 1px solid var(--atelier-border);
+}
+
+// Code Window gives the file name no width of its own and breaks it at any
+// character, which splits a short name such as `_brand.yml` on a narrow
+// screen. The name takes its full width, the language and the lines chip move
+// to a second row when there is no space, and a name that is wider than the
+// row breaks at a word boundary first.
+html .code-with-filename .code-with-filename-file pre {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: inherit;
+  color: inherit;
+  overflow-wrap: break-word;
+}
+
+// Code Window mixes the chip ink from the current colour and its own
+// background, which falls below AA. Use the page tokens instead.
+html .code-with-filename .code-with-filename-file .code-with-filename-lines {
+  color: var(--atelier-muted);
+  background-color: var(--atelier-surface);
+  border-color: var(--atelier-border);
+}
+
+html .code-with-filename .atelier-code-language {
+  margin-left: auto;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// The copy button is always visible, whatever the pointer does.
+html .code-copy-button {
+  opacity: 1;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+  border: 1px solid var(--atelier-control-border);
+  border-radius: 5px;
+}
+
+html .code-with-filename .code-copy-outer-scaffold {
+  position: relative;
+  overflow: visible;
+}
+
+html .code-with-filename .code-copy-outer-scaffold > .code-copy-button {
+  position: absolute;
+  top: 0;
+  bottom: auto;
+  right: 0.8rem;
+  z-index: 2;
+  transform: translateY(calc(-100% - 0.35rem));
+}
+
+// Line numbers are muted and are not copied with the code.
+html pre.numberSource code > span > a:first-child::before {
+  color: var(--atelier-muted);
+  user-select: none;
+}
+
+// A highlighted line fills the width of the block, past the padding of the
+// pre, on a tinted band with an accent marker. Quarto sets inline-block on the
+// lines of numbered code, so the selector names the code. A block span would
+// add an empty line after the band, because the newline between lines stays.
+// Quarto pads the code by 0.25em, which the first rule removes so the band can
+// reach the frame.
+html pre.sourceCode > code {
+  padding-inline: 0;
+}
+
+html pre.sourceCode code > span.atelier-line-highlight {
+  box-sizing: content-box;
+  width: 100%;
+  margin-inline-start: calc(-1 * #{$code-block-bg-padding});
+  padding-inline: $code-block-bg-padding;
+  background-color: var(--atelier-accent-soft);
+  box-shadow: inset 3px 0 0 var(--atelier-code-accent-mark);
+}
+
+// The frame clips what hangs out, so the marker is drawn from the frame edge,
+// left of the pre by its margin or at the pre in a code window, and the text
+// stays where it is.
+html pre.numberSource code > span.atelier-line-highlight {
+  width: calc(100% + #{$_atelier-number-shift} + #{$code-block-bg-padding});
+  margin-inline: 0 calc(-#{$_atelier-number-shift} - #{$code-block-bg-padding});
+  padding-inline: 0;
+  background-image: linear-gradient(var(--atelier-code-accent-mark), var(--atelier-code-accent-mark));
+  background-repeat: no-repeat;
+  background-size: 3px 100%;
+  background-position-x: calc(#{$_atelier-number-shift - $_atelier-pre-margin} - #{$code-block-bg-padding});
+  box-shadow: none;
+}
+
+html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
+  background-position-x: calc(#{$_atelier-number-shift} - #{$code-block-bg-padding});
+}

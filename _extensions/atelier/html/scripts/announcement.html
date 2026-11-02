@@ -1,0 +1,77 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-announcement" type="text/javascript">
+	(function () {
+		var bar = document.getElementById("quarto-announcement");
+		if (!bar) return;
+
+		var labels = (window.atelierOptions || {}).labels || {};
+
+		bar.setAttribute("role", "region");
+		if (labels["announcement-region"]) bar.setAttribute("aria-label", labels["announcement-region"]);
+
+		// The label names the type. The theme colours map to the notice label.
+		var typeClass = Array.prototype.find.call(bar.classList, function (name) {
+			return name.indexOf("alert-") === 0;
+		});
+		var type = (typeClass || "").slice(6);
+		var key = "announcement-" + (["info", "warning", "danger", "success"].includes(type) ? type : "notice");
+		var label = document.createElement("span");
+		label.className = "atelier-announcement-label";
+		var icon = bar.querySelector(".quarto-announcement-icon");
+		if (icon) {
+			icon.setAttribute("aria-hidden", "true");
+			label.appendChild(icon);
+		}
+		if (labels[key]) label.appendChild(document.createTextNode(labels[key]));
+		bar.insertBefore(label, bar.firstChild);
+
+		// Quarto draws the dismiss control as an <i>, which the keyboard cannot
+		// reach and which has no name. The button keeps the class that Quarto
+		// binds its handler to when the DOM is ready, and this script runs before.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15235
+		// Remove when: the minimum Quarto version includes the fix.
+		var action = bar.querySelector(".quarto-announcement-action");
+		if (action) {
+			var button = document.createElement("button");
+			button.type = "button";
+			button.className = "quarto-announcement-action atelier-announcement-dismiss";
+			if (labels["announcement-dismiss"]) button.setAttribute("aria-label", labels["announcement-dismiss"]);
+			var cross = document.createElement("i");
+			cross.className = "bi bi-x-lg";
+			cross.setAttribute("aria-hidden", "true");
+			button.appendChild(cross);
+			action.replaceWith(button);
+
+			// Quarto removes the bar on dismissal, and the focused button goes with it,
+			// so focus would fall to the body. This runs before Quarto's handler and only moves focus.
+			function isVisible(element) {
+				if (typeof element.checkVisibility === "function") {
+					return element.checkVisibility({ visibilityProperty: true });
+				}
+				return element.getClientRects().length > 0;
+			}
+			button.addEventListener("click", function () {
+				if (document.activeElement !== button) return;
+				var focusable = "a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex='-1'])";
+				var next = Array.prototype.find.call(document.querySelectorAll(focusable), function (element) {
+					return (
+						!bar.contains(element) &&
+						Boolean(bar.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) &&
+						!element.disabled &&
+						!element.closest("[inert]") &&
+						isVisible(element)
+					);
+				});
+				if (!next) {
+					next = document.querySelector("main");
+					if (next && !next.hasAttribute("tabindex")) next.setAttribute("tabindex", "-1");
+				}
+				if (next) next.focus();
+			});
+		}
+	})();
+</script>

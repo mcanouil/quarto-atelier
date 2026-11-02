@@ -72,6 +72,18 @@ $border-radius-sm: null;
 // a bar; re-point the Sass variables instead when the change should also reach
 // the colours Quarto bakes into its own markup.
 :root {
+  --atelier-bg: #{$atelier-chrome-page-bg};
+  --atelier-fg: #{$atelier-chrome-page-fg};
+  --atelier-surface: #{$atelier-surface};
+  --atelier-surface-strong: #{$atelier-surface-strong};
+  --atelier-border: #{$atelier-border};
+  --atelier-control-border: #{$atelier-control-border};
+  --atelier-muted: #{$atelier-text-muted};
+  --atelier-accent-soft: #{$atelier-accent-soft};
+  --atelier-accent-ink: #{$atelier-accent-ink};
+  --atelier-accent-mark: #{$atelier-accent-mark};
+  --atelier-code-accent-mark: #{$atelier-code-accent-mark};
+
   --atelier-navbar-bg: #{$atelier-chrome-bg};
   --atelier-navbar-surface: #{$atelier-chrome-surface};
   --atelier-navbar-fg: #{$atelier-chrome-fg};
@@ -83,6 +95,7 @@ $border-radius-sm: null;
   // A boxed control (a search field, a widget pill) needs a boundary that can
   // be seen, where the hairline above only has to separate two surfaces.
   --atelier-navbar-control-border: #{$atelier-chrome-control-border};
+  --atelier-navbar-accent-mark: #{$atelier-chrome-accent-mark};
 
   // A docked sidebar is the third bar, so its tokens default to the navbar
   // ones: overriding the navbar palette carries the sidebar with it, and a
@@ -95,13 +108,23 @@ $border-radius-sm: null;
   --atelier-sidebar-accent-soft: var(--atelier-navbar-accent-soft);
   --atelier-sidebar-border: var(--atelier-navbar-border);
   --atelier-sidebar-control-border: var(--atelier-navbar-control-border);
+  --atelier-sidebar-accent-mark: var(--atelier-navbar-accent-mark);
+
+  // The table of contents is a fourth panel, so its tokens default to the
+  // sidebar ones in the same way.
+  --atelier-toc-bg: var(--atelier-sidebar-bg);
+  --atelier-toc-fg: var(--atelier-sidebar-fg);
+  --atelier-toc-muted: var(--atelier-sidebar-muted);
+  --atelier-toc-accent: var(--atelier-sidebar-accent);
+  --atelier-toc-accent-soft: var(--atelier-sidebar-accent-soft);
+  --atelier-toc-border: var(--atelier-sidebar-border);
 }
 
 // ===========================================================================
 // ACCESSIBILITY (focus, skip link, ordinal dates)
 // ===========================================================================
 // The focus ring, shared by every control.
-$atelier-focus-ring-color: $primary !default;
+$atelier-focus-ring-color: $atelier-accent-ink !default;
 $atelier-focus-ring-width: 2px !default;
 
 // Quarto draws focus in four different ways: the browser ring, a `currentColor`
@@ -119,12 +142,13 @@ $atelier-focus-controls: ".btn:focus-visible, .btn-close:focus-visible, .nav-lin
 
 :focus-visible,
 #{$atelier-focus-controls} {
-  outline: $atelier-focus-ring-width solid $atelier-focus-ring-color;
+  outline: $atelier-focus-ring-width solid var(--atelier-focus);
   outline-offset: 2px;
 }
 
 // Quarto 1.11.7 adds an inner shadow ring of its own to the same controls.
 :root {
+  --atelier-focus: #{$atelier-focus-ring-color};
   --quarto-focus-ring-shadow: none;
 }
 
@@ -227,16 +251,6 @@ h6 {
 // ===========================================================================
 // TITLE BLOCK
 // ===========================================================================
-// Quarto fades a category badge with opacity 0.6, which puts its text below AA
-// (4.34:1 in light mode). Fade the border by its colour and keep the text at
-// full strength.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15167
-// Remove when: the minimum Quarto version includes the fix.
-.quarto-title .quarto-categories .quarto-category {
-  opacity: 1;
-  border-color: color-mix(in srgb, currentcolor 60%, transparent);
-}
-
 // Quarto writes blank lines between the conditionals of the metadata block, so
 // a page with no author, date or other metadata still gets a
 // <div class="quarto-title-meta"> that holds only whitespace. `:empty` does not
@@ -601,7 +615,7 @@ main:has(> .atelier-landing) > #title-block-header {
     }
 
     &:focus-visible::after {
-      outline: $atelier-focus-ring-width solid $atelier-focus-ring-color;
+      outline: $atelier-focus-ring-width solid var(--atelier-focus);
       outline-offset: 2px;
       border-radius: $border-radius-lg;
     }
@@ -908,72 +922,6 @@ a code.sourceCode:not(pre code) {
   }
 }
 
-// Quarto fades a callout title with opacity, which also fades the inline code
-// in it below AA. Fade the title text by its colour instead, so code keeps its
-// own ink.
-html .callout.callout-style-default > .callout-header {
-  opacity: 1;
-  color: rgba($body-color, 0.85);
-}
-
-html .callout.callout-style-simple > .callout-header {
-  opacity: 1;
-  color: rgba($body-color, 0.75);
-}
-
-// The link colour can fall below AA on the tinted title band. A link in the
-// title takes the title colour, and its underline marks it as a link.
-html .callout > .callout-header a {
-  color: inherit;
-  text-decoration: underline;
-
-  &:hover,
-  &:focus-visible {
-    text-decoration-thickness: 2px;
-  }
-}
-
-// With a link in the title, the script for the collapsible callout moves the
-// toggle to the chevron, and Quarto's rules keyed on the header's aria-expanded
-// miss it. Repeat them for the chevron.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/4934
-// Remove when: the minimum Quarto version includes the fix.
-html .callout > .callout-header:has(> .callout-btn-toggle[aria-expanded]) {
-  align-items: center;
-}
-
-// Bootstrap toggles the `collapsed` class on the chevron, so the header keeps
-// the class it was rendered with and Quarto's rounded corner for a closed
-// callout stays on an open one.
-html .callout > .callout-header.collapsed:has(> .callout-btn-toggle[aria-expanded="true"]) {
-  border-bottom-right-radius: 0;
-}
-
-html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
-  min-width: 24px;
-  min-height: 24px;
-  text-align: center;
-  cursor: pointer;
-
-  &[aria-expanded="false"] .callout-toggle::before {
-    transform: rotate(-90deg);
-  }
-
-  &[aria-expanded="true"] .callout-toggle::before {
-    transform: none;
-  }
-}
-
-// A callout with no type gets a $text-muted title band, a mid grey that title
-// text cannot clear AA on. Tint it from the page as the typed ones are tinted
-// from their colour.
-div.callout.callout-style-default:where(
-    :not(.callout-note, .callout-tip, .callout-warning, .callout-caution, .callout-important)
-  )
-  > .callout-header {
-  background-color: mix($body-bg, $text-muted, 70%);
-}
-
 // Quarto bakes a fixed grey into the copy button, which reads poorly on the
 // body-mix() code surface; use the palette accent in both schemes.
 .code-copy-button {
@@ -1072,17 +1020,6 @@ html .panel-tabset > .tab-content {
 }
 
 // ===========================================================================
-// TOC
-// ===========================================================================
-// Quarto marks the current section with .active but leaves it in the body
-// colour, and gives its border the baked grey; the margin TOC sits on the page
-// surface, so both take the palette accent.
-#TOC .active {
-  color: $primary;
-  border-left-color: $primary;
-}
-
-// ===========================================================================
 // LISTINGS
 // ===========================================================================
 // Quarto removes the underline from every link in a table listing, including
@@ -1131,15 +1068,6 @@ body.docked {
 
   .sidebar-item-container.disabled {
     color: var(--atelier-sidebar-muted);
-  }
-
-  // On the docked column, the current page also sits on a pill, which matches
-  // the navbar dropdown treatment.
-  .sidebar-item-container .sidebar-link.active {
-    background: var(--atelier-sidebar-accent-soft);
-    border-radius: $border-radius-sm;
-    padding: 0.15rem 0.4rem;
-    margin: -0.15rem -0.4rem;
   }
 
   // A sidebar entry with text and no href or contents is a group label; Quarto
@@ -1284,8 +1212,9 @@ body.docked {
     color: var(--atelier-sidebar-muted);
   }
 
-  // The page focus ring is $primary, which on the dark column is far too dim;
-  // keep its geometry and swap the colour for the sidebar accent.
+  // The page focus ring is the page accent ink, which is held to the page and
+  // not to the sidebar column. Keep its geometry and swap the colour for the
+  // sidebar accent.
   :is(#quarto-sidebar, .quarto-secondary-nav) :is(a, button):focus-visible {
     outline-color: var(--atelier-sidebar-accent);
   }
@@ -1307,16 +1236,6 @@ body.docked {
       background: var(--atelier-sidebar-accent);
     }
   }
-}
-
-// Quarto marks the current page in the sidebar by colour alone, which fails
-// WCAG 1.4.1 when the two colours are close. Make the current page bold as
-// well, in every sidebar style and in the copy that Quarto shows when content
-// overlaps the column.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
-// Remove when: the minimum Quarto version includes the fix.
-.sidebar-navigation .sidebar-item-container .sidebar-link.active {
-  font-weight: 600;
 }
 
 // Quarto sizes a section toggle to its 0.7rem icon, about 20 by 18 px, and
@@ -1378,43 +1297,6 @@ body.docked {
     var(--atelier-navbar-accent),
     var(--atelier-navbar-accent-soft)
   );
-}
-
-// Quarto marks the current page in the navbar by colour alone, which fails
-// WCAG 1.4.1 when the two colours are close. Underline the current page too.
-// On a page with a sidebar, Quarto can mark the wrong navbar link, so the
-// underline is only for pages without one.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15191
-// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
-// Remove when: the minimum Quarto version includes the fix.
-body:not(.nav-sidebar) .navbar .navbar-nav .nav-link.active {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.4em;
-}
-
-// The pill visuals on the search button and the colour-scheme toggle, the
-// border and its hover fill, ship with the gitlink widget
-// (widget-navbar-tools.css via `widget.style-navbar-tools`); their geometry
-// comes from the control tokens below. Bridge the navbar tokens onto the
-// widget's own custom properties so the pill, trigger, and dropdown match the
-// bar they sit on. Inert when the gitlink extension is not installed.
-.navbar {
-  --gitlink-widget-border: var(--atelier-navbar-control-border);
-  --gitlink-widget-accent: var(--atelier-navbar-accent);
-  --gitlink-widget-accent-soft: var(--atelier-navbar-accent-soft);
-  --gitlink-widget-menu-bg: var(--atelier-navbar-surface);
-  --gitlink-widget-menu-fg: var(--atelier-navbar-fg);
-}
-
-// The same widget can render in the sidebar tools, where it takes the sidebar
-// tokens instead.
-body.docked .sidebar-navigation {
-  --gitlink-widget-border: var(--atelier-sidebar-control-border);
-  --gitlink-widget-accent: var(--atelier-sidebar-accent);
-  --gitlink-widget-accent-soft: var(--atelier-sidebar-accent-soft);
-  --gitlink-widget-menu-bg: var(--atelier-sidebar-surface);
-  --gitlink-widget-menu-fg: var(--atelier-sidebar-fg);
 }
 
 // Quarto gives the sidebar `overflow-y: auto` and leaves `overflow-x` at
@@ -1611,40 +1493,6 @@ body .navbar .gitlink-widget-dropdown {
 }
 
 // ===========================================================================
-// ANNOUNCEMENT BANNER
-// ===========================================================================
-// Bootstrap 5.3 alert tokens flip on scheme change, which can leave the
-// banner text at poor contrast on a bright tint. Pin each alert type to a
-// light tint of its theme colour with a contrast-picked ink so the banner
-// reads the same in both schemes; inert when no announcement is configured,
-// and each type re-pinnable per .alert-<type> via the custom properties.
-#quarto-announcement {
-  @each $name, $value in $theme-colors {
-    &.alert-#{$name} {
-      --atelier-announcement-bg: #{mix($value, $white, 20%)};
-      --atelier-announcement-border: #{$value};
-      --atelier-announcement-ink: #{color-contrast(mix($value, $white, 20%))};
-    }
-  }
-
-  background: var(--atelier-announcement-bg) !important;
-  border-color: var(--atelier-announcement-border) !important;
-
-  &,
-  .quarto-announcement-content,
-  .quarto-announcement-content p,
-  .quarto-announcement-content a,
-  .quarto-announcement-icon,
-  .quarto-announcement-action {
-    color: var(--atelier-announcement-ink) !important;
-  }
-
-  .quarto-announcement-content a {
-    text-decoration-color: var(--atelier-announcement-ink);
-  }
-}
-
-// ===========================================================================
 // DISMISS BUTTON
 // ===========================================================================
 // Bootstrap bakes black into the .btn-close icon and lightens it under
@@ -1698,15 +1546,17 @@ body .navbar .gitlink-widget-dropdown {
 .atelier-404 .atelier-404-home {
   display: inline-block;
   padding: 0.45rem 1.1rem;
-  border: 1px solid $primary;
+  border: 1px solid var(--atelier-accent-mark);
   border-radius: $border-radius;
-  color: $primary;
+  color: var(--atelier-accent-ink);
   text-decoration: none;
 }
 
+// The accent ink is held to AA on the accent-soft tint, and the mark to 3:1 on
+// the page, so a pale or deep primary keeps the link readable.
 .atelier-404 .atelier-404-home:hover,
 .atelier-404 .atelier-404-home:focus-visible {
-  background: body-mix(92%);
+  background: var(--atelier-accent-soft);
   text-decoration: underline;
 }
 

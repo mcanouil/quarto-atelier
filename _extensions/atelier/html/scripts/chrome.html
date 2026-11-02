@@ -1,0 +1,99 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-chrome" type="text/javascript">
+	(function () {
+		// The other Atelier scripts read the options from here, so the block is
+		// parsed once. This script runs first.
+		var options = {};
+		try {
+			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+		} catch (error) {
+			console.warn("Atelier: the options block is not valid JSON.", error);
+		}
+		window.atelierOptions = options;
+		var labels = options.labels || {};
+
+		// The version pill follows the brand in the navbar and the title link in
+		// the sidebar. Without a version, neither is added. A navbar with a logo
+		// has two brand links in one container, so the pill goes once after the
+		// container's last child.
+		if (options.version) {
+			document.querySelectorAll(".navbar-brand-container > :last-child, .sidebar-title > a").forEach(function (brand) {
+				var pill = document.createElement("span");
+				pill.className = "atelier-version";
+				pill.textContent = options.version;
+				brand.after(pill);
+			});
+		}
+
+		// Quarto marks the current navbar link with a class, and sets
+		// aria-current only on some pages. It can also mark a tab whose page is
+		// not the current page, so "page" is kept for a tab whose link is the
+		// current page, and any other marked tab gets "true". The sidebar link is
+		// handled in a11y-fixes.html.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190
+		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
+		// Remove when: the minimum Quarto version includes both fixes.
+		var here = location.pathname.replace(/index\.html$/, "");
+		document.querySelectorAll(".navbar .nav-link.active").forEach(function (link) {
+			var target = new URL(link.href, location.href).pathname.replace(/index\.html$/, "");
+			link.setAttribute("aria-current", target === here ? "page" : "true");
+		});
+
+		// With a search field in the sidebar header, the tools follow the field
+		// instead of sitting under the title. The field sits in a wrapper, so the
+		// tools become the wrapper's next sibling.
+		var sidebarSearch = document.querySelector("#quarto-sidebar .sidebar-search");
+		var sidebarTools = document.querySelector("#quarto-sidebar .sidebar-tools-main");
+		if (sidebarSearch && sidebarTools && sidebarSearch.parentElement) {
+			sidebarSearch.parentElement.after(sidebarTools);
+		}
+
+		// The search button keeps Quarto's own accessible name. The label and the
+		// shortcut are decoration for sighted users, so both are hidden from
+		// assistive technology.
+		var searchOptions = {};
+		try {
+			searchOptions = JSON.parse(document.getElementById("quarto-search-options")?.textContent || "{}");
+		} catch (error) {
+			console.warn("Atelier: the search options block is not valid JSON.", error);
+		}
+		var shortcut = [].concat(searchOptions["keyboard-shortcut"] || [])[0];
+
+		function decorate(button) {
+			if (button.querySelector(".atelier-search-label")) return;
+			if (labels.search) {
+				var label = document.createElement("span");
+				label.className = "atelier-search-label";
+				label.setAttribute("aria-hidden", "true");
+				label.textContent = labels.search;
+				button.appendChild(label);
+			}
+			if (shortcut) {
+				var key = document.createElement("kbd");
+				key.setAttribute("aria-hidden", "true");
+				key.textContent = shortcut;
+				button.appendChild(key);
+			}
+		}
+
+		var searchHost = document.querySelector(".navbar #quarto-search");
+		if (!searchHost) return;
+		var selector = ".aa-DetachedSearchButton";
+		var found = searchHost.querySelector(selector);
+		if (found) {
+			decorate(found);
+		} else {
+			var observer = new MutationObserver(function () {
+				var button = searchHost.querySelector(selector);
+				if (!button) return;
+				observer.disconnect();
+				decorate(button);
+			});
+			observer.observe(searchHost, { childList: true, subtree: true });
+		}
+	})();
+</script>

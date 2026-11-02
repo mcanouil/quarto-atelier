@@ -1,0 +1,133 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-toc-card" type="text/javascript">
+	(function () {
+		var toc = document.querySelector("#quarto-margin-sidebar #TOC");
+		if (!toc) return;
+
+		var labels = (window.atelierOptions || {}).labels || {};
+		var readingTime = labels["toc-reading-time"];
+		var updated = labels["toc-updated"];
+		var copyLabel = labels["toc-copy-link"];
+		var copiedLabel = labels["toc-link-copied"];
+
+		// The meta row sits between the title and the entries. Reading time
+		// counts 200 words a minute, at least one minute.
+		var meta = document.createElement("div");
+		meta.className = "atelier-toc-meta";
+		var content = document.getElementById("quarto-document-content");
+		function countWords(element) {
+			return element ? element.textContent.split(/\s+/).filter(Boolean).length : 0;
+		}
+		var words = countWords(content) - countWords(document.getElementById("title-block-header"));
+		if (readingTime) {
+			var time = document.createElement("span");
+			time.className = "atelier-toc-reading-time";
+			time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
+			meta.appendChild(time);
+		}
+		var modified = document.querySelector(".quarto-title-meta .date-modified");
+		var modifiedDate = modified && modified.textContent.trim();
+		if (updated && modifiedDate) {
+			var stamp = document.createElement("span");
+			stamp.className = "atelier-toc-updated";
+			stamp.textContent = updated.replace("{date}", modifiedDate);
+			meta.appendChild(stamp);
+		}
+		var title = toc.querySelector("#toc-title");
+		if (title) {
+			title.after(meta);
+		} else {
+			toc.prepend(meta);
+		}
+
+		// Quarto writes the actions list only when the site has actions.
+		var actions = toc.querySelector(".toc-actions");
+		if (!actions) {
+			actions = document.createElement("div");
+			actions.className = "toc-actions";
+			toc.appendChild(actions);
+		}
+		var list = actions.querySelector("ul");
+		if (!list) {
+			list = document.createElement("ul");
+			actions.appendChild(list);
+		}
+		var button = document.createElement("button");
+		button.type = "button";
+		button.className = "toc-action atelier-copy-link";
+		button.innerHTML = '<i class="bi bi-link-45deg" aria-hidden="true"></i>';
+		button.appendChild(document.createTextNode(copyLabel || ""));
+		var item = document.createElement("li");
+		item.appendChild(button);
+		list.appendChild(item);
+
+		var status = document.createElement("span");
+		status.className = "visually-hidden";
+		status.setAttribute("aria-live", "polite");
+		toc.appendChild(status);
+
+		// Quarto clones the margin table of contents into a toggle on narrow
+		// pages, and a clone has no listeners. Delegate from the document so
+		// that the original and the clone both work.
+		var timers = new WeakMap();
+		document.addEventListener("click", function (event) {
+			var target = event.target;
+			var copy = target && target.closest && target.closest(".atelier-copy-link");
+			if (!copy) {
+				return;
+			}
+			function failed(error) {
+				console.warn("Atelier: copying the page link failed.", error);
+			}
+			if (!navigator.clipboard || !navigator.clipboard.writeText) {
+				failed(new Error("the clipboard is not available"));
+				return;
+			}
+			var written;
+			try {
+				written = navigator.clipboard.writeText(location.href.split("#")[0]);
+			} catch (error) {
+				failed(error);
+				return;
+			}
+			var scope = copy.closest("#TOC, .quarto-sidebar-toggle-contents") || document;
+			var live = scope.querySelector('[aria-live="polite"]');
+			var label = copy.lastChild;
+			written.then(
+				function () {
+					if (live) {
+						live.textContent = copiedLabel || "";
+					}
+					label.nodeValue = copiedLabel || "";
+					clearTimeout(timers.get(copy));
+					timers.set(copy, setTimeout(function () {
+						label.nodeValue = copyLabel || "";
+						if (live) {
+							live.textContent = "";
+						}
+					}, 2000));
+				},
+				failed
+			);
+		});
+
+		// Quarto marks the current entry with a class only. Mirror it in
+		// aria-current so assistive technology announces it.
+		var links = toc.querySelectorAll(".nav-link");
+		function syncCurrent() {
+			links.forEach(function (link) {
+				if (link.classList.contains("active")) {
+					link.setAttribute("aria-current", "location");
+				} else {
+					link.removeAttribute("aria-current");
+				}
+			});
+		}
+		syncCurrent();
+		new MutationObserver(syncCurrent).observe(toc, { subtree: true, attributes: true, attributeFilter: ["class"] });
+	})();
+</script>
