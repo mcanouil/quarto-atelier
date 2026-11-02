@@ -82,6 +82,14 @@ $border-radius-sm: null;
   --atelier-accent-soft: #{$atelier-accent-soft};
   --atelier-accent-ink: #{$atelier-accent-ink};
   --atelier-accent-mark: #{$atelier-accent-mark};
+  --atelier-accent-text: #{$atelier-accent-text};
+  --atelier-accent-fill: #{$atelier-accent-fill};
+  --atelier-on-accent: #{$atelier-on-accent};
+  --atelier-code-ink: #{$atelier-code-ink};
+  --atelier-shadow: #{$atelier-shadow-color};
+  --atelier-overlay: #{$atelier-overlay-color};
+  --atelier-link: #{$link-color};
+  --atelier-link-hover: #{$link-hover-color};
   --atelier-code-accent-mark: #{$atelier-code-accent-mark};
 
   --atelier-navbar-bg: #{$atelier-chrome-bg};
@@ -118,6 +126,20 @@ $border-radius-sm: null;
   --atelier-toc-accent: var(--atelier-sidebar-accent);
   --atelier-toc-accent-soft: var(--atelier-sidebar-accent-soft);
   --atelier-toc-border: var(--atelier-sidebar-border);
+}
+
+// Quarto inks breadcrumb links with the raw link colour, which a pale or deep
+// primary leaves under 4.5:1 on the page. The resting ink is the muted text and
+// the hover ink is the link hover token. The breadcrumb in the secondary
+// navigation bar is inked by its own rules below.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15175
+// Remove when: Quarto inks breadcrumb links from a contrast-checked colour.
+.quarto-page-breadcrumbs a {
+  color: var(--atelier-muted);
+}
+
+.quarto-page-breadcrumbs a:hover {
+  color: var(--atelier-link-hover);
 }
 
 // ===========================================================================
@@ -874,7 +896,7 @@ html .code-with-filename > pre:not(.sourceCode) {
 // The patch is darker than the page, so a primary that passes on the page can
 // fail on it; hold the ink to AA on the patch.
 code:not(.sourceCode):not(pre code) {
-  color: theme-contrast($primary, body-mix(90%), "AA");
+  color: var(--atelier-code-ink);
   background-color: body-mix(90%);
   padding: 0.1em 0.35em;
   border-radius: 0.3em;
@@ -929,7 +951,7 @@ a code.sourceCode:not(pre code) {
 // Quarto bakes a fixed grey into the copy button, which reads poorly on the
 // body-mix() code surface; use the palette accent in both schemes.
 .code-copy-button {
-  color: $primary;
+  color: var(--atelier-accent-ink);
 }
 
 // Quarto moves the copy button clear of the annotation gutter with
@@ -1011,14 +1033,14 @@ html .panel-tabset > .tab-content {
 
 .panel-tabset .nav-tabs .nav-link:hover,
 .panel-tabset .nav-tabs .nav-link:focus {
-  color: $primary;
+  color: var(--atelier-accent-ink);
   border-color: transparent;
 }
 
 .panel-tabset .nav-tabs .nav-link.active {
   color: var(--bs-body-color);
   border-color: transparent;
-  border-bottom: 2px solid $primary;
+  border-bottom: 2px solid var(--atelier-accent-mark);
   background: transparent;
   font-weight: 600;
 }
@@ -1661,7 +1683,7 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 // ===========================================================================
 // Quarto leaves the browser default scrollbar, a light-grey bar that clashes
 // with the dark navbar and the tinted code surfaces; derive it from the page so
-// it tracks the active scheme, with $primary on hover.
+// it tracks the active scheme, with the accent mark on hover.
 $scrollbar-track: body-mix(94%);
 $scrollbar-thumb: body-mix(72%);
 
@@ -1687,7 +1709,7 @@ $scrollbar-thumb: body-mix(72%);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: $primary;
+  background: var(--atelier-accent-mark);
 }
 
 // ===========================================================================
@@ -1717,7 +1739,7 @@ blockquote:not(.twitter-tweet),
     inset-inline-start: 0.375rem;
     width: 0.25rem;
     border-radius: 0.125rem;
-    background: $primary;
+    background: var(--atelier-accent-mark);
     pointer-events: none;
   }
 
@@ -1729,7 +1751,7 @@ blockquote:not(.twitter-tweet),
     font-family: Georgia, serif;
     font-size: 2rem;
     line-height: 1;
-    color: $primary;
+    color: var(--atelier-accent-mark);
     pointer-events: none;
   }
 
@@ -1776,7 +1798,7 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
     font-weight: 700;
     letter-spacing: 0.02em;
     font-variant-numeric: tabular-nums lining-nums;
-    color: theme-contrast($primary, $body-bg, "AA");
+    color: var(--atelier-accent-text);
   }
 }
 

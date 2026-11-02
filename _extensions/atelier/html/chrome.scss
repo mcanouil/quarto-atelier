@@ -52,6 +52,28 @@
   @return atelier-contrast-all($color, ($bg,), $ratio);
 }
 
+// The ink on a filled surface: the page background or foreground, whichever
+// reads better on $fill, then mixed towards black or white until it reaches
+// $ratio. The direction is the one that reads better on $fill, so a mid-tone
+// fill does not send the mix the wrong way.
+@function atelier-on($fill, $bg, $fg, $ratio) {
+  $start: $bg;
+  @if quarto-contrast($fg, $fill) > quarto-contrast($bg, $fill) {
+    $start: $fg;
+  }
+  $toward: #000;
+  @if quarto-contrast(#fff, $fill) > quarto-contrast(#000, $fill) {
+    $toward: #fff;
+  }
+  @for $step from 0 through 100 {
+    $candidate: mix($toward, $start, $step * 1%);
+    @if quarto-contrast($candidate, $fill) >= $ratio {
+      @return $candidate;
+    }
+  }
+  @return $toward;
+}
+
 // The border of a hue over a background, and its ink: the hue mixed into the
 // foreground, then held at $ratio on $bg. Callouts and the announcement bar use
 // both, so the two mix weights live here.
@@ -267,6 +289,29 @@ $atelier-accent-ink: atelier-contrast(
   4.5
 ) !default;
 $atelier-accent-mark: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 3) !default;
+
+// The accent as text on the page needs 4.5:1, and as a filled control 3:1. The
+// ink on that fill is held at 4.5:1, so a pale accent gets a dark label.
+$atelier-accent-text: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 4.5) !default;
+$atelier-accent-fill: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 3) !default;
+$atelier-on-accent: atelier-on($atelier-accent-fill, $atelier-chrome-page-bg, $atelier-chrome-page-fg, 4.5) !default;
+
+// Inline code sits on the strong surface, which is darker than the page, so its
+// ink is held there.
+$atelier-code-ink: atelier-contrast($atelier-accent-text, $atelier-surface-strong, 4.5) !default;
+
+// Shadows and overlays are black in both schemes; the alpha carries the weight.
+$atelier-shadow-color: rgba(#000, 0.45) !default;
+$atelier-overlay-color: rgba(#000, 0.6) !default;
+
+// Links read the accent as text. The hover step moves the link a fifth towards the ink and is held at 4.5:1,
+// where Bootstrap's own shade falls under it on a deep colour in the dark scheme.
+$link-color: $atelier-accent-text !default;
+$link-hover-color: atelier-contrast(
+  mix($atelier-chrome-page-fg, $link-color, 20%),
+  $atelier-chrome-page-bg,
+  4.5
+) !default;
 
 // The marker of a highlighted code line sits on the code surface and on the
 // accent-soft band, not on the page, so it is held at 3:1 against both.
