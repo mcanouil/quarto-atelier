@@ -131,7 +131,7 @@ $border-radius-sm: null;
 // Quarto inks breadcrumb links with the raw link colour, which a pale or deep
 // primary leaves under 4.5:1 on the page. The resting ink is the muted text and
 // the hover ink is the link hover token. The breadcrumb in the secondary
-// navigation bar is inked by its own rules below.
+// navigation bar takes the sidebar tokens in the rules below.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15175
 // Remove when: Quarto inks breadcrumb links from a contrast-checked colour.
 .quarto-page-breadcrumbs a {
@@ -1222,10 +1222,15 @@ body.docked {
 
   .quarto-secondary-nav .quarto-btn-toggle,
   .quarto-secondary-nav .quarto-search-button,
-  .quarto-secondary-nav-title,
+  .quarto-secondary-nav-title {
+    color: var(--atelier-sidebar-fg);
+  }
+
+  // The crumbs are muted on this bar as they are on the page, from the bar's
+  // own token because the bar can be pinned to another scheme than the page.
   .quarto-secondary-nav .quarto-page-breadcrumbs,
   .quarto-secondary-nav .quarto-page-breadcrumbs a {
-    color: var(--atelier-sidebar-fg);
+    color: var(--atelier-sidebar-muted);
   }
 
   .quarto-secondary-nav .quarto-btn-toggle:hover,

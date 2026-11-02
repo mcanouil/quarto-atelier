@@ -304,8 +304,9 @@ $atelier-code-ink: atelier-contrast($atelier-accent-text, $atelier-surface-stron
 $atelier-shadow-color: rgba(#000, 0.45) !default;
 $atelier-overlay-color: rgba(#000, 0.6) !default;
 
-// Links read the accent as text. The hover step moves the link a fifth towards the ink and is held at 4.5:1,
-// where Bootstrap's own shade falls under it on a deep colour in the dark scheme.
+// Links read the accent as text. The hover step moves the link a fifth towards
+// the ink and is held at 4.5:1, where Bootstrap's own shade falls under it on a
+// deep colour in the dark scheme.
 $link-color: $atelier-accent-text !default;
 $link-hover-color: atelier-contrast(
   mix($atelier-chrome-page-fg, $link-color, 20%),
