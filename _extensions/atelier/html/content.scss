@@ -524,16 +524,11 @@ html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
 // ===========================================================================
 // LISTINGS
 // ===========================================================================
-// Quarto's listing layer sets `$border-color` to a fixed grey before the
-// Atelier defaults, so the item divider, the chips and the pagination boxes
-// take their colours from the rules below.
-
 // The item is a row with a hairline divider below it and a 132 px thumbnail.
 div.quarto-post {
   gap: 1rem;
   margin-bottom: 0;
   padding: 1rem 0;
-  border-bottom-color: var(--atelier-border);
 
   .thumbnail img {
     margin-top: 0;

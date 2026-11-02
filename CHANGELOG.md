@@ -33,6 +33,7 @@
 - fix: Paint heading rules, form controls, and the remaining Bootstrap greys from the brand.
 - fix: Give the listing filter and sort controls visible labels, and mark the current page and the active category for screen readers.
 - fix: Paint the listing filter icon and the listing pagination from the brand, so that they stay readable in dark mode.
+  A site with a listing keeps the brand border colour instead of a Bootstrap grey.
 
 ## 0.11.0 (2026-10-29)
 

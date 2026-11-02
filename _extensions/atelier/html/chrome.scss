@@ -374,10 +374,9 @@ $input-group-addon-color: $atelier-text-muted !default;
 $input-group-addon-border-color: $atelier-control-border !default;
 
 // Bootstrap fills pagination boxes on hover, focus, and when disabled with
-// fixed light greys, and draws their edges from `$border-color`, which the
-// listing layer sets to a grey. In the dark scheme the light ink then sits on
-// a near-white box. The boxes stay on the page, with the control border, and
-// the current box is filled with the accent.
+// fixed light greys, so in the dark scheme the light ink sits on a near-white
+// box. The boxes stay on the page, with the control border, and the current
+// box is filled with the accent.
 $pagination-color: $atelier-chrome-page-fg !default;
 $pagination-bg: $atelier-chrome-page-bg !default;
 $pagination-border-color: $atelier-control-border !default;
