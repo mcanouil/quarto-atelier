@@ -303,7 +303,6 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     .aa-Form {
       min-height: 32px;
       border-radius: $border-radius-sm;
-      background-color: var(--atelier-bg);
     }
   }
 
@@ -727,12 +726,12 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 // at full strength instead.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15189
 // Remove when: the minimum Quarto version includes the fix.
-:is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapper .aa-Input::placeholder {
+:is(.aa-Autocomplete:not(.sidebar-search *), .aa-DetachedFormContainer) .aa-Form .aa-InputWrapper .aa-Input::placeholder {
   color: var(--atelier-muted);
   opacity: 1;
 }
 
-:is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperPrefix :is(.aa-Label, .aa-LoadingIndicator) svg {
+:is(.aa-Autocomplete:not(.sidebar-search *), .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperPrefix :is(.aa-Label, .aa-LoadingIndicator) svg {
   color: var(--atelier-muted);
   opacity: 1;
 }
@@ -741,6 +740,13 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 :is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperSuffix :is(.aa-ClearButton, .aa-CopyButton),
 .aa-DetachedCancelButton {
   color: var(--atelier-muted);
+  opacity: 1;
+}
+
+// The inline sidebar field keeps the sidebar tokens for its placeholder and
+// icon in `html/theme.scss`; its buttons take the same muted ink.
+.sidebar-search .aa-Form :is(.aa-SubmitButton, .aa-ClearButton, .aa-CopyButton) {
+  color: var(--atelier-sidebar-muted);
   opacity: 1;
 }
 
@@ -779,6 +785,13 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   background-color: var(--atelier-accent-soft);
   color: var(--atelier-accent-ink);
   font-weight: 650;
+}
+
+// In the selected item the match sits on the tint of the item itself, so an
+// underline marks it.
+:is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected="true"] .search-item mark.search-match {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 // Quarto leaves the search button and its icon box in a fixed white, which
