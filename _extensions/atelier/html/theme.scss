@@ -331,7 +331,7 @@ $atelier-card-min-width: 13rem !default;
 $atelier-landing-accent: theme-contrast($primary, $body-bg, "AA") !default;
 $atelier-landing-muted: theme-contrast($text-muted, $body-bg, "AA") !default;
 $atelier-landing-surface: body-mix(95%) !default;
-$atelier-landing-border: body-mix(85%) !default;
+$atelier-landing-border: var(--atelier-border) !default;
 $atelier-card-muted: theme-contrast($text-muted, $atelier-landing-surface, "AA") !default;
 $atelier-card-link: theme-contrast($link-color, $atelier-landing-surface, "AA") !default;
 $atelier-hero-glow-color: rgba($primary, 0.25) !default;
@@ -700,9 +700,9 @@ main:has(> .atelier-landing) > #title-block-header {
 // Quarto's rule; body-mix() derives the surface per bundle, correct in both.
 html div.sourceCode {
   @if $code-block-bg {
-    background-color: body-mix(95%);
+    background-color: var(--atelier-surface);
   }
-  border: 1px solid body-mix(85%);
+  border: 1px solid var(--atelier-border);
   border-radius: $border-radius-sm;
 }
 
@@ -712,11 +712,11 @@ html div.sourceCode {
 // div.sourceCode, so blocks become outlines and a plain block drops its tint.
 html pre:not(.sourceCode) {
   @if $code-block-bg {
-    background-color: body-mix(95%);
+    background-color: var(--atelier-surface);
   } @else {
     background-color: transparent;
   }
-  border: 1px solid body-mix(85%);
+  border: 1px solid var(--atelier-border);
   border-radius: $border-radius-sm;
   padding: $code-block-bg-padding;
 }
@@ -793,7 +793,7 @@ html .code-annotation-gutter {
 
 @if $code-block-bg {
   html .code-annotation-gutter-bg {
-    background-color: body-mix(95%);
+    background-color: var(--atelier-surface);
   }
 }
 
@@ -811,7 +811,7 @@ html .code-with-filename .code-with-filename-file pre {
 // derives the border, filename and chip colours from --code-window-bg. Its
 // defaults sit in :where(:root), so this rule wins in each scheme bundle.
 :root {
-  --code-window-bg: #{body-mix(95%)};
+  --code-window-bg: var(--atelier-surface);
   --code-window-title-bg: #{body-mix(90%)};
 }
 
@@ -843,12 +843,12 @@ html .quarto-dark .code-with-filename .code-with-filename-file {
 // title bar divider uses the same border colour.
 html .code-with-filename {
   margin: 1rem 0;
-  border-color: body-mix(85%);
+  border-color: var(--atelier-border);
   border-radius: $border-radius-sm;
 }
 
 html .code-with-filename .code-with-filename-file {
-  border-bottom-color: body-mix(85%);
+  border-bottom-color: var(--atelier-border);
 }
 
 html .code-with-filename .code-copy-outer-scaffold {
@@ -896,7 +896,7 @@ code:not(.sourceCode):not(pre code) {
 // Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14135
 // Remove when: never, because Atelier sets its own code surface.
 code.sourceCode:not(pre code) {
-  background-color: body-mix(95%);
+  background-color: var(--atelier-surface);
   padding: 0.1em 0.35em;
   border-radius: 0.3em;
 }

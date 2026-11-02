@@ -1093,10 +1093,10 @@ html table.quarto-listing-table a {
     margin-bottom: 1rem;
     padding: $code-block-bg-padding;
     font-size: 0.78rem;
-    border: 1px solid body-mix(85%);
+    border: 1px solid var(--atelier-border);
     border-radius: $border-radius-sm;
     @if $code-block-bg {
-      background-color: body-mix(95%);
+      background-color: var(--atelier-surface);
     }
 
     &::before {
