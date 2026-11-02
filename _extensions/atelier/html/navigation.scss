@@ -1092,11 +1092,16 @@ body:not(.glightbox-mobile) div.gslide-description :is(.gslide-title, .gslide-de
 }
 
 // Glightbox sizes an SVG with no intrinsic size to its own default, a small
-// box. Fill the slide at the 4:3 ratio of a typical viewport instead.
+// box, and crops a tall one. Fit the image inside 90% of the viewport and keep
+// its ratio. The selector matches a file name that ends in `.svg`; it misses an
+// address with a query string and a data URI.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/10315 (related)
 // Remove when: Quarto sizes SVG images in the lightbox to the slide.
 .glightbox-container .gslide-image img[src$=".svg" i] {
   width: min(90vw, calc(90vh * 4 / 3));
   height: auto;
   max-width: none;
+  // Glightbox sets its own max-height inline, so only `!important` wins.
+  max-height: 90vh !important;
+  object-fit: contain;
 }
