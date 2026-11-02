@@ -628,8 +628,13 @@ html #code-annotation-line-highlight {
   }
 }
 
-// The title block rules above use the id of the header, so this selector
-// repeats it to give a chip on the banner the border of the bar.
+// The title block rules above use the id of the header, so these selectors
+// repeat it. The subtitle takes the banner text, which the page may colour,
+// and a chip on the banner takes the border of the bar.
+#{$_atelier-title-block} .quarto-title-banner .subtitle {
+  color: currentcolor;
+}
+
 #{$_atelier-title-block} .quarto-title-banner .quarto-category {
   border-color: var(--atelier-navbar-control-border);
 }

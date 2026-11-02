@@ -754,14 +754,18 @@ body.floating .sidebar.sidebar-navigation {
 // the same icon, so the button and the icon follow one token.
 $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294l4-13zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/></svg>');
 
-.code-tools-button,
-.quarto-title-banner .code-tools-button {
+.code-tools-button {
   color: var(--atelier-muted);
 }
 
-.code-tools-button:hover,
-.quarto-title-banner .code-tools-button:hover {
+.code-tools-button:hover {
   color: var(--atelier-fg);
+}
+
+// On a banner the button follows the banner text, which the page may colour.
+.quarto-title-banner .code-tools-button,
+.quarto-title-banner .code-tools-button:hover {
+  color: currentcolor;
 }
 
 .code-tools-button > .bi::before,
