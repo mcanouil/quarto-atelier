@@ -293,11 +293,19 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
       background: var(--atelier-surface-strong);
     }
 
+    // Quarto and Bootstrap Icons nudge the icons to sit on a text baseline.
+    // The grid centres them, so the nudges put them off centre.
     img,
     .bi {
       width: 15px;
       height: 15px;
+      margin: 0;
       font-size: 15px;
+      line-height: 1;
+    }
+
+    .bi::before {
+      vertical-align: top;
     }
   }
 
