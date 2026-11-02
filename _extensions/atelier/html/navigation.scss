@@ -32,8 +32,10 @@
 
 @include media-breakpoint-up(lg) {
   // Quarto pads the bar through `#quarto-header > nav`, which this has to match.
+  // With no bottom padding, the tab row meets the bar's bottom border.
   #quarto-header > .navbar.navbar-expand-lg {
     padding-inline: 0;
+    padding-bottom: 0;
   }
 
   .navbar.navbar-expand-lg {
