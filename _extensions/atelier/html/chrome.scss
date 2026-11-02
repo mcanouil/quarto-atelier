@@ -6,14 +6,20 @@
 
 /*-- scss:functions --*/
 
+// The colour a text colour moves toward to gain contrast on $bg: black on a
+// light background and white on a dark one.
+@function atelier-toward($bg) {
+  @if tone($bg) == "light" {
+    @return #000;
+  }
+  @return #fff;
+}
+
 // Mix $color towards black or white, as Quarto's `theme-contrast()` does, until
 // it reads at 4.5:1 on its own soft tint: $color at $alpha over $bg. The tint
 // darkens with the colour, so it is recomputed at every step.
 @function atelier-contrast-on-tint($color, $bg, $alpha) {
-  $toward: #fff;
-  @if tone($bg) == "light" {
-    $toward: #000;
-  }
+  $toward: atelier-toward($bg);
   @for $step from 0 through 100 {
     $candidate: mix($toward, $color, $step * 1%);
     @if quarto-contrast($candidate, mix($candidate, $bg, $alpha * 100%)) >= 4.5 {
@@ -26,10 +32,7 @@
 // The same as atelier-contrast(), but the colour must reach $ratio on every
 // background in the $bgs list. The backgrounds must share one tone.
 @function atelier-contrast-all($color, $bgs, $ratio) {
-  $toward: #fff;
-  @if tone(nth($bgs, 1)) == "light" {
-    $toward: #000;
-  }
+  $toward: atelier-toward(nth($bgs, 1));
   @for $step from 0 through 100 {
     $candidate: mix($toward, $color, $step * 1%);
     $passes: true;
@@ -293,7 +296,7 @@ $atelier-accent-mark: atelier-contrast($atelier-chrome-page-accent, $atelier-chr
 // The accent as text on the page needs 4.5:1, and as a filled control 3:1. The
 // ink on that fill is held at 4.5:1, so a pale accent gets a dark label.
 $atelier-accent-text: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 4.5) !default;
-$atelier-accent-fill: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 3) !default;
+$atelier-accent-fill: $atelier-accent-mark !default;
 $atelier-on-accent: atelier-on($atelier-accent-fill, $atelier-chrome-page-bg, $atelier-chrome-page-fg, 4.5) !default;
 
 // Inline code sits on the strong surface, which is darker than the page, so its

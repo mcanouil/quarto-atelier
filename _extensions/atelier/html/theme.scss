@@ -812,7 +812,7 @@ html .code-with-filename .code-with-filename-file pre {
 // defaults sit in :where(:root), so this rule wins in each scheme bundle.
 :root {
   --code-window-bg: var(--atelier-surface);
-  --code-window-title-bg: #{body-mix(90%)};
+  --code-window-title-bg: var(--atelier-surface-strong);
 }
 
 // The window draws the frame and the surface, so code inside it takes the
@@ -884,7 +884,7 @@ html .code-with-filename > pre:not(.sourceCode) {
 // fail on it; hold the ink to AA on the patch.
 code:not(.sourceCode):not(pre code) {
   color: var(--atelier-code-ink);
-  background-color: body-mix(90%);
+  background-color: var(--atelier-surface-strong);
   padding: 0.1em 0.35em;
   white-space: pre-wrap;
   border-radius: 0.3em;

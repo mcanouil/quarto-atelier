@@ -723,30 +723,30 @@ body.floating .sidebar.sidebar-navigation {
 :is(main, #title-block-header) .dropdown-menu {
   padding: 0.35rem;
   font-size: 0.86rem;
-}
 
-:is(main, #title-block-header) .dropdown-menu .dropdown-header {
-  color: var(--atelier-muted);
-  font-size: 0.74rem;
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+  .dropdown-header {
+    color: var(--atelier-muted);
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 
-:is(main, #title-block-header) .dropdown-menu .dropdown-divider {
-  border-top-color: var(--atelier-border);
-}
+  .dropdown-divider {
+    border-top-color: var(--atelier-border);
+  }
 
-:is(main, #title-block-header) .dropdown-menu .dropdown-item {
-  padding: 0.38rem 0.55rem;
-  border-radius: $border-radius-sm;
-  color: var(--atelier-fg);
-  font-size: 0.86rem;
-}
+  .dropdown-item {
+    padding: 0.38rem 0.55rem;
+    border-radius: $border-radius-sm;
+    color: var(--atelier-fg);
+    font-size: 0.86rem;
 
-:is(main, #title-block-header) .dropdown-menu .dropdown-item:is(:hover, :focus, :active, .active) {
-  background-color: var(--atelier-accent-soft);
-  color: var(--atelier-accent-ink);
+    &:is(:hover, :focus, :active, .active) {
+      background-color: var(--atelier-accent-soft);
+      color: var(--atelier-accent-ink);
+    }
+  }
 }
 
 // Quarto bakes the code tools icon into a data URI with a fixed fill, and again
@@ -824,16 +824,8 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 // at full strength instead.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15189
 // Remove when: the minimum Quarto version includes the fix.
-:is(.aa-Autocomplete:not(.sidebar-search *), .aa-DetachedFormContainer) .aa-Form .aa-InputWrapper .aa-Input::placeholder {
-  color: var(--atelier-muted);
-  opacity: 1;
-}
-
-:is(.aa-Autocomplete:not(.sidebar-search *), .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperPrefix :is(.aa-Label, .aa-LoadingIndicator) svg {
-  color: var(--atelier-muted);
-  opacity: 1;
-}
-
+:is(.aa-Autocomplete:not(.sidebar-search *), .aa-DetachedFormContainer) .aa-Form .aa-InputWrapper .aa-Input::placeholder,
+:is(.aa-Autocomplete:not(.sidebar-search *), .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperPrefix :is(.aa-Label, .aa-LoadingIndicator) svg,
 :is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperPrefix .aa-SubmitButton,
 :is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperSuffix :is(.aa-ClearButton, .aa-CopyButton),
 .aa-DetachedCancelButton {
@@ -857,17 +849,6 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   box-shadow: inset 3px 0 0 var(--atelier-accent-mark);
 }
 
-:is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected] :is(
-    .search-item,
-    .search-item.search-result-more,
-    .search-item .search-result-section,
-    .search-item .search-result-text,
-    .search-item .search-result-title-container,
-    .search-item .search-result-text-container
-  ) {
-  color: var(--atelier-fg);
-}
-
 :is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected="true"] :is(
     .search-item,
     .search-item.search-result-more,
@@ -877,6 +858,7 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
     .search-item .search-result-text-container
   ) {
   background-color: transparent;
+  color: var(--atelier-fg);
 }
 
 :is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected] .search-item mark.search-match {

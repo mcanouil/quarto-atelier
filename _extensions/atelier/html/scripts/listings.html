@@ -61,10 +61,10 @@
 				if (!header.dataset.atelierSortKeys) {
 					header.dataset.atelierSortKeys = "true";
 					header.addEventListener("keydown", function (event) {
-						if (event.key === "Enter" || event.key === " ") {
-							event.preventDefault();
-							header.click();
-						}
+						if (event.key !== "Enter" && event.key !== " ") return;
+						if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
+						event.preventDefault();
+						if (!event.repeat) header.click();
 					});
 				}
 				var cell = header.parentElement;
@@ -89,23 +89,21 @@
 		}
 
 		// list.js builds the pagination again after each page change, filter, or
-		// sort, so the changes are applied again from an observer. The pagination
-		// and the header row are watched for class changes, which mark the current
-		// page and the sorted column.
+		// sort, so the changes are applied again from an observer. Class changes
+		// mark the current page and the sorted column. A burst of mutations runs
+		// apply() once, in the next frame. apply() writes only attributes outside
+		// the class filter, so it cannot trigger itself in a loop.
 		listings.forEach(function (listing) {
 			apply(listing);
-			var observer = new MutationObserver(function () {
-				apply(listing);
-			});
-			observer.observe(listing, { childList: true, subtree: true });
-			var pagination = listing.querySelector(".pagination");
-			if (pagination) {
-				observer.observe(pagination, { subtree: true, attributes: true, attributeFilter: ["class"] });
-			}
-			var headerRow = listing.querySelector("thead");
-			if (headerRow) {
-				observer.observe(headerRow, { subtree: true, attributes: true, attributeFilter: ["class"] });
-			}
+			var scheduled = false;
+			new MutationObserver(function () {
+				if (scheduled) return;
+				scheduled = true;
+				requestAnimationFrame(function () {
+					scheduled = false;
+					apply(listing);
+				});
+			}).observe(listing, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
 		});
 	})();
 </script>

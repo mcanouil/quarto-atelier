@@ -559,6 +559,8 @@ html code.sourceCode .code-annotation-anchor {
   padding: 0;
 }
 
+// Quarto's active selector is stronger than the base marker rule above, so the
+// active state needs its own rule.
 html code.sourceCode .code-annotation-anchor.code-annotation-active,
 dl.code-annotation-container-grid dt[data-target-cell].code-annotation-active {
   border: none;
@@ -831,17 +833,13 @@ div.quarto-post {
     border-color: var(--atelier-control-border);
     background-color: var(--atelier-bg);
     color: var(--atelier-fg);
+    border-top-right-radius: $border-radius-sm;
+    border-bottom-right-radius: $border-radius-sm;
   }
 
   .input-group-text {
     border-top-left-radius: $border-radius-sm;
     border-bottom-left-radius: $border-radius-sm;
-  }
-
-  .form-control,
-  .form-select {
-    border-top-right-radius: $border-radius-sm;
-    border-bottom-right-radius: $border-radius-sm;
   }
 
   .form-control {

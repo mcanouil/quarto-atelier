@@ -281,13 +281,14 @@
 		const categorySelector = ".quarto-listing-category .category, .listing-category";
 		const makeCategoriesButtons = (root) => {
 			root.querySelectorAll(categorySelector).forEach((el) => {
-				if (el.hasAttribute("role")) return;
-				el.setAttribute("role", "button");
-				el.setAttribute("tabindex", "0");
-			});
-			root.querySelectorAll(".quarto-listing-category .category").forEach((el) => {
-				const pressed = el.classList.contains("active") ? "true" : "false";
-				if (el.getAttribute("aria-pressed") !== pressed) el.setAttribute("aria-pressed", pressed);
+				if (!el.hasAttribute("role")) {
+					el.setAttribute("role", "button");
+					el.setAttribute("tabindex", "0");
+				}
+				if (el.closest(".quarto-listing-category")) {
+					const pressed = el.classList.contains("active") ? "true" : "false";
+					if (el.getAttribute("aria-pressed") !== pressed) el.setAttribute("aria-pressed", pressed);
+				}
 			});
 		};
 		makeCategoriesButtons(document);
@@ -299,6 +300,7 @@
 		});
 		document.querySelectorAll(".quarto-listing-category").forEach((list) => {
 			new MutationObserver(() => makeCategoriesButtons(list)).observe(list, {
+				childList: true,
 				subtree: true,
 				attributes: true,
 				attributeFilter: ["class"],
