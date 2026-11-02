@@ -496,7 +496,7 @@ main:has(> .atelier-landing) > #title-block-header {
 .atelier-hero.glow .atelier-hero-figure::before {
   content: "";
   position: absolute;
-  inset: -10%;
+  inset: -10% 0;
   background: radial-gradient(circle, $atelier-hero-glow-color, transparent 65%);
   pointer-events: none;
 }
