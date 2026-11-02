@@ -240,12 +240,16 @@ h6 {
 // and drop a heading colour that a brand sets.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15169
 // Remove when: the minimum Quarto version includes the fix.
+$_heading-ink: $body-color;
+@if type-of($headings-color) == color {
+  $_heading-ink: $headings-color;
+}
 h3,
 h4,
 h5,
 h6 {
   opacity: 1;
-  color: rgba(if(type-of($headings-color) == color, $headings-color, $body-color), 0.9);
+  color: rgba($_heading-ink, 0.9);
 }
 
 // ===========================================================================

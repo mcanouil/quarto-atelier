@@ -1,10 +1,19 @@
+/*-- scss:uses --*/
+
+// Quarto writes every uses section before the other layers, and its own files
+// load `sass:meta` under other names, so a namespace of our own avoids a clash.
+@use "sass:meta" as atelier-meta;
+
 /*-- scss:functions --*/
 
 // Mix $color towards black or white, as Quarto's `theme-contrast()` does, until
 // it reads at 4.5:1 on its own soft tint: $color at $alpha over $bg. The tint
 // darkens with the colour, so it is recomputed at every step.
 @function atelier-contrast-on-tint($color, $bg, $alpha) {
-  $toward: if(tone($bg) == "light", #000, #fff);
+  $toward: #fff;
+  @if tone($bg) == "light" {
+    $toward: #000;
+  }
   @for $step from 0 through 100 {
     $candidate: mix($toward, $color, $step * 1%);
     @if quarto-contrast($candidate, mix($candidate, $bg, $alpha * 100%)) >= 4.5 {
@@ -17,7 +26,10 @@
 // The same as atelier-contrast(), but the colour must reach $ratio on every
 // background in the $bgs list. The backgrounds must share one tone.
 @function atelier-contrast-all($color, $bgs, $ratio) {
-  $toward: if(tone(nth($bgs, 1)) == "light", #000, #fff);
+  $toward: #fff;
+  @if tone(nth($bgs, 1)) == "light" {
+    $toward: #000;
+  }
   @for $step from 0 through 100 {
     $candidate: mix($toward, $color, $step * 1%);
     $passes: true;
@@ -60,27 +72,27 @@
 // derives from them, such as $danger, so a palette name reaches those too.
 // Remove when: Quarto maps the palette names without defaults.bootstrap.
 $blue: null !default;
-@if variable-exists("brand-blue") {
+@if atelier-meta.variable-exists("brand-blue") {
   $blue: $brand-blue !default;
 }
 
 $red: null !default;
-@if variable-exists("brand-red") {
+@if atelier-meta.variable-exists("brand-red") {
   $red: $brand-red !default;
 }
 
 $orange: null !default;
-@if variable-exists("brand-orange") {
+@if atelier-meta.variable-exists("brand-orange") {
   $orange: $brand-orange !default;
 }
 
 $yellow: null !default;
-@if variable-exists("brand-yellow") {
+@if atelier-meta.variable-exists("brand-yellow") {
   $yellow: $brand-yellow !default;
 }
 
 $green: null !default;
-@if variable-exists("brand-green") {
+@if atelier-meta.variable-exists("brand-green") {
   $green: $brand-green !default;
 }
 
@@ -124,9 +136,18 @@ $atelier-chrome-light-accent: #1f5f80 !default;
 // A project can drop `brand` from its theme list, in which case the page
 // variables are only defined in the Bootstrap layer that follows this one;
 // fall back to the Bootstrap defaults so `auto` still resolves.
-$atelier-chrome-page-bg: if(variable-exists(body-bg), $body-bg, #fff);
-$atelier-chrome-page-fg: if(variable-exists(body-color), $body-color, #212529);
-$atelier-chrome-page-accent: if(variable-exists(primary), $primary, #0d6efd);
+$atelier-chrome-page-bg: #fff;
+@if atelier-meta.variable-exists(body-bg) {
+  $atelier-chrome-page-bg: $body-bg;
+}
+$atelier-chrome-page-fg: #212529;
+@if atelier-meta.variable-exists(body-color) {
+  $atelier-chrome-page-fg: $body-color;
+}
+$atelier-chrome-page-accent: #0d6efd;
+@if atelier-meta.variable-exists(primary) {
+  $atelier-chrome-page-accent: $primary;
+}
 
 // ===========================================================================
 // RADIUS AND MERMAID TOKENS
@@ -152,15 +173,13 @@ $mermaid-fg-color--lightest: mix($atelier-chrome-page-bg, $atelier-chrome-page-f
 // itself, so it still reads as a bar without a hard colour break, and the
 // mix resolves per bundle: a paler paper in the light one, a lifted slate in
 // the dark one.
-$atelier-chrome-bg: if(
-  $atelier-chrome == dark,
-  $atelier-chrome-dark-bg,
-  if(
-    $atelier-chrome == light,
-    $atelier-chrome-light-bg,
-    mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 94%)
-  )
-) !default;
+$_atelier-chrome-bg-source: mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 94%);
+@if $atelier-chrome == dark {
+  $_atelier-chrome-bg-source: $atelier-chrome-dark-bg;
+} @else if $atelier-chrome == light {
+  $_atelier-chrome-bg-source: $atelier-chrome-light-bg;
+}
+$atelier-chrome-bg: $_atelier-chrome-bg-source !default;
 
 // Both inks are mixed towards black or white only until they clear 4.5:1, and
 // returned untouched when they already do; a ratio that cannot be met ends at
@@ -168,16 +187,14 @@ $atelier-chrome-bg: if(
 // sitting just above 4.5:1 on the page can fall under it here.
 // Setting either variable in a project skips the correction, since a `!default`
 // assignment is not evaluated at all once the variable is set.
+$_atelier-chrome-fg-source: $atelier-chrome-page-fg;
+@if $atelier-chrome == dark {
+  $_atelier-chrome-fg-source: $atelier-chrome-dark-fg;
+} @else if $atelier-chrome == light {
+  $_atelier-chrome-fg-source: $atelier-chrome-light-fg;
+}
 $atelier-chrome-fg: theme-contrast(
-  if(
-    $atelier-chrome == dark,
-    $atelier-chrome-dark-fg,
-    if(
-      $atelier-chrome == light,
-      $atelier-chrome-light-fg,
-      $atelier-chrome-page-fg
-    )
-  ),
+  $_atelier-chrome-fg-source,
   $atelier-chrome-bg,
   "AA"
 ) !default;
@@ -190,19 +207,14 @@ $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !defau
 // of these to the accent, so holding the accent to AA there covers the rest.
 $atelier-chrome-accent-soft-alpha: 0.16 !default;
 // A project or brand that sets $atelier-chrome-accent wins, so the mark follows it.
-$_atelier-chrome-accent-source: if(
-  variable-exists(atelier-chrome-accent),
-  $atelier-chrome-accent,
-  if(
-    $atelier-chrome == dark,
-    $atelier-chrome-dark-accent,
-    if(
-      $atelier-chrome == light,
-      $atelier-chrome-light-accent,
-      $atelier-chrome-page-accent
-    )
-  )
-);
+$_atelier-chrome-accent-source: $atelier-chrome-page-accent;
+@if atelier-meta.variable-exists(atelier-chrome-accent) {
+  $_atelier-chrome-accent-source: $atelier-chrome-accent;
+} @else if $atelier-chrome == dark {
+  $_atelier-chrome-accent-source: $atelier-chrome-dark-accent;
+} @else if $atelier-chrome == light {
+  $_atelier-chrome-accent-source: $atelier-chrome-light-accent;
+}
 $atelier-chrome-accent: atelier-contrast-on-tint(
   $_atelier-chrome-accent-source,
   $atelier-chrome-surface,
@@ -273,12 +285,12 @@ $atelier-code-accent-mark: atelier-contrast-all(
 // A `!default` would lose to that layer, so it is handed over by plain
 // assignment, like the chrome variables below; a project sets
 // $atelier-text-muted instead.
+$_atelier-text-muted-source: mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%);
+@if atelier-meta.variable-exists(secondary) {
+  $_atelier-text-muted-source: $secondary;
+}
 $atelier-text-muted: theme-contrast(
-  if(
-    variable-exists(secondary),
-    $secondary,
-    mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%)
-  ),
+  $_atelier-text-muted-source,
   $atelier-surface-strong,
   "AA"
 ) !default;
