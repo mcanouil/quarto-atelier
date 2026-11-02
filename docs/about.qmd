@@ -22,7 +22,7 @@ It gives a documentation site an accessible design.
 The design comes from one `_brand.yml` file.
 
 Mickaël Canouil makes Atelier and the other Quarto extensions in this family.
-He keeps the source code on GitHub.
+The source code is on GitHub.
 
 This page uses the `trestles` template.
 Quarto has four other about templates: `jolla`, `solana`, `marquee`, and `broadside`.
