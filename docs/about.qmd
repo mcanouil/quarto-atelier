@@ -18,7 +18,8 @@ about:
 ---
 
 Atelier is a project type for Quarto websites.
-It gives a documentation site an accessible design that comes from one `_brand.yml` file.
+It gives a documentation site an accessible design.
+The design comes from one `_brand.yml` file.
 
 Mickaël Canouil makes Atelier and the other Quarto extensions in this family.
 He keeps the source code on GitHub.
