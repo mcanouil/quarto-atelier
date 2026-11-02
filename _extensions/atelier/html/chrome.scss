@@ -300,6 +300,29 @@ $atelier-on-accent: atelier-on($atelier-accent-fill, $atelier-chrome-page-bg, $a
 // ink is held there.
 $atelier-code-ink: atelier-contrast($atelier-accent-text, $atelier-surface-strong, 4.5) !default;
 
+// Quarto fades h3 to h6 to nine tenths of the heading ink. That is an opaque
+// mix here, so the ink is a colour the page can publish, held at 4.5:1. The
+// source is the theme heading colour when a brand sets one, else the body ink.
+$_atelier-heading-source: $atelier-chrome-page-fg;
+@if atelier-meta.variable-exists(headings-color) {
+  @if type-of($headings-color) == color {
+    $_atelier-heading-source: $headings-color;
+  }
+}
+$atelier-heading: atelier-contrast(
+  mix($_atelier-heading-source, $atelier-chrome-page-bg, 90%),
+  $atelier-chrome-page-bg,
+  4.5
+) !default;
+
+// Bootstrap paints its rules (the h2 underline, table and card edges) from
+// $border-color and $table-border-color, and its form controls from
+// $input-border-color. All three follow the page tokens, so no Bootstrap grey
+// reaches the page.
+$border-color: $atelier-border !default;
+$table-border-color: $atelier-border !default;
+$input-border-color: $atelier-control-border !default;
+
 // Shadows and overlays are black in both schemes; the alpha carries the weight.
 $atelier-shadow-color: rgba(#000, 0.45) !default;
 $atelier-overlay-color: rgba(#000, 0.6) !default;

@@ -29,6 +29,7 @@
 - fix: Keep the "Back to home" link of the 404 page readable when the primary colour is very pale or very deep. (#76)
 - fix: Hold content and breadcrumb links to 4.5:1 on the page, so that a pale or deep primary colour stays readable.
 - fix: Report an unreadable search options block in the console instead of hiding it.
+- fix: Paint heading rules, form controls, and the remaining Bootstrap greys from the brand.
 
 ## 0.11.0 (2026-10-29)
 

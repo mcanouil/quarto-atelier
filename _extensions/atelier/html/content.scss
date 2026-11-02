@@ -514,3 +514,9 @@ html pre.numberSource code > span.atelier-line-highlight {
 html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
   background-position-x: calc(#{$_atelier-number-shift} - #{$code-block-bg-padding});
 }
+
+// Bootstrap shades `.column-screen-inset-shaded` with a fixed light grey, which
+// stays pale in the dark scheme. Paint it from the surface token.
+.page-columns .column-screen-inset-shaded {
+  background-color: var(--atelier-surface);
+}

@@ -86,6 +86,7 @@ $border-radius-sm: null;
   --atelier-accent-fill: #{$atelier-accent-fill};
   --atelier-on-accent: #{$atelier-on-accent};
   --atelier-code-ink: #{$atelier-code-ink};
+  --atelier-heading: #{$atelier-heading};
   --atelier-shadow: #{$atelier-shadow-color};
   --atelier-overlay: #{$atelier-overlay-color};
   --atelier-link: #{$link-color};
@@ -256,22 +257,16 @@ h6 {
 
 // Quarto fades h3 to h6 with opacity, which also fades the links inside them
 // below AA (3.97:1 on an h4 link in light mode). Fade the heading text by its
-// colour instead, so a link keeps its own ink. The ink is the theme heading
-// colour (`$headings-color`, which a brand sets) or, when there is none, the
-// body colour, because `currentcolor` here would resolve to the parent's colour
-// and drop a heading colour that a brand sets.
+// colour instead, so a link keeps its own ink. The faded ink is the
+// `--atelier-heading` token, resolved in `html/chrome.scss`.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15169
 // Remove when: the minimum Quarto version includes the fix.
-$_heading-ink: $body-color;
-@if type-of($headings-color) == color {
-  $_heading-ink: $headings-color;
-}
 h3,
 h4,
 h5,
 h6 {
   opacity: 1;
-  color: rgba($_heading-ink, 0.9);
+  color: var(--atelier-heading);
 }
 
 // ===========================================================================
@@ -352,6 +347,10 @@ $atelier-landing-border: body-mix(85%) !default;
 $atelier-card-muted: theme-contrast($text-muted, $atelier-landing-surface, "AA") !default;
 $atelier-card-link: theme-contrast($link-color, $atelier-landing-surface, "AA") !default;
 $atelier-hero-glow-color: rgba($primary, 0.25) !default;
+
+:root {
+  --atelier-card-link: #{$atelier-card-link};
+}
 
 // Each stop of the title gradient is moved until it has 4.5:1 against the
 // page. The middle stop is calculated too, because a mix of two colours that
@@ -626,7 +625,7 @@ main:has(> .atelier-landing) > #title-block-header {
   }
 
   a {
-    color: $atelier-card-link;
+    color: var(--atelier-card-link);
     font-weight: 600;
 
     &::after {
@@ -1012,8 +1011,8 @@ html .callout :is(.callout-body, .callout-body-container) {
 // ===========================================================================
 .panel-tabset .nav-tabs {
   // This line is the panel box's top edge (Quarto leaves .tab-content without a
-  // border-top); body-mix() keeps it visible in dark mode and matches the sides.
-  border-bottom: 1px solid body-mix(85%);
+  // border-top); the border token matches the sides in both schemes.
+  border-bottom: 1px solid var(--atelier-border);
   // Bootstrap bakes the active tab colour to near-black; override the variables.
   --bs-nav-tabs-link-active-color: var(--bs-body-color);
   --bs-nav-tabs-link-active-bg: transparent;
@@ -1021,13 +1020,13 @@ html .callout :is(.callout-body, .callout-body-container) {
 }
 
 // Quarto hard-codes #dee2e6 on the panel's left/right/bottom edges, which does
-// not adapt to dark; re-derive them from body-mix() so all four edges match.
+// not adapt to dark; paint them from the border token so all four edges match.
 html .panel-tabset > .tab-content {
-  border-color: body-mix(85%);
+  border-color: var(--atelier-border);
 }
 
 .panel-tabset .nav-tabs .nav-link {
-  color: var(--bs-secondary-color);
+  color: var(--atelier-muted);
   transition: color 0.15s ease-in-out;
 }
 
@@ -1570,7 +1569,7 @@ body .navbar .gitlink-widget-dropdown {
   font-size: clamp(6rem, 20vw, 11rem);
   font-weight: 700;
   line-height: 1;
-  color: body-mix(88%);
+  color: var(--atelier-control-border);
   user-select: none;
 }
 
@@ -1673,6 +1672,12 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   }
 }
 
+// On a page with no navbar or sidebar the toggle floats at the top right, and
+// the browser paints a button black unless told otherwise.
+.top-right.quarto-color-scheme-toggle {
+  color: var(--atelier-fg);
+}
+
 // In the sidebar tools row, Quarto sizes the tool icons from the font size of
 // the row, but the toggle glyph from the root font size, so the toggle is
 // larger than the icons beside it. Size the glyph from the row instead.
@@ -1718,6 +1723,31 @@ $scrollbar-thumb: body-mix(72%);
 }
 
 // ===========================================================================
+// BOOTSTRAP BUTTONS AND ALERTS
+// ===========================================================================
+// Bootstrap derives the primary button text from the primary colour and the
+// secondary alert from its grey. Both read the page tokens instead: the fill is
+// the accent held to 3:1 with its ink at 4.5:1, and the alert is a quiet panel.
+.btn-primary {
+  --bs-btn-color: var(--atelier-on-accent);
+  --bs-btn-bg: var(--atelier-accent-fill);
+  --bs-btn-border-color: var(--atelier-accent-fill);
+  --bs-btn-hover-color: var(--atelier-bg);
+  --bs-btn-hover-bg: var(--atelier-accent-text);
+  --bs-btn-hover-border-color: var(--atelier-accent-text);
+  --bs-btn-active-color: var(--atelier-bg);
+  --bs-btn-active-bg: var(--atelier-accent-text);
+  --bs-btn-active-border-color: var(--atelier-accent-text);
+}
+
+.alert-secondary {
+  --bs-alert-color: var(--atelier-fg);
+  --bs-alert-bg: var(--atelier-surface-strong);
+  --bs-alert-border-color: var(--atelier-border);
+  --bs-alert-link-color: var(--atelier-link);
+}
+
+// ===========================================================================
 // BLOCKQUOTES AND SECTION NUMBERS
 // ===========================================================================
 // A blockquote has an inset bar in the primary colour and a decorative opening
@@ -1735,6 +1765,7 @@ blockquote:not(.twitter-tweet),
   background: none;
   font-style: normal;
   font-size: 1.0625em;
+  color: var(--atelier-muted);
 
   &::before {
     content: "";
@@ -1775,7 +1806,7 @@ blockquote:not(.twitter-tweet),
     margin-top: 0.25rem;
     font-size: 0.85em;
     font-style: normal;
-    color: theme-contrast($text-muted, $body-bg, "AA");
+    color: var(--atelier-muted);
   }
 
   // A `cite` inside an attribution is part of its line: keep it inline, at the

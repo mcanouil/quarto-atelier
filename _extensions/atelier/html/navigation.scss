@@ -182,6 +182,12 @@ body.docked .sidebar-navigation {
   --gitlink-widget-accent-soft: var(--atelier-sidebar-accent-soft);
 }
 
+// The widget menu shadow is fixed in widget.css, with no property to set, so
+// it is repainted from the shadow token here.
+body .gitlink-widget .gitlink-widget-dropdown {
+  box-shadow: 0 12px 30px -16px var(--atelier-shadow);
+}
+
 // ===========================================================================
 // SIDEBAR MENU
 // ===========================================================================
@@ -352,6 +358,17 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
 #TOC .nav-link.active {
   color: var(--atelier-accent-ink) !important;
   font-weight: 650;
+}
+
+// Quarto draws a grey rule along the left of each entry and mutes the section
+// number. The rule takes the border token, and the number takes the ink of its
+// entry, which the entry holds to contrast.
+#TOC .nav-link:not(.active) {
+  border-left-color: var(--atelier-border);
+}
+
+#TOC .nav-link .header-section-number {
+  color: inherit;
 }
 
 #quarto-margin-sidebar #TOC {
