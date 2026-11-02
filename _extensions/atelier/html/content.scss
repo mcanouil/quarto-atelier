@@ -286,7 +286,7 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     place-items: center;
     width: 24px;
     height: 24px;
-    border-radius: 4px;
+    border-radius: var(--bs-border-radius-sm);
     color: var(--atelier-muted);
 
     &:hover {
@@ -726,7 +726,9 @@ div.quarto-post {
 }
 
 // The category chips are pills. Each is a button, so it keeps a 24 px target.
-div.quarto-post .listing-categories {
+// Quarto sets the pills of a grid card with a selector as strong as this one,
+// so the rule names both listings to take the same pills in each.
+:is(div.quarto-post, .quarto-grid-item) .listing-categories {
   gap: 0.35rem;
 
   .listing-category {
@@ -928,25 +930,6 @@ div.quarto-post .listing-categories {
   }
 }
 
-// Quarto sets the pills of a grid card with a selector as strong as this one,
-// so the rule repeats it to take the same pills as the default listing.
-.quarto-grid-item .listing-categories .listing-category {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  margin: 0;
-  padding: 0.1rem 0.55rem;
-  border: 1px solid var(--atelier-control-border);
-  border-radius: 999px;
-  color: var(--atelier-fg);
-  font-size: 0.74rem;
-  text-transform: none;
-}
-
-.quarto-grid-item .listing-categories {
-  gap: 0.35rem;
-}
-
 // ===========================================================================
 // TABLES
 // ===========================================================================
@@ -957,7 +940,10 @@ div.quarto-post .listing-categories {
 main table.table,
 table.quarto-listing-table {
   --bs-table-bg: transparent;
+  --bs-table-striped-bg: var(--atelier-surface);
+  --bs-table-striped-color: var(--atelier-fg);
   --bs-table-hover-bg: var(--atelier-surface);
+  --bs-table-hover-color: var(--atelier-fg);
   width: 100%;
   border-top: 0;
   border-bottom: 0;
@@ -966,9 +952,7 @@ table.quarto-listing-table {
   > :not(caption) > * > * {
     padding: 0.55rem 0.75rem;
     border-bottom: 1px solid var(--atelier-border);
-    background-color: transparent;
     color: var(--atelier-fg);
-    box-shadow: none;
   }
 
   > thead {
@@ -1031,6 +1015,8 @@ table.quarto-listing-table th a.sort {
 // Quarto draws the sort arrow as a background image, and an image does not
 // take `currentColor`, so the arrow stays black. Draw it as a mask over the
 // muted ink instead, in both colour schemes.
+// Upstream: none filed (WCAG 1.4.11)
+// Remove when: Quarto draws the sort arrow from the current colour.
 table.quarto-listing-table th a.sort:is(.asc, .desc)::after {
   background-color: var(--atelier-muted);
   background-image: none;
@@ -1067,6 +1053,7 @@ html table.quarto-listing-table a {
 
   .quarto-appendix-heading {
     margin: 1rem 0 0.35rem;
+    // Quarto sets the size to 1em with !important.
     font-size: 0.74rem !important;
     font-weight: 650;
     letter-spacing: 0.08em;
