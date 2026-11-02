@@ -61,12 +61,14 @@ contributes:
           - html/theme.scss
           - html/navigation.scss
           - html/content.scss
+          - html/pages.scss
         dark:
           - html/chrome.scss
           - brand
           - html/theme.scss
           - html/navigation.scss
           - html/content.scss
+          - html/pages.scss
       syntax-highlighting:
         light: arrow-light
         dark: arrow-dark
