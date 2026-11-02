@@ -373,6 +373,26 @@ $input-group-addon-bg: $atelier-surface-strong !default;
 $input-group-addon-color: $atelier-text-muted !default;
 $input-group-addon-border-color: $atelier-control-border !default;
 
+// Bootstrap fills pagination boxes on hover, focus, and when disabled with
+// fixed light greys, and draws their edges from `$border-color`, which the
+// listing layer sets to a grey. In the dark scheme the light ink then sits on
+// a near-white box. The boxes stay on the page, with the control border, and
+// the current box is filled with the accent.
+$pagination-color: $atelier-chrome-page-fg !default;
+$pagination-bg: $atelier-chrome-page-bg !default;
+$pagination-border-color: $atelier-control-border !default;
+$pagination-hover-color: $atelier-accent-ink !default;
+$pagination-hover-bg: $atelier-chrome-page-bg !default;
+$pagination-hover-border-color: $atelier-accent-mark !default;
+$pagination-focus-color: $atelier-accent-ink !default;
+$pagination-focus-bg: $atelier-chrome-page-bg !default;
+$pagination-active-color: $atelier-on-accent !default;
+$pagination-active-bg: $atelier-accent-fill !default;
+$pagination-active-border-color: $atelier-accent-fill !default;
+$pagination-disabled-color: $atelier-text-muted !default;
+$pagination-disabled-bg: $atelier-chrome-page-bg !default;
+$pagination-disabled-border-color: $atelier-control-border !default;
+
 // A hairline between two surfaces, which is what the bar edges and the section
 // dividers want.
 $atelier-chrome-border: rgba($atelier-chrome-fg, 0.2) !default;

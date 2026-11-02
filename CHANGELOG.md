@@ -32,7 +32,7 @@
 - fix: Report an unreadable search options block in the console instead of hiding it.
 - fix: Paint heading rules, form controls, and the remaining Bootstrap greys from the brand.
 - fix: Give the listing filter and sort controls visible labels, and mark the current page and the active category for screen readers.
-- fix: Paint the listing filter icon from the brand, so that it stays visible in dark mode.
+- fix: Paint the listing filter icon and the listing pagination from the brand, so that they stay readable in dark mode.
 
 ## 0.11.0 (2026-10-29)
 

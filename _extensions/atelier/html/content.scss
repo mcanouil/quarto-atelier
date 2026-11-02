@@ -702,25 +702,10 @@ div.quarto-post .listing-categories {
   }
 }
 
-// Pagination boxes are 32 px with the control border, and the current page is
-// filled with the accent. Quarto sets the current link colour with a stronger
-// selector, which the second rule matches.
+// Pagination boxes are 32 px, and the current page is set in a heavier
+// weight. The colours come from the `$pagination-*` defaults in `chrome.scss`.
 .quarto-listing ul.pagination {
   gap: 0.3rem;
-  --bs-pagination-color: var(--atelier-fg);
-  --bs-pagination-bg: var(--atelier-bg);
-  --bs-pagination-border-color: var(--atelier-control-border);
-  --bs-pagination-hover-color: var(--atelier-accent-ink);
-  --bs-pagination-hover-bg: var(--atelier-bg);
-  --bs-pagination-hover-border-color: var(--atelier-accent-mark);
-  --bs-pagination-focus-color: var(--atelier-accent-ink);
-  --bs-pagination-focus-bg: var(--atelier-bg);
-  --bs-pagination-active-color: var(--atelier-on-accent);
-  --bs-pagination-active-bg: var(--atelier-accent-fill);
-  --bs-pagination-active-border-color: var(--atelier-accent-fill);
-  --bs-pagination-disabled-color: var(--atelier-muted);
-  --bs-pagination-disabled-bg: var(--atelier-bg);
-  --bs-pagination-disabled-border-color: var(--atelier-control-border);
 
   li {
     padding-right: 0;
@@ -736,11 +721,10 @@ div.quarto-post .listing-categories {
     border-radius: $border-radius-sm;
     font-size: 0.85rem;
   }
-}
 
-.quarto-listing ul.pagination li.active .page-link {
-  color: var(--atelier-on-accent);
-  font-weight: 650;
+  li.active .page-link {
+    font-weight: 650;
+  }
 }
 
 // Quarto removes the underline from every link in a table listing, including
