@@ -525,6 +525,58 @@ html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
   background-position-x: calc(#{$_atelier-number-shift} - #{$code-block-bg-padding});
 }
 
+// Code annotations. Quarto draws the active marker and the line band from one
+// fixed grey (#aaaaaa), which is 2.32:1 with the marker text and does not follow
+// the theme. The markers take the accent fill with its readable text, in the
+// list below the block and in the code, and the band takes the accent-soft
+// tint with the same inset marker as a highlighted line.
+// Upstream: none filed (WCAG 1.4.3)
+// Remove when: Quarto derives the annotation colours from the theme.
+dl.code-annotation-container-grid {
+  gap: 0.55rem;
+}
+
+dl.code-annotation-container-grid dt,
+dl.code-annotation-container-grid dd {
+  margin: 0;
+}
+
+dl.code-annotation-container-grid dt,
+html code.sourceCode .code-annotation-anchor {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--atelier-accent-fill);
+  color: var(--atelier-on-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+html code.sourceCode .code-annotation-anchor {
+  margin-top: 0;
+  padding: 0;
+}
+
+html code.sourceCode .code-annotation-anchor.code-annotation-active,
+dl.code-annotation-container-grid dt[data-target-cell].code-annotation-active {
+  border: none;
+  background-color: var(--atelier-accent-fill);
+  color: var(--atelier-on-accent);
+}
+
+html #code-annotation-line-highlight,
+html #code-annotation-line-highlight-gutter {
+  border: none;
+  background-color: var(--atelier-accent-soft);
+  color: var(--atelier-code-ink);
+}
+
+html #code-annotation-line-highlight {
+  box-shadow: inset 3px 0 0 var(--atelier-code-accent-mark);
+}
+
 // Bootstrap shades the shaded screen columns with a fixed light grey, which
 // stays pale in the dark scheme. Paint them from the surface token.
 .page-columns :is(.column-screen-inset-shaded, .column-screen-left-shaded, .column-screen-right-shaded) {

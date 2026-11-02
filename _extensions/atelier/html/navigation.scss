@@ -568,3 +568,228 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     }
   }
 }
+
+// ===========================================================================
+// POPUPS AND SEARCH
+// ===========================================================================
+// Cross-reference and footnote popups, the code tools menu, every dropdown in
+// the page body, and the search panel share one surface: the page background
+// on a control border, with a soft shadow. Bootstrap tooltips keep the navbar
+// tokens, since every control they are bound to sits on the navbar.
+.tooltip {
+  --bs-tooltip-bg: var(--atelier-navbar-bg);
+  --bs-tooltip-color: var(--atelier-navbar-fg);
+  --bs-tooltip-opacity: 1;
+  --bs-tooltip-border-radius: #{$border-radius-sm};
+}
+
+.tooltip .tooltip-inner {
+  border: 1px solid var(--atelier-navbar-accent);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.tippy-box[data-theme~="atelier"] {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.tippy-box[data-theme~="atelier"] .tippy-content {
+  padding: 0.2rem 0.55rem;
+}
+
+.tippy-box:is([data-theme~="quarto"], [data-theme~="atelier"]),
+main .dropdown-menu {
+  border: 1px solid var(--atelier-control-border);
+  border-radius: $border-radius;
+  background-color: var(--atelier-bg);
+  box-shadow: 0 14px 30px -16px var(--atelier-shadow);
+  color: var(--atelier-fg);
+}
+
+.tippy-box[data-theme~="quarto"] > .tippy-backdrop {
+  background-color: var(--atelier-bg);
+}
+
+// Quarto draws each arrow from two triangles, a fill in the page background and
+// an outline in the border colour, both baked in as Sass values. Paint them from
+// the tokens, so the arrow follows the box.
+@each $side in top, bottom, left, right {
+  .tippy-box[data-theme~="quarto"][data-placement^="#{$side}"] > .tippy-arrow::before {
+    border-#{$side}-color: var(--atelier-bg);
+  }
+
+  .tippy-box[data-theme~="quarto"][data-placement^="#{$side}"] > .tippy-arrow::after {
+    border-#{$side}-color: var(--atelier-control-border);
+  }
+}
+
+.tippy-box[data-theme~="atelier"] > .tippy-arrow {
+  color: var(--atelier-bg);
+}
+
+main .dropdown-menu {
+  padding: 0.35rem;
+  font-size: 0.86rem;
+}
+
+main .dropdown-menu .dropdown-header {
+  color: var(--atelier-muted);
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+main .dropdown-menu .dropdown-divider {
+  border-top-color: var(--atelier-border);
+}
+
+main .dropdown-menu .dropdown-item {
+  padding: 0.38rem 0.55rem;
+  border-radius: $border-radius-sm;
+  color: var(--atelier-fg);
+  font-size: 0.86rem;
+}
+
+main .dropdown-menu .dropdown-item:is(:hover, :focus, :active, .active) {
+  background-color: var(--atelier-accent-soft);
+  color: var(--atelier-accent-ink);
+}
+
+// Quarto bakes the code tools icon into a data URI with a fixed fill, and again
+// for the hover and the banner. Draw it as a mask over the text colour, from
+// the same icon, so the button and the icon follow one token.
+$atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294l4-13zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/></svg>');
+
+.code-tools-button {
+  color: var(--atelier-muted);
+}
+
+.code-tools-button:hover {
+  color: var(--atelier-fg);
+}
+
+.code-tools-button > .bi::before,
+.code-tools-button:hover > .bi::before,
+.quarto-title-banner .code-tools-button > .bi::before,
+.quarto-title-banner .code-tools-button:hover > .bi::before {
+  background-color: currentcolor;
+  background-image: none;
+  mask-image: $atelier-icon-code;
+  mask-repeat: no-repeat;
+  mask-size: 1rem 1rem;
+}
+
+// Search. The panel of the sidebar field and the modal of the overlay button
+// take the shared surface with the large radius and a deeper shadow; the modal
+// is full width on a narrow screen, where it keeps square corners.
+#quarto-search-results .aa-Panel,
+.aa-DetachedContainer {
+  border: 1px solid var(--atelier-control-border);
+  background-color: var(--atelier-bg);
+  box-shadow: 0 18px 40px -20px var(--atelier-shadow);
+  color: var(--atelier-fg);
+}
+
+#quarto-search-results .aa-Panel,
+.aa-DetachedContainer--modal {
+  border-radius: $border-radius-lg;
+}
+
+.aa-DetachedOverlay {
+  background-color: var(--atelier-overlay);
+}
+
+.aa-DetachedContainer .aa-Panel,
+.aa-DetachedFormContainer {
+  background-color: var(--atelier-bg);
+}
+
+.aa-DetachedFormContainer {
+  border-bottom-color: var(--atelier-border);
+}
+
+.aa-DetachedFormContainer .aa-Form {
+  border-color: var(--atelier-control-border);
+  background-color: var(--atelier-bg);
+  color: var(--atelier-fg);
+}
+
+:is(.aa-DetachedOverlay, #quarto-search-results) .aa-SourceHeader .search-result-header {
+  background-color: var(--atelier-surface);
+  color: var(--atelier-fg);
+}
+
+// Quarto fades the field icons, the placeholder, and the clear and copy buttons
+// with opacity, which leaves their text under 4.5:1. Use the muted text colour
+// at full strength instead.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15189
+// Remove when: the minimum Quarto version includes the fix.
+:is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapper .aa-Input::placeholder {
+  color: var(--atelier-muted);
+  opacity: 1;
+}
+
+:is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperPrefix :is(.aa-Label, .aa-LoadingIndicator) svg {
+  color: var(--atelier-muted);
+  opacity: 1;
+}
+
+:is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperPrefix .aa-SubmitButton,
+:is(.aa-Autocomplete, .aa-DetachedFormContainer) .aa-Form .aa-InputWrapperSuffix :is(.aa-ClearButton, .aa-CopyButton),
+.aa-DetachedCancelButton {
+  color: var(--atelier-muted);
+  opacity: 1;
+}
+
+// The selected result takes the accent-soft tint with the inset marker of a
+// highlighted code line. Quarto fills the result inside the item with the
+// primary colour and white text, which covers an inset shadow on the item, so
+// the result is cleared and the item carries both.
+:is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected="true"] {
+  background-color: var(--atelier-accent-soft);
+  box-shadow: inset 3px 0 0 var(--atelier-accent-mark);
+}
+
+:is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected] :is(
+    .search-item,
+    .search-item.search-result-more,
+    .search-item .search-result-section,
+    .search-item .search-result-text,
+    .search-item .search-result-title-container,
+    .search-item .search-result-text-container
+  ) {
+  color: var(--atelier-fg);
+}
+
+:is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected="true"] :is(
+    .search-item,
+    .search-item.search-result-more,
+    .search-item .search-result-section,
+    .search-item .search-result-text,
+    .search-item .search-result-title-container,
+    .search-item .search-result-text-container
+  ) {
+  background-color: transparent;
+}
+
+:is(.aa-DetachedOverlay, #quarto-search-results) li.aa-Item[aria-selected] .search-item mark.search-match {
+  background-color: var(--atelier-accent-soft);
+  color: var(--atelier-accent-ink);
+  font-weight: 650;
+}
+
+// Quarto leaves the search button and its icon box in a fixed white, which
+// neither bar uses; the glyph and the label draw their own colour. Give the
+// button the ink of the bar it sits on.
+.navbar #quarto-search .aa-DetachedSearchButton,
+.navbar #quarto-search .aa-DetachedSearchButtonIcon {
+  color: var(--atelier-navbar-fg);
+}
+
+.sidebar-navigation #quarto-search .aa-DetachedSearchButton,
+.sidebar-navigation #quarto-search .aa-DetachedSearchButtonIcon {
+  color: var(--atelier-sidebar-fg);
+}

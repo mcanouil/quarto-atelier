@@ -23,6 +23,7 @@
 - feat: Restyle the default listing, its categories, its filter and sort controls, and its pagination from the brand.
 - feat: Restyle grid listing cards with an accent border and a small lift on hover or keyboard focus, and give listing tables and tables in the text one style.
 - feat: Put the title banner on the chrome surface with its breadcrumbs, and restyle figure captions, keyboard keys, margin notes, and shaded columns from the brand.
+- feat: Restyle cross-reference and footnote popups, the code tools menu, and the search results on one surface from the brand.
 
 ### Bug Fixes
 
@@ -39,6 +40,7 @@
 - fix: Let the keyboard reach the sort headers of a table listing, and announce the sorted column.
 - fix: Mark the current page in the breadcrumbs for screen readers, and hold the breadcrumb links to 4.5:1 in the title banner.
 - fix: Hide the empty metadata strip of a title block, and leave it out of the page landmarks.
+- fix: Draw code annotation markers on the accent with readable text, in place of Quarto's fixed grey.
 
 ## 0.11.0 (2026-10-29)
 

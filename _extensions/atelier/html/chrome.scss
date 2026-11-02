@@ -392,6 +392,10 @@ $pagination-disabled-color: $atelier-text-muted !default;
 $pagination-disabled-bg: $atelier-chrome-page-bg !default;
 $pagination-disabled-border-color: $atelier-control-border !default;
 
+// Quarto's annotation markers and line band, which it spells "higlight".
+$code-annotation-higlight-color: $atelier-accent-fill !default;
+$code-annotation-higlight-bg: $atelier-accent-soft !default;
+
 // The title banner sits on the chrome surface unless a page sets its own
 // colours, which Quarto writes into the page and which win over these.
 $title-banner-bg: $atelier-chrome-bg !default;

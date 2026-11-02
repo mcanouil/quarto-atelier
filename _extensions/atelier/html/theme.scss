@@ -163,7 +163,7 @@ $atelier-focus-ring-width: 2px !default;
 // Fixed upstream in Quarto 1.11.7: https://github.com/quarto-dev/quarto-cli/pull/15163
 // Remove when: the minimum Quarto version is 1.11.7 or later, and
 // `--quarto-focus-ring-shadow: none` below is removed with the list.
-$atelier-focus-controls: ".btn:focus-visible, .btn-close:focus-visible, .nav-link:focus-visible, .navbar-brand:focus-visible, .navbar-toggler:focus-visible, .dropdown-item:focus-visible, .form-control:focus-visible, .form-select:focus-visible, .aa-Autocomplete .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-DetachedSearchButton:focus-visible, .sidebar-item .sidebar-item-toggle:focus-visible, .sidebar-item button.sidebar-item-text:focus-visible, .quarto-navigation-tool:focus-visible, .code-copy-button:focus-visible, .quarto-color-scheme-toggle:focus-visible, .pagination .page-item .page-link:focus-visible, table.quarto-listing-table th a.sort:focus-visible, .quarto-grid-link:focus-visible";
+$atelier-focus-controls: ".btn:focus-visible, .btn-close:focus-visible, .nav-link:focus-visible, .navbar-brand:focus-visible, .navbar-toggler:focus-visible, .dropdown-item:focus-visible, .form-control:focus-visible, .form-select:focus-visible, .aa-Autocomplete .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input:focus-visible, .aa-Form:has(.aa-Input:focus-visible), .aa-DetachedSearchButton:focus-visible, .sidebar-item .sidebar-item-toggle:focus-visible, .sidebar-item button.sidebar-item-text:focus-visible, .quarto-navigation-tool:focus-visible, .code-copy-button:focus-visible, .quarto-color-scheme-toggle:focus-visible, .pagination .page-item .page-link:focus-visible, table.quarto-listing-table th a.sort:focus-visible, .quarto-grid-link:focus-visible";
 
 :focus-visible,
 #{$atelier-focus-controls} {
@@ -1565,40 +1565,6 @@ body .navbar .gitlink-widget-dropdown {
 .atelier-404 .atelier-404-home:focus-visible {
   background: var(--atelier-accent-soft);
   text-decoration: underline;
-}
-
-// ===========================================================================
-// TOOLTIPS
-// ===========================================================================
-// Bootstrap tooltips plus the tippy theme used by navbar-tooltips.html; both
-// take the navbar tokens, since every control they are bound to sits on the
-// navbar.
-.tooltip {
-  --bs-tooltip-bg: var(--atelier-navbar-bg);
-  --bs-tooltip-color: var(--atelier-navbar-fg);
-  --bs-tooltip-opacity: 1;
-  --bs-tooltip-border-radius: #{$border-radius-sm};
-}
-
-.tooltip .tooltip-inner {
-  border: 1px solid var(--atelier-navbar-accent);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.tippy-box[data-theme~="atelier"] {
-  background-color: var(--atelier-navbar-bg);
-  color: var(--atelier-navbar-fg);
-  border: 1px solid var(--atelier-navbar-accent);
-  border-radius: $border-radius-sm;
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.tippy-box[data-theme~="atelier"] .tippy-content {
-  padding: 0.2rem 0.55rem;
 }
 
 // ===========================================================================
