@@ -43,6 +43,32 @@
 			link.setAttribute("aria-current", target === here ? "page" : "true");
 		});
 
+		// Quarto marks the current page in the breadcrumbs by class only, so the
+		// last crumb, a link or a span, gets aria-current when it has none.
+		// Upstream: none filed (WCAG 4.1.2)
+		// Remove when: Quarto marks the current breadcrumb.
+		document.querySelectorAll(".breadcrumb").forEach(function (list) {
+			var last = list.querySelector(".breadcrumb-item:last-child");
+			if (!last) return;
+			var target = last.querySelector("a") || last;
+			if (!target.hasAttribute("aria-current")) target.setAttribute("aria-current", "page");
+		});
+
+		// Quarto writes a caption label as plain text ("Figure 1: ..."), so the
+		// text up to the first colon is wrapped to give the label its own style.
+		// Not SCSS: CSS cannot select a part of a text node.
+		document.querySelectorAll("figcaption").forEach(function (caption) {
+			var first = caption.firstChild;
+			if (!first || first.nodeType !== Node.TEXT_NODE || caption.querySelector(".atelier-caption-label")) return;
+			var match = /^(\s*[^:]{1,40}:)/.exec(first.textContent);
+			if (!match) return;
+			var label = document.createElement("span");
+			label.className = "atelier-caption-label";
+			label.textContent = match[1];
+			first.textContent = first.textContent.slice(match[1].length);
+			caption.insertBefore(label, first);
+		});
+
 		// With a search field in the sidebar header, the tools follow the field
 		// instead of sitting under the title. The field sits in a wrapper, so the
 		// tools become the wrapper's next sibling.

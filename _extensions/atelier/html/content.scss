@@ -319,6 +319,16 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     border-top: 1px solid var(--atelier-border);
     border-bottom: 1px solid var(--atelier-border);
 
+    // Quarto writes blank lines between the conditionals of the metadata block,
+    // so a page with no author, date or other metadata still gets a
+    // <div class="quarto-title-meta"> that holds only whitespace. `:empty` does
+    // not match it, but `:has(*)` can tell that it has no element inside.
+    // Upstream: https://github.com/quarto-dev/quarto-cli/issues/13537
+    // Remove when: the minimum Quarto version includes the fix.
+    &:not(:has(*)) {
+      display: none;
+    }
+
     // On a narrow screen the items stack, so a divider would only end a line.
     > div {
       @media (min-width: 640px) {
@@ -358,8 +368,8 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
   }
 
   // Quarto fades a category badge with opacity 0.6, which puts its text below AA
-  // (4.34:1 in light mode). Fade the border by its colour and keep the text at
-  // full strength.
+  // (4.34:1 in light mode). Keep the text at full strength and draw the border
+  // from the control border token.
   // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15167
   // Remove when: the minimum Quarto version includes the fix.
   .quarto-categories {
@@ -372,7 +382,7 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
       padding: 0.15rem 0.6rem;
       font-size: 0.76rem;
       text-transform: none;
-      border: 1px solid color-mix(in srgb, currentcolor 60%, transparent);
+      border: 1px solid var(--atelier-control-border);
       border-radius: 999px;
     }
   }
@@ -515,10 +525,95 @@ html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
   background-position-x: calc(#{$_atelier-number-shift} - #{$code-block-bg-padding});
 }
 
-// Bootstrap shades `.column-screen-inset-shaded` with a fixed light grey, which
-// stays pale in the dark scheme. Paint it from the surface token.
-.page-columns .column-screen-inset-shaded {
+// Bootstrap shades the shaded screen columns with a fixed light grey, which
+// stays pale in the dark scheme. Paint them from the surface token.
+.page-columns :is(.column-screen-inset-shaded, .column-screen-left-shaded, .column-screen-right-shaded) {
   background-color: var(--atelier-surface);
+}
+
+// ===========================================================================
+// BANNER
+// ===========================================================================
+// Quarto paints the banner and its text from $title-banner-bg and
+// $title-banner-color, which default to the chrome surface here. A page that
+// sets its own colours writes them into the page, so the rules below never set
+// a banner colour. The crumbs take the banner text at full strength, since
+// fading them is what leaves a custom colour under 4.5:1.
+.quarto-title-banner {
+  border-bottom: 1px solid var(--atelier-navbar-border);
+  padding-inline: 1.6rem;
+
+  .quarto-title-breadcrumbs {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+
+    .breadcrumb {
+      margin: 0;
+    }
+
+    .breadcrumb-item,
+    .breadcrumb-item::before,
+    .breadcrumb-item a {
+      color: currentcolor;
+      opacity: 1;
+    }
+
+    .breadcrumb-item a:hover {
+      color: currentcolor;
+      text-decoration-thickness: 2px;
+    }
+
+    .breadcrumb-item:last-child {
+      font-weight: 650;
+    }
+  }
+
+  .title {
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    margin-bottom: 0;
+  }
+}
+
+// A chip on the banner takes the bar's boundary, as the title block rules above
+// use the id of the header, so this selector repeats it.
+#{$_atelier-title-block} .quarto-title-banner .quarto-category {
+  border-color: var(--atelier-navbar-control-border);
+}
+
+// ===========================================================================
+// FIGURES, KEYS AND MARGIN CONTENT
+// ===========================================================================
+figcaption,
+.figure-caption {
+  color: var(--atelier-muted);
+  font-size: 0.84rem;
+
+  .atelier-caption-label {
+    color: var(--atelier-fg);
+    font-weight: 700;
+  }
+}
+
+// The kbd shortcode paints `.kbd` with a fixed grey, so the class is named too.
+kbd,
+kbd.kbd {
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--atelier-control-border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--atelier-surface);
+  color: var(--atelier-fg);
+  font-size: 0.78rem;
+}
+
+.column-margin {
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--atelier-border);
+  color: var(--atelier-muted);
+  font-size: 0.8rem;
 }
 
 // ===========================================================================

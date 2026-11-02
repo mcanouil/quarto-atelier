@@ -272,20 +272,6 @@ h6 {
 }
 
 // ===========================================================================
-// TITLE BLOCK
-// ===========================================================================
-// Quarto writes blank lines between the conditionals of the metadata block, so
-// a page with no author, date or other metadata still gets a
-// <div class="quarto-title-meta"> that holds only whitespace. `:empty` does not
-// match it, but `:has(*)` can tell that it has no element inside. The selector
-// repeats Quarto's own, whose id would otherwise win over it.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13537
-// Remove when: the minimum Quarto version includes the fix.
-#title-block-header.quarto-title-block.default .quarto-title-meta:not(:has(*)) {
-  display: none;
-}
-
-// ===========================================================================
 // FRAMED EMBEDS
 // ===========================================================================
 // The one class in this file an author opts into by typing it, rather than a

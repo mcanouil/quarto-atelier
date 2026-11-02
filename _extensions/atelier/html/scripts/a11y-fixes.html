@@ -262,7 +262,10 @@
 			if (inToggleClone(el)) return;
 			labelOnce(el, "complementary", "Listing filters");
 		});
-		document.querySelectorAll(".quarto-title-meta").forEach((el) => labelOnce(el, "region", "Page metadata"));
+		// An empty strip (Quarto writes it with whitespace only) is hidden by SCSS and has no landmark.
+		document.querySelectorAll(".quarto-title-meta").forEach((el) => {
+			if (el.firstElementChild) labelOnce(el, "region", "Page metadata");
+		});
 
 		// Listing categories: Quarto emits <div> elements with a click handler, so
 		// Tab never reaches them and a screen reader does not call them controls.
