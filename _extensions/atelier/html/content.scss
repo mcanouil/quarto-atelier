@@ -617,6 +617,12 @@ html #code-annotation-line-highlight {
     .breadcrumb-item:last-child {
       font-weight: 650;
     }
+
+    // Quarto mutes the last crumb with a rule on `li:last-of-type a`.
+    .breadcrumb li:last-of-type a {
+      color: currentcolor;
+      font-weight: inherit;
+    }
   }
 
   .title {
