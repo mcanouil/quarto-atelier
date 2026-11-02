@@ -965,6 +965,12 @@ footer.footer .nav-footer {
     }
   }
 
+  // A link inside a line of text differs from the text by less than 3:1, so
+  // the underline is what marks it.
+  p a {
+    text-decoration: underline;
+  }
+
   // Repository actions outside the card show as muted links that take the
   // foreground when pointed at.
   .toc-actions a.toc-action {
