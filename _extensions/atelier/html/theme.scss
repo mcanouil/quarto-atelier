@@ -220,7 +220,7 @@ button:focus-visible,
   background-color: var(--atelier-navbar-accent);
   color: var(--atelier-navbar-bg);
   font-weight: 600;
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
+  box-shadow: 0 6px 20px var(--atelier-shadow);
 }
 
 // Quarto 1.11 writes its own skip link as the first element of the page, so
