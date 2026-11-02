@@ -54,13 +54,15 @@
 			if (!target.hasAttribute("aria-current")) target.setAttribute("aria-current", "page");
 		});
 
-		// Quarto writes a caption label as plain text ("Figure 1: ..."), so the
-		// text up to the first colon is wrapped to give the label its own style.
+		// Quarto writes the label of a numbered, cross-referenced float as plain
+		// text ("Figure 1: ..."), so the text up to the first colon is wrapped to
+		// give the label its own style. A caption that is not a numbered float
+		// is left alone, because its words before a colon are not a label.
 		// Not SCSS: CSS cannot select a part of a text node.
-		document.querySelectorAll("figcaption").forEach(function (caption) {
+		document.querySelectorAll(".quarto-float figcaption").forEach(function (caption) {
 			var first = caption.firstChild;
 			if (!first || first.nodeType !== Node.TEXT_NODE || caption.querySelector(".atelier-caption-label")) return;
-			var match = /^(\s*[^:]{1,40}:)/.exec(first.textContent);
+			var match = /^(\s*[^:\d]{1,30}\d[\d.]*:)/.exec(first.textContent);
 			if (!match) return;
 			var label = document.createElement("span");
 			label.className = "atelier-caption-label";

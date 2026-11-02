@@ -541,7 +541,6 @@ html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
 // fading them is what leaves a custom colour under 4.5:1.
 .quarto-title-banner {
   border-bottom: 1px solid var(--atelier-navbar-border);
-  padding-inline: 1.6rem;
 
   .quarto-title-breadcrumbs {
     margin: 0 0 0.5rem;
@@ -577,8 +576,8 @@ html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
   }
 }
 
-// A chip on the banner takes the bar's boundary, as the title block rules above
-// use the id of the header, so this selector repeats it.
+// The title block rules above use the id of the header, so this selector
+// repeats it to give a chip on the banner the border of the bar.
 #{$_atelier-title-block} .quarto-title-banner .quarto-category {
   border-color: var(--atelier-navbar-control-border);
 }
@@ -587,7 +586,8 @@ html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
 // FIGURES, KEYS AND MARGIN CONTENT
 // ===========================================================================
 figcaption,
-.figure-caption {
+.figure-caption,
+.column-margin figcaption {
   color: var(--atelier-muted);
   font-size: 0.84rem;
 
@@ -610,10 +610,14 @@ kbd.kbd {
 }
 
 .column-margin {
-  padding-left: 0.7rem;
-  border-left: 2px solid var(--atelier-border);
   color: var(--atelier-muted);
   font-size: 0.8rem;
+}
+
+// A note gets the rule; a figure or table in the margin does not.
+.column-margin:not(:has(figure, .quarto-float)) {
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--atelier-border);
 }
 
 // ===========================================================================
