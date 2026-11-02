@@ -47,7 +47,7 @@
 		// last crumb, a link or a span, gets aria-current when it has none.
 		// Upstream: none filed (WCAG 4.1.2)
 		// Remove when: Quarto marks the current breadcrumb.
-		document.querySelectorAll(".breadcrumb").forEach(function (list) {
+		document.querySelectorAll(".quarto-page-breadcrumbs .breadcrumb, .quarto-title-breadcrumbs .breadcrumb").forEach(function (list) {
 			var last = list.querySelector(".breadcrumb-item:last-child");
 			if (!last) return;
 			var target = last.querySelector("a") || last;

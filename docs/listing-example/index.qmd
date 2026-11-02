@@ -27,7 +27,7 @@ listing:
 This page shows how Atelier styles each listing type.
 It has a table listing and a default listing.
 The default listing has a filter box and a sort menu.
-The grid listing has categories.
+Both the default listing and the grid listing have categories.
 
 ## Table listing
 

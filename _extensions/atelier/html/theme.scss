@@ -1040,6 +1040,19 @@ html .panel-tabset > .tab-content {
 // other two bars. What is left here is the treatment Quarto has no variable
 // for, plus the handful of colours it bakes past those two.
 //
+// The crumbs in the secondary navigation bar are muted as they are on the page,
+// from the sidebar token because the bar sits on the sidebar surface, docked or
+// floating, and can be pinned to another scheme than the page.
+.quarto-secondary-nav nav.quarto-page-breadcrumbs,
+.quarto-secondary-nav nav.quarto-page-breadcrumbs a,
+.quarto-secondary-nav nav.quarto-page-breadcrumbs .breadcrumb-item::before {
+  color: var(--atelier-sidebar-muted);
+}
+
+.quarto-secondary-nav nav.quarto-page-breadcrumbs a:hover {
+  color: var(--atelier-sidebar-accent);
+}
+
 // Everything below is scoped to `body.docked`, the class Quarto adds when the
 // sidebar style is `docked`, which is also what raises these rules over the
 // Quarto rules they replace; only the sidebar edge, which Quarto draws with
@@ -1202,21 +1215,9 @@ body.docked {
     color: var(--atelier-sidebar-fg);
   }
 
-  // The crumbs are muted on this bar as they are on the page, from the bar's
-  // own token because the bar can be pinned to another scheme than the page.
-  .quarto-secondary-nav .quarto-page-breadcrumbs,
-  .quarto-secondary-nav .quarto-page-breadcrumbs a {
-    color: var(--atelier-sidebar-muted);
-  }
-
   .quarto-secondary-nav .quarto-btn-toggle:hover,
-  .quarto-secondary-nav .quarto-search-button:hover,
-  .quarto-secondary-nav .quarto-page-breadcrumbs a:hover {
+  .quarto-secondary-nav .quarto-search-button:hover {
     color: var(--atelier-sidebar-accent);
-  }
-
-  .quarto-secondary-nav .breadcrumb-item::before {
-    color: var(--atelier-sidebar-muted);
   }
 
   // The page focus ring is the page accent ink, which is held to the page and

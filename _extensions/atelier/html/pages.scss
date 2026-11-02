@@ -1,15 +1,15 @@
 /*-- scss:rules --*/
 
-// Quarto lightens the about link colour by 20% with no contrast check, so the
-// link falls below 4.5:1 on some brands.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14605
-// Remove when: Quarto keeps the about link colour at 4.5:1 on the page surface.
+// Quarto lightens the about link colour by 20% of the body colour. That passes
+// with its own colours, but the link takes the muted ink here, so it follows the
+// brand and the colour scheme, and the border and hover state match the other
+// controls.
 // The selectors match the strength of Quarto's own, and this file comes last.
 div[class*="quarto-about-"] {
   .about-links .about-link {
     color: var(--atelier-muted);
     border: 1px solid var(--atelier-control-border);
-    border-radius: 4px;
+    border-radius: var(--bs-border-radius-sm);
     min-height: 24px;
 
     &:hover,

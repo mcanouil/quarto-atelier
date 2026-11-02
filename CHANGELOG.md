@@ -25,7 +25,7 @@
 - feat: Put the title banner on the chrome surface with its breadcrumbs, and restyle figure captions, keyboard keys, margin notes, and shaded columns from the brand.
 - feat: Restyle cross-reference and footnote popups, the code tools menu, and the search results on one surface from the brand.
 - feat: Restyle the appendix as labelled groups with the BibTeX entry in a code block, lay the footer out in three aligned columns, and restyle notebook links and the reader toggle from the brand.
-- feat: Restyle the floating sidebar, the narrow-screen sidebar toggle and backdrop, and the lightbox overlay from the brand, and show SVG images at full size in the lightbox.
+- feat: Restyle the floating sidebar, the narrow-screen sidebar toggle and backdrop, and the lightbox overlay from the brand, and fit SVG images to the screen in the lightbox.
 - feat: Restyle the five about page templates from the brand, with link buttons held to 4.5:1.
 
 ### Bug Fixes
@@ -38,10 +38,10 @@
 - fix: Report an unreadable search options block in the console instead of hiding it.
 - fix: Paint heading rules, form controls, and the remaining Bootstrap greys from the brand.
 - fix: Give the listing filter and sort controls visible labels, and mark the current page and the active category for screen readers.
-- fix: Paint the listing filter icon and the listing pagination from the brand, so that they stay readable in dark mode.
+- fix: Paint the listing filter icon from the brand, so that it stays readable in dark mode.
   A site with a listing keeps the brand border colour instead of a Bootstrap grey.
 - fix: Let the keyboard reach the sort headers of a table listing, and announce the sorted column.
-- fix: Mark the current page in the breadcrumbs for screen readers, and hold the breadcrumb links to 4.5:1 in the title banner.
+- fix: Mark the current page in the breadcrumbs for screen readers.
 - fix: Hide the empty metadata strip of a title block, and leave it out of the page landmarks.
 - fix: Draw code annotation markers on the accent with readable text, in place of Quarto's fixed grey.
 
