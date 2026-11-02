@@ -21,6 +21,7 @@
 - feat: Restyle the announcement bar with a faint tint of its type that follows the colour scheme, an upper-case type label, and a rule below.
   The `atelier-announcement-*` language keys set the label text. (#76)
 - feat: Restyle the default listing, its categories, its filter and sort controls, and its pagination from the brand.
+- feat: Restyle grid listing cards with an accent border and a small lift on hover or keyboard focus, and give listing tables and tables in the text one style.
 
 ### Bug Fixes
 
@@ -34,6 +35,7 @@
 - fix: Give the listing filter and sort controls visible labels, and mark the current page and the active category for screen readers.
 - fix: Paint the listing filter icon and the listing pagination from the brand, so that they stay readable in dark mode.
   A site with a listing keeps the brand border colour instead of a Bootstrap grey.
+- fix: Let the keyboard reach the sort headers of a table listing, and announce the sorted column.
 
 ## 0.11.0 (2026-10-29)
 

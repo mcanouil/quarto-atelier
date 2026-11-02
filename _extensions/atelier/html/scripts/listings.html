@@ -45,17 +45,53 @@
 			});
 		}
 
+		// Quarto writes a sort header as a link with no href, so the keyboard
+		// cannot reach it, and nothing says which column is sorted. Make the link
+		// a button that answers Enter and Space, and set aria-sort on its cell.
+		// Upstream: none filed (WCAG 2.1.1, 4.1.2)
+		// Remove when: Quarto writes sortable headers as buttons with aria-sort.
+		function sortHeaders(listing) {
+			listing.querySelectorAll("th > a.sort").forEach(function (header) {
+				if (header.getAttribute("role") !== "button") {
+					header.setAttribute("role", "button");
+				}
+				if (!header.hasAttribute("tabindex")) {
+					header.setAttribute("tabindex", "0");
+				}
+				if (!header.dataset.atelierSortKeys) {
+					header.dataset.atelierSortKeys = "true";
+					header.addEventListener("keydown", function (event) {
+						if (event.key === "Enter" || event.key === " ") {
+							event.preventDefault();
+							header.click();
+						}
+					});
+				}
+				var cell = header.parentElement;
+				var direction = null;
+				if (header.classList.contains("sort-asc")) direction = "ascending";
+				if (header.classList.contains("sort-desc")) direction = "descending";
+				if (direction && cell.getAttribute("aria-sort") !== direction) {
+					cell.setAttribute("aria-sort", direction);
+				} else if (!direction && cell.hasAttribute("aria-sort")) {
+					cell.removeAttribute("aria-sort");
+				}
+			});
+		}
+
 		function apply(listing) {
 			var filter = listing.querySelector(".quarto-listing-filter input");
 			var sort = listing.querySelector(".quarto-listing-sort select");
 			labelControl(filter, filter && filter.getAttribute("placeholder"), "filter");
 			labelControl(sort, sort && sort.getAttribute("aria-label"), "sort");
 			markCurrentPage(listing);
+			sortHeaders(listing);
 		}
 
 		// list.js builds the pagination again after each page change, filter, or
-		// sort, so the changes are applied again from an observer. Only the
-		// pagination is watched for class changes, which mark the current page.
+		// sort, so the changes are applied again from an observer. The pagination
+		// and the header row are watched for class changes, which mark the current
+		// page and the sorted column.
 		listings.forEach(function (listing) {
 			apply(listing);
 			var observer = new MutationObserver(function () {
@@ -65,6 +101,10 @@
 			var pagination = listing.querySelector(".pagination");
 			if (pagination) {
 				observer.observe(pagination, { subtree: true, attributes: true, attributeFilter: ["class"] });
+			}
+			var headerRow = listing.querySelector("thead");
+			if (headerRow) {
+				observer.observe(headerRow, { subtree: true, attributes: true, attributeFilter: ["class"] });
 			}
 		});
 	})();

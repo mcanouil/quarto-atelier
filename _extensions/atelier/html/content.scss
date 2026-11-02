@@ -722,6 +722,155 @@ div.quarto-post .listing-categories {
   }
 }
 
+// A grid card is a bordered box on the page. The accent border, the lift, and
+// the shadow show on hover and on keyboard focus of the card link, so the
+// card reads as one target. The lift needs the motion guard.
+.quarto-grid-item.card {
+  overflow: hidden;
+  border: 1px solid var(--atelier-border);
+  border-radius: $border-radius-lg;
+  background: var(--atelier-bg);
+  color: var(--atelier-fg);
+
+  p.card-img-top > img {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .card-body {
+    padding: 0.8rem 0.9rem;
+  }
+
+  .card-title {
+    color: var(--atelier-fg);
+    font-weight: 700;
+  }
+
+  .listing-description,
+  .card-attribution,
+  .listing-date {
+    color: var(--atelier-muted);
+  }
+
+  .card-attribution {
+    padding-top: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+    text-transform: none;
+  }
+}
+
+.quarto-grid-link:is(:hover, :focus-visible) > .quarto-grid-item.card,
+.quarto-grid-item.card:focus-within {
+  border-color: var(--atelier-accent-mark);
+  box-shadow: 0 10px 24px -16px var(--atelier-shadow);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .quarto-grid-item.card {
+    transition: transform 0.15s;
+  }
+
+  .quarto-grid-link:is(:hover, :focus-visible) > .quarto-grid-item.card,
+  .quarto-grid-item.card:focus-within {
+    transform: translateY(-2px);
+  }
+}
+
+// Quarto sets the pills of a grid card with a selector as strong as this one,
+// so the rule repeats it to take the same pills as the default listing.
+.quarto-grid-item .listing-categories .listing-category {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin: 0;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--atelier-control-border);
+  border-radius: 999px;
+  color: var(--atelier-fg);
+  font-size: 0.74rem;
+  text-transform: none;
+}
+
+.quarto-grid-item .listing-categories {
+  gap: 0.35rem;
+}
+
+// ===========================================================================
+// TABLES
+// ===========================================================================
+// One style for the table listing and the tables in the page text: a small
+// upper-case header over a 2 px rule, hairline rows, and a tinted hover row.
+// Tables of a component (code annotations, listings other than the table
+// listing) keep their own rules.
+main table.table,
+table.quarto-listing-table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: var(--atelier-surface);
+  width: 100%;
+  border-top: 0;
+  border-bottom: 0;
+  font-size: 0.88rem;
+
+  > :not(caption) > * > * {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--atelier-border);
+    background-color: transparent;
+    color: var(--atelier-fg);
+    box-shadow: none;
+  }
+
+  > thead {
+    border-bottom: 0;
+  }
+
+  > thead > tr > th {
+    border-bottom: 2px solid var(--atelier-control-border);
+    color: var(--atelier-muted);
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  > thead > tr > th a {
+    color: inherit;
+  }
+
+  > thead > tr > th[aria-sort],
+  > thead > tr > th[aria-sort] a {
+    color: var(--atelier-fg);
+  }
+
+  > tbody > tr:hover > * {
+    background-color: var(--atelier-surface);
+  }
+
+  caption {
+    padding: 0 0 0.5rem;
+    color: var(--atelier-muted);
+    font-size: 0.82rem;
+    text-align: left;
+  }
+}
+
+figure.quarto-float-tbl > figcaption {
+  color: var(--atelier-muted);
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+// The sort header is a link with a button role, so it takes the pointer of a
+// button and keeps a 24 px target.
+table.quarto-listing-table th a.sort {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
 // Quarto removes the underline from every link in a table listing, including
 // links in running text, so colour alone marks them. Underline them again.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15173
