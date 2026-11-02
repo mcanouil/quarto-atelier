@@ -1053,3 +1053,97 @@ table.quarto-listing-table th a.sort.desc::after {
 html table.quarto-listing-table a {
   text-decoration: underline;
 }
+
+// ===========================================================================
+// APPENDIX
+// ===========================================================================
+// The groups of the appendix (references, footnotes, reuse, citation) each get
+// an upper-case muted label over a body in the page foreground, below a
+// hairline.
+#quarto-appendix.default {
+  padding-top: 1rem;
+  font-size: 0.88rem;
+  border-top: 1px solid var(--atelier-border);
+
+  .quarto-appendix-heading {
+    margin: 1rem 0 0.35rem;
+    font-size: 0.74rem !important;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--atelier-muted);
+  }
+
+  section:first-child .quarto-appendix-heading {
+    margin-top: 0;
+  }
+
+  .quarto-appendix-contents > *:not(h2),
+  *[role="doc-endnotes"] > ol,
+  .quarto-appendix-secondary-label {
+    font-size: inherit;
+    color: var(--atelier-fg);
+  }
+
+  .footnotes ol {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .quarto-appendix-citeas {
+    font-size: inherit;
+    border-color: var(--atelier-border);
+    border-radius: $border-radius-sm;
+  }
+
+  // Quarto writes the BibTeX entry as a `pre.sourceCode` with no
+  // `div.sourceCode` around it, so the code block frame does not reach it.
+  // It takes the same frame here, with the language above the code as in a
+  // code window.
+  pre.quarto-appendix-bibtex {
+    position: relative;
+    margin-bottom: 1rem;
+    padding: $code-block-bg-padding;
+    font-size: 0.78rem;
+    border: 1px solid body-mix(85%);
+    border-radius: $border-radius-sm;
+    @if $code-block-bg {
+      background-color: body-mix(95%);
+    }
+
+    &::before {
+      display: block;
+      margin-bottom: 0.4rem;
+      content: "BibTeX";
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--atelier-muted);
+    }
+  }
+}
+
+// The back link of a footnote is a 15px glyph, below the 24px target size. It
+// keeps its underline, so that colour is not the only mark of a link.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15064
+// Remove when: the minimum Quarto version includes the fix.
+.footnote-back {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  min-height: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+// Quarto fades the appendix to opacity 0.9, which pulls the back-links and the
+// licence link below 4.5:1. The selectors match the specificity of Quarto's
+// and come later.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14679
+// Remove when: the minimum Quarto version includes the fix.
+#quarto-appendix.default .quarto-appendix-heading,
+#quarto-appendix.default section *[role="doc-endnotes"],
+#quarto-appendix.default section > *:not(a) {
+  opacity: 1;
+}

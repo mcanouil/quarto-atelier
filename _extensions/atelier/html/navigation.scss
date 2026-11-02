@@ -806,3 +806,174 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 .sidebar-navigation #quarto-search .aa-DetachedSearchButtonIcon {
   color: var(--atelier-sidebar-fg);
 }
+
+// ===========================================================================
+// FOOTER
+// ===========================================================================
+// Quarto paints the surface, the links, and the top edge from the chrome
+// palette, the edge because `html/chrome.scss` sets `$footer-border-color`
+// alongside the rest. The text takes the chrome muted ink, because Quarto's
+// `$text-muted` is held to AA on the page rather than on the bar.
+//
+// Quarto lays the three columns out with flex, stacks the centre one below
+// `lg` and the other two below `md`, and pushes the centre one to the end with
+// `order`. A grid gives three equal columns from `md` up and one column below,
+// in the order the markup has.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13665
+// Remove when: the minimum Quarto version lays the footer out in three equal
+// columns from `md` up.
+footer.footer .nav-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.9rem 1.2rem;
+  color: var(--atelier-navbar-muted);
+  font-size: 0.84rem;
+
+  .nav-footer-left,
+  .nav-footer-center,
+  .nav-footer-right {
+    flex: none;
+    order: 0;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .nav-footer-center {
+    text-align: center;
+  }
+
+  @include media-breakpoint-up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    .nav-footer-left {
+      text-align: left;
+    }
+
+    .nav-footer-right {
+      text-align: right;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: var(--atelier-navbar-fg);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--atelier-navbar-accent);
+      text-decoration: underline;
+    }
+  }
+
+  // Repository actions outside the card show as muted links that take the
+  // foreground when pointed at.
+  .toc-actions a.toc-action {
+    min-height: 24px;
+    color: var(--atelier-navbar-muted);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--atelier-navbar-fg);
+      text-decoration: underline;
+    }
+  }
+}
+
+.sidebar .sidebar-footer {
+  color: var(--atelier-sidebar-muted);
+}
+
+// ===========================================================================
+// PAGE TOOLS
+// ===========================================================================
+// The other formats, the notebooks, and the code links sit under the table of
+// contents. Each list gets a hairline on its left, and a link takes the accent
+// ink when pointed at, where Quarto uses the link colour of the page.
+.quarto-alternate-formats,
+.quarto-alternate-notebooks,
+.quarto-code-links {
+  ul {
+    margin: 0;
+    padding: 0 0 0 0.6rem;
+    list-style: none;
+    border-left: 1px solid var(--atelier-border);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+}
+
+// Quarto sets the hover colour of every link in the table of contents with
+// `!important`, so this one needs it too, with the same specificity.
+.sidebar nav[role="doc-toc"] :is(.quarto-alternate-formats, .quarto-alternate-notebooks, .quarto-code-links) ul > li > a:hover,
+.sidebar nav[role="doc-toc"] :is(.quarto-alternate-formats, .quarto-alternate-notebooks, .quarto-code-links) ul > li > a:focus-visible {
+  color: var(--atelier-accent-ink) !important;
+}
+
+// Quarto bakes the glyph of the reader toggle into a data URI with the colour
+// of the bar and swaps it on the active state, so it cannot follow the accent.
+// Draw it as a mask over the current colour, as the colour scheme toggle is.
+// The selectors name both states to match the specificity of Quarto's.
+// Upstream: none filed (WCAG 1.4.11)
+// Remove when: Quarto draws the reader toggle glyph from the current colour.
+$atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M0 .5A.5.5 0 0 1 .5 0h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 0 .5Zm0 2A.5.5 0 0 1 .5 2h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm9 0a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5Zm-9 2A.5.5 0 0 1 .5 4h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5Zm5 0a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5Zm7 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5Zm-12 2A.5.5 0 0 1 .5 6h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5Zm8 0a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5Zm-8 2A.5.5 0 0 1 .5 8h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5Zm7 0a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm-7 2a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1h-8a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Z"/></svg>');
+
+.navbar .quarto-reader-toggle:is(.reader, :not(.reader)) .bi::before,
+.sidebar-navigation .quarto-reader-toggle:is(.reader, :not(.reader)) .bi::before {
+  background-image: none;
+  background-color: currentcolor;
+  mask-image: $atelier-icon-reader;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: $atelier-icon-reader;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+// The active toggle sits on the soft accent tint of its bar, in the accent ink
+// of the bar, in place of Quarto's solid block of the bar foreground.
+.navbar .quarto-reader-toggle.reader {
+  color: var(--atelier-navbar-accent);
+
+  .quarto-reader-toggle-btn {
+    background-color: var(--atelier-navbar-accent-soft);
+    border-radius: 4px;
+  }
+}
+
+.sidebar-navigation .quarto-reader-toggle.reader {
+  color: var(--atelier-sidebar-accent);
+
+  .quarto-reader-toggle-btn {
+    background-color: var(--atelier-sidebar-accent-soft);
+    border-radius: 4px;
+  }
+}
+
+.quarto-reader-toggle .quarto-reader-toggle-btn {
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+// The bar of a notebook preview page is a Bootstrap `bg-primary` block with
+// white text, which takes the brand colour whatever its contrast with white.
+// It takes the chrome surface and ink instead, as the navbar above it does.
+// The `!important` answers the one on Bootstrap's background utility.
+#quarto-embed-header.bg-primary {
+  background-color: var(--atelier-navbar-bg) !important;
+  color: var(--atelier-navbar-fg);
+  border-bottom-color: var(--atelier-navbar-border);
+}

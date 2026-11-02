@@ -1266,9 +1266,9 @@ body.docked {
 }
 
 // Quarto's floating back-to-top pill has no edge on tinted surfaces; give it
-// the same hairline as the code surfaces.
+// the border token, which a pinned chrome palette does not change.
 #quarto-back-to-top {
-  border: 1px solid body-mix(85%);
+  border: 1px solid var(--atelier-border);
 }
 
 // Quarto hides the back-to-top pill with its stylesheet before the first
@@ -1470,33 +1470,6 @@ body .navbar .gitlink-widget-dropdown {
   .navbar.navbar-expand-lg .navbar-container > .navbar-brand-container {
     margin-inline: auto !important;
   }
-}
-
-// ===========================================================================
-// FOOTER
-// ===========================================================================
-// Quarto paints the surface, the text, the links, and the top edge from the
-// chrome palette, the edge because `html/chrome.scss` sets
-// `$footer-border-color` alongside the rest. Only the link treatment is left:
-// Quarto underlines nothing and gives no hover colour of its own.
-.nav-footer a {
-  text-decoration: none;
-}
-
-.nav-footer a:hover,
-.nav-footer a:focus-visible {
-  color: var(--atelier-navbar-accent);
-  text-decoration: underline;
-}
-
-// Quarto gives footer text $text-muted, which is held to AA on the page rather
-// than on the bar; use the chrome muted ink instead.
-.nav-footer-contents {
-  color: var(--atelier-navbar-muted);
-}
-
-.sidebar .sidebar-footer {
-  color: var(--atelier-sidebar-muted);
 }
 
 // ===========================================================================
@@ -1779,31 +1752,6 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
     font-variant-numeric: tabular-nums lining-nums;
     color: var(--atelier-accent-text);
   }
-}
-
-// ===========================================================================
-// FOOTNOTES AND APPENDIX
-// ===========================================================================
-// The back-link of a footnote is a 15px glyph, below the 24px target size.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15064
-// Remove when: the minimum Quarto version includes the fix.
-.footnote-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  min-height: 24px;
-}
-
-// Quarto fades the appendix to opacity 0.9, which pulls the back-links and the
-// licence link below 4.5:1. The selectors match the specificity of Quarto's
-// and come later.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14679
-// Remove when: the minimum Quarto version includes the fix.
-#quarto-appendix.default .quarto-appendix-heading,
-#quarto-appendix.default section *[role="doc-endnotes"],
-#quarto-appendix.default section > *:not(a) {
-  opacity: 1;
 }
 
 // ===========================================================================

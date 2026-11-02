@@ -24,6 +24,7 @@
 - feat: Restyle grid listing cards with an accent border and a small lift on hover or keyboard focus, and give listing tables and tables in the text one style.
 - feat: Put the title banner on the chrome surface with its breadcrumbs, and restyle figure captions, keyboard keys, margin notes, and shaded columns from the brand.
 - feat: Restyle cross-reference and footnote popups, the code tools menu, and the search results on one surface from the brand.
+- feat: Restyle the appendix as labelled groups with the BibTeX entry in a code block, lay the footer out in three aligned columns, and restyle notebook links and the reader toggle from the brand.
 
 ### Bug Fixes
 
