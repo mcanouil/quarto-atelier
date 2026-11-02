@@ -442,7 +442,7 @@ body.floating .sidebar.sidebar-navigation {
 // are more specific and keep their own tokens. Quarto sets its own colour
 // with !important, so this one needs it as well.
 #TOC .nav-link.active {
-  color: var(--atelier-accent-ink) !important;
+  color: var(--atelier-toc-accent) !important;
   font-weight: 650;
 }
 
