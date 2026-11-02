@@ -3,6 +3,7 @@ title: "Example post 1"
 description: "A short page for the listing example."
 date: "2026-10-01"
 image: ../../assets/icons/icon.svg
+image-alt: "The Atelier logo."
 categories: [notes, tips]
 ---
 

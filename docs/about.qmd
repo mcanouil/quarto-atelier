@@ -5,6 +5,7 @@ toc: false
 about:
   template: trestles
   image: assets/icons/icon.svg
+  image-alt: "The Atelier logo."
   links:
     - icon: github
       text: "GitHub repository"
