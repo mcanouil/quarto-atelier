@@ -347,6 +347,93 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
   }
 }
 
+// A floating sidebar has no column of its own. It becomes a card on the sidebar
+// tokens, with the sidebar border and the theme radius, so that its links keep
+// contrast on the surface they sit on.
+body.floating .sidebar.sidebar-navigation {
+  border: 1px solid var(--atelier-sidebar-border);
+  border-radius: $border-radius;
+  background-color: var(--atelier-sidebar-bg);
+  color: var(--atelier-sidebar-fg);
+
+  .sidebar-item-container {
+    color: var(--atelier-sidebar-fg);
+  }
+
+  .sidebar-item-container:hover,
+  .sidebar-item-container:focus-within,
+  .sidebar-item-container .active,
+  .sidebar-item-container [aria-current="page"],
+  .sidebar-item-container .sidebar-link > code {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  .sidebar-item-container.disabled,
+  .sidebar-item > .menu-text,
+  .sidebar-item-toggle {
+    color: var(--atelier-sidebar-muted);
+  }
+
+  .sidebar-item-toggle:hover {
+    color: var(--atelier-sidebar-accent);
+  }
+
+  .sidebar-divider {
+    border-top-color: var(--atelier-sidebar-border);
+    opacity: 1;
+  }
+}
+
+// The narrow-screen toggle sits in the secondary nav bar. It is a 32 px icon
+// button in the bar foreground; Quarto sizes it from the glyph alone.
+.quarto-secondary-nav .quarto-btn-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  color: var(--atelier-sidebar-fg);
+
+  &:hover {
+    color: var(--atelier-sidebar-accent);
+  }
+}
+
+// The "On this page" toggle shows the table of contents on narrow screens. It
+// takes the card tokens of the table of contents, so that it matches the card
+// it replaces.
+#quarto-content .quarto-sidebar-toggle {
+  border-color: var(--atelier-toc-border);
+  background: var(--atelier-toc-bg);
+}
+
+#quarto-content .quarto-sidebar-toggle-title {
+  color: var(--atelier-toc-fg);
+}
+
+.quarto-sidebar-toggle-icon {
+  color: var(--atelier-toc-muted);
+}
+
+.quarto-sidebar-toggle.expanded .quarto-sidebar-toggle-title {
+  border-bottom-color: var(--atelier-toc-border);
+}
+
+.quarto-sidebar-toggle-contents {
+  background-color: var(--atelier-toc-bg);
+  color: var(--atelier-toc-fg);
+
+  .toc-action {
+    border: 0;
+    background: transparent;
+    color: var(--atelier-toc-muted);
+  }
+
+  :is(a, button):focus-visible {
+    outline-color: var(--atelier-toc-accent);
+  }
+}
+
 // ===========================================================================
 // T2 table of contents card
 // ===========================================================================
@@ -976,4 +1063,40 @@ $atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
   background-color: var(--atelier-navbar-bg) !important;
   color: var(--atelier-navbar-fg);
   border-bottom-color: var(--atelier-navbar-border);
+}
+
+// ===========================================================================
+// LIGHTBOX
+// ===========================================================================
+// Quarto hides the image made for the other colour scheme but keeps its
+// lightbox link, which leaves an empty tab stop of 0 by 0 pixels. Hide the
+// link together with its image.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15170
+// Remove when: the minimum Quarto version includes the fix.
+body.quarto-light a.lightbox:has(> img.dark-content),
+body.quarto-dark a.lightbox:has(> img.light-content) {
+  display: none !important;
+}
+
+// The lightbox backdrop is the shared overlay. Glightbox paints it at 0.7 black
+// from a rule of the same weight, so the selector is one element heavier.
+body .goverlay {
+  background: var(--atelier-overlay);
+}
+
+// The slide description reads in the page tokens.
+body:not(.glightbox-mobile) div.gslide div.gslide-description,
+body:not(.glightbox-mobile) div.gslide-description :is(.gslide-title, .gslide-desc) {
+  background-color: var(--atelier-bg);
+  color: var(--atelier-fg);
+}
+
+// Glightbox sizes an SVG with no intrinsic size to its own default, a small
+// box. Fill the slide at the 4:3 ratio of a typical viewport instead.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/10315 (related)
+// Remove when: Quarto sizes SVG images in the lightbox to the slide.
+.glightbox-container .gslide-image img[src$=".svg" i] {
+  width: min(90vw, calc(90vh * 4 / 3));
+  height: auto;
+  max-width: none;
 }

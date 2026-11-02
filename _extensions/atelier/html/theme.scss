@@ -1755,19 +1755,6 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
 }
 
 // ===========================================================================
-// LIGHTBOX
-// ===========================================================================
-// Quarto hides the image made for the other colour scheme but keeps its
-// lightbox link, which leaves an empty tab stop of 0 by 0 pixels. Hide the
-// link together with its image.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15170
-// Remove when: the minimum Quarto version includes the fix.
-body.quarto-light a.lightbox:has(> img.dark-content),
-body.quarto-dark a.lightbox:has(> img.light-content) {
-  display: none !important;
-}
-
-// ===========================================================================
 // PRINT
 // ===========================================================================
 // A browser prints without background colours by default. A filled button

@@ -432,6 +432,9 @@ $navbar-hl: $atelier-chrome-accent;
 $navbar-hover-color: $atelier-chrome-accent;
 
 $sidebar-bg: $atelier-chrome-bg;
+
+// The backdrop behind the narrow-screen sidebar is the shared overlay.
+$sidebar-glass-bg: $atelier-overlay-color;
 $sidebar-fg: $atelier-chrome-fg;
 
 $footer-bg: $atelier-chrome-bg;
