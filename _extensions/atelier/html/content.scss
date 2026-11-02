@@ -520,3 +520,233 @@ html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
 .page-columns .column-screen-inset-shaded {
   background-color: var(--atelier-surface);
 }
+
+// ===========================================================================
+// LISTINGS
+// ===========================================================================
+// Quarto's listing layer sets `$border-color` to a fixed grey before the
+// Atelier defaults, so the item divider, the chips and the pagination boxes
+// take their colours from the rules below.
+
+// The item is a row with a hairline divider below it and a 132 px thumbnail.
+div.quarto-post {
+  gap: 1rem;
+  margin-bottom: 0;
+  padding: 1rem 0;
+  border-bottom-color: var(--atelier-border);
+
+  .thumbnail img {
+    margin-top: 0;
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--atelier-border);
+    border-radius: $border-radius;
+  }
+
+  h3.listing-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--atelier-fg);
+
+    a {
+      color: var(--atelier-fg);
+    }
+
+    a:hover {
+      color: var(--atelier-accent-ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  .listing-date,
+  .listing-description,
+  .listing-description a {
+    color: var(--atelier-muted);
+  }
+
+  .listing-description {
+    font-size: 0.9rem;
+  }
+}
+
+.list.quarto-listing-default > div.quarto-post:first-child {
+  padding-top: 0;
+}
+
+@include media-breakpoint-up(md) {
+  div.quarto-post .thumbnail {
+    flex-basis: 132px;
+  }
+}
+
+// The category chips are pills. Each is a button, so it keeps a 24 px target.
+div.quarto-post .listing-categories {
+  gap: 0.35rem;
+
+  .listing-category {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    margin: 0;
+    padding: 0.1rem 0.55rem;
+    border: 1px solid var(--atelier-control-border);
+    border-radius: 999px;
+    color: var(--atelier-fg);
+    font-size: 0.74rem;
+    text-transform: none;
+  }
+}
+
+// The category list takes the upper-case label of the sidebar sections, and
+// the active category takes the current-item style of the sidebar menu.
+#quarto-margin-sidebar .quarto-listing-category-title {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border-bottom: 0;
+  color: var(--atelier-muted);
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#quarto-margin-sidebar .quarto-listing-category {
+  font-size: 0.85rem;
+}
+
+.quarto-listing-category.category-default .category {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: $border-radius-sm;
+  color: var(--atelier-muted);
+
+  &:hover {
+    background: var(--atelier-surface-strong);
+    color: var(--atelier-fg);
+  }
+
+  // Quarto writes the class and the script adds `aria-pressed`, so the rule
+  // keys on both and holds without JavaScript.
+  &:is(.active, [aria-pressed="true"]) {
+    background: var(--atelier-accent-soft);
+    color: var(--atelier-accent-ink);
+    font-weight: 650;
+    box-shadow: inset 3px 0 0 var(--atelier-accent-mark);
+  }
+
+  .quarto-category-count {
+    font-family: $font-family-monospace;
+    font-size: 0.76rem;
+  }
+}
+
+// The filter and sort controls sit on one row that wraps. Each field is 32 px
+// high, on the page, with the control border.
+.listing-actions-group {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+
+  .input-group {
+    flex-wrap: nowrap;
+    align-items: center;
+    width: auto;
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+
+  .input-group-text,
+  .form-control,
+  .form-select {
+    min-height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .form-control,
+  .form-select {
+    border-color: var(--atelier-control-border);
+    background-color: var(--atelier-bg);
+    color: var(--atelier-fg);
+  }
+
+  .input-group-text {
+    border-top-left-radius: $border-radius-sm;
+    border-bottom-left-radius: $border-radius-sm;
+  }
+
+  .form-control,
+  .form-select {
+    border-top-right-radius: $border-radius-sm;
+    border-bottom-right-radius: $border-radius-sm;
+  }
+
+  .form-control {
+    min-width: 0;
+    width: 12rem;
+  }
+}
+
+// The script adds the label before the icon box, so Bootstrap's join rules for
+// an input group would square the box and pull it one pixel left.
+.listing-actions-group .input-group > .atelier-listing-label {
+  margin: 0 0.45rem 0 0;
+  color: var(--atelier-muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+
+  + .input-group-text {
+    margin-left: 0;
+  }
+}
+
+// Pagination boxes are 32 px with the control border, and the current page is
+// filled with the accent. Quarto sets the current link colour with a stronger
+// selector, which the second rule matches.
+.quarto-listing ul.pagination {
+  gap: 0.3rem;
+  --bs-pagination-color: var(--atelier-fg);
+  --bs-pagination-bg: var(--atelier-bg);
+  --bs-pagination-border-color: var(--atelier-control-border);
+  --bs-pagination-hover-color: var(--atelier-accent-ink);
+  --bs-pagination-hover-bg: var(--atelier-bg);
+  --bs-pagination-hover-border-color: var(--atelier-accent-mark);
+  --bs-pagination-focus-color: var(--atelier-accent-ink);
+  --bs-pagination-focus-bg: var(--atelier-bg);
+  --bs-pagination-active-color: var(--atelier-on-accent);
+  --bs-pagination-active-bg: var(--atelier-accent-fill);
+  --bs-pagination-active-border-color: var(--atelier-accent-fill);
+  --bs-pagination-disabled-color: var(--atelier-muted);
+  --bs-pagination-disabled-bg: var(--atelier-bg);
+  --bs-pagination-disabled-border-color: var(--atelier-control-border);
+
+  li {
+    padding-right: 0;
+  }
+
+  .page-link {
+    display: grid;
+    place-items: center;
+    min-width: 32px;
+    height: 32px;
+    margin-left: 0;
+    padding: 0 0.55rem;
+    border-radius: $border-radius-sm;
+    font-size: 0.85rem;
+  }
+}
+
+.quarto-listing ul.pagination li.active .page-link {
+  color: var(--atelier-on-accent);
+  font-weight: 650;
+}
+
+// Quarto removes the underline from every link in a table listing, including
+// links in running text, so colour alone marks them. Underline them again.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15173
+// Remove when: the minimum Quarto version includes the fix.
+html table.quarto-listing-table a {
+  text-decoration: underline;
+}

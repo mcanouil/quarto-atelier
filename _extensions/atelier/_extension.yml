@@ -120,3 +120,4 @@ contributes:
         - file: html/scripts/toc-card.html
         - file: html/scripts/title-block.html
         - file: html/scripts/code-blocks.html
+        - file: html/scripts/listings.html

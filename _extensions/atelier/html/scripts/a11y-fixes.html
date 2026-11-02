@@ -269,9 +269,12 @@
 		// Give them a button role, a place in the Tab order and Enter or Space.
 		// Quarto re-renders listing items after a filter or a page change, so the
 		// attributes are set only on elements that do not have them yet.
+		// The categories in the list are toggles: Quarto marks the active one by
+		// its class only, so `aria-pressed` follows the class. The chips on each
+		// item set the filter and do not toggle it, so they take no pressed state.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15067
 		// Remove when: the minimum Quarto version includes the fix.
-		// Not SCSS: a role and a tab stop are attributes, which CSS cannot set.
+		// Not SCSS: a role, a tab stop, and a pressed state are attributes, which CSS cannot set.
 		const categorySelector = ".quarto-listing-category .category, .listing-category";
 		const makeCategoriesButtons = (root) => {
 			root.querySelectorAll(categorySelector).forEach((el) => {
@@ -279,12 +282,23 @@
 				el.setAttribute("role", "button");
 				el.setAttribute("tabindex", "0");
 			});
+			root.querySelectorAll(".quarto-listing-category .category").forEach((el) => {
+				const pressed = el.classList.contains("active") ? "true" : "false";
+				if (el.getAttribute("aria-pressed") !== pressed) el.setAttribute("aria-pressed", pressed);
+			});
 		};
 		makeCategoriesButtons(document);
 		document.querySelectorAll(".quarto-listing").forEach((listing) => {
 			new MutationObserver(() => makeCategoriesButtons(listing)).observe(listing, {
 				childList: true,
 				subtree: true,
+			});
+		});
+		document.querySelectorAll(".quarto-listing-category").forEach((list) => {
+			new MutationObserver(() => makeCategoriesButtons(list)).observe(list, {
+				subtree: true,
+				attributes: true,
+				attributeFilter: ["class"],
 			});
 		});
 		document.addEventListener("keydown", (event) => {

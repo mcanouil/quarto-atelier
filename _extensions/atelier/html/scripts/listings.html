@@ -1,0 +1,60 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-listings" type="text/javascript">
+	(function () {
+		var listings = document.querySelectorAll(".quarto-listing");
+		if (listings.length === 0) return;
+
+		// The filter and sort controls have a placeholder or an aria-label, but no
+		// visible label, so the name disappears when the user types. Add a label
+		// before the icon box, with the text that Quarto already gives the control.
+		// Upstream: none filed (WCAG 3.3.2)
+		// Remove when: Quarto gives the listing filter and sort controls a visible label.
+		function labelControl(listing, control, text, suffix) {
+			if (!control || !text) return;
+			var group = control.closest(".input-group");
+			if (!group || group.querySelector(".atelier-listing-label")) return;
+			if (!control.id) control.id = (listing.id || "listing") + "-" + suffix;
+			var label = document.createElement("label");
+			label.className = "atelier-listing-label";
+			label.htmlFor = control.id;
+			label.textContent = text;
+			group.insertBefore(label, group.firstElementChild);
+		}
+
+		// Quarto marks the current page of a listing by a class only, so a screen
+		// reader does not announce it.
+		// Upstream: none filed (WCAG 4.1.2)
+		// Remove when: Quarto sets aria-current on the link of the current listing page.
+		function markCurrentPage(listing) {
+			listing.querySelectorAll(".pagination .page-link").forEach(function (link) {
+				var current = link.closest(".page-item").classList.contains("active");
+				if (current && link.getAttribute("aria-current") !== "page") {
+					link.setAttribute("aria-current", "page");
+				} else if (!current && link.hasAttribute("aria-current")) {
+					link.removeAttribute("aria-current");
+				}
+			});
+		}
+
+		function apply(listing) {
+			var filter = listing.querySelector(".quarto-listing-filter input");
+			var sort = listing.querySelector(".quarto-listing-sort select");
+			labelControl(listing, filter, filter && filter.getAttribute("placeholder"), "filter");
+			labelControl(listing, sort, sort && sort.getAttribute("aria-label"), "sort");
+			markCurrentPage(listing);
+		}
+
+		// list.js builds the pagination again after each page change, filter, or
+		// sort, so the changes are applied again from an observer.
+		listings.forEach(function (listing) {
+			apply(listing);
+			new MutationObserver(function () {
+				apply(listing);
+			}).observe(listing, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+		});
+	})();
+</script>

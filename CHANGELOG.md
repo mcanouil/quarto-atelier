@@ -20,6 +20,7 @@
   Lines named in `code-window-lines` or `code-line-numbers` get a tinted band and an accent marker. (#76)
 - feat: Restyle the announcement bar with a faint tint of its type that follows the colour scheme, an upper-case type label, and a rule below.
   The `atelier-announcement-*` language keys set the label text. (#76)
+- feat: Restyle the default listing, its categories, its filter and sort controls, and its pagination from the brand.
 
 ### Bug Fixes
 
@@ -30,6 +31,8 @@
 - fix: Hold content and breadcrumb links to 4.5:1 on the page, so that a pale or deep primary colour stays readable.
 - fix: Report an unreadable search options block in the console instead of hiding it.
 - fix: Paint heading rules, form controls, and the remaining Bootstrap greys from the brand.
+- fix: Give the listing filter and sort controls visible labels, and mark the current page and the active category for screen readers.
+- fix: Paint the listing filter icon from the brand, so that it stays visible in dark mode.
 
 ## 0.11.0 (2026-10-29)
 
