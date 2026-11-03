@@ -55,24 +55,23 @@
 		if (workshop && course.duration !== null) {
 			actions.appendChild(timer(course.duration * 60));
 		}
-		[
-			["previous", course.previous, "bi-arrow-left-short"],
-			["next", course.next, "bi-arrow-right-short"],
-		].forEach(function (entry) {
-			if (!entry[1]) return;
-			var link = element("a", "atelier-bar-" + entry[0]);
-			// Quarto's bottom page navigation holds the link relative to this page.
-			link.href = document.querySelector(".page-navigation .nav-page-" + entry[0] + " a").href;
-			var text = document.createTextNode(course.label(entry[0]));
-			if (entry[0] === "previous") {
-				link.appendChild(icon(entry[2]));
+		// Quarto's bottom page navigation holds the link relative to this page.
+		function navLink(kind, target, iconName) {
+			if (!target) return;
+			var link = element("a", "atelier-bar-" + kind);
+			link.href = document.querySelector(".page-navigation .nav-page-" + kind + " a").href;
+			var text = document.createTextNode(course.label(kind));
+			if (kind === "previous") {
+				link.appendChild(icon(iconName));
 				link.appendChild(text);
 			} else {
 				link.appendChild(text);
-				link.appendChild(icon(entry[2]));
+				link.appendChild(icon(iconName));
 			}
 			actions.appendChild(link);
-		});
+		}
+		navLink("previous", course.previous, "bi-arrow-left-short");
+		navLink("next", course.next, "bi-arrow-right-short");
 		row.appendChild(actions);
 		bar.appendChild(row);
 
@@ -145,7 +144,7 @@
 				end = Date.now() + remaining * 1000;
 				interval = setInterval(function () {
 					remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
-					show();
+					if (!document.hidden || remaining === 0) show();
 					if (remaining === 0) stop();
 				}, 1000);
 			}
