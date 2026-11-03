@@ -100,8 +100,8 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 28px;
-  min-height: 28px;
+  min-width: 32px;
+  min-height: 32px;
   padding: 0 0.2rem 0 0.45rem;
   border: 1px solid currentColor;
   border-right: 0;
@@ -117,7 +117,7 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
 .atelier-timer {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
+  min-height: 32px;
   margin-left: -0.5rem;
   padding: 0 0.55rem 0 0.2rem;
   border: 1px solid currentColor;
