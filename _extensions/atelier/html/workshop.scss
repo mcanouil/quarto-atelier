@@ -675,7 +675,9 @@ html pre.sourceCode.atelier-terminal {
     color: var(--atelier-terminal-fg);
 
     // The empty alternative text keeps the prompt out of the accessible text.
+    // A browser without alternative text reads the first declaration.
     &::before {
+      content: "$ ";
       content: "$ " / "";
       color: var(--atelier-terminal-prompt);
       user-select: none;
