@@ -216,9 +216,28 @@ local function resolve_path(path, base)
   return joined
 end
 
+--- Tell if a sidebar path is a URL with a scheme, such as `https://example.org`.
+--- @param path string The path
+--- @return boolean True when the path is a URL
+local function is_url(path)
+  return path:match('^%a[%w+.-]*:') ~= nil
+end
+
+--- Add a sidebar path to a list, unless it is a URL or holds a `*`.
+--- @param path string The path as the metadata holds it
+--- @param base string The folder of the page, relative to the project
+--- @param paths string[] The list that receives the path
+--- @return nil
+local function add_path(path, base, paths)
+  if not path:find('*', 1, true) and not is_url(path) then
+    paths[#paths + 1] = resolve_path(path, base)
+  end
+end
+
 --- Collect the file paths of a sidebar `contents` tree, in order.
---- An item is a path string, a map with `href`, or a map with `section` and
---- `contents`. An item with `auto` or a `*` is skipped.
+--- An item is a path string, a map with `href` or its alias `file`, or a map
+--- with `section` and `contents`. An item with `auto`, a `*`, or a URL is
+--- skipped.
 --- @param contents table The contents list
 --- @param base string The folder of the page, relative to the project
 --- @param paths string[] The list that receives the paths
@@ -227,16 +246,11 @@ local function collect_paths(contents, base, paths)
   for _, item in ipairs(contents) do
     local kind = pandoc.utils.type(item)
     if kind == 'Inlines' or kind == 'string' or kind == 'Blocks' then
-      local path = pandoc.utils.stringify(item)
-      if not path:find('*', 1, true) then
-        paths[#paths + 1] = resolve_path(path, base)
-      end
+      add_path(pandoc.utils.stringify(item), base, paths)
     elseif type(item) == 'table' and item.auto == nil then
-      if item.href ~= nil then
-        local path = pandoc.utils.stringify(item.href)
-        if not path:find('*', 1, true) then
-          paths[#paths + 1] = resolve_path(path, base)
-        end
+      local href = item.href or item.file
+      if href ~= nil then
+        add_path(pandoc.utils.stringify(href), base, paths)
       end
       if type(item.contents) == 'table' then
         collect_paths(item.contents, base, paths)
