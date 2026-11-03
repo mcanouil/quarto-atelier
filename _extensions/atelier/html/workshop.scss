@@ -282,56 +282,51 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
   }
 }
 
-// The sidebar shell styles the top-level sections as group labels with a
-// selector that holds an id. The selector here holds one id and more classes,
-// so the module rows replace that style.
-html.atelier-workshop #quarto-sidebar.sidebar-navigation .sidebar-menu-container.atelier-stepper {
-  // Quarto pads the top of every block in the sidebar. The summary above the
-  // menu already gives the space.
+// Quarto pads the top of every block in the sidebar with `.sidebar.sidebar-navigation > *`.
+// The summary above the menu already gives the space.
+#quarto-sidebar > .atelier-stepper {
   padding-top: 0;
+}
 
-  > ul > .sidebar-item.atelier-step {
-    position: relative;
-    margin: 0;
-    padding: 0;
+#quarto-sidebar .atelier-stepper > ul > .atelier-step {
+  position: relative;
+  margin: 0;
+  padding: 0;
 
-    // Each module draws the line from its dot to the dot of the next module.
-    &:not(:last-child)::before {
-      content: "";
-      position: absolute;
-      top: $atelier-step-centre;
-      bottom: calc(-1 * #{$atelier-step-centre});
-      left: calc(#{$atelier-step-inset} + #{$atelier-step-dot * 0.5} - 1px);
-      width: 2px;
-      background-color: var(--atelier-sidebar-border);
-    }
+  // Each module draws the line from its dot to the dot of the next module.
+  &:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: $atelier-step-centre;
+    bottom: calc(-1 * #{$atelier-step-centre});
+    left: calc(#{$atelier-step-inset} + #{$atelier-step-dot * 0.5} - 1px);
+    width: 2px;
+    background-color: var(--atelier-sidebar-border);
+  }
 
-    > .sidebar-item-container > :is(.sidebar-item-text.sidebar-item-toggle, a.sidebar-link) {
-      display: flex;
-      align-items: flex-start;
-      gap: $atelier-step-gap;
-      width: 100%;
-      padding: $atelier-step-pad $atelier-step-inset;
-      color: var(--atelier-sidebar-fg);
-      font-size: inherit;
-      font-weight: 400;
-      letter-spacing: normal;
-      text-align: start;
-      text-transform: none;
+  // The S2 section button keeps its colours. The row puts the dot at the
+  // start and the title at normal weight.
+  > .sidebar-item-container > :is(.sidebar-item-toggle, .sidebar-link) {
+    display: flex;
+    align-items: flex-start;
+    gap: $atelier-step-gap;
+    width: 100%;
+    padding: $atelier-step-pad $atelier-step-inset;
+    font-weight: 400;
+    text-align: start;
 
-      > .bi-chevron-right {
-        align-self: center;
-      }
-    }
-
-    // The pages of the open module align with the module title.
-    > .sidebar-section {
-      padding-inline-start: calc(#{$atelier-step-inset} + #{$atelier-step-dot} + #{$atelier-step-gap} - 0.6rem);
+    > .bi-chevron-right {
+      align-self: center;
     }
   }
 
-  > ul > .atelier-step-current > .sidebar-item-container > * {
+  &.atelier-step-current > .sidebar-item-container > :is(.sidebar-item-toggle, .sidebar-link) {
     font-weight: 650;
+  }
+
+  // The pages of the open module align with the module title.
+  > .sidebar-section {
+    padding-inline-start: calc(#{$atelier-step-inset} + #{$atelier-step-dot} + #{$atelier-step-gap} - 0.6rem);
   }
 }
 
