@@ -296,24 +296,24 @@ $atelier-workshop-bar-accent-soft: rgba($atelier-workshop-bar-accent, $atelier-c
 
 // The accent as text (a version pill, a hovered link, an open menu trigger)
 // needs 4.5:1 on the bar, on the bar surface, and on the soft tint over each.
-// The fill accent above only needs 3:1. The tints are computed as opaque
-// colours because the contrast function cannot read an alpha channel.
+// The mark sits on the soft tint over the bar. The fill accent above only
+// needs 3:1. The tints are computed as opaque colours because the contrast
+// function cannot read a colour with an alpha channel.
+$_atelier-workshop-bar-accent-tint: mix($atelier-workshop-bar-accent, $atelier-workshop-bar-bg, $atelier-chrome-accent-soft-alpha * 100%);
+$_atelier-workshop-bar-accent-tint-surface: mix($atelier-workshop-bar-accent, $atelier-workshop-bar-surface, $atelier-chrome-accent-soft-alpha * 100%);
 $atelier-workshop-bar-accent-text: atelier-contrast-all(
   $atelier-chrome-accent,
   (
     $atelier-workshop-bar-bg,
     $atelier-workshop-bar-surface,
-    mix($atelier-workshop-bar-accent, $atelier-workshop-bar-bg, $atelier-chrome-accent-soft-alpha * 100%),
-    mix($atelier-workshop-bar-accent, $atelier-workshop-bar-surface, $atelier-chrome-accent-soft-alpha * 100%)
+    $_atelier-workshop-bar-accent-tint,
+    $_atelier-workshop-bar-accent-tint-surface
   ),
   4.5
 ) !default;
-
-// The mark sits on the soft tint, which is computed here as an opaque colour
-// because the contrast function cannot read a colour with an alpha channel.
 $atelier-workshop-bar-accent-mark: atelier-contrast(
   $atelier-workshop-bar-accent,
-  mix($atelier-workshop-bar-accent, $atelier-workshop-bar-bg, $atelier-chrome-accent-soft-alpha * 100%),
+  $_atelier-workshop-bar-accent-tint,
   3
 ) !default;
 $atelier-workshop-bar-border: rgba($atelier-workshop-bar-fg, 0.2) !default;
