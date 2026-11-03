@@ -41,10 +41,11 @@
 		var row = element("div", "atelier-bar-row");
 		var crumb = element("p", "atelier-bar-crumb");
 		// In documentation mode a top-level page has no section, so the crumb
-		// shows the page title only.
+		// shows the page title only. A module with the same title as the page,
+		// such as a module of one page, also shows the page title only.
 		var active = document.querySelector("#quarto-sidebar .sidebar-link.active");
 		var inSection = Boolean(active && active.closest(".sidebar-item-section"));
-		if (module && module.title && (workshop || inSection)) {
+		if (module && module.title && module.title !== page.title && (workshop || inSection)) {
 			crumb.appendChild(document.createTextNode(module.title + " / "));
 		}
 		crumb.appendChild(element("b", "", page.title));
