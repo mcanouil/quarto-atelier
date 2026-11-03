@@ -8,10 +8,12 @@
 // workshop mode. The colours come from the `--atelier-workshop-bar-*` tokens.
 
 // The row is 50 px and the progress track is 5 px. The script writes the
-// measured height to `--atelier-bar-height`; the sum is the fallback.
-$atelier-bar-row-height: 50px;
-$atelier-bar-track-height: 5px;
-$atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atelier-bar-track-height});
+// measured height to `--atelier-bar-height`; the sum is the fallback. The
+// `$_atelier-` variables of this file are layout values of the rules, not
+// project options, so they have no `!default` in `chrome.scss`.
+$_atelier-bar-row-height: 50px;
+$_atelier-bar-track-height: 5px;
+$_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_atelier-bar-track-height});
 
 .atelier-bar {
   grid-column: screen-start / screen-end;
@@ -49,7 +51,7 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 1rem;
-  min-height: $atelier-bar-row-height;
+  min-height: $_atelier-bar-row-height;
   padding: 0.5rem 1.1rem;
 }
 
@@ -126,7 +128,7 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
 }
 
 .atelier-bar-progress {
-  height: $atelier-bar-track-height;
+  height: $_atelier-bar-track-height;
   background-color: var(--atelier-workshop-bar-track);
 
   > span {
@@ -141,7 +143,7 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
 // and focused elements scroll to below it.
 @include media-breakpoint-up(lg) {
   html:has(#quarto-content > .atelier-bar) {
-    scroll-padding-top: $atelier-bar-height;
+    scroll-padding-top: $_atelier-bar-height;
   }
 
   #quarto-content > .atelier-bar {
@@ -158,8 +160,8 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
     // Quarto writes `top` and `max-height` inline on every `.sidebar`, so
     // only `!important` puts the table of contents below the bar.
     > #quarto-margin-sidebar {
-      top: $atelier-bar-height !important;
-      max-height: calc(100vh - #{$atelier-bar-height}) !important;
+      top: $_atelier-bar-height !important;
+      max-height: calc(100vh - #{$_atelier-bar-height}) !important;
     }
   }
 }
@@ -192,7 +194,7 @@ html.atelier-workshop #quarto-header {
 
 // Quarto bakes the navbar background and the Bootstrap navbar colours from the
 // `$navbar-*` variables. Point them at the tokens above.
-$atelier-icon-toggler: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+$_atelier-icon-toggler: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 
 html.atelier-workshop #quarto-header > .navbar {
   --bs-navbar-color: var(--atelier-navbar-fg);
@@ -217,7 +219,7 @@ html.atelier-workshop #quarto-header > .navbar {
   .navbar-toggler-icon {
     background-image: none;
     background-color: currentcolor;
-    mask: $atelier-icon-toggler center / 100% no-repeat;
+    mask: $_atelier-icon-toggler center / 100% no-repeat;
   }
 }
 
@@ -250,11 +252,11 @@ html.atelier-workshop #quarto-header {
 
 // The dot column starts at the inset of the module row. The line runs through
 // the centre of the dots.
-$atelier-step-dot: 24px;
-$atelier-step-inset: 0.3rem;
-$atelier-step-pad: 0.4rem;
-$atelier-step-gap: 0.7rem;
-$atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
+$_atelier-step-dot: 24px;
+$_atelier-step-inset: 0.3rem;
+$_atelier-step-pad: 0.4rem;
+$_atelier-step-gap: 0.7rem;
+$_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5});
 
 .atelier-course-summary {
   margin: 0 0.75rem 1rem;
@@ -297,9 +299,9 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
   &:not(:last-child)::before {
     content: "";
     position: absolute;
-    top: $atelier-step-centre;
-    bottom: calc(-1 * #{$atelier-step-centre});
-    left: calc(#{$atelier-step-inset} + #{$atelier-step-dot * 0.5} - 1px);
+    top: $_atelier-step-centre;
+    bottom: calc(-1 * #{$_atelier-step-centre});
+    left: calc(#{$_atelier-step-inset} + #{$_atelier-step-dot * 0.5} - 1px);
     width: 2px;
     background-color: var(--atelier-sidebar-border);
   }
@@ -309,9 +311,9 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
   > .sidebar-item-container > :is(.sidebar-item-toggle, .sidebar-link) {
     display: flex;
     align-items: flex-start;
-    gap: $atelier-step-gap;
+    gap: $_atelier-step-gap;
     width: 100%;
-    padding: $atelier-step-pad $atelier-step-inset;
+    padding: $_atelier-step-pad $_atelier-step-inset;
     font-weight: 400;
     text-align: start;
 
@@ -326,7 +328,7 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
 
   // The pages of the open module align with the module title.
   > .sidebar-section {
-    padding-inline-start: calc(#{$atelier-step-inset} + #{$atelier-step-dot} + #{$atelier-step-gap} - 0.6rem);
+    padding-inline-start: calc(#{$_atelier-step-inset} + #{$_atelier-step-dot} + #{$_atelier-step-gap} - 0.6rem);
   }
 }
 
@@ -336,8 +338,8 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
   display: grid;
   flex: none;
   place-items: center;
-  width: $atelier-step-dot;
-  height: $atelier-step-dot;
+  width: $_atelier-step-dot;
+  height: $_atelier-step-dot;
   border: 2px solid var(--atelier-sidebar-control-border);
   border-radius: 50%;
   background-color: var(--atelier-bg);
