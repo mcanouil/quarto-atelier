@@ -90,6 +90,7 @@ contributes:
         - iconify
       filters:
         - atelier-chrome.lua
+        - atelier-workshop.lua
         - social-metadata.lua
         - iconify
         - code-window
