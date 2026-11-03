@@ -265,6 +265,57 @@ $atelier-chrome-accent-mark: atelier-contrast(
 ) !default;
 
 // ===========================================================================
+// WORKSHOP TOKENS
+// ===========================================================================
+// The workshop and reading bar is the inverse of the chrome: the chrome ink is
+// its background and the chrome background is its ink. Every text ink is held
+// at 4.5:1 on the bar, and the progress fill at 3:1 on the bar and on the track.
+$atelier-workshop-bar-bg: $atelier-chrome-fg !default;
+$atelier-workshop-bar-fg: atelier-contrast($atelier-chrome-bg, $atelier-workshop-bar-bg, 4.5) !default;
+$atelier-workshop-bar-muted: atelier-contrast(
+  mix($atelier-workshop-bar-fg, $atelier-workshop-bar-bg, 80%),
+  $atelier-workshop-bar-bg,
+  4.5
+) !default;
+$atelier-workshop-bar-surface: mix($atelier-workshop-bar-bg, $atelier-workshop-bar-fg, 90%) !default;
+
+// The progress track, which the accent fill must also stand out from.
+$atelier-workshop-bar-track: mix($atelier-workshop-bar-bg, $atelier-workshop-bar-fg, 80%) !default;
+$atelier-workshop-bar-accent: atelier-contrast-all(
+  $atelier-chrome-accent,
+  ($atelier-workshop-bar-bg, $atelier-workshop-bar-track),
+  3
+) !default;
+$atelier-workshop-bar-on-accent: atelier-on(
+  $atelier-workshop-bar-accent,
+  $atelier-workshop-bar-bg,
+  $atelier-workshop-bar-fg,
+  4.5
+) !default;
+$atelier-workshop-bar-accent-soft: rgba($atelier-workshop-bar-accent, $atelier-chrome-accent-soft-alpha) !default;
+
+// The mark sits on the soft tint, which is computed here as an opaque colour
+// because the contrast function cannot read a colour with an alpha channel.
+$atelier-workshop-bar-accent-mark: atelier-contrast(
+  $atelier-workshop-bar-accent,
+  mix($atelier-workshop-bar-accent, $atelier-workshop-bar-bg, $atelier-chrome-accent-soft-alpha * 100%),
+  3
+) !default;
+$atelier-workshop-bar-border: rgba($atelier-workshop-bar-fg, 0.2) !default;
+$atelier-workshop-bar-control-border: rgba($atelier-workshop-bar-fg, 0.55) !default;
+
+// The terminal block is dark in both colour schemes, so these are fixed
+// colours. Each ink is at least 4.5:1 on the terminal background, and the
+// control border is at least 3:1.
+$atelier-terminal-bg: #111418 !default;
+$atelier-terminal-fg: #e6e8eb !default;
+$atelier-terminal-muted: #aeb6bf !default;
+$atelier-terminal-border: #2a3037 !default;
+$atelier-terminal-control-border: #6b747e !default;
+$atelier-terminal-prompt: #7cc4a3 !default;
+$atelier-terminal-dot: #3a4048 !default;
+
+// ===========================================================================
 // PAGE VARIABLES
 // ===========================================================================
 // Steps from the page towards its ink: a quiet panel, and a stronger one for
