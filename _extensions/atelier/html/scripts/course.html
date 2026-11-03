@@ -1,0 +1,103 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-course" type="text/javascript">
+	(function () {
+		// In workshop mode, these components show the course from
+		// window.atelierCourse. Each block below is one component.
+		var course = window.atelierCourse;
+		if (!course || course.mode !== "workshop") return;
+
+		function element(tag, className, text) {
+			var node = document.createElement(tag);
+			if (className) node.className = className;
+			if (text) node.textContent = text;
+			return node;
+		}
+
+		// =====================================================================
+		// S3 COURSE STEPPER
+		// =====================================================================
+		// The sidebar menu shows each module with a number, its duration, and a
+		// tick when all its pages are visited. A summary above the menu shows
+		// the module position and the total time. Quarto's markup stays: the
+		// script adds classes and elements only. All modules other than the
+		// current module are collapsed, and Quarto's toggle opens them again.
+		(function () {
+			var menu = document.querySelector("#quarto-sidebar .sidebar-menu-container");
+			var list = menu && menu.querySelector("ul");
+			if (!list) return;
+
+			// The course model keeps a top-level item as a module only when it
+			// has a page link. The same filter gives the same order here.
+			var items = Array.prototype.filter.call(list.children, function (item) {
+				return Array.prototype.some.call(item.querySelectorAll("a.sidebar-link[href]"), function (link) {
+					return link.getAttribute("href") !== "#";
+				});
+			});
+			if (items.length !== course.modules.length) {
+				console.warn("Atelier: the sidebar modules do not match the course; the stepper is not shown.");
+				return;
+			}
+
+			menu.classList.add("atelier-stepper");
+			var hasCurrent = course.currentModule !== -1;
+
+			items.forEach(function (item, index) {
+				var module = course.modules[index];
+				var section = item.classList.contains("sidebar-item-section");
+				var control = item.querySelector(":scope > .sidebar-item-container > " + (section ? ".sidebar-item-toggle" : "a.sidebar-link"));
+				var text = control && control.querySelector(".menu-text");
+				if (!text) return;
+
+				var done = course.isComplete(index);
+				var current = index === course.currentModule;
+				item.classList.add("atelier-step");
+				if (done) item.classList.add("atelier-step-done");
+				if (current) item.classList.add("atelier-step-current");
+
+				var dot = element("span", "atelier-step-dot", done ? "✓" : String(index + 1));
+				dot.setAttribute("aria-hidden", "true");
+				control.insertBefore(dot, control.firstChild);
+
+				// The wrapper moves the label node with its id, so the section
+				// list keeps its accessible name.
+				var label = element("span", "atelier-step-label");
+				text.parentNode.insertBefore(label, text);
+				label.appendChild(text);
+				if (done) {
+					label.appendChild(element("span", "visually-hidden", " " + course.label("workshop-completed")));
+				}
+				if (module.minutes !== null) {
+					label.appendChild(element("small", "atelier-step-time", course.format(module.minutes)));
+				}
+
+				if (section && hasCurrent && !current) {
+					var target = item.querySelector(":scope > .sidebar-section");
+					if (target) target.classList.remove("show");
+					control.classList.add("collapsed");
+					control.setAttribute("aria-expanded", "false");
+				}
+			});
+
+			var summary = element("div", "atelier-course-summary");
+			var parts = [];
+			var m = course.modules.length;
+			var n = course.currentModule + 1;
+			if (hasCurrent) parts.push(course.label("workshop-position", { n: n, m: m }));
+			if (course.totalMinutes !== null) {
+				parts.push(course.label("workshop-total", { time: course.format(course.totalMinutes) }));
+			}
+			if (parts.length) summary.appendChild(element("p", "", parts.join(" · ")));
+			var progress = element("div", "atelier-course-progress");
+			progress.setAttribute("aria-hidden", "true");
+			var fill = element("span");
+			fill.style.width = (m ? (n / m) * 100 : 0) + "%";
+			progress.appendChild(fill);
+			summary.appendChild(progress);
+			menu.parentNode.insertBefore(summary, menu);
+		})();
+	})();
+</script>

@@ -123,6 +123,7 @@ contributes:
         - file: html/scripts/chrome.html
         - file: html/scripts/course-model.html
         - file: html/scripts/reading-bar.html
+        - file: html/scripts/course.html
         - file: html/scripts/announcement.html
         - file: html/scripts/toc-card.html
         - file: html/scripts/title-block.html

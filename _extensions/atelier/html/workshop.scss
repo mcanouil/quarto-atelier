@@ -239,3 +239,142 @@ html.atelier-workshop #quarto-header {
     --gitlink-widget-accent-soft: var(--atelier-accent-soft);
   }
 }
+
+// ===========================================================================
+// S3 COURSE STEPPER
+// ===========================================================================
+// In workshop mode, `html/scripts/course.html` turns the sidebar menu into a
+// course stepper: a numbered dot before each module, a vertical line between
+// the dots, and the duration under the module title. The current page in the
+// open module keeps the S2 current item.
+
+// The dot column starts at the inset of the module row. The line runs through
+// the centre of the dots.
+$atelier-step-dot: 24px;
+$atelier-step-inset: 0.3rem;
+$atelier-step-pad: 0.4rem;
+$atelier-step-gap: 0.7rem;
+$atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
+
+.atelier-course-summary {
+  margin: 0 0.75rem 1rem;
+  padding: 0 0.4rem 1rem;
+  border-bottom: 1px solid var(--atelier-sidebar-border);
+
+  p {
+    margin: 0;
+    color: var(--atelier-sidebar-muted);
+    font-size: 0.82rem;
+  }
+}
+
+.atelier-course-progress {
+  height: 6px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: var(--atelier-surface-strong);
+
+  > span {
+    display: block;
+    height: 100%;
+    background-color: var(--atelier-accent-fill);
+  }
+}
+
+// The sidebar shell styles the top-level sections as group labels with a
+// selector that holds an id. The selector here holds one id and more classes,
+// so the module rows replace that style.
+html.atelier-workshop #quarto-sidebar.sidebar-navigation .sidebar-menu-container.atelier-stepper {
+  // Quarto pads the top of every block in the sidebar. The summary above the
+  // menu already gives the space.
+  padding-top: 0;
+
+  > ul > .sidebar-item.atelier-step {
+    position: relative;
+    margin: 0;
+    padding: 0;
+
+    // Each module draws the line from its dot to the dot of the next module.
+    &:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: $atelier-step-centre;
+      bottom: calc(-1 * #{$atelier-step-centre});
+      left: calc(#{$atelier-step-inset} + #{$atelier-step-dot * 0.5} - 1px);
+      width: 2px;
+      background-color: var(--atelier-sidebar-border);
+    }
+
+    > .sidebar-item-container > :is(.sidebar-item-text.sidebar-item-toggle, a.sidebar-link) {
+      display: flex;
+      align-items: flex-start;
+      gap: $atelier-step-gap;
+      width: 100%;
+      padding: $atelier-step-pad $atelier-step-inset;
+      color: var(--atelier-sidebar-fg);
+      font-size: inherit;
+      font-weight: 400;
+      letter-spacing: normal;
+      text-align: start;
+      text-transform: none;
+
+      > .bi-chevron-right {
+        align-self: center;
+      }
+    }
+
+    // The pages of the open module align with the module title.
+    > .sidebar-section {
+      padding-inline-start: calc(#{$atelier-step-inset} + #{$atelier-step-dot} + #{$atelier-step-gap} - 0.6rem);
+    }
+  }
+
+  > ul > .atelier-step-current > .sidebar-item-container > * {
+    font-weight: 650;
+  }
+}
+
+.atelier-step-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: $atelier-step-dot;
+  height: $atelier-step-dot;
+  border: 2px solid var(--atelier-sidebar-control-border);
+  border-radius: 50%;
+  background-color: var(--atelier-bg);
+  color: var(--atelier-sidebar-muted);
+  font: 600 0.72rem / 1 var(--bs-font-monospace);
+
+  .atelier-step-done & {
+    border-color: var(--atelier-accent-fill);
+    background-color: var(--atelier-accent-fill);
+    color: var(--atelier-on-accent);
+  }
+
+  .atelier-step-current & {
+    box-shadow: 0 0 0 4px var(--atelier-sidebar-accent-soft);
+  }
+
+  .atelier-step-current:not(.atelier-step-done) & {
+    border-color: var(--atelier-sidebar-accent);
+    color: var(--atelier-sidebar-accent);
+  }
+}
+
+.atelier-step-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  // The label centres on the dot when it has one line.
+  padding-top: 0.1rem;
+}
+
+.atelier-step-time {
+  display: block;
+  color: var(--atelier-sidebar-muted);
+  font-size: 0.76rem;
+  font-weight: 400;
+}
