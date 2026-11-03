@@ -27,20 +27,8 @@
 		// current module are collapsed, and Quarto's toggle opens them again.
 		(function () {
 			var menu = document.querySelector("#quarto-sidebar .sidebar-menu-container");
-			var list = menu && menu.querySelector("ul");
-			if (!list) return;
-
-			// The course model keeps a top-level item as a module only when it
-			// has a page link. The same filter gives the same order here.
-			var items = Array.prototype.filter.call(list.children, function (item) {
-				return Array.prototype.some.call(item.querySelectorAll("a.sidebar-link[href]"), function (link) {
-					return link.getAttribute("href") !== "#";
-				});
-			});
-			if (items.length !== course.modules.length) {
-				console.warn("Atelier: the sidebar modules do not match the course; the stepper is not shown.");
-				return;
-			}
+			var items = course.moduleItems;
+			if (!menu || !items.length) return;
 
 			menu.classList.add("atelier-stepper");
 			var hasCurrent = course.currentModule !== -1;

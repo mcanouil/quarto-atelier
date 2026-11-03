@@ -32,6 +32,14 @@
 			return path.indexOf(root) === 0 ? path.slice(root.length) : path;
 		}
 
+		// A page of the course is a link to this site, below the site root.
+		function isPage(link) {
+			var href = link.getAttribute("href");
+			if (href === "#") return false;
+			var url = new URL(href, location.href);
+			return url.origin === location.origin && url.pathname.indexOf(root) === 0;
+		}
+
 		function label(key, values) {
 			return String(labels[key] || "").replace(/\{(\w+)\}/g, function (match, name) {
 				return values && name in values ? values[name] : match;
@@ -60,6 +68,7 @@
 
 		var pages = [];
 		var modules = [];
+		var moduleItems = [];
 		var indexByHref = {};
 
 		function pageIndex(link) {
@@ -81,11 +90,12 @@
 		Array.prototype.forEach.call(items, function (item) {
 			var indices = [];
 			item.querySelectorAll("a.sidebar-link[href]").forEach(function (link) {
-				if (link.getAttribute("href") === "#") return;
+				if (!isPage(link)) return;
 				var index = pageIndex(link);
 				if (indices.indexOf(index) === -1) indices.push(index);
 			});
 			if (!indices.length) return;
+			moduleItems.push(item);
 			modules.push({
 				title: textOf(item.querySelector(".sidebar-item-container .menu-text")),
 				pages: indices,
@@ -108,6 +118,8 @@
 			duration: typeof data.duration === "number" ? data.duration : null,
 			pages: pages,
 			modules: modules,
+			// The top-level sidebar items of the modules, in the order of modules.
+			moduleItems: moduleItems,
 			current: current,
 			currentModule: current === -1 ? -1 : pages[current].module,
 			previous: neighbour(".page-navigation .nav-page-previous a"),

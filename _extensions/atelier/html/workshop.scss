@@ -296,7 +296,9 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   padding: 0;
 
   // Each module draws the line from its dot to the dot of the next module.
-  &:not(:last-child)::before {
+  // A top-level link that is not a page, such as an external link, is not a
+  // module, so the last module draws no line.
+  &:has(~ .atelier-step)::before {
     content: "";
     position: absolute;
     top: $_atelier-step-centre;
