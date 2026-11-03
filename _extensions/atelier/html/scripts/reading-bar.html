@@ -88,6 +88,14 @@
 
 		content.insertBefore(bar, content.firstChild);
 
+		// The table of contents and the scroll padding sit below the bar. The bar
+		// grows when the crumb wraps, so its height is kept current.
+		function measure() {
+			document.documentElement.style.setProperty("--atelier-bar-height", bar.getBoundingClientRect().height + "px");
+		}
+		measure();
+		if (typeof ResizeObserver === "function") new ResizeObserver(measure).observe(bar);
+
 		// The timer counts down from the page duration. It is not a live region,
 		// so it does not announce each second.
 		function timer(total) {

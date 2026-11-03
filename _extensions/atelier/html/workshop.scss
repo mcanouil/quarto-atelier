@@ -7,10 +7,11 @@
 // the content: the reading bar in documentation mode, the workshop bar in
 // workshop mode. The colours come from the `--atelier-workshop-bar-*` tokens.
 
-// The row is 50 px and the progress track is 5 px.
+// The row is 50 px and the progress track is 5 px. The script writes the
+// measured height to `--atelier-bar-height`; the sum is the fallback.
 $atelier-bar-row-height: 50px;
 $atelier-bar-track-height: 5px;
-$atelier-bar-height: $atelier-bar-row-height + $atelier-bar-track-height;
+$atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atelier-bar-track-height});
 
 .atelier-bar {
   grid-column: screen-start / screen-end;
@@ -22,6 +23,11 @@ $atelier-bar-height: $atelier-bar-row-height + $atelier-bar-track-height;
   :focus-visible {
     outline-color: var(--atelier-workshop-bar-fg);
   }
+}
+
+// Quarto pads the top of every child of `#quarto-content` with an id selector.
+#quarto-content > .atelier-bar {
+  padding-top: 0;
 }
 
 #quarto-content:has(> .atelier-bar) {
@@ -125,8 +131,13 @@ $atelier-bar-height: $atelier-bar-row-height + $atelier-bar-track-height;
 }
 
 // From `lg` the bar sits beside the full-height sidebar and stays at the top
-// while the page scrolls. The table of contents sticks below it.
+// while the page scrolls. The table of contents sticks below it, and anchors
+// and focused elements scroll to below it.
 @include media-breakpoint-up(lg) {
+  html:has(#quarto-content > .atelier-bar) {
+    scroll-padding-top: $atelier-bar-height;
+  }
+
   .atelier-bar {
     position: sticky;
     top: 0;
@@ -138,9 +149,11 @@ $atelier-bar-height: $atelier-bar-row-height + $atelier-bar-track-height;
       grid-row: bar-top / page-bottom;
     }
 
+    // Quarto writes `top` and `max-height` inline on every `.sidebar`, so
+    // only `!important` puts the table of contents below the bar.
     > #quarto-margin-sidebar {
-      top: $atelier-bar-height;
-      max-height: calc(100vh - #{$atelier-bar-height});
+      top: $atelier-bar-height !important;
+      max-height: calc(100vh - #{$atelier-bar-height}) !important;
     }
   }
 }
