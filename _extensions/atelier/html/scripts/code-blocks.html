@@ -32,7 +32,7 @@
 				return;
 			}
 			parseSpec(block.getAttribute("data-atelier-highlight")).forEach(function (line) {
-				var span = block.querySelector('span[id="' + prefix + "-" + line + '"]');
+				var span = document.getElementById(prefix + "-" + line);
 				if (span) {
 					span.classList.add("atelier-line-highlight");
 				}
@@ -47,7 +47,7 @@
 				return;
 			}
 			parseSpec(block.getAttribute("data-atelier-prompt")).forEach(function (line) {
-				var span = block.querySelector('span[id="' + prefix + "-" + line + '"]');
+				var span = document.getElementById(prefix + "-" + line);
 				if (span) {
 					span.classList.add("atelier-prompt-line");
 				}
