@@ -911,6 +911,11 @@ footer.footer .nav-footer {
   color: var(--atelier-navbar-muted);
   font-size: 0.84rem;
 
+  // Quarto paints this wrapper grey with a bare class, so it does not inherit.
+  .nav-footer-contents {
+    color: var(--atelier-navbar-muted);
+  }
+
   .nav-footer-left,
   .nav-footer-center,
   .nav-footer-right {

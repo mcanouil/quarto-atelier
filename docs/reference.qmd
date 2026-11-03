@@ -274,7 +274,7 @@ The gradient check above also applies to gradient colours that you set.
 | `$atelier-landing-accent`        | `$primary`, moved to 4.5:1 against the page             | Eyebrow, legend numbers, card hover.   |
 | `$atelier-landing-muted`         | `$text-muted`, moved to 4.5:1 against the page          | Lead and legend detail text.           |
 | `$atelier-landing-surface`       | `body-mix(95%)`                                         | Card and banner surface.               |
-| `$atelier-landing-border`        | `body-mix(85%)`                                         | Card, banner and feature row borders.  |
+| `$atelier-landing-border`        | `var(--atelier-border)`                                 | Card, banner and feature row borders.  |
 | `$atelier-card-muted`            | `$text-muted`, moved to 4.5:1 against the card surface  | Card text.                             |
 | `$atelier-card-link`             | `$link-color`, moved to 4.5:1 against the card surface  | Card link.                             |
 | `$atelier-hero-gradient-start`   | `$atelier-landing-accent`                               | First colour of the title gradient.    |
