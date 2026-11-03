@@ -152,6 +152,12 @@
 				}, 1000);
 			}
 
+			document.addEventListener("visibilitychange", function () {
+				if (document.hidden || interval === null) return;
+				remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+				show();
+			});
+
 			toggle.addEventListener("click", function () {
 				if (remaining === 0) return;
 				var paused = interval !== null;

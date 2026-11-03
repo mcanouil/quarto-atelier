@@ -345,10 +345,12 @@ end
 
 --- Read the front matter of a page file as metadata, once per render.
 --- The YAML is parsed only when it mentions `duration`.
+--- A front matter that pandoc cannot read logs one warning and gives no metadata.
 --- @param path string The file path
---- @return table|nil The metadata, or nil when the file has no front matter
+--- @param report boolean True to log the warning when the front matter cannot be read
+--- @return table|nil The metadata, or nil when the file has no front matter or it cannot be read
 --- @return boolean True when the file exists
-local function read_front_matter(path)
+local function read_front_matter(path, report)
   local entry = files[path]
   if entry ~= nil and (entry.read or not entry.exists) then
     return entry.meta, entry.exists
@@ -363,7 +365,16 @@ local function read_front_matter(path)
   local meta = nil
   if yaml ~= nil then
     if yaml:find('duration', 1, true) then
-      meta = pandoc.read('---\n' .. yaml .. '\n---\n', 'markdown').meta
+      local ok, document = pcall(pandoc.read, '---\n' .. yaml .. '\n---\n', 'markdown')
+      if ok then
+        meta = document.meta
+      elseif report then
+        log.log_warning(
+          EXTENSION_NAME,
+          path .. ': its front matter could not be read; its duration is ignored. ' ..
+          'Correct the YAML of that file.'
+        )
+      end
     else
       meta = pandoc.Meta({})
     end
@@ -399,7 +410,7 @@ local function read_durations(paths, page)
   for _, path in ipairs(paths) do
     local extension = path:match('%.(%w+)$')
     if extension and FRONT_MATTER_EXTENSIONS[extension] then
-      local meta, exists = read_front_matter(directory .. '/' .. path)
+      local meta, exists = read_front_matter(directory .. '/' .. path, page == first)
       if not exists then
         if page == first then
           log.log_warning(
@@ -432,6 +443,24 @@ end
 --- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil, objectives: integer }
 local state = { objectives = 0 }
 
+--- Log the warning for a listed sidebar that has no id.
+--- Each page of the sidebar finds the same problem, so only the first page that exists warns.
+--- @param source string The input file, for the warning
+--- @param paths string[] The page paths of the sidebar
+--- @param page string The page path relative to the project
+--- @return nil
+local function warn_sidebar_without_id(source, paths, page)
+  if page ~= first_existing(paths, quarto.project.directory or '.') then
+    return nil
+  end
+  log.log_warning(
+    EXTENSION_NAME,
+    source .. ' is listed in a sidebar of extensions.atelier.sidebars that has no id, ' ..
+    'so its progress is not stored. Give its website.sidebar entry an id, ' ..
+    'for example `id: course`, so progress can be stored.'
+  )
+end
+
 --- Add the workshop data block to the head.
 --- @param meta table The document metadata
 --- @return nil
@@ -461,7 +490,11 @@ local function publish_workshop(meta)
         'The extension does not resolve contents: auto or glob patterns, so list the page by its path.'
       )
     else
-      data.sidebar = sidebar
+      if sidebar == '' then
+        warn_sidebar_without_id(source, paths, page)
+      else
+        data.sidebar = sidebar
+      end
       local durations = read_durations(paths, page)
       if next(durations) ~= nil then
         data.durations = durations

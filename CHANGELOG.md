@@ -28,7 +28,8 @@
 - feat: Restyle the floating sidebar, the narrow-screen sidebar toggle and backdrop, and the lightbox overlay from the brand, and fit SVG images to the screen in the lightbox. (#77)
 - feat: Restyle the five about page templates from the brand, with link buttons held to 4.5:1. (#77)
 - feat: Add the `extensions: atelier: mode: workshop` option, set in the `_metadata.yml` of a workshop folder, the `extensions: atelier: duration` page option, and `extensions: atelier: sidebars`, which lists the workshop sidebars through a YAML alias.
-- feat: Show a bar at the top of the content in the sidebar-only layout, with the section and page, previous and next links, and "Page n of m". In workshop mode, it shows "Module n of m" and a session timer that can be paused.
+- feat: Show a bar at the top of the content in the sidebar-only layout, with the section and page, previous and next links, and "Page n of m".
+  In workshop mode, it shows "Module n of m" and a session timer that can be paused.
 - feat: In workshop mode with a navbar, draw the navbar in inverted colours and add a module row with the breadcrumb, the timer, previous and next links, and the module progress.
 - feat: In workshop mode, show the sidebar as numbered modules with their durations, the completed modules ticked, and a summary with the module position and the total time.
 - feat: In workshop mode, show the table of contents with a dot for each section, filled once read, and a ring with the share of the module read.
