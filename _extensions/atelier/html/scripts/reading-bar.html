@@ -9,13 +9,16 @@
 		// sidebar. In documentation mode it shows the section, the page, the page
 		// position, and the previous and next links. In workshop mode it shows the
 		// module, the module position, and a session timer when the page has a
-		// duration.
+		// duration. With a navbar, only workshop mode has the bar: it is the module
+		// row under the navbar, inside the header, so it stays with the navbar.
 		if (!window.atelierCourse || window.atelierCourse.current < 0) return;
 		var content = document.getElementById("quarto-content");
-		if (!content || document.querySelector("#quarto-header .navbar")) return;
+		if (!content) return;
 
 		var course = window.atelierCourse;
 		var workshop = course.mode === "workshop";
+		var navbar = document.querySelector("#quarto-header > nav.navbar");
+		if (navbar && !workshop) return;
 		var page = course.pages[course.current];
 		var module = course.modules[course.currentModule];
 
@@ -86,15 +89,21 @@
 		progress.appendChild(fill);
 		bar.appendChild(progress);
 
-		content.insertBefore(bar, content.firstChild);
-
-		// The table of contents and the scroll padding sit below the bar. The bar
-		// grows when the crumb wraps, so its height is kept current.
-		function measure() {
-			document.documentElement.style.setProperty("--atelier-bar-height", bar.getBoundingClientRect().height + "px");
+		// In the header, Quarto measures the module row with the navbar when it
+		// sets the page offset, so the row needs no measurement of its own.
+		if (navbar) {
+			bar.classList.add("atelier-bar-module-row");
+			navbar.after(bar);
+		} else {
+			content.insertBefore(bar, content.firstChild);
+			// The table of contents and the scroll padding sit below the bar. The
+			// bar grows when the crumb wraps, so its height is kept current.
+			var measure = function () {
+				document.documentElement.style.setProperty("--atelier-bar-height", bar.getBoundingClientRect().height + "px");
+			};
+			measure();
+			if (typeof ResizeObserver === "function") new ResizeObserver(measure).observe(bar);
 		}
-		measure();
-		if (typeof ResizeObserver === "function") new ResizeObserver(measure).observe(bar);
 
 		// The timer counts down from the page duration. It is not a live region,
 		// so it does not announce each second.

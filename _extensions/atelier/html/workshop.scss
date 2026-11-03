@@ -30,6 +30,12 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
   padding-top: 0;
 }
 
+// Quarto pads the sides of every `nav` in the header with an id selector. The
+// module row has its own padding.
+#quarto-header > .atelier-bar {
+  padding-inline: 0;
+}
+
 #quarto-content:has(> .atelier-bar) {
   grid-template-rows:
     [bar-top] auto
@@ -138,7 +144,7 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
     scroll-padding-top: $atelier-bar-height;
   }
 
-  .atelier-bar {
+  #quarto-content > .atelier-bar {
     position: sticky;
     top: 0;
     grid-column: body-start / screen-end;
@@ -161,5 +167,66 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
 @include media-breakpoint-down(md) {
   .atelier-bar-actions {
     margin-left: 0;
+  }
+}
+
+// ===========================================================================
+// WORKSHOP NAVBAR
+// ===========================================================================
+// In workshop mode the navbar takes the colours of the workshop bar, so the
+// navbar and the module row under it read as one inverted header. The N2 rules
+// and the gitlink widget read the `--atelier-navbar-*` tokens, so they follow.
+html.atelier-workshop #quarto-header {
+  --atelier-navbar-bg: var(--atelier-workshop-bar-bg);
+  --atelier-navbar-surface: var(--atelier-workshop-bar-surface);
+  --atelier-navbar-fg: var(--atelier-workshop-bar-fg);
+  --atelier-navbar-muted: var(--atelier-workshop-bar-muted);
+  --atelier-navbar-accent: var(--atelier-workshop-bar-accent);
+  --atelier-navbar-accent-soft: var(--atelier-workshop-bar-accent-soft);
+  --atelier-navbar-border: var(--atelier-workshop-bar-border);
+  --atelier-navbar-control-border: var(--atelier-workshop-bar-control-border);
+  --atelier-navbar-accent-mark: var(--atelier-workshop-bar-accent-mark);
+}
+
+// Quarto bakes the navbar background and the Bootstrap navbar colours from the
+// `$navbar-*` variables. Point them at the tokens above.
+$atelier-icon-toggler: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+
+html.atelier-workshop #quarto-header > .navbar {
+  --bs-navbar-color: var(--atelier-navbar-fg);
+  --bs-navbar-hover-color: var(--atelier-navbar-accent);
+  --bs-navbar-active-color: var(--atelier-navbar-accent);
+  --bs-navbar-disabled-color: var(--atelier-navbar-muted);
+  --bs-navbar-brand-color: var(--atelier-navbar-fg);
+  --bs-navbar-brand-hover-color: var(--atelier-navbar-accent);
+  background-color: var(--atelier-navbar-bg);
+  color: var(--atelier-navbar-fg);
+
+  .quarto-navbar-tools .quarto-navigation-tool {
+    color: var(--atelier-navbar-fg);
+
+    &:hover {
+      color: var(--atelier-navbar-accent);
+    }
+  }
+
+  // Bootstrap bakes the toggler glyph into a data URI with the colour of the
+  // bar. Draw it as a mask over the current colour.
+  .navbar-toggler-icon {
+    background-image: none;
+    background-color: currentcolor;
+    mask: $atelier-icon-toggler center / 100% no-repeat;
+  }
+}
+
+// The focus ring on the inverted header is the bar ink. The gitlink menu has
+// the page colours, so it keeps the page focus ring.
+html.atelier-workshop #quarto-header {
+  :focus-visible {
+    outline-color: var(--atelier-workshop-bar-fg);
+  }
+
+  .gitlink-widget-dropdown :focus-visible {
+    outline-color: var(--atelier-focus);
   }
 }

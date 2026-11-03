@@ -29,6 +29,7 @@
 - feat: Restyle the five about page templates from the brand, with link buttons held to 4.5:1. (#77)
 - feat: Add the `extensions: atelier: mode: workshop` option, set in the `_metadata.yml` of a workshop folder, the `extensions: atelier: duration` page option, and `extensions: atelier: sidebars`, which lists the workshop sidebars through a YAML alias.
 - feat: Show a bar at the top of the content in the sidebar-only layout, with the section and page, previous and next links, and "Page n of m", or "Module n of m" and a session timer that can be paused in workshop mode.
+- feat: In workshop mode with a navbar, draw the navbar in inverted colours and add a module row with the breadcrumb, the timer, previous and next links, and the module progress.
 
 ### Bug Fixes
 
