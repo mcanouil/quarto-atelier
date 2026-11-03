@@ -88,6 +88,7 @@ local function parse_duration(text)
 end
 
 --- Format minutes with the duration labels.
+--- The spaces become no-break spaces, so the duration stays on one line.
 --- @param minutes integer The duration in minutes
 --- @param labels table<string, string> The resolved labels
 --- @return string The text, such as `25 min`, `1 h`, or `1 h 30 min`
@@ -100,7 +101,7 @@ local function format_duration(minutes, labels)
   elseif hours > 0 then
     template = labels['duration-hours']
   end
-  return (template:gsub('{h}', tostring(hours)):gsub('{m}', tostring(rest)))
+  return (template:gsub('{h}', tostring(hours)):gsub('{m}', tostring(rest)):gsub(' ', '\u{00A0}'))
 end
 
 --- Read the `extensions.atelier` table of a metadata table.

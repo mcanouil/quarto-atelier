@@ -52,7 +52,8 @@
 			var key = "duration-minutes";
 			if (hours > 0 && rest > 0) key = "duration-hours-minutes";
 			else if (hours > 0) key = "duration-hours";
-			return label(key, { h: hours, m: rest });
+			// No-break spaces keep a duration on one line.
+			return label(key, { h: hours, m: rest }).replace(/ /g, "\u00a0");
 		}
 
 		function sum(values) {
