@@ -11,6 +11,8 @@
 --- A workshop page also gets the `atelier-workshop` class on `<html>`.
 
 --- Load modules
+local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
+local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
 
 --- Modes that `extensions.atelier.mode` accepts.
@@ -18,6 +20,10 @@ local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/m
 local MODE_DOCUMENTATION = 'documentation'
 --- @type string
 local MODE_WORKSHOP = 'workshop'
+
+--- Name that prefixes each warning.
+--- @type string
+local EXTENSION_NAME = 'atelier'
 
 --- Page file extensions whose front matter holds a duration.
 --- @type table<string, boolean>
@@ -71,7 +77,7 @@ end
 --- @param text string The duration text
 --- @return integer|nil The minutes, or nil when the text is not a duration
 local function parse_duration(text)
-  local value = text:lower():gsub('^%s+', ''):gsub('%s+$', '')
+  local value = str.trim(text:lower())
   local minutes = value:match('^(%d+)$') or value:match('^(%d+)%s*min$')
   if minutes then
     return tonumber(minutes)
@@ -121,7 +127,8 @@ end
 --- @param source string The file the duration comes from
 --- @return nil
 local function warn_duration(subject, text, source)
-  quarto.log.warning(
+  log.log_warning(
+    EXTENSION_NAME,
     subject .. " '" .. text .. "' in " .. source ..
     " is not a duration such as '25 min' or '1 h 30 min'. Ignoring it."
   )
@@ -160,7 +167,8 @@ local function read_mode(meta, source)
   if text == MODE_DOCUMENTATION or text == MODE_WORKSHOP then
     return text
   end
-  quarto.log.warning(
+  log.log_warning(
+    EXTENSION_NAME,
     'extensions.atelier.mode must be documentation or workshop, but was \'' .. text ..
     '\' in ' .. source .. '. Using documentation.'
   )
@@ -198,6 +206,27 @@ local function project_relative_input()
   return input
 end
 
+--- What the render knows about each file, by path.
+--- Each entry holds `exists`, `read` (true once the front matter is read), and `meta`.
+--- @type table<string, { exists: boolean, read: boolean, meta: table|nil }>
+local files = {}
+
+--- Tell if a file exists.
+--- @param path string The file path
+--- @return boolean True when the file opens
+local function file_exists(path)
+  local entry = files[path]
+  if entry == nil then
+    local file = io.open(path, 'r')
+    entry = { exists = file ~= nil, read = false }
+    if file ~= nil then
+      file:close()
+    end
+    files[path] = entry
+  end
+  return entry.exists
+end
+
 --- Resolve a sidebar path to a project path.
 --- Quarto rewrites the paths of existing files relative to the page, so the
 --- path is joined to the folder of the page. A path that does not exist that
@@ -211,11 +240,9 @@ local function resolve_path(path, base)
     return normalise_path(path)
   end
   local joined = normalise_path(base .. '/' .. path)
-  local file = io.open((quarto.project.directory or '.') .. '/' .. joined, 'r')
-  if file == nil then
+  if not file_exists((quarto.project.directory or '.') .. '/' .. joined) then
     return normalise_path(path)
   end
-  file:close()
   return joined
 end
 
@@ -296,34 +323,66 @@ local function find_sidebar(options, page)
   return nil, nil
 end
 
---- Read the front matter of a page file as metadata.
---- @param path string The file path
---- @return table|nil The metadata, or nil when the file has no front matter
-local function read_front_matter(path)
-  local file = io.open(path, 'r')
-  if file == nil then
+--- Read the YAML text of the front matter of an open file.
+--- The read stops at the closing `---`.
+--- @param file file* The open file
+--- @return string|nil The YAML text, or nil when the file has no front matter
+local function read_yaml(file)
+  local first = file:read('l')
+  if first == nil or first:gsub('\r$', '') ~= '---' then
     return nil
   end
-  local text = file:read('a')
-  file:close()
-  local yaml = text:match('^%-%-%-\r?\n(.-)\r?\n%-%-%-[ \t]*\r?\n') or
-    text:match('^%-%-%-\r?\n(.-)\r?\n%-%-%-[ \t]*$')
-  if yaml == nil then
-    return nil
+  local lines = {}
+  for raw in file:lines() do
+    local line = raw:gsub('\r$', '')
+    if line:match('^%-%-%-[ \t]*$') then
+      return table.concat(lines, '\n')
+    end
+    lines[#lines + 1] = line
   end
-  return pandoc.read('---\n' .. yaml .. '\n---\n', 'markdown').meta
+  return nil
 end
 
---- Tell if a file exists.
+--- Read the front matter of a page file as metadata, once per render.
+--- The YAML is parsed only when it mentions `duration`.
 --- @param path string The file path
---- @return boolean True when the file opens
-local function file_exists(path)
+--- @return table|nil The metadata, or nil when the file has no front matter
+--- @return boolean True when the file exists
+local function read_front_matter(path)
+  local entry = files[path]
+  if entry ~= nil and (entry.read or not entry.exists) then
+    return entry.meta, entry.exists
+  end
   local file = io.open(path, 'r')
   if file == nil then
-    return false
+    files[path] = { exists = false, read = true }
+    return nil, false
   end
+  local yaml = read_yaml(file)
   file:close()
-  return true
+  local meta = nil
+  if yaml ~= nil then
+    if yaml:find('duration', 1, true) then
+      meta = pandoc.read('---\n' .. yaml .. '\n---\n', 'markdown').meta
+    else
+      meta = pandoc.Meta({})
+    end
+  end
+  files[path] = { exists = true, read = true, meta = meta }
+  return meta, true
+end
+
+--- Find the first page of a list that exists.
+--- @param paths string[] The page paths relative to the project
+--- @param directory string The project folder
+--- @return string|nil The first path whose file exists
+local function first_existing(paths, directory)
+  for _, path in ipairs(paths) do
+    if file_exists(directory .. '/' .. path) then
+      return path
+    end
+  end
+  return nil
 end
 
 --- Read the duration of each page of a sidebar.
@@ -336,20 +395,15 @@ end
 local function read_durations(paths, page)
   local durations = {}
   local directory = quarto.project.directory or '.'
-  local first = nil
-  for _, path in ipairs(paths) do
-    if first == nil and file_exists(directory .. '/' .. path) then
-      first = path
-    end
-  end
+  local first = first_existing(paths, directory)
   for _, path in ipairs(paths) do
     local extension = path:match('%.(%w+)$')
     if extension and FRONT_MATTER_EXTENSIONS[extension] then
-      local full = directory .. '/' .. path
-      local meta = read_front_matter(full)
-      if meta == nil and not file_exists(full) then
+      local meta, exists = read_front_matter(directory .. '/' .. path)
+      if not exists then
         if page == first then
-          quarto.log.warning(
+          log.log_warning(
+            EXTENSION_NAME,
             'extensions.atelier.sidebars lists ' .. path .. ', but that file does not exist. ' ..
             'Correct the path or remove the entry from the sidebar.'
           )
@@ -365,21 +419,11 @@ local function read_durations(paths, page)
   return durations
 end
 
---- Encode the data as JSON, keeping an empty `durations` as an object.
---- @param data table The data without `durations`
---- @param durations table<string, integer>|nil The durations, or nil to leave them out
+--- Encode the data as JSON.
+--- @param data table The data
 --- @return string The JSON text, safe inside a script element
-local function encode(data, durations)
-  local placeholder = '__atelier_durations__'
-  if durations ~= nil then
-    data.durations = placeholder
-  end
-  local json = quarto.json.encode(data)
-  if durations ~= nil then
-    local encoded = next(durations) == nil and '{}' or quarto.json.encode(durations)
-    json = json:gsub('"' .. placeholder .. '"', function() return encoded end)
-  end
-  return (json:gsub('</', '<\\/'))
+local function encode(data)
+  return (quarto.json.encode(data):gsub('</', '<\\/'))
 end
 
 --- The mode, page duration, and labels that the `Div` handler reads.
@@ -405,20 +449,23 @@ local function publish_workshop(meta)
     offset = quarto.project.offset or '',
     labels = state.labels,
   }
-  local durations = nil
   if mode == MODE_WORKSHOP then
     data.duration = duration
     local page = project_relative_input()
     local sidebar, paths = find_sidebar(options, page)
     if sidebar == nil then
-      quarto.log.warning(
+      log.log_warning(
+        EXTENSION_NAME,
         source .. ' is in workshop mode, but no sidebar in extensions.atelier.sidebars lists it. ' ..
         'Add a YAML anchor to its website.sidebar entry and list the alias in extensions.atelier.sidebars. ' ..
         'The extension does not resolve contents: auto or glob patterns, so list the page by its path.'
       )
     else
       data.sidebar = sidebar
-      durations = read_durations(paths, page)
+      local durations = read_durations(paths, page)
+      if next(durations) ~= nil then
+        data.durations = durations
+      end
     end
     quarto.doc.include_text(
       'in-header',
@@ -427,7 +474,7 @@ local function publish_workshop(meta)
   end
   quarto.doc.include_text(
     'in-header',
-    '<script type="application/json" id="atelier-workshop">' .. encode(data, durations) .. '</script>'
+    '<script type="application/json" id="atelier-workshop">' .. encode(data) .. '</script>'
   )
   return nil
 end
@@ -519,7 +566,7 @@ local function block_attr(div, class)
   local attributes = {}
   for _, pair in ipairs(div.attributes) do
     if pair[1] ~= 'title' and pair[1] ~= 'duration' then
-      attributes[#attributes + 1] = { pair[1], pair[2] }
+      attributes[#attributes + 1] = pair
     end
   end
   return pandoc.Attr(div.identifier, classes, attributes)
@@ -551,7 +598,8 @@ local function objectives_block(div)
     end
   end
   if not done then
-    quarto.log.warning(
+    log.log_warning(
+      EXTENSION_NAME,
       'The .objectives block in ' .. (quarto.doc.input_file or '') .. ' has no bullet list, so it shows no checkboxes. ' ..
       'Write each objective as an item of a bullet list.'
     )
@@ -583,7 +631,7 @@ end
 --- @return pandoc.Blocks The disclosure
 local function solution_block(div, title, identifier)
   local id = identifier ~= '' and (' id="' .. identifier .. '"') or ''
-  local blocks = pandoc.Blocks({
+  return pandoc.Blocks({
     pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
     pandoc.Plain({
       pandoc.RawInline('html', '<summary>'),
@@ -593,7 +641,6 @@ local function solution_block(div, title, identifier)
     block_body(div.content),
     pandoc.RawBlock('html', '</details>'),
   })
-  return blocks
 end
 
 --- Turn the workshop divs into blocks, in workshop mode only.
@@ -664,7 +711,7 @@ local function style_terminal(block)
   if #prompts > 0 then
     block.attributes['atelier-prompt'] = table.concat(prompts, ',')
   end
-  if block.attributes.filename == nil and state.labels ~= nil then
+  if block.attributes.filename == nil then
     block.attributes.filename = state.labels.terminal
     block.classes:insert('cw-auto')
   end
