@@ -176,12 +176,14 @@ $atelier-bar-height: var(--atelier-bar-height, #{$atelier-bar-row-height + $atel
 // In workshop mode the navbar takes the colours of the workshop bar, so the
 // navbar and the module row under it read as one inverted header. The N2 rules
 // and the gitlink widget read the `--atelier-navbar-*` tokens, so they follow.
+// The navbar accent is a text ink, so it takes the accent text token, not the
+// fill accent of the Next button and the progress.
 html.atelier-workshop #quarto-header {
   --atelier-navbar-bg: var(--atelier-workshop-bar-bg);
   --atelier-navbar-surface: var(--atelier-workshop-bar-surface);
   --atelier-navbar-fg: var(--atelier-workshop-bar-fg);
   --atelier-navbar-muted: var(--atelier-workshop-bar-muted);
-  --atelier-navbar-accent: var(--atelier-workshop-bar-accent);
+  --atelier-navbar-accent: var(--atelier-workshop-bar-accent-text);
   --atelier-navbar-accent-soft: var(--atelier-workshop-bar-accent-soft);
   --atelier-navbar-border: var(--atelier-workshop-bar-border);
   --atelier-navbar-control-border: var(--atelier-workshop-bar-control-border);
@@ -228,5 +230,12 @@ html.atelier-workshop #quarto-header {
 
   .gitlink-widget-dropdown :focus-visible {
     outline-color: var(--atelier-focus);
+  }
+
+  // The gitlink menu sits on the page background, so its hover and focus
+  // colours are the page accent, not the inverted header accent.
+  .gitlink-widget-dropdown {
+    --gitlink-widget-accent: var(--atelier-accent-ink);
+    --gitlink-widget-accent-soft: var(--atelier-accent-soft);
   }
 }
