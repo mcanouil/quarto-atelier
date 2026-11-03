@@ -131,19 +131,21 @@
 			var read = Array.isArray(stored) ? stored.slice() : [];
 			var inModule = course.currentModule !== -1;
 
-			toc.classList.add("atelier-toc-dots");
-			var progress = null;
-			if (inModule) {
-				progress = element("p", "atelier-toc-progress");
+			// A clone made before this block runs lacks the class and the line,
+			// so render() calls this on every root. It adds only what is missing.
+			function prepare(root) {
+				root.classList.add("atelier-toc-dots");
+				if (!inModule || root.querySelector(".atelier-toc-progress")) return;
+				var progress = element("p", "atelier-toc-progress");
 				var ring = element("span", "atelier-ring");
 				ring.setAttribute("aria-hidden", "true");
 				progress.appendChild(ring);
 				progress.appendChild(document.createTextNode(""));
-				var title = toc.querySelector("#toc-title");
+				var title = root.querySelector("#toc-title");
 				if (title) {
 					title.after(progress);
 				} else {
-					toc.prepend(progress);
+					root.prepend(progress);
 				}
 			}
 
@@ -158,6 +160,7 @@
 
 			function render() {
 				document.querySelectorAll("#quarto-margin-sidebar #TOC, .quarto-sidebar-toggle-contents #TOC").forEach(function (root) {
+					prepare(root);
 					headings.forEach(function (heading) {
 						var link = root.querySelector('a.nav-link[data-scroll-target="' + heading.href + '"]');
 						if (!link) return;
