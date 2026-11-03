@@ -135,20 +135,25 @@
 
 			// A clone made before this block runs lacks the class and the line,
 			// so render() calls this on every root. It adds only what is missing.
+			// It returns the ring and the text node of the line, or null outside a module.
 			function prepare(root) {
 				root.classList.add("atelier-toc-dots");
-				if (!inModule || root.querySelector(".atelier-toc-progress")) return;
+				if (!inModule) return null;
+				var existing = root.querySelector(".atelier-toc-progress");
+				if (existing) return { ring: existing.querySelector(".atelier-ring"), text: existing.lastChild };
 				var progress = element("p", "atelier-toc-progress");
 				var ring = element("span", "atelier-ring");
 				ring.setAttribute("aria-hidden", "true");
 				progress.appendChild(ring);
-				progress.appendChild(document.createTextNode(""));
+				var text = document.createTextNode("");
+				progress.appendChild(text);
 				var title = root.querySelector("#toc-title");
 				if (title) {
 					title.after(progress);
 				} else {
 					root.prepend(progress);
 				}
+				return { ring: ring, text: text };
 			}
 
 			function share() {
@@ -161,8 +166,9 @@
 			}
 
 			function render() {
+				var percent = inModule ? share() : 0;
 				document.querySelectorAll("#quarto-margin-sidebar #TOC, .quarto-sidebar-toggle-contents #TOC").forEach(function (root) {
-					prepare(root);
+					var line = prepare(root);
 					headings.forEach(function (heading) {
 						var link = root.querySelector('a.nav-link[data-scroll-target="' + heading.href + '"]');
 						if (!link) return;
@@ -175,11 +181,9 @@
 							hidden.remove();
 						}
 					});
-					var line = root.querySelector(".atelier-toc-progress");
 					if (line) {
-						var percent = share();
-						line.querySelector(".atelier-ring").style.setProperty("--atelier-ring", percent + "%");
-						line.lastChild.nodeValue = course.label("toc-module-read", { n: percent });
+						line.ring.style.setProperty("--atelier-ring", percent + "%");
+						line.text.nodeValue = course.label("toc-module-read", { n: percent });
 					}
 				});
 			}
@@ -189,6 +193,8 @@
 				var added = hrefs.filter(function (href) { return read.indexOf(href) === -1; });
 				if (!added.length) return;
 				read = read.concat(added);
+				added.forEach(function (href) { observer.unobserve(nodeByHref.get(href)); });
+				stopWatchingWhenRead();
 				if (pending) return;
 				pending = true;
 				requestAnimationFrame(function () {
@@ -200,12 +206,15 @@
 			}
 
 			var byNode = new Map(headings.map(function (heading) { return [heading.node, heading.href]; }));
+			var nodeByHref = new Map(headings.map(function (heading) { return [heading.href, heading.node]; }));
 			var observer = new IntersectionObserver(function (entries) {
 				mark(entries.filter(function (entry) {
 					return entry.boundingClientRect.top < 0;
 				}).map(function (entry) { return byNode.get(entry.target); }));
 			}, { threshold: [0, 1] });
-			headings.forEach(function (heading) { observer.observe(heading.node); });
+			headings.forEach(function (heading) {
+				if (read.indexOf(heading.href) === -1) observer.observe(heading.node);
+			});
 
 			// The last headings of a short final section never reach the top.
 			function checkEnd() {
@@ -215,7 +224,15 @@
 				}
 			}
 			window.addEventListener("scroll", checkEnd, { passive: true });
+
+			// Once every heading is read, nothing is left to watch.
+			function stopWatchingWhenRead() {
+				if (read.length < headings.length) return;
+				observer.disconnect();
+				window.removeEventListener("scroll", checkEnd);
+			}
 			checkEnd();
+			stopWatchingWhenRead();
 
 			// Quarto marks the current entry with a class only. Mirror it in
 			// aria-current so assistive technology announces it.
