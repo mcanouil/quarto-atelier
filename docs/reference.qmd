@@ -85,9 +85,9 @@ Configure it by that name: declaring `format: html` replaces it rather than conf
 
 : Keys the project type sets on `atelier-html`. {.striped .hover tbl-colwidths="[30,70]"}
 
-It also bundles fourteen scripts into every page.
-They are a skip link before the body, and after it the current year, the external-link marks, the ordinal dates, the accessibility fixes, the navbar tooltips, the page chrome, the announcement bar, the table of contents card, the title block, the code blocks, the course model, the reading bar, and the course.
-Replacing the format with `html` drops all fourteen, which is what the `id="navbar-tooltips"` check on the [home page](index.qmd) looks for.
+It also bundles fifteen scripts into every page.
+They are a skip link before the body, and after it the current year, the external-link marks, the ordinal dates, the accessibility fixes, the navbar tooltips, the page chrome, the course model, the reading bar, the course, the announcement bar, the table of contents card, the title block, the code blocks, and the listings.
+Replacing the format with `html` drops all fifteen, which is what the `id="navbar-tooltips"` check on the [home page](index.qmd) looks for.
 
 Code blocks show on a tinted surface, with a border and an inset.
 If you set `code-block-bg: false` under `format.atelier-html`, the tint is not shown and code blocks show as outlines.

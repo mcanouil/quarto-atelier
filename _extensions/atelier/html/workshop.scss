@@ -220,6 +220,7 @@ html.atelier-workshop #quarto-header > .navbar {
     background-image: none;
     background-color: currentcolor;
     mask: $_atelier-icon-toggler center / 100% no-repeat;
+    -webkit-mask: $_atelier-icon-toggler center / 100% no-repeat;
   }
 }
 
@@ -560,6 +561,7 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
     margin-top: -9px;
     background-color: var(--atelier-on-accent);
     mask: $_atelier-icon-check center / 14px no-repeat;
+    -webkit-mask: $_atelier-icon-check center / 14px no-repeat;
     pointer-events: none;
   }
 

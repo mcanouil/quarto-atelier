@@ -663,7 +663,7 @@ end
 --- @param identifier string The identifier, or an empty string
 --- @return pandoc.Blocks The disclosure
 local function solution_block(div, title, identifier)
-  local id = identifier ~= '' and (' id="' .. identifier .. '"') or ''
+  local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
   return pandoc.Blocks({
     pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
     pandoc.Plain({
