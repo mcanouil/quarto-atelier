@@ -120,7 +120,10 @@
 
 			var key = course.current !== -1 ? course.pages[course.current].href : location.pathname;
 			var stored = course.progress.read[key];
-			var read = Array.isArray(stored) ? stored.slice() : [];
+			// Only the headings that are on the page now count as read.
+			var read = (Array.isArray(stored) ? stored : []).filter(function (href) {
+				return headings.some(function (heading) { return heading.href === href; });
+			});
 			var inModule = course.currentModule !== -1;
 
 			// A clone made before this block runs lacks the class and the line,
