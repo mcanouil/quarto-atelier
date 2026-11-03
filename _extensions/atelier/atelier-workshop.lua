@@ -560,10 +560,47 @@ local function style_proof(proof)
   return solution_block(proof.div, title, proof.identifier or '')
 end
 
+--- Draw a `.terminal` code block as a terminal, in both modes.
+--- Each line that starts with `$` and a space loses those two characters, and
+--- its number joins `atelier-prompt`, a line spec. The code-blocks script marks
+--- those lines, and the style draws the `$` prompt before them. The prompt is
+--- not in the text, so screen readers and the copy button skip it.
+--- Code Window draws the header from `filename`, which this filter sets to the
+--- `terminal` label when the block has none. The class `cw-auto` makes the Code
+--- Window script build the window. This filter runs before Code Window.
+--- @param block pandoc.CodeBlock The code block
+--- @return pandoc.CodeBlock|nil The block, or nil to keep it
+local function style_terminal(block)
+  if not quarto.doc.is_format('html') or not block.classes:includes('terminal') then
+    return nil
+  end
+  local lines = {}
+  local prompts = {}
+  local number = 0
+  for line in (block.text .. '\n'):gmatch('(.-)\n') do
+    number = number + 1
+    if line:sub(1, 2) == '$ ' then
+      line = line:sub(3)
+      prompts[#prompts + 1] = tostring(number)
+    end
+    lines[#lines + 1] = line
+  end
+  block.text = table.concat(lines, '\n')
+  block.classes:insert('atelier-terminal')
+  if #prompts > 0 then
+    block.attributes['atelier-prompt'] = table.concat(prompts, ',')
+  end
+  if block.attributes.filename == nil and state.labels ~= nil then
+    block.attributes.filename = state.labels.terminal
+    block.classes:insert('cw-auto')
+  end
+  return block
+end
+
 --- Two filter tables: pandoc finishes the `Meta` pass before the `Div` pass
 --- starts, so `state` is complete when `style_block` reads it. One table gives
 --- no such order between element types.
 return {
   { Meta = publish_workshop },
-  { Div = style_block, Proof = style_proof },
+  { Div = style_block, Proof = style_proof, CodeBlock = style_terminal },
 }

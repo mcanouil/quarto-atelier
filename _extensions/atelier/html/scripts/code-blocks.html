@@ -39,6 +39,21 @@
 			});
 		});
 
+		// The terminal block lists the lines that had a `$` prompt in
+		// `data-atelier-prompt`, and the style draws the prompt before them.
+		document.querySelectorAll("[data-atelier-prompt]").forEach(function (block) {
+			var prefix = block.id;
+			if (!prefix) {
+				return;
+			}
+			parseSpec(block.getAttribute("data-atelier-prompt")).forEach(function (line) {
+				var span = block.querySelector('span[id="' + prefix + "-" + line + '"]');
+				if (span) {
+					span.classList.add("atelier-prompt-line");
+				}
+			});
+		});
+
 		// The window header shows the language beside the file name. The language
 		// is the first class of the code that is not a Quarto or Pandoc class.
 		var ignored = ["sourceCode", "numberSource", "number-lines", "code-with-copy", "code-annotation-code"];
@@ -48,6 +63,9 @@
 				var pre = codeWindow.querySelector("pre.sourceCode");
 				if (!header || !pre || header.querySelector(".atelier-code-language")) {
 					return;
+				}
+				if (pre.classList.contains("atelier-terminal")) {
+					codeWindow.classList.add("atelier-terminal");
 				}
 				var language = Array.prototype.find.call(pre.classList, function (name) {
 					return ignored.indexOf(name) === -1;

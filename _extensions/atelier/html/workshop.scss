@@ -548,3 +548,86 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
     }
   }
 }
+
+// ===========================================================================
+// TERMINAL BLOCK
+// ===========================================================================
+// A `.terminal` code block is dark in both colour schemes. The code-blocks
+// script adds `atelier-terminal` to the Code Window, and the filter adds it to
+// the code. Code Window reads its surfaces from the two variables.
+html .code-with-filename.atelier-terminal {
+  --code-window-bg: var(--atelier-terminal-bg);
+  --code-window-title-bg: var(--atelier-terminal-bg);
+
+  color: var(--atelier-terminal-fg);
+  border-color: var(--atelier-terminal-border);
+
+  .code-with-filename-file {
+    color: var(--atelier-terminal-muted);
+    border-bottom-color: var(--atelier-terminal-border);
+
+    // Three dots, drawn with one dot and two shadows.
+    &::before {
+      content: "";
+      flex: none;
+      width: 9px;
+      height: 9px;
+      margin-right: 28px;
+      background: var(--atelier-terminal-dot);
+      border-radius: 50%;
+      box-shadow:
+        14px 0 0 var(--atelier-terminal-dot),
+        28px 0 0 var(--atelier-terminal-dot);
+    }
+  }
+
+  // Code Window sets the label of a generated name in small caps.
+  &.code-window-auto .code-with-filename-file pre {
+    text-align: start;
+
+    strong {
+      font-size: inherit;
+      text-transform: none;
+    }
+  }
+
+  .code-with-filename-lines {
+    color: var(--atelier-terminal-muted);
+    background-color: var(--atelier-terminal-bg);
+    border-color: var(--atelier-terminal-border);
+  }
+
+  .code-copy-button {
+    color: var(--atelier-terminal-fg);
+    background-color: transparent;
+    border-color: var(--atelier-terminal-control-border);
+  }
+}
+
+// The scheme's syntax colours fail on the dark ground, so every token takes
+// the line colour: the foreground on a command and the muted ink on output.
+html pre.sourceCode.atelier-terminal {
+  color: var(--atelier-terminal-fg);
+  background-color: var(--atelier-terminal-bg);
+
+  code > span {
+    color: var(--atelier-terminal-muted);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  code > span.atelier-prompt-line {
+    color: var(--atelier-terminal-fg);
+
+    // The empty alternative text keeps the prompt out of the accessible text.
+    &::before {
+      content: "$ " / "";
+      color: var(--atelier-terminal-prompt);
+      user-select: none;
+    }
+  }
+
+  code span span {
+    color: inherit;
+  }
+}
