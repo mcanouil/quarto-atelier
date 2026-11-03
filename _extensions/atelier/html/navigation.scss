@@ -183,8 +183,9 @@ body.docked .sidebar-navigation {
 }
 
 // The widget menu shadow is fixed in widget.css, with no property to set, so
-// it is repainted from the shadow token here.
-body .gitlink-widget .gitlink-widget-dropdown {
+// it is repainted from the shadow token here. The sidebar form of the menu
+// sits in the column and has no shadow.
+body .gitlink-widget:not(.gitlink-widget-sidebar) .gitlink-widget-dropdown {
   box-shadow: 0 12px 30px -16px var(--atelier-shadow);
 }
 

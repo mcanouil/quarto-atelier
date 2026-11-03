@@ -36,7 +36,8 @@
 		// Remove when: Quarto sets aria-current on the link of the current listing page.
 		function markCurrentPage(listing) {
 			listing.querySelectorAll(".pagination .page-link").forEach(function (link) {
-				var current = link.closest(".page-item").classList.contains("active");
+				var item = link.closest(".page-item");
+				var current = !!item && item.classList.contains("active");
 				if (current && link.getAttribute("aria-current") !== "page") {
 					link.setAttribute("aria-current", "page");
 				} else if (!current && link.hasAttribute("aria-current")) {

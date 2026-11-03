@@ -956,9 +956,15 @@ div.quarto-post {
 // upper-case header over a 2 px rule, hairline rows, and a tinted hover row.
 // Tables of a component (code annotations, listings other than the table
 // listing) keep their own rules.
+// The transparent default sits in `:where()`, so that a Bootstrap variant
+// class on the table (`.table-dark`, `.table-primary`) still sets its own.
+:where(main table.table, table.quarto-listing-table) {
+  --bs-table-bg: transparent;
+}
+
 main table.table,
 table.quarto-listing-table {
-  --bs-table-bg: transparent;
+  --bs-table-color: var(--atelier-fg);
   --bs-table-striped-bg: var(--atelier-surface);
   --bs-table-striped-color: var(--atelier-fg);
   --bs-table-hover-bg: var(--atelier-surface);
@@ -971,7 +977,6 @@ table.quarto-listing-table {
   > :not(caption) > * > * {
     padding: 0.55rem 0.75rem;
     border-bottom: 1px solid var(--atelier-border);
-    color: var(--atelier-fg);
     overflow-wrap: anywhere;
   }
 
