@@ -550,6 +550,12 @@ local function objectives_block(div)
       body:insert(block)
     end
   end
+  if not done then
+    quarto.log.warning(
+      'The .objectives block in ' .. (quarto.doc.input_file or '') .. ' has no bullet list, so it shows no checkboxes. ' ..
+      'Write each objective as an item of a bullet list.'
+    )
+  end
   return pandoc.Div(
     { block_head('bullseye', div.attributes.title or state.labels['objectives-title'], time), block_body(body) },
     block_attr(div, 'objectives')
