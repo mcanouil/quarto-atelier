@@ -62,6 +62,7 @@ contributes:
           - html/navigation.scss
           - html/content.scss
           - html/pages.scss
+          - html/workshop.scss
         dark:
           - html/chrome.scss
           - brand
@@ -69,6 +70,7 @@ contributes:
           - html/navigation.scss
           - html/content.scss
           - html/pages.scss
+          - html/workshop.scss
       syntax-highlighting:
         light: arrow-light
         dark: arrow-dark
@@ -120,6 +122,7 @@ contributes:
         - file: html/scripts/navbar-tooltips.html
         - file: html/scripts/chrome.html
         - file: html/scripts/course-model.html
+        - file: html/scripts/reading-bar.html
         - file: html/scripts/announcement.html
         - file: html/scripts/toc-card.html
         - file: html/scripts/title-block.html

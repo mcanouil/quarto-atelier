@@ -1,0 +1,152 @@
+/*-- scss:rules --*/
+
+// ===========================================================================
+// N3 BAR
+// ===========================================================================
+// Without a navbar, `html/scripts/reading-bar.html` puts a bar at the top of
+// the content: the reading bar in documentation mode, the workshop bar in
+// workshop mode. The colours come from the `--atelier-workshop-bar-*` tokens.
+
+// The row is 50 px and the progress track is 5 px.
+$atelier-bar-row-height: 50px;
+$atelier-bar-track-height: 5px;
+$atelier-bar-height: $atelier-bar-row-height + $atelier-bar-track-height;
+
+.atelier-bar {
+  grid-column: screen-start / screen-end;
+  grid-row: bar-top / content-top;
+  z-index: 10;
+  background-color: var(--atelier-workshop-bar-bg);
+  color: var(--atelier-workshop-bar-fg);
+
+  :focus-visible {
+    outline-color: var(--atelier-workshop-bar-fg);
+  }
+}
+
+#quarto-content:has(> .atelier-bar) {
+  grid-template-rows:
+    [bar-top] auto
+    [content-top] minmax(max-content, 1fr)
+    [content-bottom] minmax(60px, max-content)
+    [page-bottom];
+}
+
+.atelier-bar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  min-height: $atelier-bar-row-height;
+  padding: 0.5rem 1.1rem;
+}
+
+.atelier-bar-crumb {
+  margin: 0;
+  color: var(--atelier-workshop-bar-muted);
+  font-size: 0.85rem;
+
+  b {
+    color: var(--atelier-workshop-bar-fg);
+    font-weight: 650;
+  }
+}
+
+.atelier-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  font-size: 0.82rem;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    min-height: 28px;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid currentColor;
+    border-radius: $border-radius-sm;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .atelier-bar-next {
+    border-color: var(--atelier-workshop-bar-accent);
+    background-color: var(--atelier-workshop-bar-accent);
+    color: var(--atelier-workshop-bar-on-accent);
+    font-weight: 650;
+  }
+}
+
+// The toggle and the time read as one pill, as in the mockup: the toggle is
+// the left end and the time is the right end.
+.atelier-timer-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 0.2rem 0 0.45rem;
+  border: 1px solid currentColor;
+  border-right: 0;
+  border-radius: 999px 0 0 999px;
+  background: none;
+  color: inherit;
+
+  &[aria-pressed="true"] {
+    background-color: var(--atelier-workshop-bar-surface);
+  }
+}
+
+.atelier-timer {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  margin-left: -0.5rem;
+  padding: 0 0.55rem 0 0.2rem;
+  border: 1px solid currentColor;
+  border-left: 0;
+  border-radius: 0 999px 999px 0;
+  font: 500 0.78rem / 1 var(--bs-font-monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.atelier-bar-progress {
+  height: $atelier-bar-track-height;
+  background-color: var(--atelier-workshop-bar-track);
+
+  > span {
+    display: block;
+    height: 100%;
+    background-color: var(--atelier-workshop-bar-accent);
+  }
+}
+
+// From `lg` the bar sits beside the full-height sidebar and stays at the top
+// while the page scrolls. The table of contents sticks below it.
+@include media-breakpoint-up(lg) {
+  .atelier-bar {
+    position: sticky;
+    top: 0;
+    grid-column: body-start / screen-end;
+  }
+
+  #quarto-content:has(> .atelier-bar) {
+    > #quarto-sidebar {
+      grid-row: bar-top / page-bottom;
+    }
+
+    > #quarto-margin-sidebar {
+      top: $atelier-bar-height;
+      max-height: calc(100vh - #{$atelier-bar-height});
+    }
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .atelier-bar-actions {
+    margin-left: 0;
+  }
+}
