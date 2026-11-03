@@ -309,8 +309,10 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   }
 
   // The S2 section button keeps its colours. The row puts the dot at the
-  // start and the title at normal weight.
-  > .sidebar-item-container > :is(.sidebar-item-toggle, .sidebar-link) {
+  // start and the title at normal weight. A section with its own page has
+  // its title in a link and the chevron in a separate toggle, which keeps
+  // its own size.
+  > .sidebar-item-container > .sidebar-link {
     display: flex;
     align-items: flex-start;
     gap: $_atelier-step-gap;
@@ -324,7 +326,11 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
     }
   }
 
-  &.atelier-step-current > .sidebar-item-container > :is(.sidebar-item-toggle, .sidebar-link) {
+  > .sidebar-item-container > .sidebar-item-toggle:not(.sidebar-link) {
+    align-self: center;
+  }
+
+  &.atelier-step-current > .sidebar-item-container > .sidebar-link {
     font-weight: 650;
   }
 

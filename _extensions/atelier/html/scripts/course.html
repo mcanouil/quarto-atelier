@@ -35,8 +35,12 @@
 
 			items.forEach(function (item, index) {
 				var module = course.modules[index];
-				var section = item.classList.contains("sidebar-item-section");
-				var control = item.querySelector(":scope > .sidebar-item-container > " + (section ? ".sidebar-item-toggle" : "a.sidebar-link"));
+				// A section with its own page has the label in a link and a separate
+				// toggle with the chevron only. Other sections have the label in the
+				// toggle. A page has the label in its link.
+				var container = item.querySelector(":scope > .sidebar-item-container");
+				var toggle = container && container.querySelector(":scope > .sidebar-item-toggle");
+				var control = (container && container.querySelector(":scope > a.sidebar-link")) || toggle;
 				var text = control && control.querySelector(".menu-text");
 				if (!text) return;
 
@@ -62,11 +66,11 @@
 					label.appendChild(element("small", "atelier-step-time", course.format(module.minutes)));
 				}
 
-				if (section && hasCurrent && !current) {
+				if (toggle && hasCurrent && !current) {
 					var target = item.querySelector(":scope > .sidebar-section");
 					if (target) target.classList.remove("show");
-					control.classList.add("collapsed");
-					control.setAttribute("aria-expanded", "false");
+					toggle.classList.add("collapsed");
+					toggle.setAttribute("aria-expanded", "false");
 				}
 			});
 
