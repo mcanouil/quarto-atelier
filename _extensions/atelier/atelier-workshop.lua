@@ -187,9 +187,10 @@ local function project_relative_input()
 end
 
 --- Resolve a sidebar path to a project path.
---- Quarto rewrites the paths of the project metadata relative to the page, so
---- the path is joined to the folder of the page. A leading `/` marks a path
---- from the project root.
+--- Quarto rewrites the paths of existing files relative to the page, so the
+--- path is joined to the folder of the page. A path that does not exist that
+--- way is already relative to the project, as Quarto leaves missing files
+--- alone. A leading `/` marks a path from the project root.
 --- @param path string The path as the metadata holds it
 --- @param base string The folder of the page, relative to the project
 --- @return string The project path
@@ -197,7 +198,13 @@ local function resolve_path(path, base)
   if path:sub(1, 1) == '/' then
     return normalise_path(path)
   end
-  return normalise_path(base .. '/' .. path)
+  local joined = normalise_path(base .. '/' .. path)
+  local file = io.open((quarto.project.directory or '.') .. '/' .. joined, 'r')
+  if file == nil then
+    return normalise_path(path)
+  end
+  file:close()
+  return joined
 end
 
 --- Collect the file paths of a sidebar `contents` tree, in order.
@@ -294,7 +301,8 @@ local function read_durations(paths)
       local meta = read_front_matter(full)
       if meta == nil and io.open(full, 'r') == nil then
         quarto.log.warning(
-          'extensions.atelier.sidebars lists ' .. path .. ', but ' .. full .. ' does not exist.'
+          'extensions.atelier.sidebars lists ' .. path .. ', but that file does not exist. ' ..
+          'Correct the path or remove the entry from the sidebar.'
         )
       elseif meta ~= nil then
         local minutes = read_duration(meta, path)
