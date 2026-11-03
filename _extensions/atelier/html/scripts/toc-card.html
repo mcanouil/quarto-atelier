@@ -8,6 +8,10 @@
 		var toc = document.querySelector("#quarto-margin-sidebar #TOC");
 		if (!toc) return;
 
+		// In workshop mode, html/scripts/course.html draws the progress dots in
+		// place of this card.
+		if (window.atelierCourse && window.atelierCourse.mode === "workshop") return;
+
 		var labels = (window.atelierOptions || {}).labels || {};
 		var readingTime = labels["toc-reading-time"];
 		var updated = labels["toc-updated"];

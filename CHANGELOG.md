@@ -31,6 +31,7 @@
 - feat: Show a bar at the top of the content in the sidebar-only layout, with the section and page, previous and next links, and "Page n of m", or "Module n of m" and a session timer that can be paused in workshop mode.
 - feat: In workshop mode with a navbar, draw the navbar in inverted colours and add a module row with the breadcrumb, the timer, previous and next links, and the module progress.
 - feat: In workshop mode, show the sidebar as numbered modules with their durations, the completed modules ticked, and a summary with the module position and the total time.
+- feat: In workshop mode, show the table of contents with a dot for each section, filled once read, and a ring with the share of the module read.
 
 ### Bug Fixes
 
