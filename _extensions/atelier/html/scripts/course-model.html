@@ -23,10 +23,12 @@
 		var workshop = data.mode === "workshop";
 		var durations = data.durations || {};
 
-		// The site root path is the page path with the offset applied.
+		// The site root path is the page path with the offset applied. A folder
+		// URL gets "index.html", so it matches the sidebar link to that page.
 		var root = new URL(data.offset || "./", location.href).pathname;
 		function toHref(url) {
 			var path = new URL(url, location.href).pathname;
+			if (path.slice(-1) === "/") path += "index.html";
 			return path.indexOf(root) === 0 ? path.slice(root.length) : path;
 		}
 
