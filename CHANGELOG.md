@@ -20,13 +20,13 @@
   Lines named in `code-window-lines` or `code-line-numbers` get a tinted band and an accent marker. (#76)
 - feat: Restyle the announcement bar with a faint tint of its type that follows the colour scheme, an upper-case type label, and a rule below.
   The `atelier-announcement-*` language keys set the label text. (#76)
-- feat: Restyle the default listing, its categories, its filter and sort controls, and its pagination from the brand.
-- feat: Restyle grid listing cards with an accent border and a small lift on hover or keyboard focus, and give listing tables and tables in the text one style.
-- feat: Put the title banner on the chrome surface with its breadcrumbs, and restyle figure captions, keyboard keys, margin notes, and shaded columns from the brand.
-- feat: Restyle cross-reference and footnote popups, the code tools menu, and the search results on one surface from the brand.
-- feat: Restyle the appendix as labelled groups with the BibTeX entry in a code block, lay the footer out in three aligned columns, and restyle notebook links and the reader toggle from the brand.
-- feat: Restyle the floating sidebar, the narrow-screen sidebar toggle and backdrop, and the lightbox overlay from the brand, and fit SVG images to the screen in the lightbox.
-- feat: Restyle the five about page templates from the brand, with link buttons held to 4.5:1.
+- feat: Restyle the default listing, its categories, its filter and sort controls, and its pagination from the brand. (#77)
+- feat: Restyle grid listing cards with an accent border and a small lift on hover or keyboard focus, and give listing tables and tables in the text one style. (#77)
+- feat: Put the title banner on the chrome surface with its breadcrumbs, and restyle figure captions, keyboard keys, margin notes, and shaded columns from the brand. (#77)
+- feat: Restyle cross-reference and footnote popups, the code tools menu, and the search results on one surface from the brand. (#77)
+- feat: Restyle the appendix as labelled groups with the BibTeX entry in a code block, lay the footer out in three aligned columns, and restyle notebook links and the reader toggle from the brand. (#77)
+- feat: Restyle the floating sidebar, the narrow-screen sidebar toggle and backdrop, and the lightbox overlay from the brand, and fit SVG images to the screen in the lightbox. (#77)
+- feat: Restyle the five about page templates from the brand, with link buttons held to 4.5:1. (#77)
 
 ### Bug Fixes
 
@@ -34,16 +34,16 @@
 - fix: Map the `color.palette` names `blue`, `green`, `red`, `orange`, and `yellow` to the Bootstrap colours for every brand, not only for a brand with `defaults.bootstrap`.
   The callouts and the theme colours that Bootstrap derives from them follow the palette. (#76)
 - fix: Keep the "Back to home" link of the 404 page readable when the primary colour is very pale or very deep. (#76)
-- fix: Hold content and breadcrumb links to 4.5:1 on the page, so that a pale or deep primary colour stays readable.
-- fix: Report an unreadable search options block in the console instead of hiding it.
-- fix: Paint heading rules, form controls, and the remaining Bootstrap greys from the brand.
-- fix: Give the listing filter and sort controls visible labels, and mark the current page and the active category for screen readers.
+- fix: Hold content and breadcrumb links to 4.5:1 on the page, so that a pale or deep primary colour stays readable. (#77)
+- fix: Report an unreadable search options block in the console instead of hiding it. (#77)
+- fix: Paint heading rules, form controls, and the remaining Bootstrap greys from the brand. (#77)
+- fix: Give the listing filter and sort controls visible labels, and mark the current page and the active category for screen readers. (#77)
 - fix: Paint the listing filter icon from the brand, so that it stays readable in dark mode.
-  A site with a listing keeps the brand border colour instead of a Bootstrap grey.
-- fix: Let the keyboard reach the sort headers of a table listing, and announce the sorted column.
-- fix: Mark the current page in the breadcrumbs for screen readers.
-- fix: Hide the empty metadata strip of a title block, and leave it out of the page landmarks.
-- fix: Draw code annotation markers on the accent with readable text, in place of Quarto's fixed grey.
+  A site with a listing keeps the brand border colour instead of a Bootstrap grey. (#77)
+- fix: Let the keyboard reach the sort headers of a table listing, and announce the sorted column. (#77)
+- fix: Mark the current page in the breadcrumbs for screen readers. (#77)
+- fix: Hide the empty metadata strip of a title block, and leave it out of the page landmarks. (#77)
+- fix: Draw code annotation markers on the accent with readable text, in place of Quarto's fixed grey. (#77)
 
 ## 0.11.0 (2026-10-29)
 
