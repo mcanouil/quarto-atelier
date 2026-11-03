@@ -343,8 +343,9 @@ end
 
 --- The mode, page duration, and labels that the `Div` handler reads.
 --- `publish_workshop` fills it in the first filter pass.
---- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil }
-local state = {}
+--- `objectives` counts the checkboxes written so far, so the numbers run on across the page.
+--- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil, objectives: integer }
+local state = { objectives = 0 }
 
 --- Add the workshop data block to the head.
 --- @param meta table The document metadata
@@ -357,7 +358,7 @@ local function publish_workshop(meta)
   local options = read_options(meta)
   local mode = read_mode(meta, source)
   local duration = read_duration(meta, source)
-  state = { mode = mode, duration = duration, labels = resolve_labels() }
+  state = { mode = mode, duration = duration, labels = resolve_labels(), objectives = 0 }
   local data = {
     mode = mode,
     offset = quarto.project.offset or '',
@@ -425,11 +426,14 @@ local function attribute_duration(div, class)
 end
 
 --- Turn each item of a bullet list into a checkbox label.
+--- The checkboxes are numbered from 1 across the whole page.
 --- @param list pandoc.BulletList The list
 --- @return pandoc.Blocks The labels, followed by any further blocks of the items
 local function objective_labels(list)
   local blocks = pandoc.Blocks({})
-  for index, item in ipairs(list.content) do
+  for _, item in ipairs(list.content) do
+    state.objectives = state.objectives + 1
+    local index = state.objectives
     local first = item[1]
     local inlines = pandoc.Inlines({})
     local rest = 1
@@ -500,14 +504,16 @@ end
 
 --- Build the closed solution disclosure.
 --- @param div pandoc.Div The solution content
+--- @param title string The summary text
+--- @param identifier string The identifier, or an empty string
 --- @return pandoc.Blocks The disclosure
-local function solution_block(div)
-  local id = div.identifier ~= '' and (' id="' .. div.identifier .. '"') or ''
+local function solution_block(div, title, identifier)
+  local id = identifier ~= '' and (' id="' .. identifier .. '"') or ''
   local blocks = pandoc.Blocks({
     pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
     pandoc.Plain({
       pandoc.RawInline('html', '<summary>'),
-      pandoc.Str(div.attributes.title or state.labels['solution-summary']),
+      pandoc.Str(title),
       pandoc.RawInline('html', '</summary>'),
     }),
     block_body(div.content),
@@ -534,17 +540,24 @@ end
 --- Turn a `.solution` div into the disclosure, in workshop mode only.
 --- Quarto turns a `.solution` div into a `Proof` node before this filter runs
 --- and removes the class, so the handler takes the node and its `div`.
---- A solution with an identifier is a numbered cross-reference target and stays.
+--- The summary is the `title` attribute, else the name that Quarto took from
+--- the `name` attribute or a leading heading, else the label.
+--- A solution with a `sol-` identifier is a cross-reference target and stays.
 --- @param proof table The `Proof` node
 --- @return pandoc.Blocks|nil The disclosure, or nil to keep the node
 local function style_proof(proof)
-  if state.mode ~= MODE_WORKSHOP or proof.identifier ~= '' then
+  if state.mode ~= MODE_WORKSHOP or (proof.identifier or ''):find('^sol%-') then
     return nil
   end
   if pandoc.utils.stringify(proof.type or ''):lower() ~= 'solution' then
     return nil
   end
-  return solution_block(proof.div)
+  local title = proof.div.attributes.title
+  if title == nil then
+    local name = pandoc.utils.stringify(proof.name or '')
+    title = name ~= '' and name or state.labels['solution-summary']
+  end
+  return solution_block(proof.div, title, proof.identifier or '')
 end
 
 --- Two filter tables: pandoc finishes the `Meta` pass before the `Div` pass
