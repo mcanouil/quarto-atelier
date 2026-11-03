@@ -127,18 +127,20 @@ local function warn_duration(subject, text, source)
 end
 
 --- Read the duration option of a metadata table.
---- A duration that does not parse logs a warning naming the source file.
+--- A duration that does not parse logs a warning naming the source file,
+--- unless `quiet` is true.
 --- @param meta table The metadata
 --- @param source string The file the metadata comes from
+--- @param quiet boolean|nil True to log no warning
 --- @return integer|nil The minutes, or nil when unset or invalid
-local function read_duration(meta, source)
+local function read_duration(meta, source, quiet)
   local value = read_options(meta).duration
   if value == nil then
     return nil
   end
   local text = pandoc.utils.stringify(value)
   local minutes = parse_duration(text)
-  if minutes == nil then
+  if minutes == nil and not quiet then
     warn_duration('extensions.atelier.duration', text, source)
   end
   return minutes
@@ -311,24 +313,48 @@ local function read_front_matter(path)
   return pandoc.read('---\n' .. yaml .. '\n---\n', 'markdown').meta
 end
 
+--- Tell if a file exists.
+--- @param path string The file path
+--- @return boolean True when the file opens
+local function file_exists(path)
+  local file = io.open(path, 'r')
+  if file == nil then
+    return false
+  end
+  file:close()
+  return true
+end
+
 --- Read the duration of each page of a sidebar.
+--- Each page of the sidebar reads all the durations, so each problem must log
+--- one warning only. The render of a page warns for its own duration. The
+--- render of the first page that exists warns for the files that do not exist.
 --- @param paths string[] The page paths relative to the project
+--- @param page string The page path relative to the project
 --- @return table<string, integer> The minutes by output path
-local function read_durations(paths)
+local function read_durations(paths, page)
   local durations = {}
   local directory = quarto.project.directory or '.'
+  local first = nil
+  for _, path in ipairs(paths) do
+    if first == nil and file_exists(directory .. '/' .. path) then
+      first = path
+    end
+  end
   for _, path in ipairs(paths) do
     local extension = path:match('%.(%w+)$')
     if extension and FRONT_MATTER_EXTENSIONS[extension] then
       local full = directory .. '/' .. path
       local meta = read_front_matter(full)
-      if meta == nil and io.open(full, 'r') == nil then
-        quarto.log.warning(
-          'extensions.atelier.sidebars lists ' .. path .. ', but that file does not exist. ' ..
-          'Correct the path or remove the entry from the sidebar.'
-        )
+      if meta == nil and not file_exists(full) then
+        if page == first then
+          quarto.log.warning(
+            'extensions.atelier.sidebars lists ' .. path .. ', but that file does not exist. ' ..
+            'Correct the path or remove the entry from the sidebar.'
+          )
+        end
       elseif meta ~= nil then
-        local minutes = read_duration(meta, path)
+        local minutes = read_duration(meta, path, true)
         if minutes ~= nil then
           durations[path:gsub('%.%w+$', '.html')] = minutes
         end
@@ -381,7 +407,8 @@ local function publish_workshop(meta)
   local durations = nil
   if mode == MODE_WORKSHOP then
     data.duration = duration
-    local sidebar, paths = find_sidebar(options, project_relative_input())
+    local page = project_relative_input()
+    local sidebar, paths = find_sidebar(options, page)
     if sidebar == nil then
       quarto.log.warning(
         source .. ' is in workshop mode, but no sidebar in extensions.atelier.sidebars lists it. ' ..
@@ -389,7 +416,7 @@ local function publish_workshop(meta)
       )
     else
       data.sidebar = sidebar
-      durations = read_durations(paths)
+      durations = read_durations(paths, page)
     end
     quarto.doc.include_text(
       'in-header',
