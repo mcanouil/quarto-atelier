@@ -412,7 +412,8 @@ local function publish_workshop(meta)
     if sidebar == nil then
       quarto.log.warning(
         source .. ' is in workshop mode, but no sidebar in extensions.atelier.sidebars lists it. ' ..
-        'Add a YAML anchor to its website.sidebar entry and list the alias in extensions.atelier.sidebars.'
+        'Add a YAML anchor to its website.sidebar entry and list the alias in extensions.atelier.sidebars. ' ..
+        'The extension does not resolve contents: auto or glob patterns, so list the page by its path.'
       )
     else
       data.sidebar = sidebar
