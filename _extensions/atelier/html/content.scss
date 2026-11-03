@@ -1007,7 +1007,9 @@ table.quarto-listing-table {
     color: var(--atelier-fg);
   }
 
-  > tbody > tr:hover > * {
+  // A row with a Bootstrap variant class keeps its own fill on hover, so that
+  // its own ink stays readable.
+  > tbody > tr:not([class*="table-"]):hover > * {
     background-color: var(--atelier-surface);
   }
 
