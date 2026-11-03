@@ -469,7 +469,8 @@ local function attribute_duration(div, class)
 end
 
 --- Turn each item of a bullet list into a checkbox label.
---- The checkboxes are numbered from 1 across the whole page.
+--- The checkboxes are numbered from 1 across the whole page. The empty span
+--- after each checkbox holds the tick that the style draws.
 --- @param list pandoc.BulletList The list
 --- @return pandoc.Blocks The labels, followed by any further blocks of the items
 local function objective_labels(list)
@@ -487,7 +488,8 @@ local function objective_labels(list)
     local label = pandoc.Inlines({
       pandoc.RawInline(
         'html',
-        '<label><input type="checkbox" data-atelier-objective="' .. index .. '"> '
+        '<label><input type="checkbox" data-atelier-objective="' .. index .. '">' ..
+        '<span class="atelier-check" aria-hidden="true"></span> '
       ),
     })
     label:extend(inlines)

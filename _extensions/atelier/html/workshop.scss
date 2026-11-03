@@ -511,6 +511,8 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   line-height: 1;
 }
 
+$_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M3 8.5l3.2 3L13 4.5'/%3e%3c/svg%3e");
+
 .atelier-block-body {
   padding: 0.8rem 1rem;
 
@@ -519,6 +521,7 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   }
 
   label {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.55rem;
@@ -526,13 +529,53 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
     margin: 0.25rem 0;
   }
 
+  // The box comes from the tokens, so its border holds 3:1 on the block. The
+  // span after the box holds the tick, drawn as a mask in the on-accent colour
+  // over the accent fill. The global focus ring stays.
   input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
+    flex: none;
+    width: 18px;
+    height: 18px;
     margin: 0;
+    border: 2px solid var(--atelier-control-border);
+    border-radius: $border-radius-sm;
+    background-color: var(--atelier-bg);
     // The browser gives a form control its own text colour. Use the colour of the label.
     color: inherit;
-    accent-color: var(--atelier-accent-fill);
+    appearance: none;
+
+    &:checked {
+      border-color: var(--atelier-accent-fill);
+      background-color: var(--atelier-accent-fill);
+    }
+  }
+
+  .atelier-check {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: -9px;
+    background-color: var(--atelier-on-accent);
+    mask: $_atelier-icon-check center / 14px no-repeat;
+    pointer-events: none;
+  }
+
+  input[type="checkbox"]:checked + .atelier-check {
+    display: block;
+  }
+
+  // In forced colours the system draws the box and its tick.
+  @media (forced-colors: active) {
+    input[type="checkbox"] {
+      appearance: auto;
+    }
+
+    input[type="checkbox"]:checked + .atelier-check {
+      display: none;
+    }
   }
 }
 
