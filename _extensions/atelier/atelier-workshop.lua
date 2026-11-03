@@ -29,7 +29,7 @@ local LABELS = {
   { key = 'duration-minutes', default = '{m} min' },
   { key = 'duration-hours', default = '{h} h' },
   { key = 'duration-hours-minutes', default = '{h} h {m} min' },
-  { key = 'reading-bar', default = 'Page navigation' },
+  { key = 'reading-bar', default = 'Reading navigation' },
   { key = 'reading-progress', default = 'Reading progress' },
   { key = 'reading-position', default = 'Page {n} of {m}' },
   { key = 'workshop-bar', default = 'Module navigation' },
