@@ -627,7 +627,22 @@ html pre.sourceCode.atelier-terminal {
     }
   }
 
+  // A token class can set its own background, such as `.al` or `.er`, which
+  // would paint a light box on the dark ground.
   code span span {
     color: inherit;
+    background-color: transparent;
   }
+
+  // The highlight band of the page is a light tint, so the terminal has its
+  // own dark band and a marker in the prompt colour.
+  code > span.atelier-line-highlight {
+    background-color: var(--atelier-terminal-highlight);
+    box-shadow: inset 3px 0 0 var(--atelier-terminal-prompt);
+  }
+}
+
+html pre.numberSource.atelier-terminal code > span.atelier-line-highlight {
+  background-image: linear-gradient(var(--atelier-terminal-prompt), var(--atelier-terminal-prompt));
+  box-shadow: none;
 }

@@ -129,6 +129,7 @@ $border-color: null;
   --atelier-terminal-control-border: #{$atelier-terminal-control-border};
   --atelier-terminal-prompt: #{$atelier-terminal-prompt};
   --atelier-terminal-dot: #{$atelier-terminal-dot};
+  --atelier-terminal-highlight: #{$atelier-terminal-highlight};
 
   // A docked sidebar is the third bar, so its tokens default to the navbar
   // ones: overriding the navbar palette carries the sidebar with it, and a
