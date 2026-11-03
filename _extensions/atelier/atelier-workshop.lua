@@ -114,6 +114,18 @@ local function read_options(meta)
   return options
 end
 
+--- Log the warning for a duration that does not parse.
+--- @param subject string What holds the duration, such as an option or an attribute
+--- @param text string The duration text
+--- @param source string The file the duration comes from
+--- @return nil
+local function warn_duration(subject, text, source)
+  quarto.log.warning(
+    subject .. " '" .. text .. "' in " .. source ..
+    " is not a duration such as '25 min' or '1 h 30 min'. Ignoring it."
+  )
+end
+
 --- Read the duration option of a metadata table.
 --- A duration that does not parse logs a warning naming the source file.
 --- @param meta table The metadata
@@ -127,10 +139,7 @@ local function read_duration(meta, source)
   local text = pandoc.utils.stringify(value)
   local minutes = parse_duration(text)
   if minutes == nil then
-    quarto.log.warning(
-      "extensions.atelier.duration '" .. text .. "' in " .. source ..
-      " is not a duration such as '25 min' or '1 h 30 min'. Ignoring it."
-    )
+    warn_duration('extensions.atelier.duration', text, source)
   end
   return minutes
 end
@@ -332,6 +341,11 @@ local function encode(data, durations)
   return (json:gsub('</', '<\\/'))
 end
 
+--- The mode, page duration, and labels that the `Div` handler reads.
+--- `publish_workshop` fills it in the first filter pass.
+--- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil }
+local state = {}
+
 --- Add the workshop data block to the head.
 --- @param meta table The document metadata
 --- @return nil
@@ -343,10 +357,11 @@ local function publish_workshop(meta)
   local options = read_options(meta)
   local mode = read_mode(meta, source)
   local duration = read_duration(meta, source)
+  state = { mode = mode, duration = duration, labels = resolve_labels() }
   local data = {
     mode = mode,
     offset = quarto.project.offset or '',
-    labels = resolve_labels(),
+    labels = state.labels,
   }
   local durations = nil
   if mode == MODE_WORKSHOP then
@@ -373,6 +388,169 @@ local function publish_workshop(meta)
   return nil
 end
 
+--- Build the head line of a block.
+--- @param icon string The Bootstrap Icons name, such as `bullseye`
+--- @param title string The title text
+--- @param time string|nil The formatted duration, or nil to leave the pill out
+--- @return pandoc.Plain The head paragraph
+local function block_head(icon, title, time)
+  local head = pandoc.Inlines({
+    pandoc.RawInline('html', '<p class="atelier-block-head"><i class="bi bi-' .. icon .. '" aria-hidden="true"></i>'),
+    pandoc.Str(title),
+  })
+  if time ~= nil then
+    head:insert(pandoc.RawInline('html', '<span class="atelier-block-time">'))
+    head:insert(pandoc.Str(time))
+    head:insert(pandoc.RawInline('html', '</span>'))
+  end
+  head:insert(pandoc.RawInline('html', '</p>'))
+  return pandoc.Plain(head)
+end
+
+--- Read the duration attribute of a block.
+--- @param div pandoc.Div The block
+--- @param class string The block class, for the warning
+--- @return string|nil The formatted duration, or nil when absent or invalid
+local function attribute_duration(div, class)
+  local text = div.attributes.duration
+  if text == nil then
+    return nil
+  end
+  local minutes = parse_duration(text)
+  if minutes == nil then
+    warn_duration('The duration attribute of the .' .. class .. ' block', text, quarto.doc.input_file or '')
+    return nil
+  end
+  return format_duration(minutes, state.labels)
+end
+
+--- Turn each item of a bullet list into a checkbox label.
+--- @param list pandoc.BulletList The list
+--- @return pandoc.Blocks The labels, followed by any further blocks of the items
+local function objective_labels(list)
+  local blocks = pandoc.Blocks({})
+  for index, item in ipairs(list.content) do
+    local first = item[1]
+    local inlines = pandoc.Inlines({})
+    local rest = 1
+    if first ~= nil and (first.t == 'Plain' or first.t == 'Para') then
+      inlines = first.content
+      rest = 2
+    end
+    local label = pandoc.Inlines({
+      pandoc.RawInline(
+        'html',
+        '<label><input type="checkbox" data-atelier-objective="' .. index .. '"> '
+      ),
+    })
+    label:extend(inlines)
+    label:insert(pandoc.RawInline('html', '</label>'))
+    blocks:insert(pandoc.Plain(label))
+    for position = rest, #item do
+      blocks:insert(item[position])
+    end
+  end
+  return blocks
+end
+
+--- Wrap blocks in the body container of a workshop block.
+--- @param blocks pandoc.Blocks The content
+--- @return pandoc.Div The body
+local function block_body(blocks)
+  return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-block-body' }))
+end
+
+--- Build the objectives block.
+--- @param div pandoc.Div The `.objectives` div
+--- @return pandoc.Div The block
+local function objectives_block(div)
+  local time = attribute_duration(div, 'objectives')
+  if div.attributes.duration == nil and state.duration ~= nil then
+    time = format_duration(state.duration, state.labels)
+  end
+  local body = pandoc.Blocks({})
+  local done = false
+  for _, block in ipairs(div.content) do
+    if not done and block.t == 'BulletList' then
+      body:extend(objective_labels(block))
+      done = true
+    else
+      body:insert(block)
+    end
+  end
+  return pandoc.Div(
+    { block_head('bullseye', div.attributes.title or state.labels['objectives-title'], time), block_body(body) },
+    pandoc.Attr(div.identifier, { 'atelier-objectives' })
+  )
+end
+
+--- Build the exercise block.
+--- @param div pandoc.Div The `.exercise` div
+--- @return pandoc.Div The block
+local function exercise_block(div)
+  local time = attribute_duration(div, 'exercise')
+  return pandoc.Div(
+    {
+      block_head('pencil-square', div.attributes.title or state.labels['exercise-title'], time),
+      block_body(div.content),
+    },
+    pandoc.Attr(div.identifier, { 'atelier-exercise' })
+  )
+end
+
+--- Build the closed solution disclosure.
+--- @param div pandoc.Div The solution content
+--- @return pandoc.Blocks The disclosure
+local function solution_block(div)
+  local id = div.identifier ~= '' and (' id="' .. div.identifier .. '"') or ''
+  local blocks = pandoc.Blocks({
+    pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
+    pandoc.Plain({
+      pandoc.RawInline('html', '<summary>'),
+      pandoc.Str(div.attributes.title or state.labels['solution-summary']),
+      pandoc.RawInline('html', '</summary>'),
+    }),
+    block_body(div.content),
+    pandoc.RawBlock('html', '</details>'),
+  })
+  return blocks
+end
+
+--- Turn the workshop divs into blocks, in workshop mode only.
+--- @param div pandoc.Div The div
+--- @return pandoc.Div|pandoc.Blocks|nil The block, or nil to keep the div
+local function style_block(div)
+  if state.mode ~= MODE_WORKSHOP then
+    return nil
+  end
+  if div.classes:includes('objectives') then
+    return objectives_block(div)
+  elseif div.classes:includes('exercise') then
+    return exercise_block(div)
+  end
+  return nil
+end
+
+--- Turn a `.solution` div into the disclosure, in workshop mode only.
+--- Quarto turns a `.solution` div into a `Proof` node before this filter runs
+--- and removes the class, so the handler takes the node and its `div`.
+--- A solution with an identifier is a numbered cross-reference target and stays.
+--- @param proof table The `Proof` node
+--- @return pandoc.Blocks|nil The disclosure, or nil to keep the node
+local function style_proof(proof)
+  if state.mode ~= MODE_WORKSHOP or proof.identifier ~= '' then
+    return nil
+  end
+  if pandoc.utils.stringify(proof.type or ''):lower() ~= 'solution' then
+    return nil
+  end
+  return solution_block(proof.div)
+end
+
+--- Two filter tables: pandoc finishes the `Meta` pass before the `Div` pass
+--- starts, so `state` is complete when `style_block` reads it. One table gives
+--- no such order between element types.
 return {
   { Meta = publish_workshop },
+  { Div = style_block, Proof = style_proof },
 }

@@ -32,6 +32,7 @@
 - feat: In workshop mode with a navbar, draw the navbar in inverted colours and add a module row with the breadcrumb, the timer, previous and next links, and the module progress.
 - feat: In workshop mode, show the sidebar as numbered modules with their durations, the completed modules ticked, and a summary with the module position and the total time.
 - feat: In workshop mode, show the table of contents with a dot for each section, filled once read, and a ring with the share of the module read.
+- feat: In workshop mode, turn `.objectives` divs into a list of checkboxes that the browser remembers, `.exercise` divs into a block with a title and an optional `duration`, and `.solution` divs into a closed disclosure.
 
 ### Bug Fixes
 

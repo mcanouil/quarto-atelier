@@ -463,3 +463,88 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
     }
   }
 }
+
+// ===========================================================================
+// W1 TO W3 BLOCKS
+// ===========================================================================
+// Objectives, exercises, and solutions are blocks with a hairline border and
+// a large radius. The Lua filter writes them in workshop mode only.
+
+.atelier-objectives,
+.atelier-exercise,
+.atelier-solution {
+  margin: 1rem 0;
+  overflow: hidden;
+  border: 1px solid var(--atelier-border);
+  border-radius: $border-radius-lg;
+  font-size: 0.9rem;
+}
+
+.atelier-block-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.atelier-block-time {
+  margin-left: auto;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid currentcolor;
+  border-radius: 99px;
+  font-family: var(--bs-font-monospace);
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.atelier-block-body {
+  padding: 0.8rem 1rem;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 24px;
+    margin: 0.25rem 0;
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--atelier-accent-fill);
+  }
+}
+
+.atelier-objectives > .atelier-block-head {
+  background: var(--atelier-accent-soft);
+  color: var(--atelier-accent-ink);
+}
+
+.atelier-exercise > .atelier-block-head {
+  background: var(--atelier-workshop-bar-bg);
+  color: var(--atelier-workshop-bar-fg);
+}
+
+.atelier-solution {
+  border-style: dashed;
+  border-color: var(--atelier-control-border);
+
+  > summary {
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &::marker {
+      color: var(--atelier-accent-ink);
+    }
+  }
+}
