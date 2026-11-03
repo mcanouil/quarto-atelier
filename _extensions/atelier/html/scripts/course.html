@@ -113,7 +113,14 @@
 			var headings = [];
 			anchors.forEach(function (link) {
 				var target = link.getAttribute("data-scroll-target");
-				var heading = document.getElementById(decodeURIComponent(target.slice(1)));
+				var id;
+				try {
+					id = decodeURIComponent(target.slice(1));
+				} catch (error) {
+					console.warn("Atelier: the table of contents target " + target + " is not a valid URL fragment; the entry gets no progress dot.", error);
+					return;
+				}
+				var heading = document.getElementById(id);
 				if (heading) headings.push({ href: target, node: heading });
 			});
 			if (!headings.length) return;
