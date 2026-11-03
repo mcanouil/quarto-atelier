@@ -1,0 +1,166 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<script id="atelier-course-model" type="text/javascript">
+	(function () {
+		// The workshop bar, the stepper, the table of contents, and the objectives
+		// read the course from window.atelierCourse. It is built here once, from the
+		// workshop data block and Quarto's own sidebar. A page without a sidebar menu
+		// gets null.
+		window.atelierCourse = null;
+		var menu = document.querySelector("#quarto-sidebar .sidebar-menu-container");
+		if (!menu) return;
+
+		var data = {};
+		try {
+			data = JSON.parse(document.getElementById("atelier-workshop")?.textContent || "{}");
+		} catch (error) {
+			console.warn("Atelier: the workshop data block is not valid JSON.", error);
+		}
+		var labels = data.labels || {};
+		var workshop = data.mode === "workshop";
+		var durations = data.durations || {};
+
+		// The site root path is the page path with the offset applied.
+		var root = new URL(data.offset || "./", location.href).pathname;
+		function toHref(url) {
+			var path = new URL(url, location.href).pathname;
+			return path.indexOf(root) === 0 ? path.slice(root.length) : path;
+		}
+
+		function label(key, values) {
+			return String(labels[key] || "").replace(/\{(\w+)\}/g, function (match, name) {
+				return values && name in values ? values[name] : match;
+			});
+		}
+
+		function format(minutes) {
+			var hours = Math.floor(minutes / 60);
+			var rest = minutes % 60;
+			var key = "duration-minutes";
+			if (hours > 0 && rest > 0) key = "duration-hours-minutes";
+			else if (hours > 0) key = "duration-hours";
+			return label(key, { h: hours, m: rest });
+		}
+
+		function sum(values) {
+			var known = values.filter(function (value) {
+				return value !== null;
+			});
+			return known.length ? known.reduce(function (a, b) { return a + b; }, 0) : null;
+		}
+
+		function textOf(element) {
+			return (element?.textContent || "").replace(/\s+/g, " ").trim();
+		}
+
+		var pages = [];
+		var modules = [];
+		var indexByHref = {};
+
+		function pageIndex(link) {
+			var href = toHref(link.getAttribute("href"));
+			if (!(href in indexByHref)) {
+				var minutes = durations[href];
+				indexByHref[href] = pages.length;
+				pages.push({
+					href: href,
+					title: textOf(link.querySelector(".menu-text") || link),
+					minutes: typeof minutes === "number" ? minutes : null,
+					module: modules.length,
+				});
+			}
+			return indexByHref[href];
+		}
+
+		var items = menu.querySelector("ul")?.children || [];
+		Array.prototype.forEach.call(items, function (item) {
+			var indices = [];
+			item.querySelectorAll("a.sidebar-link[href]").forEach(function (link) {
+				if (link.getAttribute("href") === "#") return;
+				var index = pageIndex(link);
+				if (indices.indexOf(index) === -1) indices.push(index);
+			});
+			if (!indices.length) return;
+			modules.push({
+				title: textOf(item.querySelector(".sidebar-item-container .menu-text")),
+				pages: indices,
+				minutes: sum(indices.map(function (index) { return pages[index].minutes; })),
+			});
+		});
+
+		var here = toHref(location.href);
+		var current = Object.prototype.hasOwnProperty.call(indexByHref, here) ? indexByHref[here] : -1;
+
+		function neighbour(selector) {
+			var link = document.querySelector(selector);
+			if (!link) return null;
+			return { href: toHref(link.getAttribute("href")), title: textOf(link.querySelector(".nav-page-text") || link) };
+		}
+
+		var course = {
+			mode: workshop ? "workshop" : "documentation",
+			labels: labels,
+			duration: typeof data.duration === "number" ? data.duration : null,
+			pages: pages,
+			modules: modules,
+			current: current,
+			currentModule: current === -1 ? -1 : pages[current].module,
+			previous: neighbour(".page-navigation .nav-page-previous a"),
+			next: neighbour(".page-navigation .nav-page-next a"),
+			totalMinutes: sum(pages.map(function (page) { return page.minutes; })),
+			format: format,
+			label: label,
+		};
+
+		if (workshop) {
+			course.storageKey = data.sidebar ? "atelier:" + root + ":" + data.sidebar : null;
+			course.progress = { visited: [], read: {}, objectives: {} };
+			var warned = false;
+			function warn(error) {
+				if (warned) return;
+				warned = true;
+				console.warn("Atelier: the workshop progress cannot be stored in this browser.", error);
+			}
+
+			course.save = function () {
+				if (!course.storageKey) return;
+				try {
+					localStorage.setItem(course.storageKey, JSON.stringify(course.progress));
+				} catch (error) {
+					warn(error);
+				}
+			};
+
+			course.isComplete = function (moduleIndex) {
+				var module = modules[moduleIndex];
+				return Boolean(module) && module.pages.every(function (index) {
+					return course.progress.visited.indexOf(pages[index].href) !== -1;
+				});
+			};
+
+			if (course.storageKey) {
+				try {
+					var stored = JSON.parse(localStorage.getItem(course.storageKey) || "null");
+					if (stored && typeof stored === "object") {
+						course.progress = {
+							visited: Array.isArray(stored.visited) ? stored.visited : [],
+							read: stored.read && typeof stored.read === "object" ? stored.read : {},
+							objectives: stored.objectives && typeof stored.objectives === "object" ? stored.objectives : {},
+						};
+					}
+				} catch (error) {
+					warn(error);
+				}
+			}
+			if (current !== -1 && course.progress.visited.indexOf(here) === -1) {
+				course.progress.visited.push(here);
+			}
+			course.save();
+		}
+
+		window.atelierCourse = course;
+	})();
+</script>

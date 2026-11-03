@@ -119,6 +119,7 @@ contributes:
         - file: html/scripts/a11y-fixes.html
         - file: html/scripts/navbar-tooltips.html
         - file: html/scripts/chrome.html
+        - file: html/scripts/course-model.html
         - file: html/scripts/announcement.html
         - file: html/scripts/toc-card.html
         - file: html/scripts/title-block.html
