@@ -520,6 +520,8 @@ $atelier-step-centre: calc(#{$atelier-step-pad} + #{$atelier-step-dot * 0.5});
     width: 16px;
     height: 16px;
     margin: 0;
+    // The browser gives a form control its own text colour. Use the colour of the label.
+    color: inherit;
     accent-color: var(--atelier-accent-fill);
   }
 }
