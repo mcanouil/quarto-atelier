@@ -502,6 +502,29 @@ local function objective_labels(list)
   return blocks
 end
 
+--- Build the attributes of a workshop block from the attributes of its div.
+--- The author's identifier, other classes, and other attributes stay. The
+--- block class replaces the div class, and `title` and `duration` go, as the
+--- head shows them.
+--- @param div pandoc.Div The div
+--- @param class string The div class, such as `objectives`
+--- @return pandoc.Attr The attributes
+local function block_attr(div, class)
+  local classes = { 'atelier-' .. class }
+  for _, name in ipairs(div.classes) do
+    if name ~= class then
+      classes[#classes + 1] = name
+    end
+  end
+  local attributes = {}
+  for _, pair in ipairs(div.attributes) do
+    if pair[1] ~= 'title' and pair[1] ~= 'duration' then
+      attributes[#attributes + 1] = { pair[1], pair[2] }
+    end
+  end
+  return pandoc.Attr(div.identifier, classes, attributes)
+end
+
 --- Wrap blocks in the body container of a workshop block.
 --- @param blocks pandoc.Blocks The content
 --- @return pandoc.Div The body
@@ -529,7 +552,7 @@ local function objectives_block(div)
   end
   return pandoc.Div(
     { block_head('bullseye', div.attributes.title or state.labels['objectives-title'], time), block_body(body) },
-    pandoc.Attr(div.identifier, { 'atelier-objectives' })
+    block_attr(div, 'objectives')
   )
 end
 
@@ -543,7 +566,7 @@ local function exercise_block(div)
       block_head('pencil-square', div.attributes.title or state.labels['exercise-title'], time),
       block_body(div.content),
     },
-    pandoc.Attr(div.identifier, { 'atelier-exercise' })
+    block_attr(div, 'exercise')
   )
 end
 
