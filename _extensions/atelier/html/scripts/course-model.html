@@ -27,16 +27,13 @@
 		// URL gets "index.html", so it matches the sidebar link to that page.
 		var root = new URL(data.offset || "./", location.href).pathname;
 		function toHref(url) {
-			var path = new URL(url, location.href).pathname;
+			var path = url.pathname;
 			if (path.slice(-1) === "/") path += "index.html";
 			return path.indexOf(root) === 0 ? path.slice(root.length) : path;
 		}
 
 		// A page of the course is a link to this site, below the site root.
-		function isPage(link) {
-			var href = link.getAttribute("href");
-			if (href === "#") return false;
-			var url = new URL(href, location.href);
+		function isPage(url) {
 			return url.origin === location.origin && url.pathname.indexOf(root) === 0;
 		}
 
@@ -72,8 +69,8 @@
 		var moduleItems = [];
 		var indexByHref = {};
 
-		function pageIndex(link) {
-			var href = toHref(link.getAttribute("href"));
+		function pageIndex(link, url) {
+			var href = toHref(url);
 			if (!(href in indexByHref)) {
 				var minutes = durations[href];
 				indexByHref[href] = pages.length;
@@ -91,8 +88,11 @@
 		Array.prototype.forEach.call(items, function (item) {
 			var indices = [];
 			item.querySelectorAll("a.sidebar-link[href]").forEach(function (link) {
-				if (!isPage(link)) return;
-				var index = pageIndex(link);
+				var raw = link.getAttribute("href");
+				if (raw === "#") return;
+				var url = new URL(raw, location.href);
+				if (!isPage(url)) return;
+				var index = pageIndex(link, url);
 				if (indices.indexOf(index) === -1) indices.push(index);
 			});
 			if (!indices.length) return;
@@ -104,13 +104,13 @@
 			});
 		});
 
-		var here = toHref(location.href);
+		var here = toHref(new URL(location.href));
 		var current = Object.prototype.hasOwnProperty.call(indexByHref, here) ? indexByHref[here] : -1;
 
 		function neighbour(selector) {
 			var link = document.querySelector(selector);
 			if (!link) return null;
-			return { href: toHref(link.getAttribute("href")), title: textOf(link.querySelector(".nav-page-text") || link) };
+			return { href: toHref(new URL(link.getAttribute("href"), location.href)), title: textOf(link.querySelector(".nav-page-text") || link) };
 		}
 
 		var course = {
@@ -172,8 +172,8 @@
 			}
 			if (current !== -1 && course.progress.visited.indexOf(here) === -1) {
 				course.progress.visited.push(here);
+				course.save();
 			}
-			course.save();
 		}
 
 		window.atelierCourse = course;
