@@ -18,6 +18,10 @@ website:
         text: "Landing page"
       - href: examples.qmd
         text: "Examples"
+      - href: listing-example/index.qmd
+        text: "Listing example"
+      - href: about.qmd
+        text: "About"
       # An icon beside text, and a menu, are the two navbar item shapes Quarto
       # writes with markup of its own; Atelier repairs both. See the "Navbar and
       # search" section of examples.qmd.

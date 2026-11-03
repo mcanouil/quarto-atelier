@@ -1,6 +1,6 @@
 ---
 title: "Listing example"
-description: "Two listings that show the listing defects Atelier works around."
+description: "This page shows the three listing types: table, default, and grid."
 toc: false
 listing:
   - id: table-listing
@@ -13,12 +13,21 @@ listing:
     contents: posts
     type: default
     categories: true
+    filter-ui: true
+    sort-ui: true
     fields: [title, date, categories]
+    sort: "date desc"
+  - id: grid-listing
+    contents: posts
+    type: grid
+    categories: true
     sort: "date desc"
 ---
 
-This page exists to check listing styles.
-It has a table listing and a default listing with categories.
+This page shows how Atelier styles each listing type.
+It has a table listing and a default listing.
+The default listing has a filter box and a sort menu.
+Both the default listing and the grid listing have categories.
 
 ## Table listing
 
@@ -28,4 +37,9 @@ It has a table listing and a default listing with categories.
 ## Default listing
 
 :::{#default-listing}
+:::
+
+## Grid listing
+
+:::{#grid-listing}
 :::

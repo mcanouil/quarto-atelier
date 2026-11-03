@@ -1,10 +1,25 @@
+/*-- scss:uses --*/
+
+// Quarto writes every uses section before the other layers, and its own files
+// load `sass:meta` under other names, so a namespace of our own avoids a clash.
+@use "sass:meta" as atelier-meta;
+
 /*-- scss:functions --*/
+
+// The colour a text colour moves toward to gain contrast on $bg: black on a
+// light background and white on a dark one.
+@function atelier-toward($bg) {
+  @if tone($bg) == "light" {
+    @return #000;
+  }
+  @return #fff;
+}
 
 // Mix $color towards black or white, as Quarto's `theme-contrast()` does, until
 // it reads at 4.5:1 on its own soft tint: $color at $alpha over $bg. The tint
 // darkens with the colour, so it is recomputed at every step.
 @function atelier-contrast-on-tint($color, $bg, $alpha) {
-  $toward: if(tone($bg) == "light", #000, #fff);
+  $toward: atelier-toward($bg);
   @for $step from 0 through 100 {
     $candidate: mix($toward, $color, $step * 1%);
     @if quarto-contrast($candidate, mix($candidate, $bg, $alpha * 100%)) >= 4.5 {
@@ -17,7 +32,7 @@
 // The same as atelier-contrast(), but the colour must reach $ratio on every
 // background in the $bgs list. The backgrounds must share one tone.
 @function atelier-contrast-all($color, $bgs, $ratio) {
-  $toward: if(tone(nth($bgs, 1)) == "light", #000, #fff);
+  $toward: atelier-toward(nth($bgs, 1));
   @for $step from 0 through 100 {
     $candidate: mix($toward, $color, $step * 1%);
     $passes: true;
@@ -40,6 +55,28 @@
   @return atelier-contrast-all($color, ($bg,), $ratio);
 }
 
+// The ink on a filled surface: the page background or foreground, whichever
+// reads better on $fill, then mixed towards black or white until it reaches
+// $ratio. The direction is the one that reads better on $fill, so a mid-tone
+// fill does not send the mix the wrong way.
+@function atelier-on($fill, $bg, $fg, $ratio) {
+  $start: $bg;
+  @if quarto-contrast($fg, $fill) > quarto-contrast($bg, $fill) {
+    $start: $fg;
+  }
+  $toward: #000;
+  @if quarto-contrast(#fff, $fill) > quarto-contrast(#000, $fill) {
+    $toward: #fff;
+  }
+  @for $step from 0 through 100 {
+    $candidate: mix($toward, $start, $step * 1%);
+    @if quarto-contrast($candidate, $fill) >= $ratio {
+      @return $candidate;
+    }
+  }
+  @return $toward;
+}
+
 // The border of a hue over a background, and its ink: the hue mixed into the
 // foreground, then held at $ratio on $bg. Callouts and the announcement bar use
 // both, so the two mix weights live here.
@@ -60,27 +97,27 @@
 // derives from them, such as $danger, so a palette name reaches those too.
 // Remove when: Quarto maps the palette names without defaults.bootstrap.
 $blue: null !default;
-@if variable-exists("brand-blue") {
+@if atelier-meta.variable-exists("brand-blue") {
   $blue: $brand-blue !default;
 }
 
 $red: null !default;
-@if variable-exists("brand-red") {
+@if atelier-meta.variable-exists("brand-red") {
   $red: $brand-red !default;
 }
 
 $orange: null !default;
-@if variable-exists("brand-orange") {
+@if atelier-meta.variable-exists("brand-orange") {
   $orange: $brand-orange !default;
 }
 
 $yellow: null !default;
-@if variable-exists("brand-yellow") {
+@if atelier-meta.variable-exists("brand-yellow") {
   $yellow: $brand-yellow !default;
 }
 
 $green: null !default;
-@if variable-exists("brand-green") {
+@if atelier-meta.variable-exists("brand-green") {
   $green: $brand-green !default;
 }
 
@@ -124,9 +161,18 @@ $atelier-chrome-light-accent: #1f5f80 !default;
 // A project can drop `brand` from its theme list, in which case the page
 // variables are only defined in the Bootstrap layer that follows this one;
 // fall back to the Bootstrap defaults so `auto` still resolves.
-$atelier-chrome-page-bg: if(variable-exists(body-bg), $body-bg, #fff);
-$atelier-chrome-page-fg: if(variable-exists(body-color), $body-color, #212529);
-$atelier-chrome-page-accent: if(variable-exists(primary), $primary, #0d6efd);
+$atelier-chrome-page-bg: #fff;
+@if atelier-meta.variable-exists(body-bg) {
+  $atelier-chrome-page-bg: $body-bg;
+}
+$atelier-chrome-page-fg: #212529;
+@if atelier-meta.variable-exists(body-color) {
+  $atelier-chrome-page-fg: $body-color;
+}
+$atelier-chrome-page-accent: #0d6efd;
+@if atelier-meta.variable-exists(primary) {
+  $atelier-chrome-page-accent: $primary;
+}
 
 // ===========================================================================
 // RADIUS AND MERMAID TOKENS
@@ -152,15 +198,13 @@ $mermaid-fg-color--lightest: mix($atelier-chrome-page-bg, $atelier-chrome-page-f
 // itself, so it still reads as a bar without a hard colour break, and the
 // mix resolves per bundle: a paler paper in the light one, a lifted slate in
 // the dark one.
-$atelier-chrome-bg: if(
-  $atelier-chrome == dark,
-  $atelier-chrome-dark-bg,
-  if(
-    $atelier-chrome == light,
-    $atelier-chrome-light-bg,
-    mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 94%)
-  )
-) !default;
+$_atelier-chrome-bg-source: mix($atelier-chrome-page-bg, $atelier-chrome-page-fg, 94%);
+@if $atelier-chrome == dark {
+  $_atelier-chrome-bg-source: $atelier-chrome-dark-bg;
+} @else if $atelier-chrome == light {
+  $_atelier-chrome-bg-source: $atelier-chrome-light-bg;
+}
+$atelier-chrome-bg: $_atelier-chrome-bg-source !default;
 
 // Both inks are mixed towards black or white only until they clear 4.5:1, and
 // returned untouched when they already do; a ratio that cannot be met ends at
@@ -168,16 +212,14 @@ $atelier-chrome-bg: if(
 // sitting just above 4.5:1 on the page can fall under it here.
 // Setting either variable in a project skips the correction, since a `!default`
 // assignment is not evaluated at all once the variable is set.
+$_atelier-chrome-fg-source: $atelier-chrome-page-fg;
+@if $atelier-chrome == dark {
+  $_atelier-chrome-fg-source: $atelier-chrome-dark-fg;
+} @else if $atelier-chrome == light {
+  $_atelier-chrome-fg-source: $atelier-chrome-light-fg;
+}
 $atelier-chrome-fg: theme-contrast(
-  if(
-    $atelier-chrome == dark,
-    $atelier-chrome-dark-fg,
-    if(
-      $atelier-chrome == light,
-      $atelier-chrome-light-fg,
-      $atelier-chrome-page-fg
-    )
-  ),
+  $_atelier-chrome-fg-source,
   $atelier-chrome-bg,
   "AA"
 ) !default;
@@ -190,19 +232,14 @@ $atelier-chrome-surface: mix($atelier-chrome-bg, $atelier-chrome-fg, 90%) !defau
 // of these to the accent, so holding the accent to AA there covers the rest.
 $atelier-chrome-accent-soft-alpha: 0.16 !default;
 // A project or brand that sets $atelier-chrome-accent wins, so the mark follows it.
-$_atelier-chrome-accent-source: if(
-  variable-exists(atelier-chrome-accent),
-  $atelier-chrome-accent,
-  if(
-    $atelier-chrome == dark,
-    $atelier-chrome-dark-accent,
-    if(
-      $atelier-chrome == light,
-      $atelier-chrome-light-accent,
-      $atelier-chrome-page-accent
-    )
-  )
-);
+$_atelier-chrome-accent-source: $atelier-chrome-page-accent;
+@if atelier-meta.variable-exists(atelier-chrome-accent) {
+  $_atelier-chrome-accent-source: $atelier-chrome-accent;
+} @else if $atelier-chrome == dark {
+  $_atelier-chrome-accent-source: $atelier-chrome-dark-accent;
+} @else if $atelier-chrome == light {
+  $_atelier-chrome-accent-source: $atelier-chrome-light-accent;
+}
 $atelier-chrome-accent: atelier-contrast-on-tint(
   $_atelier-chrome-accent-source,
   $atelier-chrome-surface,
@@ -256,6 +293,53 @@ $atelier-accent-ink: atelier-contrast(
 ) !default;
 $atelier-accent-mark: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 3) !default;
 
+// The accent as text on the page needs 4.5:1, and as a filled control 3:1. The
+// ink on that fill is held at 4.5:1, so a pale accent gets a dark label.
+$atelier-accent-text: atelier-contrast($atelier-chrome-page-accent, $atelier-chrome-page-bg, 4.5) !default;
+$atelier-accent-fill: $atelier-accent-mark !default;
+$atelier-on-accent: atelier-on($atelier-accent-fill, $atelier-chrome-page-bg, $atelier-chrome-page-fg, 4.5) !default;
+
+// Inline code sits on the strong surface, which is darker than the page, so its
+// ink is held there.
+$atelier-code-ink: atelier-contrast($atelier-accent-text, $atelier-surface-strong, 4.5) !default;
+
+// Quarto fades h3 to h6 to nine tenths of the heading ink. That is an opaque
+// mix here, so the ink is a colour the page can publish, held at 4.5:1. The
+// source is the theme heading colour when a brand sets one, else the body ink.
+$_atelier-heading-source: $atelier-chrome-page-fg;
+@if atelier-meta.variable-exists(headings-color) {
+  @if type-of($headings-color) == color {
+    $_atelier-heading-source: $headings-color;
+  }
+}
+$atelier-heading: atelier-contrast(
+  mix($_atelier-heading-source, $atelier-chrome-page-bg, 90%),
+  $atelier-chrome-page-bg,
+  4.5
+) !default;
+
+// Bootstrap paints its rules (the h2 underline, table and card edges) from
+// $border-color and $table-border-color, and its form controls from
+// $input-border-color. All three follow the page tokens, so no Bootstrap grey
+// reaches the page.
+$border-color: $atelier-border !default;
+$table-border-color: $atelier-border !default;
+$input-border-color: $atelier-control-border !default;
+
+// Shadows and overlays are black in both schemes; the alpha carries the weight.
+$atelier-shadow-color: rgba(#000, 0.45) !default;
+$atelier-overlay-color: rgba(#000, 0.6) !default;
+
+// Links read the accent as text. The hover step moves the link a fifth towards
+// the ink and is held at 4.5:1, where Bootstrap's own shade falls under it on a
+// deep colour in the dark scheme.
+$link-color: $atelier-accent-text !default;
+$link-hover-color: atelier-contrast(
+  mix($atelier-chrome-page-fg, $link-color, 20%),
+  $atelier-chrome-page-bg,
+  4.5
+) !default;
+
 // The marker of a highlighted code line sits on the code surface and on the
 // accent-soft band, not on the page, so it is held at 3:1 against both.
 $atelier-code-accent-mark: atelier-contrast-all(
@@ -273,16 +357,58 @@ $atelier-code-accent-mark: atelier-contrast-all(
 // A `!default` would lose to that layer, so it is handed over by plain
 // assignment, like the chrome variables below; a project sets
 // $atelier-text-muted instead.
+$_atelier-text-muted-source: mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%);
+@if atelier-meta.variable-exists(secondary) {
+  $_atelier-text-muted-source: $secondary;
+}
 $atelier-text-muted: theme-contrast(
-  if(
-    variable-exists(secondary),
-    $secondary,
-    mix($atelier-chrome-page-fg, $atelier-chrome-page-bg, 65%)
-  ),
+  $_atelier-text-muted-source,
   $atelier-surface-strong,
   "AA"
 ) !default;
 $text-muted: $atelier-text-muted;
+
+// Bootstrap paints the icon box of an input group (the listing filter and sort
+// icons) on a fixed light grey, and keeps the scheme ink on it, so the icon
+// disappears in the dark scheme. The box takes the strong surface and the muted
+// ink, which is held at 4.5:1 there. The pagination variables below have the
+// same fault, as their light greys come from `$gray-*`.
+// Upstream: none filed (WCAG 1.4.3)
+// Remove when: Quarto sets the input group and pagination colours per scheme.
+$input-group-addon-bg: $atelier-surface-strong !default;
+$input-group-addon-color: $atelier-text-muted !default;
+$input-group-addon-border-color: $atelier-control-border !default;
+
+// Bootstrap fills pagination boxes on hover, focus, and when disabled with
+// fixed light greys, so in the dark scheme the light ink sits on a near-white
+// box. The boxes stay on the page, with the control border, and the current
+// box is filled with the accent.
+$pagination-color: $atelier-chrome-page-fg !default;
+$pagination-bg: $atelier-chrome-page-bg !default;
+$pagination-border-color: $atelier-control-border !default;
+$pagination-hover-color: $atelier-accent-ink !default;
+$pagination-hover-bg: $atelier-chrome-page-bg !default;
+$pagination-hover-border-color: $atelier-accent-mark !default;
+$pagination-focus-color: $atelier-accent-ink !default;
+$pagination-focus-bg: $atelier-chrome-page-bg !default;
+$pagination-active-color: $atelier-on-accent !default;
+$pagination-active-bg: $atelier-accent-fill !default;
+$pagination-active-border-color: $atelier-accent-fill !default;
+$pagination-disabled-color: $atelier-text-muted !default;
+$pagination-disabled-bg: $atelier-chrome-page-bg !default;
+$pagination-disabled-border-color: $atelier-control-border !default;
+
+// Quarto's annotation markers and line band, which it spells "higlight".
+$code-annotation-higlight-color: $atelier-accent-fill !default;
+$code-annotation-higlight-bg: $atelier-accent-soft !default;
+
+// The title banner sits on the chrome surface unless a page sets its own
+// colours, which Quarto writes into the page and which win over these.
+$title-banner-bg: $atelier-chrome-bg !default;
+$title-banner-color: $atelier-chrome-fg !default;
+
+// The rule beside the table of contents is a hairline, as the other dividers are.
+$toc-inactive-border: $atelier-border !default;
 
 // A hairline between two surfaces, which is what the bar edges and the section
 // dividers want.
@@ -312,6 +438,9 @@ $navbar-hl: $atelier-chrome-accent;
 $navbar-hover-color: $atelier-chrome-accent;
 
 $sidebar-bg: $atelier-chrome-bg;
+
+// The backdrop behind the narrow-screen sidebar is the shared overlay.
+$sidebar-glass-bg: $atelier-overlay-color !default;
 $sidebar-fg: $atelier-chrome-fg;
 
 $footer-bg: $atelier-chrome-bg;

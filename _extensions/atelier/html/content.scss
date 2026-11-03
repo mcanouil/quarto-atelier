@@ -286,7 +286,7 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     place-items: center;
     width: 24px;
     height: 24px;
-    border-radius: 4px;
+    border-radius: var(--bs-border-radius-sm);
     color: var(--atelier-muted);
 
     &:hover {
@@ -318,6 +318,16 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     padding: 0.7rem 0;
     border-top: 1px solid var(--atelier-border);
     border-bottom: 1px solid var(--atelier-border);
+
+    // Quarto writes blank lines between the conditionals of the metadata block,
+    // so a page with no author, date or other metadata still gets a
+    // <div class="quarto-title-meta"> that holds only whitespace. `:empty` does
+    // not match it, but `:has(*)` can tell that it has no element inside.
+    // Upstream: https://github.com/quarto-dev/quarto-cli/issues/13537
+    // Remove when: the minimum Quarto version includes the fix.
+    &:not(:has(*)) {
+      display: none;
+    }
 
     // On a narrow screen the items stack, so a divider would only end a line.
     > div {
@@ -358,8 +368,8 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
   }
 
   // Quarto fades a category badge with opacity 0.6, which puts its text below AA
-  // (4.34:1 in light mode). Fade the border by its colour and keep the text at
-  // full strength.
+  // (4.34:1 in light mode). Keep the text at full strength and draw the border
+  // from the control border token.
   // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15167
   // Remove when: the minimum Quarto version includes the fix.
   .quarto-categories {
@@ -372,7 +382,7 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
       padding: 0.15rem 0.6rem;
       font-size: 0.76rem;
       text-transform: none;
-      border: 1px solid color-mix(in srgb, currentcolor 60%, transparent);
+      border: 1px solid var(--atelier-control-border);
       border-radius: 999px;
     }
   }
@@ -513,4 +523,645 @@ html pre.numberSource code > span.atelier-line-highlight {
 
 html .code-with-filename pre.numberSource code > span.atelier-line-highlight {
   background-position-x: calc(#{$_atelier-number-shift} - #{$code-block-bg-padding});
+}
+
+// Code annotations. Quarto draws the active marker and the line band from one
+// fixed grey (#aaaaaa), which is 2.32:1 with the marker text and does not follow
+// the theme. The markers take the accent fill with its readable text, in the
+// list below the block and in the code, and the band takes the accent-soft
+// tint with the same inset marker as a highlighted line.
+// Upstream: none filed (WCAG 1.4.3)
+// Remove when: Quarto derives the annotation colours from the theme.
+dl.code-annotation-container-grid {
+  gap: 0.55rem;
+}
+
+dl.code-annotation-container-grid dt,
+dl.code-annotation-container-grid dd {
+  margin: 0;
+}
+
+dl.code-annotation-container-grid dt,
+html code.sourceCode .code-annotation-anchor {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--atelier-accent-fill);
+  color: var(--atelier-on-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+// The list marker is a click target outside a line of text, so it takes the
+// 24 px minimum; the anchor inside the code stays inline.
+dl.code-annotation-container-grid dt {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
+
+html code.sourceCode .code-annotation-anchor {
+  margin-top: 0;
+  padding: 0;
+}
+
+// Quarto's active selector is stronger than the base marker rule above, so the
+// active state needs its own rule.
+html code.sourceCode .code-annotation-anchor.code-annotation-active,
+dl.code-annotation-container-grid dt[data-target-cell].code-annotation-active {
+  border: none;
+  background-color: var(--atelier-accent-fill);
+  color: var(--atelier-on-accent);
+}
+
+html #code-annotation-line-highlight,
+html #code-annotation-line-highlight-gutter {
+  border: none;
+  background-color: var(--atelier-accent-soft);
+  color: var(--atelier-code-ink);
+}
+
+html #code-annotation-line-highlight {
+  box-shadow: inset 3px 0 0 var(--atelier-code-accent-mark);
+}
+
+// Bootstrap shades the shaded screen columns with a fixed light grey, which
+// stays pale in the dark scheme. Paint them from the surface token.
+.page-columns :is(.column-screen-inset-shaded, .column-screen-left-shaded, .column-screen-right-shaded) {
+  background-color: var(--atelier-surface);
+}
+
+// ===========================================================================
+// BANNER
+// ===========================================================================
+// Quarto paints the banner and its text from $title-banner-bg and
+// $title-banner-color, which default to the chrome surface here. A page that
+// sets its own colours writes them into the page, so the rules below never set
+// a banner colour. The crumbs take the banner text at full strength, since
+// fading them is what leaves a custom colour under 4.5:1.
+.quarto-title-banner {
+  border-bottom: 1px solid var(--atelier-navbar-border);
+
+  .quarto-title-breadcrumbs {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+
+    .breadcrumb {
+      margin: 0;
+    }
+
+    .breadcrumb-item,
+    .breadcrumb-item::before,
+    .breadcrumb-item a {
+      color: currentcolor;
+      opacity: 1;
+    }
+
+    .breadcrumb-item a:hover {
+      color: currentcolor;
+      text-decoration-thickness: 2px;
+    }
+
+    .breadcrumb-item:last-child {
+      font-weight: 650;
+    }
+
+    // Quarto mutes the last crumb with a rule on `li:last-of-type a`.
+    .breadcrumb li:last-of-type a {
+      color: currentcolor;
+      font-weight: inherit;
+    }
+  }
+
+  .title {
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    margin-bottom: 0;
+  }
+}
+
+// The title block rules above use the id of the header, so these selectors
+// repeat it. The subtitle takes the banner text, which the page may colour,
+// and a chip on the banner takes the border of the bar.
+#{$_atelier-title-block} .quarto-title-banner .subtitle {
+  color: currentcolor;
+}
+
+#{$_atelier-title-block} .quarto-title-banner .quarto-category {
+  border-color: var(--atelier-navbar-control-border);
+}
+
+// ===========================================================================
+// FIGURES, KEYS AND MARGIN CONTENT
+// ===========================================================================
+figcaption,
+.figure-caption,
+.column-margin figcaption {
+  color: var(--atelier-muted);
+  font-size: 0.84rem;
+
+  .atelier-caption-label {
+    color: var(--atelier-fg);
+    font-weight: 700;
+  }
+}
+
+// The kbd shortcode paints `.kbd` with a fixed grey, so the class is named too.
+kbd,
+kbd.kbd {
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--atelier-control-border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--atelier-surface);
+  color: var(--atelier-fg);
+  font-size: 0.78rem;
+}
+
+.column-margin {
+  color: var(--atelier-muted);
+  font-size: 0.8rem;
+}
+
+// A note gets the rule; a figure or table in the margin does not.
+.column-margin:not(:has(figure, .quarto-float)) {
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--atelier-border);
+}
+
+// ===========================================================================
+// LISTINGS
+// ===========================================================================
+// The item is a row with a hairline divider below it and a 132 px thumbnail.
+div.quarto-post {
+  gap: 1rem;
+  margin-bottom: 0;
+  padding: 1rem 0;
+
+  .thumbnail img {
+    margin-top: 0;
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--atelier-border);
+    border-radius: $border-radius;
+  }
+
+  h3.listing-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--atelier-fg);
+
+    // The bundle gives every link its own weight, so the link would not follow the heading.
+    a {
+      color: var(--atelier-fg);
+      font-weight: inherit;
+    }
+
+    a:hover {
+      color: var(--atelier-accent-ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  .listing-date,
+  .listing-description,
+  .listing-description a {
+    color: var(--atelier-muted);
+  }
+
+  .listing-description {
+    font-size: 0.9rem;
+  }
+}
+
+.list.quarto-listing-default > div.quarto-post:first-child {
+  padding-top: 0;
+}
+
+@include media-breakpoint-up(md) {
+  div.quarto-post .thumbnail {
+    flex-basis: 132px;
+  }
+}
+
+// The category chips are pills. Each is a button, so it keeps a 24 px target.
+// Quarto sets the pills of a grid card with a selector as strong as this one,
+// so the rule names both listings to take the same pills in each.
+:is(div.quarto-post, .quarto-grid-item) .listing-categories {
+  gap: 0.35rem;
+
+  .listing-category {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    margin: 0;
+    padding: 0.1rem 0.55rem;
+    border: 1px solid var(--atelier-control-border);
+    border-radius: 999px;
+    color: var(--atelier-fg);
+    font-size: 0.74rem;
+    text-transform: none;
+  }
+}
+
+// The category list takes the upper-case label of the sidebar sections, and
+// the active category takes the current-item style of the sidebar menu.
+#quarto-margin-sidebar .quarto-listing-category-title {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border-bottom: 0;
+  color: var(--atelier-muted);
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#quarto-margin-sidebar .quarto-listing-category {
+  font-size: 0.85rem;
+}
+
+.quarto-listing-category.category-default .category {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: $border-radius-sm;
+  color: var(--atelier-muted);
+
+  &:hover {
+    background: var(--atelier-surface-strong);
+    color: var(--atelier-fg);
+  }
+
+  // Quarto writes the class and the script adds `aria-pressed`, so the rule
+  // keys on both and holds without JavaScript.
+  &:is(.active, [aria-pressed="true"]) {
+    background: var(--atelier-accent-soft);
+    color: var(--atelier-accent-ink);
+    font-weight: 650;
+    box-shadow: inset 3px 0 0 var(--atelier-accent-mark);
+  }
+
+  .quarto-category-count {
+    font-family: $font-family-monospace;
+    font-size: 0.76rem;
+  }
+}
+
+// The filter and sort controls sit on one row that wraps. Each field is 32 px
+// high, on the page, with the control border.
+.listing-actions-group {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+
+  .input-group {
+    flex-wrap: nowrap;
+    align-items: center;
+    width: auto;
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+
+  .input-group-text,
+  .form-control,
+  .form-select {
+    min-height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .form-control,
+  .form-select {
+    border-color: var(--atelier-control-border);
+    background-color: var(--atelier-bg);
+    color: var(--atelier-fg);
+    border-top-right-radius: $border-radius-sm;
+    border-bottom-right-radius: $border-radius-sm;
+  }
+
+  .input-group-text {
+    border-top-left-radius: $border-radius-sm;
+    border-bottom-left-radius: $border-radius-sm;
+  }
+
+  .form-control {
+    min-width: 0;
+    width: 12rem;
+  }
+}
+
+// The script adds the label before the icon box, so Bootstrap's join rules for
+// an input group would square the box and pull it one pixel left.
+.listing-actions-group .input-group > .atelier-listing-label {
+  margin: 0 0.45rem 0 0;
+  color: var(--atelier-muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+
+  + .input-group-text {
+    margin-left: 0;
+  }
+}
+
+// Pagination boxes are 32 px, and the current page is set in a heavier
+// weight. The colours come from the `$pagination-*` defaults in `chrome.scss`.
+.quarto-listing ul.pagination {
+  gap: 0.3rem;
+
+  li {
+    padding-right: 0;
+  }
+
+  .page-link {
+    display: grid;
+    place-items: center;
+    min-width: 32px;
+    height: 32px;
+    margin-left: 0;
+    padding: 0 0.55rem;
+    border-radius: $border-radius-sm;
+    font-size: 0.85rem;
+  }
+
+  li.active .page-link {
+    font-weight: 650;
+  }
+}
+
+// A grid card is a bordered box on the page. The accent border, the lift, and
+// the shadow show on hover and on keyboard focus of the card link, so the
+// card reads as one target. The lift needs the motion guard.
+.quarto-grid-item.card {
+  overflow: hidden;
+  border: 1px solid var(--atelier-border);
+  border-radius: $border-radius-lg;
+  background: var(--atelier-bg);
+  color: var(--atelier-fg);
+
+  p.card-img-top > img {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .card-body {
+    padding: 0.8rem 0.9rem;
+  }
+
+  .card-title {
+    color: var(--atelier-fg);
+    font-weight: 700;
+  }
+
+  .listing-description,
+  .card-attribution,
+  .listing-date {
+    color: var(--atelier-muted);
+  }
+
+  .card-attribution {
+    padding-top: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+    text-transform: none;
+  }
+}
+
+.quarto-grid-link:is(:hover, :focus-visible) > .quarto-grid-item.card,
+.quarto-grid-item.card:focus-within {
+  border-color: var(--atelier-accent-mark);
+  box-shadow: 0 10px 24px -16px var(--atelier-shadow);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .quarto-grid-item.card {
+    transition: transform 0.15s;
+  }
+
+  .quarto-grid-link:is(:hover, :focus-visible) > .quarto-grid-item.card,
+  .quarto-grid-item.card:focus-within {
+    transform: translateY(-2px);
+  }
+}
+
+// ===========================================================================
+// TABLES
+// ===========================================================================
+// One style for the table listing and the tables in the page text: a small
+// upper-case header over a 2 px rule, hairline rows, and a tinted hover row.
+// Tables of a component (code annotations, listings other than the table
+// listing) keep their own rules.
+// The transparent default sits in `:where()`, so that a Bootstrap variant
+// class on the table (`.table-dark`, `.table-primary`) still sets its own.
+:where(main table.table, table.quarto-listing-table) {
+  --bs-table-bg: transparent;
+}
+
+main table.table,
+table.quarto-listing-table {
+  --bs-table-color: var(--atelier-fg);
+  --bs-table-striped-bg: var(--atelier-surface);
+  --bs-table-striped-color: var(--atelier-fg);
+  --bs-table-hover-bg: var(--atelier-surface);
+  --bs-table-hover-color: var(--atelier-fg);
+  width: 100%;
+  border-top: 0;
+  border-bottom: 0;
+  font-size: 0.88rem;
+
+  > :not(caption) > * > * {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--atelier-border);
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    overflow-wrap: anywhere;
+  }
+
+  > thead {
+    border-bottom: 0;
+  }
+
+  > thead > tr > th {
+    border-bottom: 2px solid var(--atelier-control-border);
+    color: var(--atelier-muted);
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  > thead > tr > th a {
+    color: inherit;
+  }
+
+  > thead > tr > th[aria-sort],
+  > thead > tr > th[aria-sort] a {
+    color: var(--atelier-fg);
+  }
+
+  // A row with a Bootstrap variant class keeps its own fill on hover, so that
+  // its own ink stays readable.
+  > tbody > tr:not([class*="table-"]):hover > * {
+    background-color: var(--atelier-surface);
+  }
+
+  // The link colour is held 4.5:1 on the page only. The hover row is darker,
+  // so its links take the page ink, and the underline still marks them.
+  > tbody > tr:hover a {
+    color: var(--atelier-fg);
+  }
+
+  caption {
+    padding: 0 0 0.5rem;
+    color: var(--atelier-muted);
+    font-size: 0.82rem;
+    text-align: left;
+  }
+}
+
+figure.quarto-float-tbl > figcaption {
+  color: var(--atelier-muted);
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+// The sort header is a link with a button role, so it takes the pointer of a
+// button and keeps a 24 px target.
+table.quarto-listing-table th a.sort {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+// Quarto draws the sort arrow as a background image, and an image does not
+// take `currentColor`, so the arrow stays black. Draw it as a mask over the
+// muted ink instead, in both colour schemes.
+// Upstream: none filed (WCAG 1.4.11)
+// Remove when: Quarto draws the sort arrow from the current colour.
+table.quarto-listing-table th a.sort:is(.asc, .desc)::after {
+  background-color: var(--atelier-muted);
+  background-image: none;
+  mask-repeat: no-repeat;
+  mask-size: 1rem 1rem;
+}
+
+table.quarto-listing-table th a.sort.asc::after {
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 12.5a.5.5 0 0 1-1 0V3.707L1.354 4.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 3.707V12.5zm3.5-9a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z"/></svg>');
+}
+
+table.quarto-listing-table th a.sort.desc::after {
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z"/></svg>');
+}
+
+// Quarto removes the underline from every link in a table listing, including
+// links in running text, so colour alone marks them. Underline them again.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15173
+// Remove when: the minimum Quarto version includes the fix.
+html table.quarto-listing-table a {
+  text-decoration: underline;
+}
+
+// ===========================================================================
+// APPENDIX
+// ===========================================================================
+// The groups of the appendix (references, footnotes, reuse, citation) each get
+// an upper-case muted label over a body in the page foreground, below a
+// hairline.
+#quarto-appendix.default {
+  padding-top: 1rem;
+  font-size: 0.88rem;
+  border-top: 1px solid var(--atelier-border);
+
+  .quarto-appendix-heading {
+    margin: 1rem 0 0.35rem;
+    // Quarto sets the size to 1em with !important.
+    font-size: 0.74rem !important;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--atelier-muted);
+  }
+
+  section:first-child .quarto-appendix-heading {
+    margin-top: 0;
+  }
+
+  .quarto-appendix-contents > *:not(h2),
+  *[role="doc-endnotes"] > ol,
+  .quarto-appendix-secondary-label {
+    font-size: inherit;
+    color: var(--atelier-fg);
+  }
+
+  .footnotes ol {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .quarto-appendix-citeas {
+    font-size: inherit;
+    border-color: var(--atelier-border);
+    border-radius: $border-radius-sm;
+  }
+
+  // Quarto writes the BibTeX entry as a `pre.sourceCode` with no
+  // `div.sourceCode` around it, so the code block frame does not reach it.
+  // It takes the same frame here, with the language above the code as in a
+  // code window.
+  pre.quarto-appendix-bibtex {
+    position: relative;
+    margin-bottom: 1rem;
+    padding: $code-block-bg-padding;
+    font-size: 0.78rem;
+    border: 1px solid var(--atelier-border);
+    border-radius: $border-radius-sm;
+    @if $code-block-bg {
+      background-color: var(--atelier-surface);
+    }
+
+    &::before {
+      display: block;
+      margin-bottom: 0.4rem;
+      content: "BibTeX";
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--atelier-muted);
+    }
+  }
+}
+
+// The back link of a footnote is a 15px glyph, below the 24px target size. It
+// keeps its underline, so that colour is not the only mark of a link.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15064
+// Remove when: the minimum Quarto version includes the fix.
+.footnote-back {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  min-height: 24px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+// Quarto fades the appendix to opacity 0.9, which pulls the back-links and the
+// licence link below 4.5:1. The selectors match the specificity of Quarto's
+// and come later.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14679
+// Remove when: the minimum Quarto version includes the fix.
+#quarto-appendix.default .quarto-appendix-heading,
+#quarto-appendix.default section *[role="doc-endnotes"],
+#quarto-appendix.default section > *:not(a) {
+  opacity: 1;
 }

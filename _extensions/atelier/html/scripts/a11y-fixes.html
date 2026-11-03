@@ -52,7 +52,8 @@
 			try {
 				const options = document.getElementById("quarto-search-options");
 				return (options && JSON.parse(options.textContent).language?.["search-label"]) || "Search";
-			} catch {
+			} catch (error) {
+				console.warn("Atelier: cannot read the search options; the search field keeps the name \"Search\".", error);
 				return "Search";
 			}
 		})();
@@ -261,22 +262,33 @@
 			if (inToggleClone(el)) return;
 			labelOnce(el, "complementary", "Listing filters");
 		});
-		document.querySelectorAll(".quarto-title-meta").forEach((el) => labelOnce(el, "region", "Page metadata"));
+		// An empty strip (Quarto writes it with whitespace only) is hidden by SCSS and has no landmark.
+		document.querySelectorAll(".quarto-title-meta").forEach((el) => {
+			if (el.firstElementChild) labelOnce(el, "region", "Page metadata");
+		});
 
 		// Listing categories: Quarto emits <div> elements with a click handler, so
 		// Tab never reaches them and a screen reader does not call them controls.
 		// Give them a button role, a place in the Tab order and Enter or Space.
 		// Quarto re-renders listing items after a filter or a page change, so the
 		// attributes are set only on elements that do not have them yet.
+		// The categories in the list are toggles: Quarto marks the active one by
+		// its class only, so `aria-pressed` follows the class. The chips on each
+		// item set the filter and do not toggle it, so they take no pressed state.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15067
 		// Remove when: the minimum Quarto version includes the fix.
-		// Not SCSS: a role and a tab stop are attributes, which CSS cannot set.
+		// Not SCSS: a role, a tab stop, and a pressed state are attributes, which CSS cannot set.
 		const categorySelector = ".quarto-listing-category .category, .listing-category";
 		const makeCategoriesButtons = (root) => {
 			root.querySelectorAll(categorySelector).forEach((el) => {
-				if (el.hasAttribute("role")) return;
-				el.setAttribute("role", "button");
-				el.setAttribute("tabindex", "0");
+				if (!el.hasAttribute("role")) {
+					el.setAttribute("role", "button");
+					el.setAttribute("tabindex", "0");
+				}
+				if (el.closest(".quarto-listing-category")) {
+					const pressed = el.classList.contains("active") ? "true" : "false";
+					if (el.getAttribute("aria-pressed") !== pressed) el.setAttribute("aria-pressed", pressed);
+				}
 			});
 		};
 		makeCategoriesButtons(document);
@@ -284,6 +296,14 @@
 			new MutationObserver(() => makeCategoriesButtons(listing)).observe(listing, {
 				childList: true,
 				subtree: true,
+			});
+		});
+		document.querySelectorAll(".quarto-listing-category").forEach((list) => {
+			new MutationObserver(() => makeCategoriesButtons(list)).observe(list, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ["class"],
 			});
 		});
 		document.addEventListener("keydown", (event) => {

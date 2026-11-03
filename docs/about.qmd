@@ -1,0 +1,29 @@
+---
+title: "About"
+description: "What Atelier is, and who makes it."
+toc: false
+about:
+  template: trestles
+  image: assets/icons/icon.svg
+  image-alt: "The Atelier logo."
+  links:
+    - icon: github
+      text: "GitHub repository"
+      href: https://github.com/mcanouil/quarto-atelier
+    - icon: chat-square-text
+      text: "Discussions"
+      href: https://github.com/mcanouil/quarto-atelier/discussions
+    - icon: heart
+      text: "Sponsor"
+      href: https://github.com/sponsors/mcanouil
+---
+
+Atelier is a project type for Quarto websites.
+It gives a documentation site an accessible design.
+The design comes from one `_brand.yml` file.
+
+Mickaël Canouil makes Atelier and the other Quarto extensions in this family.
+The source code is on GitHub.
+
+This page uses the `trestles` template.
+Quarto has four other about templates: `jolla`, `solana`, `marquee`, and `broadside`.
