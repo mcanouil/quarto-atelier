@@ -275,12 +275,12 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   margin-top: 0.5rem;
   overflow: hidden;
   border-radius: 999px;
-  background-color: var(--atelier-surface-strong);
+  background-color: var(--atelier-sidebar-surface-strong);
 
   > span {
     display: block;
     height: 100%;
-    background-color: var(--atelier-accent-fill);
+    background-color: var(--atelier-sidebar-accent-fill);
   }
 }
 
@@ -350,14 +350,14 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   height: $_atelier-step-dot;
   border: 2px solid var(--atelier-sidebar-control-border);
   border-radius: 50%;
-  background-color: var(--atelier-bg);
+  background-color: var(--atelier-sidebar-bg);
   color: var(--atelier-sidebar-muted);
   font: 600 0.72rem / 1 var(--bs-font-monospace);
 
   .atelier-step-done & {
-    border-color: var(--atelier-accent-fill);
-    background-color: var(--atelier-accent-fill);
-    color: var(--atelier-on-accent);
+    border-color: var(--atelier-sidebar-accent-fill);
+    background-color: var(--atelier-sidebar-accent-fill);
+    color: var(--atelier-sidebar-on-accent);
   }
 
   .atelier-step-current & {
@@ -409,14 +409,14 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: conic-gradient(var(--atelier-accent-fill) 0 var(--atelier-ring, 0%), var(--atelier-surface-strong) 0);
+    background: conic-gradient(var(--atelier-toc-accent-fill) 0 var(--atelier-ring, 0%), var(--atelier-toc-surface-strong) 0);
 
     &::after {
       content: "";
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: var(--atelier-bg);
+      background: var(--atelier-toc-bg);
     }
   }
 
@@ -436,17 +436,17 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
       box-sizing: border-box;
       width: 8px;
       height: 8px;
-      border: 2px solid var(--atelier-control-border);
+      border: 2px solid var(--atelier-toc-control-border);
       border-radius: 50%;
-      background: var(--atelier-bg);
+      background: var(--atelier-toc-bg);
     }
 
     &.atelier-read {
       color: var(--atelier-toc-fg);
 
       &::before {
-        border-color: var(--atelier-accent-fill);
-        background: var(--atelier-accent-fill);
+        border-color: var(--atelier-toc-accent-fill);
+        background: var(--atelier-toc-accent-fill);
       }
     }
 
@@ -454,8 +454,8 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
       font-weight: 650;
 
       &::before {
-        border-color: var(--atelier-accent-fill);
-        box-shadow: 0 0 0 3px var(--atelier-accent-soft);
+        border-color: var(--atelier-toc-accent-fill);
+        box-shadow: 0 0 0 3px var(--atelier-toc-accent-soft);
       }
     }
   }

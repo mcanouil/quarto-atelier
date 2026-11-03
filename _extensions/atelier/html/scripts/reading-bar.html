@@ -145,7 +145,10 @@
 				interval = setInterval(function () {
 					remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
 					if (!document.hidden || remaining === 0) show();
-					if (remaining === 0) stop();
+					if (remaining === 0) {
+						stop();
+						toggle.disabled = true;
+					}
 				}, 1000);
 			}
 

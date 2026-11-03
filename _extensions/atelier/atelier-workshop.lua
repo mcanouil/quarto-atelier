@@ -681,6 +681,19 @@ local function style_proof(proof)
   return solution_block(proof.div, title, proof.identifier or '')
 end
 
+--- Tell whether a code block has a class that can name a language.
+--- The classes `terminal`, `numberLines`, and `number-lines` do not name one.
+--- @param block pandoc.CodeBlock The code block
+--- @return boolean True when the block has a language class
+local function has_language_class(block)
+  for _, class in ipairs(block.classes) do
+    if class ~= 'terminal' and class ~= 'numberLines' and class ~= 'number-lines' then
+      return true
+    end
+  end
+  return false
+end
+
 --- Draw a `.terminal` code block as a terminal, in both modes.
 --- Each line that starts with `$` and a space loses those two characters, and
 --- its number joins `atelier-prompt`, a line spec. The code-blocks script marks
@@ -689,10 +702,20 @@ end
 --- Code Window draws the header from `filename`, which this filter sets to the
 --- `terminal` label when the block has none. The class `cw-auto` makes the Code
 --- Window script build the window. This filter runs before Code Window.
+--- A block with no language class is not highlighted, so the prompt and the dark
+--- style cannot apply. The filter then logs a warning and leaves the block as it is.
 --- @param block pandoc.CodeBlock The code block
 --- @return pandoc.CodeBlock|nil The block, or nil to keep it
 local function style_terminal(block)
   if not quarto.doc.is_format('html') or not block.classes:includes('terminal') then
+    return nil
+  end
+  if not has_language_class(block) then
+    log.log_warning(
+      EXTENSION_NAME,
+      'The .terminal block in ' .. (quarto.doc.input_file or '') .. ' has no language class, so it is not highlighted and shows no prompt. ' ..
+      'Add a language class such as `bash`, for example `{.bash .terminal}`.'
+    )
     return nil
   end
   local lines = {}

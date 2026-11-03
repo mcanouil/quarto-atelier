@@ -264,6 +264,23 @@ $atelier-chrome-accent-mark: atelier-contrast(
   3
 ) !default;
 
+// The course stepper and the progress dots sit on the bar, so they draw from the
+// chrome and not from the page. The strong surface is the track of a ring or a
+// bar. The fill is a mark and is held at 3:1 on the bar and on that track, and
+// the ink on the fill is held at 4.5:1.
+$atelier-chrome-surface-strong: mix($atelier-chrome-bg, $atelier-chrome-fg, 80%) !default;
+$atelier-chrome-accent-fill: atelier-contrast-all(
+  $_atelier-chrome-accent-source,
+  ($atelier-chrome-bg, $atelier-chrome-surface-strong),
+  3
+) !default;
+$atelier-chrome-on-accent: atelier-on(
+  $atelier-chrome-accent-fill,
+  $atelier-chrome-bg,
+  $atelier-chrome-fg,
+  4.5
+) !default;
+
 // ===========================================================================
 // WORKSHOP TOKENS
 // ===========================================================================

@@ -107,6 +107,9 @@ $border-color: null;
   // be seen, where the hairline above only has to separate two surfaces.
   --atelier-navbar-control-border: #{$atelier-chrome-control-border};
   --atelier-navbar-accent-mark: #{$atelier-chrome-accent-mark};
+  --atelier-navbar-surface-strong: #{$atelier-chrome-surface-strong};
+  --atelier-navbar-accent-fill: #{$atelier-chrome-accent-fill};
+  --atelier-navbar-on-accent: #{$atelier-chrome-on-accent};
 
   // The workshop bar is the inverse of the chrome, and the terminal block is
   // dark in both colour schemes.
@@ -143,6 +146,9 @@ $border-color: null;
   --atelier-sidebar-border: var(--atelier-navbar-border);
   --atelier-sidebar-control-border: var(--atelier-navbar-control-border);
   --atelier-sidebar-accent-mark: var(--atelier-navbar-accent-mark);
+  --atelier-sidebar-surface-strong: var(--atelier-navbar-surface-strong);
+  --atelier-sidebar-accent-fill: var(--atelier-navbar-accent-fill);
+  --atelier-sidebar-on-accent: var(--atelier-navbar-on-accent);
 
   // The table of contents is a fourth panel, so its tokens default to the
   // sidebar ones in the same way.
@@ -152,6 +158,9 @@ $border-color: null;
   --atelier-toc-accent: var(--atelier-sidebar-accent);
   --atelier-toc-accent-soft: var(--atelier-sidebar-accent-soft);
   --atelier-toc-border: var(--atelier-sidebar-border);
+  --atelier-toc-control-border: var(--atelier-sidebar-control-border);
+  --atelier-toc-surface-strong: var(--atelier-sidebar-surface-strong);
+  --atelier-toc-accent-fill: var(--atelier-sidebar-accent-fill);
 }
 
 // Quarto inks breadcrumb links with the raw link colour, which a pale or deep
