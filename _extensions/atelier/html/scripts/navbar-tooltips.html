@@ -20,8 +20,8 @@
 
 		function bind(el, content, extra) {
 			if (!el || !content || el.dataset.tippyBound === "1") return;
-			el.removeAttribute("title");
 			if (hasTippy) {
+				el.removeAttribute("title");
 				window.tippy(el, Object.assign({ content: content }, config, extra || {}));
 				el.dataset.tippyBound = "1";
 			}
