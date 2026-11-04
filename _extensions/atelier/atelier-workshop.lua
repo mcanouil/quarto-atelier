@@ -444,9 +444,10 @@ end
 
 --- The mode, page duration, and labels that the `Div` handler reads.
 --- `publish_workshop` fills it in the first filter pass.
---- `objectives` counts the checkboxes written so far, so the numbers run on across the page.
---- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil, objectives: integer }
-local state = { objectives = 0 }
+--- `objectives` counts the objectives written so far on the page by base id,
+--- so a repeated objective text gets its own id.
+--- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil, objectives: table<string, integer> }
+local state = { objectives = {} }
 
 --- Log the warning for a listed sidebar that has no id.
 --- Each page of the sidebar finds the same problem, so only the page that
@@ -478,7 +479,7 @@ local function publish_workshop(meta)
   local options = read_options(meta)
   local mode = read_mode(meta, source)
   local duration = read_duration(meta, source)
-  state = { mode = mode, duration = duration, labels = resolve_labels(), objectives = 0 }
+  state = { mode = mode, duration = duration, labels = resolve_labels(), objectives = {} }
   local data = {
     mode = mode,
     offset = quarto.project.offset or '',
@@ -554,16 +555,31 @@ local function attribute_duration(div, class)
   return format_duration(minutes, state.labels)
 end
 
+--- Make the id of an objective from its text.
+--- The browser stores the ticked objectives by these ids, so a tick stays on
+--- its objective when the author adds, removes, or moves other objectives.
+--- The second and later objectives with the same text on the page get `-2`,
+--- `-3`, and so on.
+--- @param inlines pandoc.Inlines The text of the objective
+--- @return string The id, such as `o-1a2b3c4d`
+local function objective_id(inlines)
+  local base = 'o-' .. pandoc.utils.sha1(pandoc.utils.stringify(inlines)):sub(1, 8)
+  local count = (state.objectives[base] or 0) + 1
+  state.objectives[base] = count
+  if count == 1 then
+    return base
+  end
+  return base .. '-' .. count
+end
+
 --- Turn each item of a bullet list into a checkbox label.
---- The checkboxes are numbered from 1 across the whole page. The empty span
---- after each checkbox holds the tick that the style draws.
+--- Each checkbox has the id of its objective text. The empty span after each
+--- checkbox holds the tick that the style draws.
 --- @param list pandoc.BulletList The list
 --- @return pandoc.Blocks The labels, followed by any further blocks of the items
 local function objective_labels(list)
   local blocks = pandoc.Blocks({})
   for _, item in ipairs(list.content) do
-    state.objectives = state.objectives + 1
-    local index = state.objectives
     local first = item[1]
     local inlines = pandoc.Inlines({})
     local rest = 1
@@ -574,7 +590,7 @@ local function objective_labels(list)
     local label = pandoc.Inlines({
       pandoc.RawInline(
         'html',
-        '<label><input type="checkbox" data-atelier-objective="' .. index .. '">' ..
+        '<label><input type="checkbox" data-atelier-objective="' .. objective_id(inlines) .. '">' ..
         '<span class="atelier-check" aria-hidden="true"></span> '
       ),
     })

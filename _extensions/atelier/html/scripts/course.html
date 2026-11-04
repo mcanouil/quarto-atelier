@@ -266,24 +266,27 @@
 		// =====================================================================
 		// W1 OBJECTIVES
 		// =====================================================================
-		// The Lua filter writes a checkbox for each objective. The ticked
-		// boxes are stored under the page in the course progress, as the
-		// numbers of the boxes.
+		// The Lua filter writes a checkbox for each objective, with an id made
+		// from the objective text. The ticked boxes are stored under the page in
+		// the course progress, as these ids. Values that are not strings come
+		// from an older format and are ignored.
 		(function () {
 			var boxes = document.querySelectorAll(".atelier-objectives input[data-atelier-objective]");
 			if (!boxes.length) return;
 
 			var key = course.current !== -1 ? course.pages[course.current].href : location.pathname;
 			var stored = course.progress.objectives[key];
-			var ticked = Array.isArray(stored) ? stored : [];
+			var ticked = (Array.isArray(stored) ? stored : []).filter(function (value) {
+				return typeof value === "string";
+			});
 
 			boxes.forEach(function (box) {
-				var number = Number(box.getAttribute("data-atelier-objective"));
-				box.checked = ticked.indexOf(number) !== -1;
+				var id = box.getAttribute("data-atelier-objective");
+				box.checked = ticked.indexOf(id) !== -1;
 				box.addEventListener("change", function () {
-					ticked = ticked.filter(function (value) { return value !== number; });
-					if (box.checked) ticked.push(number);
-					course.progress.objectives[key] = ticked.slice().sort(function (a, b) { return a - b; });
+					ticked = ticked.filter(function (value) { return value !== id; });
+					if (box.checked) ticked.push(id);
+					course.progress.objectives[key] = ticked.slice().sort();
 					course.save();
 				});
 			});
