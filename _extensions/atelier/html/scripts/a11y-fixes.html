@@ -32,14 +32,6 @@
 			if (address) a.setAttribute("aria-label", address);
 		});
 
-		// Colour scheme toggle: Quarto adds title= but no aria-label.
-		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/13463
-		// Remove when: the minimum Quarto version is 1.11.2 or later.
-		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
-		document.querySelectorAll("a.quarto-color-scheme-toggle:not([aria-label])").forEach((a) => {
-			a.setAttribute("aria-label", a.getAttribute("title") || "Toggle dark mode");
-		});
-
 		// Search input: Quarto labels the field through aria-labelledby, which
 		// names it "Submit" (textbox) or nothing (overlay), and that label wins
 		// over an aria-label on the input. Name the referenced label with Quarto's
@@ -188,11 +180,10 @@
 			el.removeAttribute("role");
 		});
 
-		// Disambiguate landmarks. The page title-block is also a <header>, which is a
-		// duplicate banner alongside the site navbar; demote it and label the rest.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14375 (banner)
-		// Fixed upstream in Quarto 1.11.4: https://github.com/quarto-dev/quarto-cli/issues/14376 (nav labels)
-		// Remove when: the minimum Quarto version includes the fix for the banner (#14375).
+		// The page title-block is also a <header>, which is a duplicate banner
+		// alongside the site navbar; demote it and label the site banner.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14375
+		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: ARIA roles and labels are attributes, which CSS cannot set.
 		const siteHeader = document.getElementById("quarto-header");
 		if (siteHeader && !siteHeader.getAttribute("aria-label")) {
@@ -202,21 +193,6 @@
 		if (titleHeader) {
 			titleHeader.setAttribute("role", "presentation");
 		}
-		const navbarPrimary = document.querySelector(".navbar");
-		if (navbarPrimary && !navbarPrimary.getAttribute("aria-label")) {
-			navbarPrimary.setAttribute("aria-label", "Primary");
-		}
-		const tocNav = document.querySelector("#TOC, nav#TOC, .sidebar-toc nav");
-		if (tocNav && !tocNav.getAttribute("aria-label")) {
-			tocNav.setAttribute("aria-label", "On this page");
-		}
-		const sidebarNav = document.querySelector("nav#quarto-sidebar");
-		if (sidebarNav && !sidebarNav.getAttribute("aria-label")) {
-			sidebarNav.setAttribute("aria-label", document.querySelector(".navbar") ? "Section" : "Site");
-		}
-		document.querySelectorAll("nav.page-navigation:not([aria-label])").forEach((nav) => {
-			nav.setAttribute("aria-label", "Page");
-		});
 
 		// Listing category sidebar: Quarto emits <h5>Categories</h5> after the page
 		// <h1>, breaking heading order. Re-tag to <h2> so the outline stays monotonic.
@@ -385,19 +361,13 @@
 
 		// The bar that replaces the sidebar on narrow screens is a nav element,
 		// but its links, if any, are in the breadcrumbs nav inside it. Remove its
-		// landmark role and its label. Quarto 1.11.1 and earlier also make the
-		// click area around the bar title a named navigation landmark; remove
-		// that role and the attributes that go with it, as Quarto 1.11.2 does.
+		// landmark role and its label.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14868
-		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/pull/14826 (click area)
-		// Remove when: the minimum Quarto version includes the fix for the bar (#14868).
+		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: ARIA roles are attributes, which CSS cannot set.
 		document.querySelectorAll("nav.quarto-secondary-nav").forEach((bar) => {
 			bar.setAttribute("role", "none");
 			bar.removeAttribute("aria-label");
-			bar.querySelectorAll('a[role="navigation"]:not([href])').forEach((area) => {
-				["role", "aria-label", "aria-controls", "aria-expanded"].forEach((name) => area.removeAttribute(name));
-			});
 		});
 
 		// The click area of the narrow-screen bar and the backdrop of the open
@@ -417,43 +387,6 @@
 				element.removeAttribute("aria-expanded");
 				expandedObserver.observe(element, { attributes: true, attributeFilter: ["aria-expanded"] });
 			});
-
-		// Quarto 1.11.1 and earlier render a sidebar section toggle as an <a> with
-		// no href and a navigation role: it is a landmark with no links, and the
-		// keyboard cannot reach it. Give it the role, tab stop and keys of a
-		// button. A section with no page of its own has two toggles side by side,
-		// its label and its chevron; keep only the label, as Quarto 1.11.2 does.
-		// The key handler is on the document, so it also works in the copy of the
-		// sidebar that Quarto shows when content overlaps the column.
-		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/12116 (keyboard)
-		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/4935 (role)
-		// Remove when: the minimum Quarto version is 1.11.2 or later.
-		// Not SCSS: roles, tab stops and key handlers are DOM changes, which CSS cannot make.
-		const sectionToggles = [
-			...document.querySelectorAll(
-				'.sidebar-item-container a[role="navigation"][data-bs-toggle="collapse"]:not([href])',
-			),
-		];
-		sectionToggles.forEach((toggle) => {
-			if (sectionToggles.includes(toggle.previousElementSibling)) {
-				toggle.removeAttribute("role");
-				toggle.setAttribute("aria-hidden", "true");
-				return;
-			}
-			toggle.setAttribute("role", "button");
-			toggle.setAttribute("tabindex", "0");
-		});
-		if (sectionToggles.length > 0) {
-			document.addEventListener("keydown", (event) => {
-				if (event.key !== "Enter" && event.key !== " ") return;
-				const toggle = event.target.closest?.(
-					'.sidebar-item-container a[role="button"][data-bs-toggle="collapse"]:not([href])',
-				);
-				if (!toggle) return;
-				event.preventDefault();
-				if (!event.repeat) toggle.click();
-			});
-		}
 
 		// Quarto marks the sidebar link to the current page with a class only, so
 		// a screen reader cannot tell which page is current. The copy of the
@@ -511,7 +444,7 @@
 		const toggleNames = {
 			"quarto-toc-toggle": "On this page",
 			"quarto-lefttoc-toggle": "On this page",
-			"quarto-sidebarnav-toggle": sidebarNav?.getAttribute("aria-label") || "Site",
+			"quarto-sidebarnav-toggle": document.querySelector("nav#quarto-sidebar")?.getAttribute("aria-label") || "Site",
 		};
 		const enhanceToggle = (title) => {
 			if (enhancedToggles.has(title)) return;
@@ -610,15 +543,6 @@
 			pressOnSpace(toggle);
 		});
 
-		// Collapsed navbar: Quarto gives the menu <button> role="menu", which a
-		// button cannot take. Remove it, so that the element is a button again.
-		// Fixed upstream in Quarto 1.11.2: https://github.com/quarto-dev/quarto-cli/issues/14615
-		// Remove when: the minimum Quarto version is 1.11.2 or later.
-		// Not SCSS: an ARIA role is an attribute, which CSS cannot remove.
-		document.querySelectorAll('.navbar-toggler[role="menu"]').forEach((toggler) => {
-			toggler.removeAttribute("role");
-		});
-
 		// Navigation icons: in the navbar, the sidebar and the footer, Quarto
 		// writes each `icon:` as <i role="img"> with no name, and writes empty
 		// title and aria-label attributes on a tool with no `text:`. Hide the icon
@@ -650,18 +574,17 @@
 		});
 
 		// Floating colour scheme toggle: on a page with no navbar and no sidebar
-		// tools, Quarto appends the toggle, or from Quarto 1.11 its container, to
-		// the end of <body>. It is drawn at the top right, but focus reaches it
-		// last. Move it after the skip links, still as a direct child of <body>,
-		// so its drawn position does not change.
+		// tools, Quarto appends the toggle's container to the end of <body>. It is
+		// drawn at the top right, but focus reaches it last. Move it after the skip
+		// link, still as a direct child of <body>, so its drawn position does not
+		// change.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838
 		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: focus order follows the DOM order, which CSS cannot change.
 		const floatingToggle = document.querySelector(".top-right.quarto-color-scheme-toggle")?.closest("body > *");
 		if (floatingToggle) {
-			const skipLinks = document.body.querySelectorAll(":scope > .skip-link, :scope > #quarto-skip-link");
-			const anchor = skipLinks[skipLinks.length - 1];
-			if (anchor) anchor.after(floatingToggle);
+			const skipLink = document.body.querySelector(":scope > #quarto-skip-link");
+			if (skipLink) skipLink.after(floatingToggle);
 			else document.body.prepend(floatingToggle);
 		}
 	});
