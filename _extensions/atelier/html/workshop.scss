@@ -489,6 +489,12 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
   // span after the box holds the tick, drawn as a mask in the on-accent colour
   // over the accent fill. The global focus ring stays. Only the objective
   // checkboxes have the tick span, so a task list keeps the native box.
+  // The browser gives a form control its own text colour. Every checkbox in
+  // the block takes the colour of its label.
+  input[type="checkbox"] {
+    color: inherit;
+  }
+
   input[data-atelier-objective] {
     flex: none;
     width: 18px;
@@ -497,8 +503,6 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
     border: 2px solid var(--atelier-control-border);
     border-radius: $border-radius-sm;
     background-color: var(--atelier-bg);
-    // The browser gives a form control its own text colour. Use the colour of the label.
-    color: inherit;
     appearance: none;
 
     &:checked {
