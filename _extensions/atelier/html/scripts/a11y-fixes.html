@@ -575,16 +575,18 @@
 
 		// Floating colour scheme toggle: on a page with no navbar and no sidebar
 		// tools, Quarto appends the toggle's container to the end of <body>. It is
-		// drawn at the top right, but focus reaches it last. Move it after the skip
-		// link, still as a direct child of <body>, so its drawn position does not
-		// change.
+		// drawn at the top right, but focus reaches it last. Move it after the
+		// fixed header that holds the announcement bar, or after the skip link
+		// when there is no header. It stays a direct child of <body>.
+		// The toggle position in theme.scss also depends on this move.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838
 		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: focus order follows the DOM order, which CSS cannot change.
 		const floatingToggle = document.querySelector(".top-right.quarto-color-scheme-toggle")?.closest("body > *");
 		if (floatingToggle) {
-			const skipLink = document.body.querySelector(":scope > #quarto-skip-link");
-			if (skipLink) skipLink.after(floatingToggle);
+			const anchor = document.body.querySelector(":scope > #quarto-header")
+				?? document.body.querySelector(":scope > #quarto-skip-link");
+			if (anchor) anchor.after(floatingToggle);
 			else document.body.prepend(floatingToggle);
 		}
 	});

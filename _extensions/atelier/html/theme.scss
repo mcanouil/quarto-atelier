@@ -1544,6 +1544,17 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   color: var(--atelier-fg);
 }
 
+// Quarto places the floating toggle 1em from the top of the document, under the
+// fixed header that holds the announcement bar. With `top: auto`, the toggle
+// starts where a11y-fixes.html puts its container: after the header, below the
+// body padding for the header. The toggle then stays 1em below the bar.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294
+// Remove when: the minimum Quarto version includes the fix.
+.top-right.quarto-color-scheme-toggle {
+  top: auto;
+  margin-top: 1em;
+}
+
 // In the sidebar tools row, Quarto sizes the tool icons from the font size of
 // the row, but the toggle glyph from the root font size, so the toggle is
 // larger than the icons beside it. Size the glyph from the row instead.
