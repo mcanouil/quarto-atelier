@@ -60,6 +60,7 @@
 - fix: Hide the empty metadata strip of a title block, and leave it out of the page landmarks. (#77)
 - fix: Draw code annotation markers on the accent with readable text, in place of Quarto's fixed grey. (#77)
 - fix: Keep code blocks inside lists on the code surface in dark mode, so their text stays readable. (#79)
+- fix: Give the colour scheme toggle its themed tooltip again, in the navbar, in the sidebar, and floating at the top right. (#81)
 
 ### Documentation
 
