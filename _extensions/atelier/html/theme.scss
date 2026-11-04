@@ -651,12 +651,6 @@ main:has(> .atelier-landing) > #title-block-header {
   }
 }
 
-@media (forced-colors: active) {
-  .atelier-card a:focus-visible::after {
-    outline-color: Highlight;
-  }
-}
-
 .atelier-cards.compact .atelier-card {
   flex-direction: row;
   align-items: center;
