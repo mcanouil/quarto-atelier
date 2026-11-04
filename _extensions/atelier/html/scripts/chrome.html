@@ -36,7 +36,7 @@
 		// handled in a11y-fixes.html.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190
 		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
-		// Remove when: the minimum Quarto version includes both fixes.
+		// Remove when: the minimum Quarto version includes the fix.
 		var here = location.pathname.replace(/index\.html$/, "");
 		document.querySelectorAll(".navbar .nav-link.active").forEach(function (link) {
 			var target = new URL(link.href, location.href).pathname.replace(/index\.html$/, "");

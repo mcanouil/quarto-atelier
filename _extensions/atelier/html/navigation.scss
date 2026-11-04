@@ -668,7 +668,7 @@ body.floating .sidebar.sidebar-navigation {
 // The popups use the tippy theme `quarto`, which has low contrast in the dark
 // scheme, so the surface takes the tokens.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/13195
-// Remove when: Quarto paints the popups from a contrast-checked surface.
+// Remove when: the minimum Quarto version includes the fix.
 .tooltip {
   --bs-tooltip-bg: var(--atelier-navbar-bg);
   --bs-tooltip-color: var(--atelier-navbar-fg);
@@ -902,8 +902,7 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 // `order`. A grid gives three equal columns from `md` up and one column below,
 // in the order the markup has.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/13665
-// Remove when: the minimum Quarto version lays the footer out in three equal
-// columns from `md` up.
+// Remove when: the minimum Quarto version includes the fix.
 footer.footer .nav-footer {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1101,7 +1100,7 @@ body:not(.glightbox-mobile) div.gslide-description :is(.gslide-title, .gslide-de
 // box, and crops a tall one. Fit the image inside 90% of the viewport and keep
 // its ratio. The selector matches a file name that ends in `.svg`; it misses an
 // address with a query string and a data URI.
-// Upstream: https://github.com/quarto-dev/quarto-cli/issues/10315 (related)
+// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/10315
 // Remove when: Quarto sizes SVG images in the lightbox to the slide.
 .glightbox-container .gslide-image img[src$=".svg" i] {
   width: min(90vw, calc(90vh * 4 / 3));

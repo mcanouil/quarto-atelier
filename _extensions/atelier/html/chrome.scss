@@ -95,7 +95,8 @@
 // mapping). Atelier sets the five names that colour the callouts for every
 // brand. $red and the others also feed the theme colours that Bootstrap
 // derives from them, such as $danger, so a palette name reaches those too.
-// Remove when: Quarto maps the palette names without defaults.bootstrap.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15295
+// Remove when: the minimum Quarto version includes the fix.
 $blue: null !default;
 @if atelier-meta.variable-exists("brand-blue") {
   $blue: $brand-blue !default;

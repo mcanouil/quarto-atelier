@@ -172,7 +172,7 @@ $border-color: null;
 // the hover ink is the link hover token. The breadcrumb in the secondary
 // navigation bar takes the sidebar tokens in the rules below.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15175
-// Remove when: Quarto inks breadcrumb links from a contrast-checked colour.
+// Remove when: the minimum Quarto version includes the fix.
 .quarto-page-breadcrumbs a {
   color: var(--atelier-muted);
 }
@@ -881,7 +881,7 @@ code.sourceCode:not(pre code) {
 // Quarto gives code blocks inside a list, paragraph, or table cell the inline
 // code background, which fails in dark mode. Make that code transparent again.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/13390
-// Remove when: the minimum Quarto version includes the fix for quarto-cli#13390.
+// Remove when: the minimum Quarto version includes the fix.
 html pre > code.sourceCode {
   background-color: transparent;
 }
