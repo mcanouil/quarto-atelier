@@ -22,7 +22,8 @@ project:
 
 Atelier ships with five extensions inside it, so you don't install them yourself: [iconify](https://github.com/mcanouil/quarto-iconify), [gitlink](https://github.com/mcanouil/quarto-gitlink), [code-window](https://github.com/mcanouil/quarto-code-window), [toc-depth](https://github.com/mcanouil/quarto-toc-depth) and [collapse-output](https://github.com/mcanouil/quarto-collapse-output).
 They live in `_extensions/atelier/_extensions/mcanouil/`, and each `_extension.yml` records the release it came from.
-Atelier's minimum Quarto version follows theirs: it is the highest version any of them needs.
+Atelier needs Quarto 1.11.9 or later, the first stable 1.11 release.
+Older releases drop the project's `extensions` options on any page that sets its own `extensions` in its front matter.
 
 If your project already has its own copy of one of them, remove it from `_extensions/` and drop its name from your `filters` list.
 Otherwise both copies run, and your copy's shortcodes replace the embedded ones.

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- fix: Atelier needs Quarto 1.11.9 or later.
+  Older releases drop the project's `extensions` options on any page that sets its own `extensions` in its front matter, which breaks workshop mode and the embedded extensions' defaults.
+
 ### New Features
 
 - feat: Derive the page surfaces, muted text, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA.
