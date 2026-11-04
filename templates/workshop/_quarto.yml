@@ -1,0 +1,20 @@
+project:
+  type: atelier
+
+metadata-files:
+  - _sidebars.yml
+
+website:
+  title: "My workshop"
+  description: "A short description of my workshop."
+  repo-url: https://github.com/owner/project
+  navbar: false
+  search:
+    location: sidebar
+    type: textbox
+
+brand: _brand.yml
+
+extensions:
+  atelier:
+    version: "2026"

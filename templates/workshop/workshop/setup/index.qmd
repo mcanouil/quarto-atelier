@@ -1,0 +1,35 @@
+---
+title: "Set up your computer"
+extensions:
+  atelier:
+    duration: 10 min
+---
+
+This module prepares your computer.
+You install Quarto, then you make sure that it works.
+
+## Goals
+
+::: {.objectives}
+
+- Install Quarto.
+- Read the version of Quarto in a terminal.
+
+:::
+
+## Check your set-up
+
+Open a terminal and read the version of Quarto.
+The command prints one line.
+
+```{.bash .terminal}
+$ quarto --version
+1.9.38
+```
+
+If the terminal prints a version number, Quarto is ready.
+If it prints an error, go to the next page and install the tools.
+
+## Next step
+
+The next page lists the tools and how to install them.

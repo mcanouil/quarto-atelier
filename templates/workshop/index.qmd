@@ -1,0 +1,25 @@
+---
+title: "Welcome"
+extensions:
+  atelier:
+    mode: workshop
+    duration: 5
+---
+
+This workshop shows how to make a Quarto website and put it online.
+Replace this text with a short description of your own workshop.
+Say who it is for and what the learners can do at the end.
+
+## How the workshop works
+
+The workshop has four modules.
+Each module is a section of the sidebar.
+The bar above the page shows the module that you are in and a timer for the page.
+
+The sidebar remembers the pages that you have read.
+Start with the first module and follow the order of the sidebar.
+
+## Before you start
+
+You need a computer with a terminal and a web browser.
+You do not need any other tool, because the first module installs them.
