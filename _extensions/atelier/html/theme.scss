@@ -1544,13 +1544,10 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   color: var(--atelier-fg);
 }
 
-// Quarto places the floating toggle 1em from the top of the document. The fixed
-// header that holds the announcement bar starts there too, so the bar covers
-// the toggle. Quarto adds a top padding to <body> for the fixed header.
-// With `top: auto`, the toggle starts where its container is in the page flow,
-// and a11y-fixes.html moves that container to the top of the page content.
-// As a result, the toggle stays 1em below the bar, and it moves up with the
-// page when the reader dismisses the bar.
+// Quarto places the floating toggle 1em from the top of the document, under the
+// fixed header that holds the announcement bar. With `top: auto`, the toggle
+// starts where a11y-fixes.html puts its container: after the header, below the
+// body padding for the header. The toggle then stays 1em below the bar.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294
 // Remove when: the minimum Quarto version includes the fix.
 .top-right.quarto-color-scheme-toggle {
