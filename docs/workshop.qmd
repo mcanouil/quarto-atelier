@@ -9,7 +9,7 @@ The pages that set `mode: workshop` get the workshop chrome, and the other pages
 
 The [example workshop](workshop-example/index.qmd) of this site uses each part that this page describes.
 The [workshop template](templates.qmd) gives you a workshop site to start from.
-Workshop mode needs Quarto 1.11.9 or later: older releases remove the project options from a page that sets `extensions` in its front matter.
+Workshop mode needs Quarto 1.11.9 or later.
 
 ## Set the mode
 

@@ -102,6 +102,7 @@ website:
           text: "Examples"
         - href: listing-example/index.qmd
           text: "Listing example"
+        # This section shows a sidebar section with its toggle.
         - section: "More examples"
           contents:
             - href: numbered-sections.qmd

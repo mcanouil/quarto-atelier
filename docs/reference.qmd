@@ -71,14 +71,7 @@ This site sets `navbar: false` and gives the docked sidebar the navigation and t
 ## Layouts and modes
 
 The layout comes from `website.navbar`, and the mode from `extensions.atelier.mode`.
-Each mode works with each layout.
-
-- Documentation with a navbar: the navbar, the sidebar menu, and the table of contents card.
-- Documentation with the sidebar only: the sidebar with the title and the tools at the top, and a reading bar above the page.
-- Workshop with a navbar: the navbar with a module row below it, the course stepper, and the progress dots.
-- Workshop with the sidebar only: the sidebar with the course stepper, a workshop bar above the page, and the progress dots.
-
-The [Workshop mode](workshop.qmd) page tells what each part of the workshop chrome does, and the [Starter templates](templates.qmd) give a site in each default layout.
+The table in [The workshop chrome](workshop.qmd#the-workshop-chrome) shows what each layout gives each mode.
 
 ## Format defaults
 

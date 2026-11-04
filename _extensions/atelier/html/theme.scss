@@ -934,12 +934,8 @@ code.sourceCode:not(pre code) {
   border-radius: 0.3em;
 }
 
-// Quarto styles code.sourceCode inside li, p, and td with the inline code
-// background. The rule also matches the code of a code block in a list item.
-// Its specificity is higher than the rule that makes the block code
-// transparent.
-// In dark mode the grey is light, so the token colours fail.
-// Make the code of a block transparent again, so the block keeps its surface.
+// Quarto gives code blocks inside a list, paragraph, or table cell the inline
+// code background, which fails in dark mode. Make that code transparent again.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/13390
 // Remove when: the minimum Quarto version includes the fix for quarto-cli#13390.
 html pre > code.sourceCode {
