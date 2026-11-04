@@ -751,9 +751,13 @@ end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.
 --- Each line that starts with `$` and a space loses those two characters, and
---- its number joins `atelier-prompt`, a line spec. The code-blocks script marks
---- those lines, and the style draws the `$` prompt before them. The prompt is
---- not in the text, so screen readers and the copy button skip it.
+--- its number joins `atelier-prompt`, a line spec. A line that is only `$`
+--- becomes one space and is a prompt line too. The code-blocks script marks those
+--- lines, and the style draws the `$` prompt before them. The prompt is not in
+--- the text, so screen readers and the copy button skip it.
+--- A command that ends with `\` goes on to the next line. The numbers of these
+--- next lines join `atelier-continuation`, and the style gives them the command
+--- colour with no prompt. An indented `$` line is output, as in usage text.
 --- Code Window draws the header from `filename`, which this filter sets to the
 --- `terminal` label when the block has none. The class `cw-auto` makes the Code
 --- Window script build the window. This filter runs before Code Window.
@@ -775,19 +779,34 @@ local function style_terminal(block)
   end
   local lines = {}
   local prompts = {}
+  local continuations = {}
+  local continued = false
   local number = 0
   for line in (block.text .. '\n'):gmatch('(.-)\n') do
     number = number + 1
-    if line:sub(1, 2) == '$ ' then
+    local command = true
+    if continued then
+      continuations[#continuations + 1] = tostring(number)
+    elseif line:sub(1, 2) == '$ ' then
       line = line:sub(3)
       prompts[#prompts + 1] = tostring(number)
+    elseif line == '$' then
+      -- A space, not an empty line: the highlighter drops an empty last line.
+      line = ' '
+      prompts[#prompts + 1] = tostring(number)
+    else
+      command = false
     end
+    continued = command and line:sub(-1) == '\\'
     lines[#lines + 1] = line
   end
   block.text = table.concat(lines, '\n')
   block.classes:insert('atelier-terminal')
   if #prompts > 0 then
     block.attributes['atelier-prompt'] = table.concat(prompts, ',')
+  end
+  if #continuations > 0 then
+    block.attributes['atelier-continuation'] = table.concat(continuations, ',')
   end
   if block.attributes.filename == nil then
     block.attributes.filename = state.labels.terminal

@@ -629,6 +629,11 @@ html pre.sourceCode.atelier-terminal {
     overflow-wrap: anywhere;
   }
 
+  // A line that continues a command takes the command colour, with no prompt.
+  code > span.atelier-command-line {
+    color: var(--atelier-terminal-fg);
+  }
+
   code > span.atelier-prompt-line {
     color: var(--atelier-terminal-fg);
 
