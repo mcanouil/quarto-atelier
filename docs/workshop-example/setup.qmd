@@ -1,0 +1,30 @@
+---
+title: "Set up"
+description: "A page with objectives and a terminal block."
+extensions:
+  atelier:
+    duration: 15 min
+---
+
+This page prepares the computer of the learner.
+
+## Goals
+
+::: {.objectives}
+
+- Install Quarto.
+- Read the version of Quarto in a terminal.
+
+:::
+
+## Check the version
+
+Open a terminal and run the command.
+The command prints one line.
+
+```{.bash .terminal}
+$ quarto --version
+1.11.9
+```
+
+If the terminal prints a version number, Quarto is ready.

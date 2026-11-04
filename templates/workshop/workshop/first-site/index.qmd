@@ -1,0 +1,52 @@
+---
+title: "Your first site"
+author:
+  - Ada Lovelace
+  - Grace Hopper
+date: 2026-11-04
+date-modified: 2026-11-05
+extensions:
+  atelier:
+    duration: 1 h
+---
+
+In this module you make a website and look at it in your browser.
+
+## Goals
+
+::: {.objectives title="By the end of this module" duration="20 min"}
+
+- Make a website project.
+- Preview the website in a browser.
+- Change the title of a page.
+
+:::
+
+## Make the project
+
+Run this command in a terminal.
+It makes the folder `my-site` with the files of a small website.
+
+```{.bash .terminal}
+$ quarto create project website my-site
+```
+
+Then go into the folder.
+
+```{.bash .terminal}
+$ cd my-site
+```
+
+## Preview the site
+
+Start the preview.
+Quarto prints the address of the site, and the browser updates each time you save a file.
+
+```{.bash .terminal}
+$ quarto preview
+Watching files for changes
+Browse at http://localhost:4444/
+```
+
+Open the address in your browser.
+Leave the terminal open while you work.

@@ -1,0 +1,7 @@
+---
+title: "Page not found"
+canonical-url: false
+---
+
+This page does not exist.
+Go to the [home page](index.qmd) to find what you need.

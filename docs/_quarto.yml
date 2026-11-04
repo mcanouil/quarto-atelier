@@ -60,42 +60,77 @@ website:
     location: sidebar
     type: textbox
   # Book-like layout: a docked sidebar carries the navigation and the search,
-  # and there is no navbar. The gitlink widget replaces the sidebar tool
+  # and there is no navbar. The site has two sidebars. The `docs` sidebar holds
+  # the documentation pages. The `workshop` sidebar holds the example workshop;
+  # its alias is in `extensions.atelier.sidebars` below. The anchors and the
+  # alias stay in this file. The gitlink widget replaces the sidebar tool
   # pointing at #gitlink-widget, and atelier themes the docked sidebar from the
   # same tokens as the navbar it replaces. Render `--profile navbar` for the
   # layout with the navbar instead; see _quarto-navbar.yml.
   navbar: false
   sidebar:
-    # `background` and `foreground` are left out: atelier repaints a docked
-    # sidebar from the chrome palette, so neither has any effect on it.
-    style: docked
-    search: true
-    pinned: true
-    align: center
-    collapse-level: 2
-    tools:
-      - href: "#gitlink-widget"
-        text: "GitHub"
-        icon: github
-    # Plain labels, no icons: Quarto expands no shortcode in a sidebar item's
-    # text, and the raw web component leaks out of the sidebar into the
-    # breadcrumbs, which reuse the same string.
-    contents:
-      - href: index.qmd
-        text: "Home"
-      - href: reference.qmd
-        text: "Reference"
-      - href: landing.qmd
-        text: "Landing page"
-      - href: examples.qmd
-        text: "Examples"
-      - href: listing-example/index.qmd
-        text: "Listing example"
-      - href: about.qmd
-        text: "About"
-      - text: "---"
-      - href: changelog.qmd
-        text: "Changelog"
+    - &docs
+      id: docs
+      # `background` and `foreground` are left out: atelier repaints a docked
+      # sidebar from the chrome palette, so neither has any effect on it.
+      style: docked
+      search: true
+      pinned: true
+      align: center
+      collapse-level: 2
+      tools:
+        - href: "#gitlink-widget"
+          text: "GitHub"
+          icon: github
+      # Plain labels, no icons: Quarto expands no shortcode in a sidebar item's
+      # text, and the raw web component leaks out of the sidebar into the
+      # breadcrumbs, which reuse the same string.
+      contents:
+        - href: index.qmd
+          text: "Home"
+        - href: templates.qmd
+          text: "Templates"
+        - href: workshop.qmd
+          text: "Workshop mode"
+        - href: brand.qmd
+          text: "Brand and colours"
+        - href: reference.qmd
+          text: "Reference"
+        - href: landing.qmd
+          text: "Landing page"
+        - href: examples.qmd
+          text: "Examples"
+        - href: listing-example/index.qmd
+          text: "Listing example"
+        # This section shows a sidebar section with its toggle.
+        - section: "More examples"
+          contents:
+            - href: numbered-sections.qmd
+              text: "Numbered sections"
+        - href: about.qmd
+          text: "About"
+        - text: "---"
+        - href: changelog.qmd
+          text: "Changelog"
+    - &workshop
+      id: workshop
+      title: "Example workshop"
+      style: docked
+      search: true
+      pinned: true
+      align: center
+      tools:
+        - href: "#gitlink-widget"
+          text: "GitHub"
+          icon: github
+      contents:
+        - section: "Getting started"
+          contents:
+            - workshop-example/index.qmd
+            - workshop-example/setup.qmd
+        - section: "Practice"
+          contents:
+            - workshop-example/practice.qmd
   announcement:
     icon: info-circle
     dismissable: true
@@ -128,6 +163,9 @@ extensions:
     icon: assets/icons/icon.svg
     apple-touch-icon: assets/icons/apple-touch-icon.png
     manifest: site.webmanifest
+    sidebars:
+      - *docs
+      - *workshop
   gitlink:
     # Widget only, as atelier sets it: the platform and repository come from
     # `website.repo-url`, and in-text reference rewriting stays off so prose is

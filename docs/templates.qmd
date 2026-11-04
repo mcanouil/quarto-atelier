@@ -1,0 +1,123 @@
+---
+title: "Starter templates"
+description: "Start a documentation site or a workshop from a template, with the two commands in the correct order."
+---
+
+Atelier has two starter templates.
+Each template sets the mode and the layout together, and holds sample pages that you replace with your own.
+
+## The two templates
+
+| Template        | Mode            | Layout                                    | Folder                     |
+| --------------- | --------------- | ----------------------------------------- | -------------------------- |
+| `documentation` | `documentation` | A navbar and a docked sidebar.            | `templates/documentation/` |
+| `workshop`      | `workshop`      | A sidebar only, with no navbar.           | `templates/workshop/`      |
+
+: The starter templates. {.striped .hover tbl-colwidths="[18,18,40,24]"}
+
+Each mode works with each layout.
+The table below shows what the page shows in each combination.
+
+| Mode          | Navbar layout                                                                 | Sidebar-only layout                                                         |
+| ------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Documentation | The default. The navbar, the sidebar menu, and the table of contents card.   | The sidebar, with the title and the tools at the top, a reading bar above the page, and the table of contents card. |
+| Workshop      | The navbar with a module row below it, the course stepper, and the progress dots. | The default. The sidebar with the course stepper, a workshop bar above the page, and the progress dots. |
+
+: What each mode shows in each layout. {.striped .hover tbl-colwidths="[16,42,42]"}
+
+The [Workshop mode](workshop.qmd) page tells what each part of the workshop chrome does.
+
+## Install a template
+
+You need Quarto 1.11.9 or later.
+Do these steps in an empty folder.
+The order of the two commands is important.
+
+1. Add the extension:
+
+   ```{.bash filename="Terminal"}
+   quarto add {{< var extension.reference >}}
+   ```
+
+2. Copy the template into the folder.
+   For the workshop template, write `workshop` in place of `documentation`.
+
+   ```{.bash filename="Terminal"}
+   quarto use template {{< var extension.repo >}}/templates/documentation@{{< var extension.version >}}
+   ```
+
+3. When Quarto asks "Create a subdirectory for template?", answer No.
+   Quarto then copies the template into the current folder, next to the `_extensions/` folder of the first command.
+
+4. Preview the site:
+
+   ```{.bash filename="Terminal"}
+   quarto preview
+   ```
+
+The template folders do not hold the extension.
+For this reason, `quarto add` must come first.
+
+### If you run the commands in the other order
+
+If you run `quarto use template` first, the template copies a `_quarto.yml` that names `project.type: atelier`.
+Then `quarto add` stops with this error:
+
+```text
+ERROR: Unsupported project type atelier
+```
+
+To correct the error, remove the files of the template, or start again in a new empty folder.
+Then run `quarto add` first, and `quarto use template` second.
+
+You cannot skip the prompt with `--no-prompt`.
+With that option, `quarto use template` stops because the folder that `quarto add` filled is not empty.
+
+## Edit the template
+
+Edit these files first:
+
+- `_quarto.yml`: the title, the description, the repository address (`repo-url`), and the navigation.
+- `_brand.yml`: the colours.
+  Each key has a comment that tells what it changes.
+  The [Brand and colours](brand.qmd) page tells how Atelier uses each key.
+
+Then replace the text of the sample pages with your own text.
+The sample repository address is `https://github.com/owner/project`.
+Change it before you publish the site, because the edit and issue links of each page use it.
+
+### Files of the documentation template
+
+| File                      | Content                                                                    |
+| ------------------------- | -------------------------------------------------------------------------- |
+| `_quarto.yml`             | The project type, the navbar, the sidebar, and `extensions.atelier.version`. |
+| `_brand.yml`              | The colours, with a comment on each key.                                   |
+| `index.qmd`               | The home page.                                                             |
+| `get-started.qmd`         | A sample page for the first steps.                                         |
+| `guides/configuration.qmd` | A sample guide page.                                                      |
+| `guides/writing.qmd`      | Each element that you can use on a page. Keep it as a source to copy from. |
+| `reference.qmd`           | A sample reference page.                                                   |
+| `404.qmd`                 | The page for a missing address.                                            |
+
+: Files of the documentation template. {.striped .hover tbl-colwidths="[30,70]"}
+
+### Files of the workshop template
+
+| File                     | Content                                                                                       |
+| ------------------------ | --------------------------------------------------------------------------------------------- |
+| `_quarto.yml`            | The project type, `navbar: false`, the search in the sidebar, and `metadata-files`.           |
+| `_sidebars.yml`          | The workshop sidebar with its anchor, and the alias in `extensions.atelier.sidebars`.         |
+| `_brand.yml`             | The colours, with a comment on each key.                                                      |
+| `index.qmd`              | The welcome page. It is a module of one page, and it sets `mode: workshop` in its front matter. |
+| `workshop/_metadata.yml` | `mode: workshop` and the title block labels for each page in the `workshop` folder.           |
+| `workshop/setup/`        | The "Set-up" module: two pages.                                                               |
+| `workshop/first-site/`   | The "Your first site" module: a page and an exercise page.                                    |
+| `workshop/publish/`      | The "Publish" module: one page.                                                               |
+| `404.qmd`                | The page for a missing address.                                                               |
+
+: Files of the workshop template. {.striped .hover tbl-colwidths="[28,72]"}
+
+The welcome page is outside the `workshop` folder, so the `_metadata.yml` of that folder does not apply to it.
+For this reason, the welcome page sets the mode itself.
+To add a module, add a section to `contents` in `_sidebars.yml`, then add its pages.
+The [Workshop mode](workshop.qmd) page tells how.

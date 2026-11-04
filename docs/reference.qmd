@@ -16,6 +16,9 @@ Each icon and manifest tag is emitted only when its key is set, while `theme-col
 | `icon`             | Path to an SVG icon, emitted as `rel="icon"` with `type="image/svg+xml"`.           |
 | `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.                         |
 | `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
+| `version`          | Text of the version pill, shown next to the title in the navbar or at the top of the sidebar. With no `version`, there is no pill. |
+| `mode`             | `documentation` (the default) or `workshop`. Set it in the `_metadata.yml` of a folder, or in the front matter of a page. See [Workshop mode](workshop.qmd). |
+| `sidebars`         | The aliases of the `website.sidebar` entries that Atelier reads, such as `- *course`. Each alias must be in the same YAML file as its anchor. |
 | `theme-color`      | Browser UI tint (Safari toolbar, Android address bar, installed web app title bar), one colour per scheme, each emitted with a `prefers-color-scheme` media query. Each scheme falls back to `color.background` of the `_brand.yml` for that mode, which is the page background of the matching bundle; set a scheme only to override it. |
 
 : Keys under `extensions.atelier`. {.striped .hover tbl-colwidths="[22,78]"}
@@ -61,7 +64,14 @@ It also sets `project.output-dir` to `_site`.
 Neither bar sets `background` or `foreground`: the chrome palette drives both, and `$atelier-chrome` decides whether it follows the colour scheme or is pinned to `light` or `dark`.
 
 A `website.sidebar` of your own is styled rather than configured: a `style: docked` sidebar is painted from the `--atelier-sidebar-*` tokens, which default to the navbar ones, and a `style: floating` sidebar takes the same tokens as a card with a border and rounded corners.
+`website.sidebar` can also be a list of sidebars, each with an `id`.
+A page uses the sidebar that lists it, and a workshop sidebar is also named in `extensions.atelier.sidebars`.
 This site sets `navbar: false` and gives the docked sidebar the navigation and the search; `--profile navbar` renders the same pages with the navbar instead.
+
+## Layouts and modes
+
+The layout comes from `website.navbar`, and the mode from `extensions.atelier.mode`.
+The table in [The workshop chrome](workshop.qmd#the-workshop-chrome) shows what each layout gives each mode.
 
 ## Format defaults
 
@@ -105,7 +115,8 @@ To change it, set `$atelier-text-muted` in a project stylesheet under `format.at
 Atelier contains five extensions, so you do not install them yourself.
 The `atelier-html` format runs their filters and shortcodes on each HTML page.
 The shortcodes work on HTML pages only: on a page in another format, such as Typst, Quarto stops with "Shortcode 'iconify' not found".
-Atelier needs the highest Quarto version that its embedded extensions need, so its own minimum version follows theirs.
+Atelier needs Quarto 1.11.9 or later, the first stable 1.11 release.
+Older releases remove the `extensions` options of the project from a page that sets `extensions` in its front matter.
 
 | Extension                                                             | What it does                                                                                         | Options under                |
 | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------- |
@@ -144,6 +155,7 @@ Keep your options under `extensions:`: the embedded copies read them.
 | `description`          | Fills `<meta name="description">` and Quarto's `og:description`.                          |
 | `subtitle`             | Used for the description tags when `description` is absent.                               |
 | `description-meta`     | Used as written, in preference to both. |
+| `extensions.atelier.duration` | The `duration` of a workshop page: `25 min`, `1 h`, `1 h 30 min`, or a number of minutes. See [Modules and durations](workshop.qmd#modules-and-durations). |
 | `canonical-url: false` | Drops the canonical link. Set it on a page served from more than one URL, like `404.qmd`. |
 
 : Front matter keys the project type reads. {.striped .hover tbl-colwidths="[24,76]"}
@@ -151,6 +163,69 @@ Keep your options under `extensions:`: the embedded copies read them.
 A page with none of the first three gets no description tag at all, so give every page a `description` or a `subtitle`.
 
 `og:url` is emitted for every page except `404.html`, which is served from any URL depth and so claims none of its own.
+
+## Language keys
+
+Atelier writes the text of its chrome from `language` keys.
+Set a key under `language` in `_quarto.yml`, in a `_metadata.yml`, or in the front matter of a page, to translate or change its text.
+In a default, `{n}`, `{m}`, `{h}`, `{date}`, and `{time}` are placeholders that Atelier replaces with a value.
+Keep each placeholder in your own text.
+
+```{.yaml filename="_quarto.yml"}
+language:
+  atelier-next: "Suivant"
+  atelier-previous: "Précédent"
+```
+
+| Key                              | Default                              |
+| -------------------------------- | ------------------------------------ |
+| `atelier-search`                 | `Search`                             |
+| `atelier-announcement-info`      | `Info`                               |
+| `atelier-announcement-warning`   | `Warning`                            |
+| `atelier-announcement-danger`    | `Danger`                             |
+| `atelier-announcement-success`   | `Success`                            |
+| `atelier-announcement-notice`    | `Notice`                             |
+| `atelier-announcement-region`    | `Announcement`                       |
+| `atelier-announcement-dismiss`   | `Dismiss the announcement`           |
+| `atelier-toc-reading-time`       | `{n} min read`                       |
+| `atelier-toc-updated`            | `Updated {date}`                     |
+| `atelier-toc-copy-link`          | `Copy link`                          |
+| `atelier-toc-link-copied`        | `Link copied`                        |
+| `atelier-duration-minutes`       | `{m} min`                            |
+| `atelier-duration-hours`         | `{h} h`                              |
+| `atelier-duration-hours-minutes` | `{h} h {m} min`                      |
+| `atelier-reading-bar`            | `Reading navigation`                 |
+| `atelier-reading-progress`       | `Reading progress`                   |
+| `atelier-reading-position`       | `Page {n} of {m}`                    |
+| `atelier-workshop-bar`           | `Module navigation`                  |
+| `atelier-workshop-progress`      | `Workshop progress`                  |
+| `atelier-workshop-position`      | `Module {n} of {m}`                  |
+| `atelier-workshop-total`         | `about {time}`                       |
+| `atelier-workshop-completed`     | `(completed)`                        |
+| `atelier-previous`               | `Previous`                           |
+| `atelier-next`                   | `Next`                               |
+| `atelier-timer-label`            | `Session time left`                  |
+| `atelier-timer-pause`            | `Pause the session timer`            |
+| `atelier-toc-read`               | `(read)`                             |
+| `atelier-toc-module-read`        | `{n}% of this module read`           |
+| `atelier-objectives-title`       | `By the end of this module, you can` |
+| `atelier-exercise-title`         | `Exercise`                           |
+| `atelier-solution-summary`       | `Show the solution`                  |
+| `atelier-terminal`               | `Terminal`                           |
+
+: The `language` keys of Atelier and their default text. {.striped .hover tbl-colwidths="[50,50]"}
+
+Quarto provides the keys of the title block labels.
+A workshop can set them in its `_metadata.yml`, as the [Workshop mode](workshop.qmd#title-block-labels) page shows.
+
+| Key                              | Default                              |
+| -------------------------------- | ------------------------------------ |
+| `title-block-author-single`      | `Author`                             |
+| `title-block-author-plural`      | `Authors`                            |
+| `title-block-published`          | `Published`                          |
+| `title-block-modified`           | `Modified`                           |
+
+: The `language` keys of Quarto for the title block labels. {.striped .hover tbl-colwidths="[50,50]"}
 
 ## Framed embeds
 

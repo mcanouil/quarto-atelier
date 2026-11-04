@@ -1,0 +1,21 @@
+---
+title: "Reference"
+---
+
+This page lists the options of My project.
+Replace the table with the options of your project.
+
+## Options
+
+| Option | Default | Use |
+|--------|---------|-----|
+| `title` | `"My project"` | The name of the site. |
+| `description` | none | The short text for search engines. |
+| `repo-url` | none | The address of the repository. |
+
+## Commands
+
+| Command | Use |
+|---------|-----|
+| `quarto preview` | Show the site and update it when a file changes. |
+| `quarto render` | Build the site in the `_site` folder. |

@@ -1,0 +1,20 @@
+---
+title: "Publish"
+---
+
+This module puts your site online.
+
+## Publish to GitHub Pages
+
+Run this command in the folder of your site.
+Quarto renders the site and sends it to the branch `gh-pages` of your repository.
+
+```{.bash .terminal}
+$ quarto publish gh-pages
+```
+
+## After the workshop
+
+Replace the sample pages of this template with your own material.
+Each page can have a `duration`.
+A page without a `duration` gets no timer.

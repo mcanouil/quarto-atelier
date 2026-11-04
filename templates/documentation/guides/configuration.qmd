@@ -1,0 +1,45 @@
+---
+title: "Configuration"
+---
+
+This guide shows how to change the site.
+Two files control how the site looks.
+
+## The site file
+
+The file `_quarto.yml` holds the title, the navigation, and the options of the site.
+Change the `title` and the `description` first.
+
+```{.yaml filename="_quarto.yml"}
+website:
+  title: "My project"
+  description: "A short description of my project."
+```
+
+Change `repo-url` to the address of your repository.
+
+## The brand file
+
+The file `_brand.yml` holds the colours of the site.
+Each colour has a `light` value and a `dark` value.
+The site uses the `primary` colour for the current item and for links.
+
+```{.yaml filename="_brand.yml"}
+color:
+  primary:
+    light: "#1d5fd1"
+    dark: "#7fa8f0"
+```
+
+::: {.callout-tip}
+
+## Test both colour schemes
+
+Change the colour scheme of your system.
+Make sure that the text is easy to read in both schemes.
+
+:::
+
+## Next steps
+
+Read [Writing pages](writing.qmd) to see each element that a page can hold.

@@ -1,0 +1,32 @@
+---
+title: "Install the tools"
+extensions:
+  atelier:
+    duration: 15 min
+---
+
+This page lists the tools that the workshop uses.
+
+## Quarto
+
+Download Quarto from the [Quarto website](https://quarto.org/docs/get-started/).
+Run the installer and follow its steps.
+Then open a new terminal and run the version command again.
+
+```{.bash .terminal}
+$ quarto --version
+```
+
+## A text editor
+
+Use any text editor that you like.
+Choose an editor that shows a preview next to the page, because it saves time.
+
+::: {.callout-tip}
+
+## Tip
+
+Close the terminal and open it again after the installation.
+The new terminal finds the new command.
+
+:::

@@ -1,0 +1,112 @@
+---
+title: "Writing pages"
+---
+
+This page shows each element that the template styles.
+Copy the element that you need and change its text.
+
+## Callouts
+
+::: {.callout-note}
+
+## A note
+
+Use a note for extra information.
+
+:::
+
+::: {.callout-tip}
+
+## A tip
+
+Use a tip for advice that saves time.
+
+:::
+
+::: {.callout-warning}
+
+## A warning
+
+Use a warning for an action that can cause a problem.
+
+:::
+
+::: {.callout-note collapse="true"}
+
+## A collapsed callout
+
+The reader opens this callout to read more.
+
+:::
+
+::: {.callout-note appearance="minimal"}
+
+A minimal callout has no title bar.
+
+:::
+
+## Code
+
+A code block can show a file name.
+
+```{.python filename="hello.py"}
+def greet(name):
+    return f"Hello, {name}"
+```
+
+A code block can number its lines.
+
+```{.python code-line-numbers="true"}
+first = 1
+second = 2
+total = first + second
+```
+
+A terminal block shows a command and its output.
+A line that starts with `$` and a space is a command.
+
+```{.bash .terminal}
+$ echo "Hello"
+Hello
+```
+
+## Tabs
+
+::: {.panel-tabset}
+
+## Python
+
+```python
+print("Hello")
+```
+
+## R
+
+```r
+cat("Hello\n")
+```
+
+:::
+
+## Figures and tables
+
+::: {#fig-layout}
+
+```{.text}
+project/
+  _quarto.yml
+  _brand.yml
+  index.qmd
+```
+
+The files that a project holds at first.
+
+:::
+
+| File | Use |
+|------|-----|
+| `_quarto.yml` | The options of the site. |
+| `_brand.yml` | The colours of the site. |
+| `index.qmd` | The home page. |
+
+: The files to change first. {#tbl-files}

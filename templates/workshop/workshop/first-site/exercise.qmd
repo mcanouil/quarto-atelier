@@ -1,0 +1,48 @@
+---
+title: "Exercise: add a page"
+extensions:
+  atelier:
+    duration: 1 h 30 min
+---
+
+In this exercise, you add a page to the site that you made on the previous page.
+
+## The task
+
+::: {.exercise title="Add a page" duration="30 min"}
+
+Make a new file `notes.qmd` in your site folder.
+Give it a title and one paragraph of text.
+Then add the page to the navigation in `_quarto.yml` and look at it in the preview.
+
+:::
+
+::: {.solution title="Hint"}
+
+The navigation of the site is in the key `website.navbar.left` of `_quarto.yml`.
+Add one item that has the key `href` with the value `notes.qmd`.
+
+:::
+
+::: {.solution}
+
+## Full answer
+
+Write this in `notes.qmd`.
+
+```{.markdown filename="notes.qmd"}
+---
+title: "Notes"
+---
+
+My first note.
+```
+
+Then add `- href: notes.qmd` to `website.navbar.left` in `_quarto.yml`.
+
+:::
+
+## Check your work
+
+Look at the preview.
+The new page must show in the navigation, and its title must show at the top of the page.

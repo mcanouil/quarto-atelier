@@ -1,0 +1,29 @@
+website:
+  sidebar:
+    - &workshop
+      id: workshop
+      title: "My workshop"
+      style: docked
+      search: true
+      contents:
+        - index.qmd
+        - section: "Set-up"
+          contents:
+            - workshop/setup/index.qmd
+            - workshop/setup/install.qmd
+        - section: "Your first site"
+          contents:
+            - workshop/first-site/index.qmd
+            - workshop/first-site/exercise.qmd
+        - section: "Publish"
+          contents:
+            - workshop/publish/index.qmd
+
+extensions:
+  atelier:
+    # Keep the anchor (&workshop) and the alias (*workshop) in this same file.
+    # Quarto cannot resolve an alias that sits in another file.
+    # The id is the key that stores the progress of each learner in the browser.
+    # List every page in contents: the entries auto and globs give no durations.
+    sidebars:
+      - *workshop

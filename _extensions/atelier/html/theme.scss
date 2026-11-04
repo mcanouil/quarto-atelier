@@ -934,6 +934,14 @@ code.sourceCode:not(pre code) {
   border-radius: 0.3em;
 }
 
+// Quarto gives code blocks inside a list, paragraph, or table cell the inline
+// code background, which fails in dark mode. Make that code transparent again.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/13390
+// Remove when: the minimum Quarto version includes the fix for quarto-cli#13390.
+html pre > code.sourceCode {
+  background-color: transparent;
+}
+
 // In a link, the text of highlighted inline code that has no token colour
 // takes the link colour, which can fail AA on the code surface. Hold it to AA.
 a code.sourceCode:not(pre code) {
