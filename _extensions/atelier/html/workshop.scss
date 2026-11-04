@@ -263,6 +263,13 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
     }
   }
 
+  // A module title that is a page link, such as a one-page module, takes the
+  // ink of a section button, not the muted ink of a page link. The current
+  // page keeps its own colour.
+  > .sidebar-item-container > a.sidebar-link:not(.active) {
+    color: var(--atelier-sidebar-fg);
+  }
+
   > .sidebar-item-container > .sidebar-item-toggle:not(.sidebar-link) {
     align-self: center;
   }
