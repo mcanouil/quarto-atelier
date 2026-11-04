@@ -264,6 +264,79 @@ $atelier-chrome-accent-mark: atelier-contrast(
   3
 ) !default;
 
+// The course stepper and the progress dots sit on the bar, so they draw from the
+// chrome and not from the page. The strong surface is the track of a ring or a
+// bar. The fill is a mark and is held at 3:1 on the bar and on that track, and
+// the ink on the fill is held at 4.5:1.
+$atelier-chrome-surface-strong: mix($atelier-chrome-bg, $atelier-chrome-fg, 80%) !default;
+$atelier-chrome-accent-fill: atelier-contrast-all(
+  $_atelier-chrome-accent-source,
+  ($atelier-chrome-bg, $atelier-chrome-surface-strong),
+  3
+) !default;
+$atelier-chrome-on-accent: atelier-on(
+  $atelier-chrome-accent-fill,
+  $atelier-chrome-bg,
+  $atelier-chrome-fg,
+  4.5
+) !default;
+
+// A hairline between two surfaces, which is what the bar edges and the section
+// dividers want.
+$atelier-chrome-border: rgba($atelier-chrome-fg, 0.2) !default;
+
+// The boundary of a boxed control, which WCAG 1.4.11 asks 3:1 of. The weight
+// has to hold on a light bar as well as a dark one: at 0.4 it is 3.3:1 on the
+// dark palette but only 2.4:1 on the light one.
+$atelier-chrome-control-border: rgba($atelier-chrome-fg, 0.55) !default;
+
+// ===========================================================================
+// WORKSHOP TOKENS
+// ===========================================================================
+// The workshop and reading bar is on the chrome surface, as the sidebar and the
+// navbar are: it takes the chrome background, ink, muted ink, surface, accent,
+// and borders. A project can still set each bar token by itself.
+$atelier-workshop-bar-bg: $atelier-chrome-bg !default;
+$atelier-workshop-bar-fg: $atelier-chrome-fg !default;
+$atelier-workshop-bar-muted: $atelier-chrome-muted !default;
+$atelier-workshop-bar-surface: $atelier-chrome-surface !default;
+
+// The progress track is a step from the bar towards the ink. The fill is a mark
+// and is held at 3:1 on the bar and on the track, and the ink on the fill is
+// held at 4.5:1.
+$atelier-workshop-bar-track: mix($atelier-workshop-bar-bg, $atelier-workshop-bar-fg, 80%) !default;
+$atelier-workshop-bar-accent: atelier-contrast-all(
+  $_atelier-chrome-accent-source,
+  ($atelier-workshop-bar-bg, $atelier-workshop-bar-track),
+  3
+) !default;
+$atelier-workshop-bar-on-accent: atelier-on(
+  $atelier-workshop-bar-accent,
+  $atelier-workshop-bar-bg,
+  $atelier-workshop-bar-fg,
+  4.5
+) !default;
+$atelier-workshop-bar-accent-soft: rgba($atelier-workshop-bar-accent, $atelier-chrome-accent-soft-alpha) !default;
+
+// The accent as text, which is also the focus ring of the bar, and the accent
+// as a mark are the chrome ones. The chrome holds them on its surface.
+$atelier-workshop-bar-accent-text: $atelier-chrome-accent !default;
+$atelier-workshop-bar-accent-mark: $atelier-chrome-accent-mark !default;
+$atelier-workshop-bar-border: $atelier-chrome-border !default;
+$atelier-workshop-bar-control-border: $atelier-chrome-control-border !default;
+
+// The terminal block is dark in both colour schemes, so these are fixed
+// colours. Each ink is at least 4.5:1 on the terminal background, and the
+// control border is at least 3:1.
+$atelier-terminal-bg: #111418 !default;
+$atelier-terminal-fg: #e6e8eb !default;
+$atelier-terminal-muted: #aeb6bf !default;
+$atelier-terminal-border: #2a3037 !default;
+$atelier-terminal-control-border: #717a85 !default;
+$atelier-terminal-prompt: #7cc4a3 !default;
+$atelier-terminal-dot: #3a4048 !default;
+$atelier-terminal-highlight: #1e252c !default;
+
 // ===========================================================================
 // PAGE VARIABLES
 // ===========================================================================
@@ -409,15 +482,6 @@ $title-banner-color: $atelier-chrome-fg !default;
 
 // The rule beside the table of contents is a hairline, as the other dividers are.
 $toc-inactive-border: $atelier-border !default;
-
-// A hairline between two surfaces, which is what the bar edges and the section
-// dividers want.
-$atelier-chrome-border: rgba($atelier-chrome-fg, 0.2) !default;
-
-// The boundary of a boxed control, which WCAG 1.4.11 asks 3:1 of. The weight
-// has to hold on a light bar as well as a dark one: at 0.4 it is 3.3:1 on the
-// dark palette but only 2.4:1 on the light one.
-$atelier-chrome-control-border: rgba($atelier-chrome-fg, 0.55) !default;
 
 // ===========================================================================
 // QUARTO CHROME VARIABLES

@@ -6,7 +6,7 @@
 
 - feat: Derive the page surfaces, muted text, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA.
   Use `color.secondary` for muted text when the brand sets it. (#76)
-- feat: Split the navbar into two rows, with the brand, the `atelier: version` pill, the search pill with its keyboard shortcut, and the tools on top, and the section tabs below.
+- feat: Split the navbar into two rows, with the brand, the `extensions: atelier: version` pill, the search pill with its keyboard shortcut, and the tools on top, and the section tabs below.
   The current tab has a 3 px accent underline, and the `atelier-search` language key sets the search label. (#76)
 - feat: Restyle the docked sidebar with the brand, search, and tools on top and filled section headers.
   The current page sits on a tinted band with a 3 px accent marker. (#76)
@@ -27,6 +27,14 @@
 - feat: Restyle the appendix as labelled groups with the BibTeX entry in a code block, lay the footer out in three aligned columns, and restyle notebook links and the reader toggle from the brand. (#77)
 - feat: Restyle the floating sidebar, the narrow-screen sidebar toggle and backdrop, and the lightbox overlay from the brand, and fit SVG images to the screen in the lightbox. (#77)
 - feat: Restyle the five about page templates from the brand, with link buttons held to 4.5:1. (#77)
+- feat: Add the `extensions: atelier: mode: workshop` option, set in the `_metadata.yml` of a workshop folder, the `extensions: atelier: duration` page option, and `extensions: atelier: sidebars`, which lists the workshop sidebars through a YAML alias. (#78)
+- feat: Show a bar at the top of the content in the sidebar-only layout, with the section and page, previous and next links, and "Page n of m".
+  In workshop mode, it shows "Module n of m" and a session timer that can be paused. (#78)
+- feat: In workshop mode with a navbar, add a module row under the navbar with the breadcrumb, the timer, previous and next links, and the module progress. (#78)
+- feat: In workshop mode, show the sidebar as numbered modules with their durations, the completed modules ticked, and a summary with the module position and the total time. (#78)
+- feat: In workshop mode, show the table of contents with a dot for each section, filled once read, and a ring with the share of the module read. (#78)
+- feat: In workshop mode, turn `.objectives` divs into a list of checkboxes that the browser remembers, `.exercise` divs into a block with a title and an optional `duration`, and `.solution` divs into a closed disclosure. (#78)
+- feat: Draw a code block with the `.terminal` class as a dark terminal in both colour schemes, with a `$` prompt before each command that screen readers and the copy button skip. (#78)
 
 ### Bug Fixes
 

@@ -338,8 +338,9 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     padding-inline: 0.75rem;
   }
 
-  // Top-level sections read as group labels. They keep their toggle.
-  .sidebar-menu-container > ul > .sidebar-item-section > .sidebar-item-container > .sidebar-item-text.sidebar-item-toggle {
+  // Top-level sections read as group labels. They keep their toggle. The
+  // workshop course stepper has its own module rows.
+  .sidebar-menu-container:not(.atelier-stepper) > ul > .sidebar-item-section > .sidebar-item-container > .sidebar-item-text.sidebar-item-toggle {
     padding: 0.9rem 0.6rem 0.35rem;
     color: var(--atelier-sidebar-muted);
     font-size: 0.72rem;

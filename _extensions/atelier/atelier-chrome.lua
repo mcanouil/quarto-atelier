@@ -5,9 +5,12 @@
 --- @author Mickaël Canouil
 --- @brief Publish the page options that the chrome scripts read.
 --- @description Writes one JSON block into the head of each HTML page. It
---- holds the version from `atelier.version` and the translated labels. A label
---- is the default text, or the `language` key `atelier-<key>` when the project
---- or the page sets one.
+--- holds the version from `extensions.atelier.version` and the translated
+--- labels. A label is the default text, or the `language` key `atelier-<key>`
+--- when the project or the page sets one.
+
+--- Load modules
+local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
 
 --- Labels and their default text, in output order.
 --- @type table<integer, { key: string, default: string }>
@@ -26,11 +29,11 @@ local LABELS = {
   { key = 'toc-link-copied', default = 'Link copied' },
 }
 
---- Read the version from `atelier.version`.
+--- Read the version from `extensions.atelier.version`.
 --- @param meta table The document metadata
 --- @return string|nil The version, or nil when it is unset or empty
 local function read_version(meta)
-  local options = meta.atelier
+  local options = meta_mod.get_extension_config(meta, 'atelier')
   if type(options) ~= 'table' or options.version == nil then
     return nil
   end
