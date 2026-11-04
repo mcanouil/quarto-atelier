@@ -112,8 +112,6 @@ contributes:
             enabled: true
         code-window:
           auto-filename: false
-      include-before-body:
-        - file: html/scripts/skip-link.html
       include-after-body:
         - file: html/scripts/current-year.html
         - file: html/scripts/external-links.html
