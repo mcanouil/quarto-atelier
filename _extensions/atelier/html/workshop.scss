@@ -385,6 +385,11 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
       background: var(--atelier-toc-bg);
     }
 
+    // An entry with no heading on the page cannot be read, so it gets no dot.
+    &:not(.atelier-toc-tracked)::before {
+      content: none;
+    }
+
     &.atelier-read {
       color: var(--atelier-toc-fg);
 
