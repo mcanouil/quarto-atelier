@@ -319,6 +319,13 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   color: var(--atelier-sidebar-muted);
   font-size: 0.76rem;
   font-weight: 400;
+
+  // On the current page, the time sits on the accent-soft pill of the link.
+  // The muted ink is held on the sidebar, not on that pill, so the time takes
+  // the link accent, which is held on the pill.
+  .sidebar-link.active & {
+    color: inherit;
+  }
 }
 
 // ===========================================================================
