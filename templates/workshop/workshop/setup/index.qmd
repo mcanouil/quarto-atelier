@@ -24,7 +24,7 @@ The command prints one line.
 
 ```{.bash .terminal}
 $ quarto --version
-1.9.38
+1.11.9
 ```
 
 If the terminal prints a version number, Quarto is ready.
