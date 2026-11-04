@@ -172,7 +172,7 @@ $border-color: null;
 // the hover ink is the link hover token. The breadcrumb in the secondary
 // navigation bar takes the sidebar tokens in the rules below.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15175
-// Remove when: Quarto inks breadcrumb links from a contrast-checked colour.
+// Remove when: the minimum Quarto version includes the fix.
 .quarto-page-breadcrumbs a {
   color: var(--atelier-muted);
 }
@@ -328,12 +328,12 @@ $atelier-hero-figure-max-width: 320px !default;
 $atelier-hero-gradient-shift: 40deg !default;
 $atelier-card-min-width: 13rem !default;
 
-$atelier-landing-accent: theme-contrast($primary, $body-bg, "AA") !default;
-$atelier-landing-muted: theme-contrast($text-muted, $body-bg, "AA") !default;
-$atelier-landing-surface: body-mix(95%) !default;
+$atelier-landing-accent: atelier-theme-contrast($primary, $body-bg) !default;
+$atelier-landing-muted: atelier-theme-contrast($text-muted, $body-bg) !default;
+$atelier-landing-surface: atelier-rendered(body-mix(95%)) !default;
 $atelier-landing-border: var(--atelier-border) !default;
-$atelier-card-muted: theme-contrast($text-muted, $atelier-landing-surface, "AA") !default;
-$atelier-card-link: theme-contrast($link-color, $atelier-landing-surface, "AA") !default;
+$atelier-card-muted: atelier-theme-contrast($text-muted, $atelier-landing-surface) !default;
+$atelier-card-link: atelier-theme-contrast($link-color, $atelier-landing-surface) !default;
 $atelier-hero-glow-color: rgba($primary, 0.25) !default;
 
 :root {
@@ -346,11 +346,11 @@ $atelier-hero-glow-color: rgba($primary, 0.25) !default;
 // stays in the plain accent colour. This check also applies to stops that a
 // project sets itself.
 $atelier-hero-gradient-start: $atelier-landing-accent !default;
-$atelier-hero-gradient-end: theme-contrast(adjust-hue($primary, $atelier-hero-gradient-shift), $body-bg, "AA") !default;
-$atelier-hero-gradient-middle: theme-contrast(mix($atelier-hero-gradient-start, $atelier-hero-gradient-end), $body-bg, "AA") !default;
+$atelier-hero-gradient-end: atelier-theme-contrast(adjust-hue($primary, $atelier-hero-gradient-shift), $body-bg) !default;
+$atelier-hero-gradient-middle: atelier-theme-contrast(mix($atelier-hero-gradient-start, $atelier-hero-gradient-end), $body-bg) !default;
 $atelier-hero-gradient: null;
 
-@if quarto-contrast($atelier-hero-gradient-start, $body-bg) >= 4.5 and quarto-contrast($atelier-hero-gradient-middle, $body-bg) >= 4.5 and quarto-contrast($atelier-hero-gradient-end, $body-bg) >= 4.5 {
+@if atelier-ratio($atelier-hero-gradient-start, $body-bg) >= 4.5 and atelier-ratio($atelier-hero-gradient-middle, $body-bg) >= 4.5 and atelier-ratio($atelier-hero-gradient-end, $body-bg) >= 4.5 {
   $atelier-hero-gradient: linear-gradient(92deg, $atelier-hero-gradient-start, $atelier-hero-gradient-middle, $atelier-hero-gradient-end);
 }
 
@@ -881,7 +881,7 @@ code.sourceCode:not(pre code) {
 // Quarto gives code blocks inside a list, paragraph, or table cell the inline
 // code background, which fails in dark mode. Make that code transparent again.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/13390
-// Remove when: the minimum Quarto version includes the fix for quarto-cli#13390.
+// Remove when: the minimum Quarto version includes the fix.
 html pre > code.sourceCode {
   background-color: transparent;
 }
@@ -889,7 +889,7 @@ html pre > code.sourceCode {
 // In a link, the text of highlighted inline code that has no token colour
 // takes the link colour, which can fail AA on the code surface. Hold it to AA.
 a code.sourceCode:not(pre code) {
-  color: theme-contrast($link-color, body-mix(95%), "AA");
+  color: atelier-theme-contrast($link-color, body-mix(95%));
 }
 
 // Token colours of the default highlighting themes, arrow-light and arrow-dark.
@@ -902,11 +902,11 @@ a code.sourceCode:not(pre code) {
 // colours to AA on the code surface.
 @if $btn-code-copy-color == #5e5e5e and $btn-code-copy-color-active == #4758ab {
   body.quarto-light code span.im {
-    color: theme-contrast(#00769e, body-mix(95%), "AA");
+    color: atelier-theme-contrast(#00769e, body-mix(95%));
   }
 
   body.quarto-light code span.at {
-    color: theme-contrast(#657422, body-mix(95%), "AA");
+    color: atelier-theme-contrast(#657422, body-mix(95%));
   }
 }
 
@@ -1708,7 +1708,7 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
 // buttons and link buttons do not change.
 @media print {
   .btn:not([class*="btn-outline-"], .btn-link) {
-    --bs-btn-color: #{theme-contrast($primary, #fff, "AA")};
+    --bs-btn-color: #{atelier-theme-contrast($primary, #fff)};
     --bs-btn-bg: transparent;
     --bs-btn-border-color: currentcolor;
   }
