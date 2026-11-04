@@ -5,25 +5,32 @@
 // ===========================================================================
 // Without a navbar, `html/scripts/reading-bar.html` puts a bar at the top of
 // the content: the reading bar in documentation mode, the workshop bar in
-// workshop mode. The colours come from the `--atelier-workshop-bar-*` tokens.
+// workshop mode. With a navbar in workshop mode, the workshop bar is the
+// module row under the navbar. The colours come from the
+// `--atelier-workshop-bar-*` tokens, which are on the chrome surface. The bar
+// has a bottom border, as the navbar has.
 
-// The row is 50 px and the progress track is 5 px. The script writes the
-// measured height to `--atelier-bar-height`; the sum is the fallback. The
-// `$_atelier-` variables of this file are layout values of the rules, not
-// project options, so they have no `!default` in `chrome.scss`.
+// The row is 50 px, the progress track is 5 px, and the bottom border is 1 px.
+// The script writes the measured height to `--atelier-bar-height`; the sum is
+// the fallback. The `$_atelier-` variables of this file are layout values of
+// the rules, not project options, so they have no `!default` in `chrome.scss`.
 $_atelier-bar-row-height: 50px;
 $_atelier-bar-track-height: 5px;
-$_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_atelier-bar-track-height});
+$_atelier-bar-border-width: 1px;
+$_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_atelier-bar-track-height + $_atelier-bar-border-width});
 
 .atelier-bar {
   grid-column: screen-start / screen-end;
   grid-row: bar-top / content-top;
   z-index: 10;
+  border-bottom: $_atelier-bar-border-width solid var(--atelier-workshop-bar-border);
   background-color: var(--atelier-workshop-bar-bg);
   color: var(--atelier-workshop-bar-fg);
 
-  :focus-visible {
-    outline-color: var(--atelier-workshop-bar-fg);
+  // The ring is the accent of the bar, as on the navbar, so that it holds 3:1
+  // on a pinned dark bar.
+  :is(a, button):focus-visible {
+    outline-color: var(--atelier-workshop-bar-accent-text);
   }
 }
 
@@ -169,77 +176,6 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
 @include media-breakpoint-down(md) {
   .atelier-bar-actions {
     margin-left: 0;
-  }
-}
-
-// ===========================================================================
-// WORKSHOP NAVBAR
-// ===========================================================================
-// In workshop mode the navbar takes the colours of the workshop bar, so the
-// navbar and the module row under it read as one inverted header. The N2 rules
-// and the gitlink widget read the `--atelier-navbar-*` tokens, so they follow.
-// The navbar accent is a text ink, so it takes the accent text token, not the
-// fill accent of the Next button and the progress.
-html.atelier-workshop #quarto-header {
-  --atelier-navbar-bg: var(--atelier-workshop-bar-bg);
-  --atelier-navbar-surface: var(--atelier-workshop-bar-surface);
-  --atelier-navbar-fg: var(--atelier-workshop-bar-fg);
-  --atelier-navbar-muted: var(--atelier-workshop-bar-muted);
-  --atelier-navbar-accent: var(--atelier-workshop-bar-accent-text);
-  --atelier-navbar-accent-soft: var(--atelier-workshop-bar-accent-soft);
-  --atelier-navbar-border: var(--atelier-workshop-bar-border);
-  --atelier-navbar-control-border: var(--atelier-workshop-bar-control-border);
-  --atelier-navbar-accent-mark: var(--atelier-workshop-bar-accent-mark);
-}
-
-// Quarto bakes the navbar background and the Bootstrap navbar colours from the
-// `$navbar-*` variables. Point them at the tokens above.
-$_atelier-icon-toggler: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-
-html.atelier-workshop #quarto-header > .navbar {
-  --bs-navbar-color: var(--atelier-navbar-fg);
-  --bs-navbar-hover-color: var(--atelier-navbar-accent);
-  --bs-navbar-active-color: var(--atelier-navbar-accent);
-  --bs-navbar-disabled-color: var(--atelier-navbar-muted);
-  --bs-navbar-brand-color: var(--atelier-navbar-fg);
-  --bs-navbar-brand-hover-color: var(--atelier-navbar-accent);
-  background-color: var(--atelier-navbar-bg);
-  color: var(--atelier-navbar-fg);
-
-  .quarto-navbar-tools .quarto-navigation-tool {
-    color: var(--atelier-navbar-fg);
-
-    &:hover {
-      color: var(--atelier-navbar-accent);
-    }
-  }
-
-  // Bootstrap bakes the toggler glyph into a data URI with the colour of the
-  // bar. Draw it as a mask over the current colour.
-  .navbar-toggler-icon {
-    background-image: none;
-    background-color: currentcolor;
-    mask: $_atelier-icon-toggler center / 100% no-repeat;
-    -webkit-mask: $_atelier-icon-toggler center / 100% no-repeat;
-  }
-}
-
-// The focus ring on the inverted header is the bar ink. The gitlink menu has
-// the page colours, so it keeps the page focus ring.
-html.atelier-workshop #quarto-header {
-  :focus-visible {
-    outline-color: var(--atelier-workshop-bar-fg);
-  }
-
-  .gitlink-widget-dropdown :focus-visible {
-    outline-color: var(--atelier-focus);
-  }
-
-  // The gitlink menu sits on the page background, so its hover and focus
-  // colours are the page accent, not the inverted header accent.
-  .gitlink-widget-dropdown {
-    --gitlink-widget-accent: var(--atelier-accent-ink);
-    --gitlink-widget-accent-soft: var(--atelier-accent-soft);
   }
 }
 

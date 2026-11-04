@@ -111,7 +111,7 @@ $border-color: null;
   --atelier-navbar-accent-fill: #{$atelier-chrome-accent-fill};
   --atelier-navbar-on-accent: #{$atelier-chrome-on-accent};
 
-  // The workshop bar is the inverse of the chrome, and the terminal block is
+  // The workshop bar is on the chrome surface, and the terminal block is
   // dark in both colour schemes.
   --atelier-workshop-bar-bg: #{$atelier-workshop-bar-bg};
   --atelier-workshop-bar-fg: #{$atelier-workshop-bar-fg};
