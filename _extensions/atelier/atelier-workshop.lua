@@ -383,13 +383,17 @@ local function read_front_matter(path, report)
   return meta, true
 end
 
---- Find the first page of a list that exists.
+--- Find the page of a sidebar that logs the warnings for the whole sidebar.
+--- Each page renders on its own, so one page must log each problem. It is the
+--- first page that exists and has front matter, because only such a page can
+--- be in workshop mode and read the sidebar.
 --- @param paths string[] The page paths relative to the project
 --- @param directory string The project folder
---- @return string|nil The first path whose file exists
-local function first_existing(paths, directory)
+--- @return string|nil The path of that page, or nil when there is none
+local function first_front_matter_page(paths, directory)
   for _, path in ipairs(paths) do
-    if file_exists(directory .. '/' .. path) then
+    local extension = path:match('%.(%w+)$')
+    if extension and FRONT_MATTER_EXTENSIONS[extension] and file_exists(directory .. '/' .. path) then
       return path
     end
   end
@@ -399,14 +403,15 @@ end
 --- Read the duration of each page of a sidebar.
 --- Each page of the sidebar reads all the durations, so each problem must log
 --- one warning only. The render of a page warns for its own duration. The
---- render of the first page that exists warns for the files that do not exist.
+--- render of the page that `first_front_matter_page` gives warns for the files
+--- that do not exist.
 --- @param paths string[] The page paths relative to the project
 --- @param page string The page path relative to the project
 --- @return table<string, integer> The minutes by output path
 local function read_durations(paths, page)
   local durations = {}
   local directory = quarto.project.directory or '.'
-  local first = first_existing(paths, directory)
+  local first = first_front_matter_page(paths, directory)
   for _, path in ipairs(paths) do
     local extension = path:match('%.(%w+)$')
     if extension and FRONT_MATTER_EXTENSIONS[extension] then
@@ -444,13 +449,14 @@ end
 local state = { objectives = 0 }
 
 --- Log the warning for a listed sidebar that has no id.
---- Each page of the sidebar finds the same problem, so only the first page that exists warns.
+--- Each page of the sidebar finds the same problem, so only the page that
+--- `first_front_matter_page` gives warns.
 --- @param source string The input file, for the warning
 --- @param paths string[] The page paths of the sidebar
 --- @param page string The page path relative to the project
 --- @return nil
 local function warn_sidebar_without_id(source, paths, page)
-  if page ~= first_existing(paths, quarto.project.directory or '.') then
+  if page ~= first_front_matter_page(paths, quarto.project.directory or '.') then
     return nil
   end
   log.log_warning(
