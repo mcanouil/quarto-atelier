@@ -49,10 +49,11 @@
 			var label = (icon && (icon.getAttribute("aria-label") || icon.getAttribute("title"))) || visibleText;
 			// The icon is decorative once the link is named; hiding it avoids a
 			// doubled screen-reader announcement (e.g. "Credits Credits").
-			// Dropping its title also suppresses the browser's own tooltip, which
-			// would otherwise appear unstyled alongside the themed one.
+			// When the themed tooltip is available, dropping the title also
+			// suppresses the browser's own tooltip, which would otherwise appear
+			// unstyled alongside the themed one.
 			if (icon) {
-				icon.removeAttribute("title");
+				if (hasTippy) icon.removeAttribute("title");
 				icon.setAttribute("aria-hidden", "true");
 				icon.setAttribute("role", "presentation");
 				icon.removeAttribute("aria-label");
