@@ -1,0 +1,6 @@
+---
+title: "Templates"
+description: "The starter templates for a documentation site and a workshop."
+---
+
+The starter templates for a documentation site and a workshop.

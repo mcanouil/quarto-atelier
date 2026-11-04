@@ -1,0 +1,14 @@
+---
+title: "Welcome"
+description: "The first page of the example workshop."
+extensions:
+  atelier:
+    duration: 5 min
+---
+
+This workshop is an example.
+It shows how a workshop page looks when you set `mode: workshop`.
+The bar above the page shows the module and the time for the page.
+
+The sidebar of this page lists only the pages of the workshop.
+Use the navigation to go to the next page.

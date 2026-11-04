@@ -1,0 +1,44 @@
+---
+title: "Practice"
+description: "A page with an exercise and a solution."
+author:
+  - Ada Example
+  - Grace Sample
+extensions:
+  atelier:
+    duration: 25 min
+---
+
+This page shows an exercise and its solution.
+
+## Goals
+
+::: {.objectives title="After this page, you can"}
+
+- Do an exercise.
+- Open a solution and compare it with your work.
+
+:::
+
+## The task
+
+::: {.exercise title="Add a page" duration="10 min"}
+
+Make a file `notes.qmd`.
+Give the file a title and one paragraph of text.
+
+:::
+
+::: {.solution title="Solution"}
+
+Write this in `notes.qmd`.
+
+```{.markdown filename="notes.qmd"}
+---
+title: "Notes"
+---
+
+My first note.
+```
+
+:::

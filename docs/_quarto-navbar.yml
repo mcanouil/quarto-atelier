@@ -1,5 +1,5 @@
 # Quarto profile demonstrating the layout the project type ships by default:
-# a navbar, with the docked sidebar beside it and the search as an overlay
+# a navbar, with the docked sidebars beside it and the search as an overlay
 # button. The site itself renders without this profile, in the book-like layout
 # the other documentation sites in this family use, so this is the one place
 # the navbar chrome is exercised.
@@ -14,6 +14,16 @@ website:
         text: "Home"
       - href: reference.qmd
         text: "Reference"
+      - text: "Guides"
+        menu:
+          - href: templates.qmd
+            text: "Templates"
+          - href: workshop.qmd
+            text: "Workshop mode"
+          - href: brand.qmd
+            text: "Brand and colours"
+          - href: workshop-example/index.qmd
+            text: "Example workshop"
       - href: landing.qmd
         text: "Landing page"
       - href: examples.qmd
@@ -52,14 +62,3 @@ website:
   search:
     location: navbar
     type: overlay
-  # A sidebar section is the one sidebar item Quarto writes with a toggle of its
-  # own; Atelier repairs it. Quarto appends these items to the flat list of the
-  # site, so the section holds the pages that list leaves out.
-  sidebar:
-    contents:
-      - section: "More examples"
-        contents:
-          - href: numbered-sections.qmd
-            text: "Numbered sections"
-          - href: listing-example/index.qmd
-            text: "Listing example"

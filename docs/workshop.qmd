@@ -1,0 +1,6 @@
+---
+title: "Workshop mode"
+description: "Workshop mode turns a sidebar into a set of modules with a timer."
+---
+
+Workshop mode turns a sidebar into a set of modules with a timer.
