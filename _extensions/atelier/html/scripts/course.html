@@ -224,13 +224,23 @@
 					mark(headings.map(function (heading) { return heading.href; }));
 				}
 			}
-			window.addEventListener("scroll", checkEnd, { passive: true });
+			// A scroll fires many events in one frame, so the check runs once a frame.
+			var endCheckQueued = false;
+			function onScroll() {
+				if (endCheckQueued) return;
+				endCheckQueued = true;
+				window.requestAnimationFrame(function () {
+					endCheckQueued = false;
+					checkEnd();
+				});
+			}
+			window.addEventListener("scroll", onScroll, { passive: true });
 
 			// Once every heading is read, nothing is left to watch.
 			function stopWatchingWhenRead() {
 				if (read.length < headings.length) return;
 				observer.disconnect();
-				window.removeEventListener("scroll", checkEnd);
+				window.removeEventListener("scroll", onScroll);
 			}
 			checkEnd();
 			stopWatchingWhenRead();
