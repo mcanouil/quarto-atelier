@@ -23,4 +23,4 @@ Start with the first module and follow the order of the sidebar.
 ## Before you start
 
 You need a computer with a terminal and a web browser.
-You do not need any other tool, because the first module installs them.
+You do not need any other tool, because the Set-up module installs them.
