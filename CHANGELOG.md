@@ -5,7 +5,7 @@
 ### Breaking Changes
 
 - fix: Atelier needs Quarto 1.11.9 or later.
-  Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode.
+  Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode. (#79)
 
 ### New Features
 
@@ -41,7 +41,7 @@
 - feat: In workshop mode, turn `.objectives` divs into a list of checkboxes that the browser remembers, `.exercise` divs into a block with a title and an optional `duration`, and `.solution` divs into a closed disclosure. (#78)
 - feat: Draw a code block with the `.terminal` class as a dark terminal in both colour schemes, with a `$` prompt before each command that screen readers and the copy button skip. (#78)
 - feat: Add two starter templates, one for documentation with a navbar and one for a workshop with the sidebar only.
-  Install Atelier with `quarto add`, then run `quarto use template mcanouil/quarto-atelier/templates/<name>`.
+  Install Atelier with `quarto add`, then run `quarto use template mcanouil/quarto-atelier/templates/<name>`. (#79)
 
 ### Bug Fixes
 
@@ -59,12 +59,12 @@
 - fix: Mark the current page in the breadcrumbs for screen readers. (#77)
 - fix: Hide the empty metadata strip of a title block, and leave it out of the page landmarks. (#77)
 - fix: Draw code annotation markers on the accent with readable text, in place of Quarto's fixed grey. (#77)
-- fix: Keep code blocks inside lists on the code surface in dark mode, so their text stays readable.
+- fix: Keep code blocks inside lists on the code surface in dark mode, so their text stays readable. (#79)
 
 ### Documentation
 
 - docs: Document workshop mode, the starter templates, the language keys, and how each `_brand.yml` key reaches the chrome.
-  Add an example workshop to the website.
+  Add an example workshop to the website. (#79)
 
 ## 0.11.0 (2026-10-29)
 
