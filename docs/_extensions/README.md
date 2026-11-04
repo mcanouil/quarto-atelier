@@ -4,7 +4,6 @@ The website uses one extension: `local/atelier/`, a copy of the extension that t
 
 Atelier embeds the other extensions that the website uses, such as iconify, gitlink and code-window, under `_extensions/atelier/_extensions/mcanouil/` at the repository root.
 The website uses those embedded copies, so this directory has no copy of its own.
-The repository README tells how to update them.
 
 ## Generated, under `local/`
 
