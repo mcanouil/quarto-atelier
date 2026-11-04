@@ -6,6 +6,9 @@ It derives the navbar, the page footer, and a docked sidebar from one `_brand.ym
 
 ## Installation
 
+Atelier needs Quarto 1.11.9 or later, which is the first stable 1.11 release.
+Older releases drop the project's `extensions` options from any page that sets `extensions` in its own front matter, which breaks workshop mode.
+
 ```bash
 quarto add mcanouil/quarto-atelier@0.11.0
 ```
@@ -36,23 +39,21 @@ The [templates page](https://m.canouil.dev/quarto-atelier/templates.html) lists 
 
 ## Embedded extensions
 
-Atelier ships with five extensions inside it, so you don't install them yourself: [iconify](https://github.com/mcanouil/quarto-iconify), [gitlink](https://github.com/mcanouil/quarto-gitlink), [code-window](https://github.com/mcanouil/quarto-code-window), [toc-depth](https://github.com/mcanouil/quarto-toc-depth) and [collapse-output](https://github.com/mcanouil/quarto-collapse-output).
-They live in `_extensions/atelier/_extensions/mcanouil/`, and each `_extension.yml` records the release it came from.
-Atelier needs Quarto 1.11.9 or later, the first stable 1.11 release.
-Older releases drop the project's `extensions` options on any page that sets its own `extensions` in its front matter.
+Atelier ships with the extensions below, so you don't install them yourself.
+
+| Extension | What it does |
+| --- | --- |
+| [iconify](https://github.com/mcanouil/quarto-iconify) | Adds the `{{< iconify >}}` shortcode, for icons from the Iconify sets. |
+| [gitlink](https://github.com/mcanouil/quarto-gitlink) | Shows a repository widget in place of a navbar item or sidebar tool with the href `#gitlink-widget`. |
+| [code-window](https://github.com/mcanouil/quarto-code-window) | Shows a code block that has a `filename` in a window frame with a title bar. |
+| [toc-depth](https://github.com/mcanouil/quarto-toc-depth) | Sets the table of contents depth below a heading, with the `toc-depth` attribute. |
+| [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option. |
+
+Each one lives in `_extensions/atelier/_extensions/mcanouil/<name>/`, and its `_extension.yml` records the release it came from.
+The [reference page](https://m.canouil.dev/quarto-atelier/reference.html) lists their options and the defaults that Atelier changes.
 
 If your project already has its own copy of one of them, remove it from `_extensions/` and drop its name from your `filters` list.
 Otherwise both copies run, and your copy's shortcodes replace the embedded ones.
-
-A monthly workflow opens a pull request when one of them has a new release.
-To bring them up to date by hand, run the [Quarto Wizard](https://github.com/mcanouil/quarto-wizard) updater from a checkout of that repository:
-
-```bash
-npm run extensions:update -- /path/to/quarto-atelier/_extensions/atelier --apply
-```
-
-Leave out `--apply` to see what would change.
-Don't use `quarto add` or `quarto update` here: they drop the `source` field the updater relies on.
 
 ## Documentation
 
