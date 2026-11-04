@@ -115,6 +115,8 @@ The project type sets `format: atelier-html`, and contributes the theme, the bun
 
 :::
 
+To start from a complete site, use one of the [starter templates](templates.qmd).
+
 :::
 
 ::: {.atelier-feature-figure}
@@ -188,6 +190,42 @@ grep -c 'id="navbar-tooltips"' _site/index.html
 ## Where next
 
 ::: {.atelier-cards}
+
+::: {.atelier-card}
+
+{{< iconify octicon:repo-template-24 aria-hidden='true' >}}
+
+### Templates
+
+A documentation site or a workshop, ready to copy.
+
+[Use a template](templates.qmd)
+
+:::
+
+::: {.atelier-card}
+
+{{< iconify octicon:mortar-board-24 aria-hidden='true' >}}
+
+### Workshop mode
+
+Modules, durations, a timer, and progress for a course.
+
+[Make a workshop](workshop.qmd)
+
+:::
+
+::: {.atelier-card}
+
+{{< iconify octicon:sun-24 aria-hidden='true' >}}
+
+### Brand and colours
+
+How each key of the brand file changes the site.
+
+[Set the brand](brand.qmd)
+
+:::
 
 ::: {.atelier-card}
 

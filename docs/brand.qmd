@@ -1,6 +1,111 @@
 ---
 title: "Brand and colours"
-description: "The brand file sets the colours and the fonts of the site."
+description: "How Atelier uses each key of _brand.yml, the contrast it keeps, and the Sass variables that change the chrome."
 ---
 
-The brand file sets the colours and the fonts of the site.
+Atelier takes the colours and the fonts of the site from `_brand.yml`.
+It calculates the colours of the navbar, the sidebar, the bars, and the cards from the brand, for each colour scheme.
+
+## Brand keys
+
+| Key | What Atelier does with it |
+| --- | ------------------------- |
+| `color.background` | The page background. Atelier mixes it with the foreground for the bars, the sidebar, and the surfaces. |
+| `color.foreground` | The text and the borders. It also gives the ink of the bars and of the exercise header. |
+| `color.primary` | The accent: the current item, the tabs, the progress fill, the focus ring, and the accent of the gitlink widget. Atelier holds it to the contrast below. |
+| `color.secondary` | The muted text, when the brand sets it, held to 4.5:1. When the brand does not set it, Atelier mixes the muted text from the foreground and the background. |
+| `color.tertiary` | Not used. Quarto makes it a text colour, so it cannot fill a surface. |
+| `color.palette.blue`, `green`, `yellow`, `orange`, `red` | The callout colours. See [Callout colours](#callout-colours). |
+| `color.success`, `info`, `warning`, `danger`, `light`, `dark` | Bootstrap components only. |
+| A colour with `light` and `dark` values | Each colour scheme calculates its own chrome from its own value. |
+| `typography` | Quarto applies the fonts to the theme, and Atelier does not change them. The chrome sizes are in `rem`, so they follow the base font size. |
+| `typography.link` | The content links. When it gives no colour, the links take `color.primary`, held to 4.5:1. The links of the chrome keep their own colours. |
+| `logo.small`, `medium`, `large` (with `light`, `dark`, and `alt`) | Quarto chooses the logo of the navbar and of the sidebar. When there is no logo, the site title shows. |
+| `meta` | Not used. |
+| `defaults.bootstrap.defaults` | Sets a Bootstrap variable or an `$atelier-*` variable. |
+| `defaults.bootstrap.uses`, `functions`, `mixins`, `rules` | Your own rules. The Atelier selectors are flat, so your rules can override them. |
+
+: How Atelier uses each key of `_brand.yml`. {.striped .hover tbl-colwidths="[30,70]"}
+
+## Contrast
+
+Atelier targets WCAG 2.2 AA in both colour schemes, for each brand.
+
+- Text has a contrast of 4.5:1 or more against its background.
+- Borders of controls, the progress fill, and the focus ring have a contrast of 3:1 or more.
+
+Atelier moves a brand colour towards black or white until it has this contrast.
+A colour that already has the contrast does not change.
+A variable that you set yourself is used as you write it, with no correction.
+
+## Chrome palette
+
+The chrome is the navbar, the sidebar, the bars above the page, the table of contents card, and the footer.
+`$atelier-chrome` sets how the chrome follows the colour scheme:
+
+| Value  | Effect                                                                                  |
+| ------ | --------------------------------------------------------------------------------------- |
+| `auto` | The default. The chrome comes from the brand, and it follows the colour scheme.         |
+| `light` | The chrome uses the light palette in both colour schemes.                               |
+| `dark` | The chrome uses the dark palette in both colour schemes.                                |
+
+: Values of `$atelier-chrome`. {.striped .hover tbl-colwidths="[16,84]"}
+
+| Variable                                                                    | Effect                                                                |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `$atelier-chrome-light-bg`, `$atelier-chrome-light-fg`, `$atelier-chrome-light-accent` | The light palette, for `$atelier-chrome: light`.                      |
+| `$atelier-chrome-dark-bg`, `$atelier-chrome-dark-fg`, `$atelier-chrome-dark-accent` | The dark palette, for `$atelier-chrome: dark`.                        |
+| `$atelier-chrome-bg`, `$atelier-chrome-fg`                                  | The background and the text of the chrome.                            |
+| `$atelier-chrome-accent`                                                    | The accent of the chrome: the current item, the tabs, and the marks.  |
+| `$atelier-chrome-muted`                                                     | The muted text of the chrome.                                         |
+| `$atelier-chrome-surface`                                                   | The surface of menus and of the tab row.                              |
+| `$atelier-chrome-border`, `$atelier-chrome-control-border`                  | The lines between surfaces, and the borders of controls.              |
+
+: Sass variables of the chrome palette. {.striped .hover tbl-colwidths="[46,54]"}
+
+Atelier calculates the other chrome colours from the background, the text, and the accent.
+Thus, to change the chrome, you usually set those three only.
+
+You can set the variables in two places.
+In `_brand.yml`, use `defaults.bootstrap.defaults`, with the name of the variable and no `$`:
+
+```{.yaml filename="_brand.yml"}
+defaults:
+  bootstrap:
+    defaults:
+      atelier-chrome: dark
+      atelier-chrome-accent: "#E0A030"
+```
+
+In a project stylesheet, set them in the `defaults` layer, and list the file in `format.atelier-html.theme`:
+
+```{.scss filename="assets/stylesheets/theme.scss"}
+/*-- scss:defaults --*/
+$atelier-chrome: light;
+$atelier-chrome-light-accent: #1f5f80;
+```
+
+## Callout colours
+
+Each callout type takes a palette colour of the brand:
+
+| Callout          | Palette colour |
+| ---------------- | -------------- |
+| `callout-note`      | `blue`         |
+| `callout-tip`       | `green`        |
+| `callout-warning`   | `yellow`       |
+| `callout-caution`   | `orange`       |
+| `callout-important` | `red`          |
+
+: The palette colour of each callout type. {.striped .hover tbl-colwidths="[50,50]"}
+
+Atelier uses these names for each brand.
+Quarto alone uses them only when the brand also has `defaults.bootstrap`.
+The same names also give the Bootstrap colours that come from them, such as `danger` from `red`.
+
+## Terminal block
+
+The [terminal block](workshop.qmd#terminal) is dark in both colour schemes.
+Its colours are fixed, and they do not come from the brand.
+To change them, set the `$atelier-terminal-*` variables, such as `$atelier-terminal-bg`.
+Each text colour has a contrast of 4.5:1 or more on the dark background.

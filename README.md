@@ -18,6 +18,22 @@ project:
   type: atelier
 ```
 
+## Starter templates
+
+Two templates give you a working site to start from: `documentation`, with a navbar and a docked sidebar, and `workshop`, with the sidebar only and workshop mode turned on.
+Run the two commands in an empty folder, in this order:
+
+```bash
+quarto add mcanouil/quarto-atelier
+quarto use template mcanouil/quarto-atelier/templates/documentation
+```
+
+Swap `documentation` for `workshop` to get the workshop.
+When Quarto asks whether to create a subdirectory for the template, answer No, so the files land next to the extension.
+The order matters: the templates don't carry the extension, and if you run `quarto use template` first, `quarto add` stops with `ERROR: Unsupported project type atelier`.
+
+The [templates page](https://m.canouil.dev/quarto-atelier/templates.html) lists the files of each template and what to edit first.
+
 ## Embedded extensions
 
 Atelier ships with five extensions inside it, so you don't install them yourself: [iconify](https://github.com/mcanouil/quarto-iconify), [gitlink](https://github.com/mcanouil/quarto-gitlink), [code-window](https://github.com/mcanouil/quarto-code-window), [toc-depth](https://github.com/mcanouil/quarto-toc-depth) and [collapse-output](https://github.com/mcanouil/quarto-collapse-output).

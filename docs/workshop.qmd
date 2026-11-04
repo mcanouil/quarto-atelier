@@ -1,6 +1,268 @@
 ---
 title: "Workshop mode"
-description: "Workshop mode turns a sidebar into a set of modules with a timer."
+description: "Turn a sidebar into a course of modules, with durations, a timer, progress, and workshop blocks."
 ---
 
-Workshop mode turns a sidebar into a set of modules with a timer.
+Workshop mode turns one sidebar of a site into a course.
+Each top-level item of that sidebar is a module.
+The pages that use the sidebar get the workshop chrome, and the other pages of the site keep the documentation chrome.
+
+The [example workshop](workshop-example/index.qmd) of this site uses each part that this page describes.
+The [workshop template](templates.qmd) gives you a workshop site to start from.
+Workshop mode needs Quarto 1.11.9 or later: older releases remove the project options from a page that sets `extensions` in its front matter.
+
+## Set the mode
+
+The mode option is `extensions.atelier.mode`.
+Its values are `documentation` (the default) and `workshop`.
+Set it once, in the `_metadata.yml` of the folder that holds the workshop pages:
+
+```{.yaml filename="workshop/_metadata.yml"}
+extensions:
+  atelier:
+    mode: workshop
+```
+
+A page outside that folder can set the same option in its own front matter.
+The workshop template does this for its welcome page, `index.qmd`.
+
+## Declare the sidebar
+
+A workshop has its own sidebar in `website.sidebar`, with an `id`.
+Atelier cannot read `website.sidebar`, so you also list the sidebar in `extensions.atelier.sidebars`.
+To do this without a second copy, put a YAML anchor on the sidebar and its alias in the list:
+
+```{.yaml filename="_quarto.yml"}
+website:
+  sidebar:
+    - &course
+      id: course
+      title: "My workshop"
+      style: docked
+      contents:
+        - section: "Set-up"
+          contents:
+            - workshop/setup/index.qmd
+            - workshop/setup/install.qmd
+        - section: "Practice"
+          contents:
+            - workshop/practice.qmd
+
+extensions:
+  atelier:
+    sidebars:
+      - *course
+```
+
+The anchor (`&course`) and the alias (`*course`) must be in the same YAML file.
+If the anchor is in one file and the alias is in another file, Quarto stops the render with `YAMLException: unidentified alias`.
+
+You can keep both in a separate file, and name that file in `metadata-files`.
+The workshop template does this with `_sidebars.yml`:
+
+```{.yaml filename="_quarto.yml"}
+metadata-files:
+  - _sidebars.yml
+```
+
+The `extensions.atelier` options of `_sidebars.yml` merge with the options of `_quarto.yml`.
+A site with more than one sidebar lists each one in `extensions.atelier.sidebars`.
+This site lists its `docs` sidebar and its `workshop` sidebar.
+
+The `id` of the sidebar is part of the key that stores the progress of the reader.
+If you change the `id`, each reader starts again with no progress.
+
+## Modules and durations
+
+A module is a top-level section of the workshop sidebar.
+The pages of the section are the steps of the module.
+A top-level page, with no section, is a module of one page.
+
+A page sets its duration in its front matter, with `extensions.atelier.duration`:
+
+```{.yaml filename="workshop/setup/install.qmd"}
+---
+title: "Install the tools"
+extensions:
+  atelier:
+    duration: 25 min
+---
+```
+
+A duration has one of these four forms:
+
+- Minutes: `25 min`.
+- Hours: `1 h`.
+- Hours and minutes: `1 h 30 min`.
+- A number with no unit, which counts as minutes: `25`.
+
+The spaces are optional, so `1h30min` is also correct.
+If a duration has a different form, Atelier logs a warning and ignores the duration.
+
+The duration of a module is the sum of the durations of its pages.
+The total time of the workshop is the sum of the durations of all its pages.
+A page with no duration adds nothing to the sums, and it shows no timer.
+
+## The workshop chrome
+
+The workshop chrome shows the same course in each layout.
+The layout changes where the bar is.
+
+| Part              | Sidebar-only layout                                     | Navbar layout                                     |
+| ----------------- | ------------------------------------------------------- | ------------------------------------------------- |
+| Workshop bar      | At the top of the content, next to the sidebar.         | A module row below the navbar.                    |
+| Course stepper    | In the sidebar.                                         | In the sidebar.                                   |
+| Progress dots     | In the table of contents.                               | In the table of contents.                         |
+
+: Where the parts of the workshop chrome are. {.striped .hover tbl-colwidths="[20,40,40]"}
+
+The workshop bar shows these items:
+
+- The name of the module and the name of the page.
+  If a module has one page with the same name, the bar shows the name of the page only.
+- The previous and next links.
+- A progress line, "Module n of m".
+- The session timer, if the page has a duration.
+
+The timer counts down from the duration of the page.
+It starts when the page opens, starts again each time the page opens, and stops at `0:00`.
+The pause button stops and starts the timer.
+The timer does not announce each second to a screen reader.
+
+The course stepper numbers each module and shows its duration.
+A summary at the top shows "Module n of m", the total time, and a progress bar.
+The current module is open and lists its pages.
+When the reader has opened all the pages of a module, the module shows a check mark.
+
+The progress dots put a dot next to each heading of the table of contents.
+A dot is filled when the top of its heading goes past the top of the window.
+A ring above the entries shows the part of the current module that the reader has read, for example "40% of this module read".
+
+Without JavaScript, the bar, the stepper, and the dots are not shown.
+The previous and next links of Quarto at the bottom of the page continue to work.
+
+In documentation mode with no navbar, a reading bar above the page shows the section, the page, "Page n of m", and the previous and next links.
+It has no timer.
+
+## Workshop blocks
+
+The workshop blocks are divs with a class.
+They apply in workshop mode only.
+In documentation mode, Atelier does not change these divs.
+
+### Objectives
+
+An `.objectives` div holds a bullet list.
+Each item becomes a checkbox with a label, and the reader can tick it.
+The default title is "By the end of this module, you can".
+
+```markdown
+::: {.objectives title="After this page, you can" duration="15 min"}
+
+- Install Quarto.
+- Read the version of Quarto in a terminal.
+
+:::
+```
+
+The `title` and `duration` attributes are optional.
+With no `duration` attribute, the block shows the duration of the page.
+The [Set up](workshop-example/setup.qmd#goals) page of the example shows this block.
+
+### Exercise
+
+An `.exercise` div has a header with a title and an optional duration.
+The default title is "Exercise".
+
+```markdown
+::: {.exercise title="Add a page" duration="10 min"}
+
+Make a file `notes.qmd`.
+Give the file a title and one paragraph of text.
+
+:::
+```
+
+The [Practice](workshop-example/practice.qmd#the-task) page of the example shows this block.
+
+### Solution
+
+A `.solution` div becomes a disclosure that is closed at first.
+The reader opens it to see the solution.
+The summary text comes from the `title` attribute, or else from a heading at the start of the div.
+The default summary is "Show the solution".
+
+```markdown
+::: {.solution title="Solution"}
+
+Write this in `notes.qmd`.
+
+:::
+```
+
+Give a solution no `id`.
+A solution with an `id` that starts with `sol-` stays a Quarto cross-reference target, and Atelier does not change it.
+Quarto stops the render on a solution with an `id` that has a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
+The [Practice](workshop-example/practice.qmd#the-task) page of the example shows a solution after the exercise.
+
+### Terminal
+
+A code block with the class `.terminal` shows a shell session.
+The terminal block works in both modes.
+It stays dark in both colour schemes.
+
+````markdown
+```{.bash .terminal}
+$ quarto --version
+1.11.9
+```
+````
+
+A line that starts with `$` and a space is a command.
+Each other line is output.
+Atelier removes the `$` from the text and draws it as a prompt.
+For this reason, the copy button copies the commands without the prompt, and screen readers do not read it.
+
+The header shows "Terminal", unless the block has a `filename`.
+The block needs a language class, such as `bash`.
+If it has no language class, Atelier logs a warning and shows the block as a normal code block.
+The [Set up](workshop-example/setup.qmd#check-the-version) page of the example shows a terminal block.
+
+## Title block labels
+
+Quarto has `language` keys for the labels of the title block.
+A workshop can change them in its `_metadata.yml`:
+
+```{.yaml filename="workshop/_metadata.yml"}
+language:
+  title-block-author-single: Instructor
+  title-block-author-plural: Instructors
+  title-block-published: Session
+  title-block-modified: Materials updated
+```
+
+The [Practice](workshop-example/practice.qmd) page of the example shows the "Instructors" label.
+The [Reference](reference.qmd#language-keys) lists the `language` keys of Atelier, which change the text of the workshop chrome.
+
+## Progress
+
+The browser keeps the progress of the reader in `localStorage`.
+The progress holds the pages that the reader opened, the headings that the reader read, and the objectives that the reader ticked.
+The key is `atelier:<site path>:<sidebar id>`.
+On this site, the key of the example workshop is `atelier:/quarto-atelier/:workshop`.
+
+Atelier has no control to reset the progress.
+To start again, the reader removes the site data in the browser settings.
+If the browser does not let the page store data, the progress stays in memory until the page closes.
+If the workshop sidebar has no `id`, Atelier logs a warning, and the progress also stays in memory only.
+
+## Limits
+
+- Atelier does not resolve `auto` or glob entries in the sidebar `contents`, so their pages have no duration.
+  List each page by its path.
+- A `.ipynb` page has no duration.
+  Atelier reads durations from `.qmd`, `.md`, and `.Rmd` pages only.
+- If a workshop page is in a sidebar that `extensions.atelier.sidebars` does not list, Atelier logs a warning.
+  The page then shows no durations, and its progress stays in memory only.
+- The anchor and the alias of a sidebar must be in the same YAML file.
+- There is no control to reset the progress.
