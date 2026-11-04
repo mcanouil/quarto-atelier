@@ -9,3 +9,6 @@ docs
 
 # The repository's own citation metadata, not the new project's.
 CITATION.cff
+
+# The starter templates, which `quarto use template` copies from their own folders.
+templates

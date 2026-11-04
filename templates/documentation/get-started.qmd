@@ -1,0 +1,38 @@
+---
+title: "Get started"
+---
+
+This page shows how to install My project.
+Replace the steps with the steps for your project.
+
+## Install
+
+Run the install command in a terminal.
+
+```{.bash .terminal}
+$ pip install my-project
+installed my-project
+```
+
+## Check the install
+
+Run the version command.
+The output shows the version number.
+
+```{.bash .terminal}
+$ my-project --version
+1.0.0
+```
+
+::: {.callout-note}
+
+## Replace this page
+
+Write the steps that a new reader must do first.
+Keep each step to one action.
+
+:::
+
+## Next steps
+
+Read the [configuration guide](guides/configuration.qmd) to change the options of the project.

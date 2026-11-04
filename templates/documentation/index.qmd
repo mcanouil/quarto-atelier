@@ -1,0 +1,23 @@
+---
+title: "My project"
+---
+
+My project is a sample documentation website.
+Replace this text with a short description of your project.
+Say what it does and who it is for.
+
+## Quick start
+
+Preview the site on your computer.
+The site updates each time you save a file.
+
+```{.bash .terminal}
+$ quarto preview
+```
+
+## Next steps
+
+- [Get started](get-started.qmd) shows how to install the project.
+- [Configuration](guides/configuration.qmd) shows how to change the site and its colours.
+- [Writing pages](guides/writing.qmd) shows each element that a page can hold.
+- [Reference](reference.qmd) lists the options of the project.

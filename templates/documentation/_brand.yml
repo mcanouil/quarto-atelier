@@ -1,0 +1,24 @@
+color:
+  # The page: surfaces, the sidebar, and the bars mix this colour with the foreground.
+  background:
+    light: "#ffffff"
+    dark: "#14161a"
+  # Text and borders, and the dark bar and header.
+  foreground:
+    light: "#1c1e21"
+    dark: "#e8e9ec"
+  # The accent: the current item, tabs, progress, and the focus ring.
+  primary:
+    light: "#1d5fd1"
+    dark: "#7fa8f0"
+  palette:
+    # The blue of note callouts.
+    blue: "#2f6fd6"
+    # The green of tip callouts.
+    green: "#2d8a4e"
+    # The red of caution callouts.
+    red: "#c43d3d"
+    # The orange of warning callouts.
+    orange: "#d9772b"
+    # The yellow of important callouts.
+    yellow: "#c9a21a"
