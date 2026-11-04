@@ -12,9 +12,7 @@ $atelier-focus-scroll-margin-narrow: 7.25rem !default;
 
 // Quarto draws one focus ring on every control. Paint it with the Atelier
 // focus token, which `:root` sets below and which follows the colour scheme.
-$atelier-focus-ring-width: 2px !default;
 $focus-ring-outer-color: var(--atelier-focus) !default;
-$focus-ring-outline-width: $atelier-focus-ring-width !default;
 
 // `.btn-close-white` asks Bootstrap to invert the dismiss icon to force a light
 // one. The icon follows the text around it instead, see DISMISS BUTTON below,
@@ -630,8 +628,7 @@ main:has(> .atelier-landing) > #title-block-header {
     }
 
     &:focus-visible::after {
-      outline: $atelier-focus-ring-width solid var(--atelier-focus);
-      outline-offset: 2px;
+      @include focus-ring;
       border-radius: $border-radius-lg;
     }
   }
