@@ -6,6 +6,7 @@ The sidebar lists the modules, and a bar above each page shows the module and a 
 
 ## Use the template
 
+You need Quarto 1.11.9 or later.
 Make an empty folder and run the two commands in this order, from inside the folder.
 
 ```bash

@@ -29,6 +29,7 @@ The [Workshop mode](workshop.qmd) page tells what each part of the workshop chro
 
 ## Install a template
 
+You need Quarto 1.11.9 or later.
 Do these steps in an empty folder.
 The order of the two commands is important.
 

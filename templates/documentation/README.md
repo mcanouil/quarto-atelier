@@ -5,6 +5,7 @@ It has a navbar, a docked sidebar, and five sample pages that you replace with y
 
 ## Use the template
 
+You need Quarto 1.11.9 or later.
 Make an empty folder and run the two commands in this order, from inside the folder.
 
 ```bash
@@ -17,7 +18,6 @@ The template then lands in the current folder, next to the extension.
 
 Order matters.
 If you run `quarto use template` first, the second command fails with `ERROR: Unsupported project type atelier`.
-Quarto reads the project before it adds the extension, and the project already names a type that is not installed yet.
 Start again in an empty folder and run `quarto add` first.
 
 ## Preview the site

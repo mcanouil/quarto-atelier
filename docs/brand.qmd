@@ -37,6 +37,7 @@ Atelier targets WCAG 2.2 AA in both colour schemes, for each brand.
 Atelier moves a brand colour towards black or white until it has this contrast.
 A colour that already has the contrast does not change.
 A variable that you set yourself is used as you write it, with no correction.
+Atelier still corrects the colours that it derives from that value, which are the accent mark and the accent fill.
 
 ## Chrome palette
 

@@ -5,8 +5,7 @@
 ### Breaking Changes
 
 - fix: Atelier needs Quarto 1.11.9 or later.
-  Older releases drop the project's `extensions` options on any page that sets its own `extensions` in its front matter.
-  That breaks workshop mode and the defaults of the embedded extensions.
+  Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode.
 
 ### New Features
 

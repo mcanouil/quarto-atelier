@@ -11,4 +11,4 @@ It shows how a workshop page looks when you set `mode: workshop`.
 The bar above the page shows the module and the time for the page.
 
 The sidebar of this page lists only the pages of the workshop.
-Use the navigation to go to the next page.
+Use the Next link in the bar above the page.

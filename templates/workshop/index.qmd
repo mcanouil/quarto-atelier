@@ -13,7 +13,8 @@ Say who it is for and what the learners can do at the end.
 ## How the workshop works
 
 The workshop has four modules.
-Each module is a section of the sidebar.
+This page is the first module.
+Each other module is a section of the sidebar.
 The bar above the page shows the module that you are in and a timer for the page.
 
 The sidebar remembers the pages that you have read.

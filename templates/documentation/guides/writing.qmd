@@ -63,7 +63,7 @@ total = first + second
 ```
 
 A terminal block shows a command and its output.
-A line that starts with `$ ` is a command.
+A line that starts with `$` and a space is a command.
 
 ```{.bash .terminal}
 $ echo "Hello"

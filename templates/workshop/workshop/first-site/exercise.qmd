@@ -5,7 +5,7 @@ extensions:
     duration: 1 h 30 min
 ---
 
-This exercise makes you add a page to the site of the previous page.
+In this exercise, you add a page to the site that you made on the previous page.
 
 ## The task
 

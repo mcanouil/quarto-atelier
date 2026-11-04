@@ -5,7 +5,7 @@ description: "Turn a sidebar into a course of modules, with durations, a timer, 
 
 Workshop mode turns one sidebar of a site into a course.
 Each top-level item of that sidebar is a module.
-The pages that use the sidebar get the workshop chrome, and the other pages of the site keep the documentation chrome.
+The pages that set `mode: workshop` get the workshop chrome, and the other pages of the site keep the documentation chrome.
 
 The [example workshop](workshop-example/index.qmd) of this site uses each part that this page describes.
 The [workshop template](templates.qmd) gives you a workshop site to start from.
@@ -119,7 +119,7 @@ The layout changes where the bar is.
 The workshop bar shows these items:
 
 - The name of the module and the name of the page.
-  If a module has one page with the same name, the bar shows the name of the page only.
+  If the module and the page have the same name, the bar shows the name of the page only.
 - The previous and next links.
 - A progress line, "Module n of m".
 - The session timer, if the page has a duration.
@@ -189,7 +189,8 @@ The [Practice](workshop-example/practice.qmd#the-task) page of the example shows
 
 A `.solution` div becomes a disclosure that is closed at first.
 The reader opens it to see the solution.
-The summary text comes from the `title` attribute, or else from a heading at the start of the div.
+The summary text comes from the `title` attribute.
+If there is no `title`, it comes from the `name` attribute or from a heading at the start of the div.
 The default summary is "Show the solution".
 
 ```markdown
