@@ -475,8 +475,9 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
 
   // The box comes from the tokens, so its border holds 3:1 on the block. The
   // span after the box holds the tick, drawn as a mask in the on-accent colour
-  // over the accent fill. The global focus ring stays.
-  input[type="checkbox"] {
+  // over the accent fill. The global focus ring stays. Only the objective
+  // checkboxes have the tick span, so a task list keeps the native box.
+  input[data-atelier-objective] {
     flex: none;
     width: 18px;
     height: 18px;
@@ -508,17 +509,17 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
     pointer-events: none;
   }
 
-  input[type="checkbox"]:checked + .atelier-check {
+  input[data-atelier-objective]:checked + .atelier-check {
     display: block;
   }
 
   // In forced colours the system draws the box and its tick.
   @media (forced-colors: active) {
-    input[type="checkbox"] {
+    input[data-atelier-objective] {
       appearance: auto;
     }
 
-    input[type="checkbox"]:checked + .atelier-check {
+    input[data-atelier-objective]:checked + .atelier-check {
       display: none;
     }
   }
