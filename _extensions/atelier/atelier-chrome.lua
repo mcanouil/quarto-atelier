@@ -29,7 +29,11 @@ local LABELS = {
   { key = 'toc-link-copied', default = 'Link copied' },
 }
 
---- Version of the font files, as published on npm by Fontsource.
+--- Version of the `site_libs` folder of the fonts, not of one package.
+--- It changes when the vendored files change.
+--- Vendored packages, all at 5.3.0 on npm:
+--- `@fontsource/alegreya-sans`, `@fontsource-variable/fira-code`,
+--- `@fontsource-variable/jetbrains-mono`.
 local FONTS_VERSION = '5.3.0'
 
 --- Font files that `fonts/fonts.css` refers to, relative to this file.

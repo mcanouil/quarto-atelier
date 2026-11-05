@@ -19,6 +19,10 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTENSION = ROOT / "_extensions" / "atelier"
 PRESETS = ("default", "quarto", "terminal")
 SCHEMES = ("light", "dark")
+ARROW_SENTINELS = {
+    "arrow-light": ("#5e5e5e", "#4758ab"),
+    "arrow-dark": ("#f8f8f2", "#ffa07a"),
+}
 COMMAND = "uv run scripts/generate-highlighting.py"
 
 CLASSES = {
@@ -94,6 +98,7 @@ def render(themes: Path) -> str:
         "$atelier-highlighting: (",
     ]
     sentinels = []
+    owners = {pair: name for name, pair in ARROW_SENTINELS.items()}
     for preset in PRESETS:
         lines.append(f'  "{preset}": (')
         for scheme in SCHEMES:
@@ -103,6 +108,14 @@ def render(themes: Path) -> str:
             lines.append("    ),")
             comment = colour_of("Comment", styles["Comment"])
             function = colour_of("Function", styles["Function"])
+            name = f"atelier-{preset}-{scheme}"
+            if (comment, function) in owners:
+                raise SystemExit(
+                    f"{name}.theme: the (Comment, Function) pair {comment}, {function} "
+                    f"equals {owners[(comment, function)]}, which html/highlighting.scss "
+                    "checks. Change one of the two colours."
+                )
+            owners[(comment, function)] = name
             sentinels.append(f'  "{preset}-{scheme}": ({comment}, {function}),')
         lines.append("  ),")
     lines.append(") !default;")
