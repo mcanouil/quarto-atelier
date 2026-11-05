@@ -28,19 +28,28 @@
 				} catch (error) {
 					// Quarto reads and writes the choice in localStorage, which can
 					// throw. The toggle runs again with a stand-in that stores nothing.
-					console.warn("Atelier: the colour scheme choice cannot be stored in this browser.", error);
+					// One warning says what happened.
 					var original = Object.getOwnPropertyDescriptor(window, "localStorage");
+					var swapped = false;
+					var message = "Atelier: the colour scheme choice cannot be stored in this browser.";
 					try {
 						Object.defineProperty(window, "localStorage", {
 							configurable: true,
 							value: { getItem: function () { return null; }, setItem: function () {} },
 						});
+						swapped = true;
 						window.quartoToggleColorScheme();
 					} catch (retryError) {
-						console.warn("Atelier: the dark colour scheme cannot be applied.", retryError);
-					} finally {
-						if (original) Object.defineProperty(window, "localStorage", original);
+						message = "Atelier: the dark colour scheme cannot be applied.";
 					}
+					if (swapped && original) {
+						try {
+							Object.defineProperty(window, "localStorage", original);
+						} catch (restoreError) {
+							message = "Atelier: the browser storage cannot be restored after applying the dark colour scheme.";
+						}
+					}
+					console.warn(message, error);
 				}
 			}
 			document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
