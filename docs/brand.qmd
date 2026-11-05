@@ -42,16 +42,9 @@ Atelier still corrects the colours that it derives from that value, which are th
 ## Dark scheme without dark colours
 
 A page can have no `_brand.yml`, or a brand that gives light colours only.
-In the dark scheme, such a page uses the dark page palette of Atelier.
+In the dark scheme, such a page uses the dark chrome palette of Atelier as its page colours.
 The brand accent stays, and Atelier moves it until it has a contrast of 4.5:1 on the dark background.
 When the brand gives no accent, the page uses the dark accent of the palette.
-
-| Variable | Effect |
-| -------- | ------ |
-| `$atelier-dark-page-bg`, `$atelier-dark-page-fg` | The background and the text of the page in the dark scheme. |
-| `$atelier-dark-page-accent` | The accent in the dark scheme, when the brand gives no accent. |
-
-: Sass variables of the dark page palette. {.striped .hover tbl-colwidths="[46,54]"}
 
 ## Chrome palette
 

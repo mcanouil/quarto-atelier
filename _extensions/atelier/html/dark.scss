@@ -11,17 +11,15 @@
 // page when the page colours are still light here.
 //
 // This file is in the dark theme list only, and it comes before `brand`, so
-// its defaults are evaluated after the brand defaults and can read them.
-$atelier-dark-page-bg: #1b242e !default;
-$atelier-dark-page-fg: #e8edf2 !default;
-$atelier-dark-page-accent: #7fa8c4 !default;
-
+// its defaults are evaluated after the brand defaults and can read them. They
+// are evaluated before `html/chrome.scss`, which derives the chrome from the
+// page, so the colours below repeat the dark chrome palette of that file.
 @if not atelier-meta.variable-exists(body-bg) or tone($body-bg) == "light" {
-  $body-bg: $atelier-dark-page-bg !global;
-  $body-color: $atelier-dark-page-fg !global;
+  $body-bg: #1b242e !global;
+  $body-color: #e8edf2 !global;
   @if atelier-meta.variable-exists(primary) {
     $primary: atelier-theme-contrast($primary, $body-bg) !global;
   } @else {
-    $primary: $atelier-dark-page-accent !global;
+    $primary: #7fa8c4 !global;
   }
 }
