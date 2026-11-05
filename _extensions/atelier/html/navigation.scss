@@ -1044,6 +1044,12 @@ $atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
   border-bottom-color: var(--atelier-navbar-border);
 }
 
+// The title of that bar is an h6, which takes the heading ink and so reads
+// dark on a dark bar. It takes the ink of the bar.
+#quarto-embed-header.bg-primary h6 {
+  color: inherit;
+}
+
 // ===========================================================================
 // LIGHTBOX
 // ===========================================================================

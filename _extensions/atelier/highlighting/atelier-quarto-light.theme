@@ -61,7 +61,7 @@
             "underline": false
         },
         "Char": {
-            "text-color": "#2f6f4f",
+            "text-color": "#2a6848",
             "background-color": null,
             "bold": false,
             "italic": false,
@@ -75,14 +75,14 @@
             "underline": false
         },
         "String": {
-            "text-color": "#2f6f4f",
+            "text-color": "#2a6848",
             "background-color": null,
             "bold": false,
             "italic": false,
             "underline": false
         },
         "VerbatimString": {
-            "text-color": "#2f6f4f",
+            "text-color": "#2a6848",
             "background-color": null,
             "bold": false,
             "italic": false,
@@ -103,28 +103,28 @@
             "underline": false
         },
         "Comment": {
-            "text-color": "#596673",
+            "text-color": "#4f5c69",
             "background-color": null,
             "bold": false,
             "italic": true,
             "underline": false
         },
         "Documentation": {
-            "text-color": "#596673",
+            "text-color": "#4f5c69",
             "background-color": null,
             "bold": false,
             "italic": true,
             "underline": false
         },
         "Annotation": {
-            "text-color": "#596673",
+            "text-color": "#4f5c69",
             "background-color": null,
             "bold": false,
             "italic": false,
             "underline": false
         },
         "CommentVar": {
-            "text-color": "#596673",
+            "text-color": "#4f5c69",
             "background-color": null,
             "bold": false,
             "italic": true,
@@ -138,7 +138,7 @@
             "underline": false
         },
         "Function": {
-            "text-color": "#3d6690",
+            "text-color": "#365e88",
             "background-color": null,
             "bold": false,
             "italic": false,
@@ -187,14 +187,14 @@
             "underline": false
         },
         "RegionMarker": {
-            "text-color": "#596673",
+            "text-color": "#4f5c69",
             "background-color": null,
             "bold": false,
             "italic": false,
             "underline": false
         },
         "Information": {
-            "text-color": "#596673",
+            "text-color": "#4f5c69",
             "background-color": null,
             "bold": false,
             "italic": false,
