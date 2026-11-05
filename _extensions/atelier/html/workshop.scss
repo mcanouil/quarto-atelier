@@ -622,8 +622,9 @@ html .code-with-filename.atelier-terminal {
   }
 }
 
-// The scheme's syntax colours fail on the dark ground, so every token takes
-// the line colour: the foreground on a command and the muted ink on output.
+// The line takes the foreground on a command and the muted ink on output.
+// A token takes the line colour only under a theme that is not an Atelier
+// theme. Under an Atelier theme, the token rules of highlighting.scss win.
 html pre.sourceCode.atelier-terminal {
   color: var(--atelier-terminal-fg);
   background-color: var(--atelier-terminal-bg);
