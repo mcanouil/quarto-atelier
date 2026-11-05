@@ -4,9 +4,9 @@
 // DARK PAGE FALLBACK
 // ===========================================================================
 // The dark theme reuses the files of the light theme, so a page with no brand,
-// or with a brand that gives light colours only, compiles a dark bundle with a
-// light page. Quarto then marks that bundle as light and keeps the body
-// `quarto-light`, but it still switches to the dark syntax highlighting, whose
+// or with a brand that gives light colours only, would compile a dark bundle
+// with a light page. Quarto would then mark that bundle as light and keep the
+// body `quarto-light`, but still switch to the dark syntax highlighting, whose
 // tokens are pale on the light page. This file gives the dark bundle a dark
 // page when the page colours are still light here.
 //
