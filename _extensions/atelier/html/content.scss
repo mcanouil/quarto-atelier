@@ -1026,8 +1026,8 @@ table.quarto-listing-table {
 // Bootstrap variant class on a table or a row, and in the dark scheme a row
 // keeps Bootstrap's black ink on the dark page. A variant takes a tint of its
 // colour on the page and the page ink, in both schemes, also on hover.
-// Upstream: none filed (WCAG 1.4.3)
-// Remove when: Quarto keeps the Bootstrap variant colours of a table or a row.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15300
+// Remove when: the minimum Quarto version includes the fix.
 
 // The theme colours that Bootstrap gives a table variant, with the page ink in
 // place of Bootstrap's fixed `$dark`, so that `.table-dark` follows the scheme.
