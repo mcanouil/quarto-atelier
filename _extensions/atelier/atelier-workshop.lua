@@ -750,13 +750,33 @@ local function style_proof(proof)
   return solution_block(proof.div, title, proof.identifier or '')
 end
 
---- Find the first class of a code block that can name a language.
+--- Tell whether a code block has a class that can name a language.
 --- The classes `terminal`, `numberLines`, and `number-lines` do not name one.
 --- @param block pandoc.CodeBlock The code block
---- @return integer|nil The position of the language class, or nil when there is none
-local function language_class_index(block)
-  for index, class in ipairs(block.classes) do
+--- @return boolean True when the block has a language class
+local function has_language_class(block)
+  for _, class in ipairs(block.classes) do
     if class ~= 'terminal' and class ~= 'numberLines' and class ~= 'number-lines' then
+      return true
+    end
+  end
+  return false
+end
+
+--- Pandoc can highlight a language when it writes a highlighted block for it.
+--- @type table<string, boolean>
+local highlights = {}
+
+--- Find the first class of a code block that Pandoc can highlight.
+--- @param block pandoc.CodeBlock The code block
+--- @return integer|nil The position of the class, or nil when there is none
+local function highlighted_class_index(block)
+  for index, class in ipairs(block.classes) do
+    if highlights[class] == nil then
+      local html = pandoc.write(pandoc.Pandoc({ pandoc.CodeBlock('x', { class = class }) }), 'html')
+      highlights[class] = html:find('sourceCode', 1, true) ~= nil
+    end
+    if highlights[class] then
       return index
     end
   end
@@ -785,8 +805,7 @@ local function style_terminal(block)
   if not quarto.doc.is_format('html') or not block.classes:includes('terminal') then
     return nil
   end
-  local language = language_class_index(block)
-  if language == nil then
+  if not has_language_class(block) then
     log.log_warning(
       EXTENSION_NAME,
       'The .terminal block in ' .. (quarto.doc.input_file or '') .. ' has no language class, so it is not highlighted and shows no prompt. ' ..
@@ -796,7 +815,8 @@ local function style_terminal(block)
   end
   -- Code Window takes the first class as the language, and renames it
   -- `default` when it is not one, so the language class goes first.
-  if language > 1 then
+  local language = highlighted_class_index(block)
+  if language and language > 1 then
     block.classes:insert(1, block.classes:remove(language))
   end
   local lines = {}
