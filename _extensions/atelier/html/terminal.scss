@@ -1,0 +1,80 @@
+/*-- scss:rules --*/
+
+// The terminal decoration: prompts, a cursor, dashed rules, and bracketed
+// markers. It applies to the terminal preset only, and a brand turns it off
+// with `atelier-terminal-decoration: false`. Each `content` has an empty
+// alternative text, so a screen reader skips the decoration.
+@if $atelier-preset == terminal and $atelier-terminal-decoration {
+  // The cursor blinks four times, 1.1 s each, and then stays steady. This is
+  // slower than three flashes a second and stops within five seconds.
+  @keyframes atelier-terminal-cursor {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .quarto-title .title::before {
+    content: "$ " / "";
+    color: var(--atelier-accent-ink);
+  }
+
+  .quarto-title .title::after {
+    content: "\2588" / "";
+    margin-left: 0.15em;
+    color: var(--atelier-accent-ink);
+    animation: atelier-terminal-cursor 1.1s steps(1) 4;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .quarto-title .title::after {
+      animation: none;
+    }
+  }
+
+  main :is(h2, h3):not(.listing-title) {
+    border-bottom-style: dashed;
+  }
+
+  main h2:not(.listing-title)::before {
+    content: "## " / "";
+    color: var(--atelier-muted);
+  }
+
+  main h3:not(.listing-title)::before {
+    content: "### " / "";
+    color: var(--atelier-muted);
+  }
+
+  .navbar .navbar-nav .nav-link.active::before {
+    content: "[" / "";
+  }
+
+  .navbar .navbar-nav .nav-link.active::after {
+    content: "]" / "";
+  }
+
+  .sidebar-navigation .sidebar-menu-container:not(.atelier-stepper) .sidebar-link:is(.active, [aria-current="page"])::before {
+    content: "> " / "";
+    color: var(--atelier-sidebar-accent);
+  }
+
+  html div.callout.callout {
+    border-style: dashed;
+    border-left-style: solid;
+    border-left-width: 1ch;
+  }
+
+  html div.sourceCode:not(.atelier-terminal) {
+    border-color: var(--atelier-control-border);
+  }
+
+  html main a:not(.btn):not(.nav-link) {
+    text-decoration-style: dotted;
+    text-underline-offset: 0.25em;
+  }
+
+  main ul:not([class]) > li::marker {
+    content: "- " / "";
+    color: var(--atelier-accent-ink);
+  }
+}

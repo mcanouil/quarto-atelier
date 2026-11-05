@@ -67,6 +67,7 @@ contributes:
           - html/content.scss
           - html/pages.scss
           - html/workshop.scss
+          - html/terminal.scss
           - html/scheme-light.scss
         dark:
           - html/chrome.scss
@@ -78,6 +79,7 @@ contributes:
           - html/content.scss
           - html/pages.scss
           - html/workshop.scss
+          - html/terminal.scss
           - html/scheme-dark.scss
       syntax-highlighting:
         light: arrow-light
