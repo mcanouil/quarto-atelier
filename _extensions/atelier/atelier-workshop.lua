@@ -765,10 +765,11 @@ end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.
 --- Each line that starts with `$` and a space loses those two characters, and
---- its number joins `atelier-prompt`, a line spec. A line that is only `$`
---- becomes one space and is a prompt line too. The code-blocks script marks those
---- lines, and the style draws the `$` prompt before them. The prompt is not in
---- the text, so screen readers and the copy button skip it.
+--- its number joins `atelier-prompt`, a line spec. A line that is only `$`,
+--- with or without spaces after it, becomes one space and is a prompt line
+--- too. The code-blocks script marks those lines, and the style draws the `$`
+--- prompt before them. The prompt is not in the text, so screen readers and
+--- the copy button skip it.
 --- A command that ends with `\` goes on to the next line. The numbers of these
 --- next lines join `atelier-continuation`, and the style gives them the command
 --- colour with no prompt. An indented `$` line is output, as in usage text.
@@ -801,12 +802,12 @@ local function style_terminal(block)
     local command = true
     if continued then
       continuations[#continuations + 1] = tostring(number)
-    elseif line:sub(1, 2) == '$ ' then
-      line = line:sub(3)
-      prompts[#prompts + 1] = tostring(number)
-    elseif line == '$' then
+    elseif line:match('^%$%s*$') then
       -- A space, not an empty line: the highlighter drops an empty last line.
       line = ' '
+      prompts[#prompts + 1] = tostring(number)
+    elseif line:sub(1, 2) == '$ ' then
+      line = line:sub(3)
       prompts[#prompts + 1] = tostring(number)
     else
       command = false
