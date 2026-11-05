@@ -27,12 +27,15 @@
 			// So the dark bundle counts as active only when the alternate (dark)
 			// sheets are enabled and the body is dark.
 			var darkSheets = document.querySelectorAll("link.quarto-color-scheme.quarto-color-alternate");
-			var needsToggle = darkSheets.length > 0 && !(
-				document.body.classList.contains("quarto-dark") &&
-				[].every.call(darkSheets, function (sheet) { return sheet.rel === "stylesheet"; })
-			);
+			var darkBundleInactive = function () {
+				return darkSheets.length > 0 && !(
+					document.body.classList.contains("quarto-dark") &&
+					[].every.call(darkSheets, function (sheet) { return sheet.rel === "stylesheet"; })
+				);
+			};
+			var needsToggle = darkBundleInactive();
 			if (needsToggle) {
-				applyDarkScheme();
+				applyDarkScheme(darkBundleInactive);
 			}
 		}
 
@@ -40,9 +43,10 @@
 		// shares. The stored value is put back after the toggle, so the reader's
 		// choice on other sites does not change. Quarto reads and writes that key
 		// in localStorage, which can throw. Then the toggle runs again with a
-		// stand-in that stores nothing. One warning says what happened, with the
-		// error that caused it.
-		function applyDarkScheme() {
+		// stand-in that stores nothing, but only when the first toggle did not
+		// already switch the sheets before it failed. One warning says what
+		// happened, with the error that caused it.
+		function applyDarkScheme(darkBundleInactive) {
 			var storageKey = "quarto-color-scheme";
 			var stored = null;
 			var canRestore = false;
@@ -62,8 +66,10 @@
 					restoreStored();
 				}
 			} catch (error) {
-				warn("Atelier: the colour scheme choice cannot be stored in this browser.", error);
-				toggleWithoutStorage();
+				warn("Atelier: the dark colour scheme could not be applied cleanly.", error);
+				if (darkBundleInactive()) {
+					toggleWithoutStorage();
+				}
 			}
 			if (warning) {
 				console.warn(warning[0], warning[1]);
