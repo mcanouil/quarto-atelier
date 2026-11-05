@@ -13,7 +13,7 @@
 // This file is in the dark theme list only, and it comes before `brand`, so
 // its defaults are evaluated after the brand defaults and can read them. They
 // are evaluated before `html/chrome.scss`, which derives the chrome from the
-// page, so the colours below repeat the dark chrome palette of that file.
+// page, so the colours come from the dark palette in its functions section.
 //
 // Each variable is declared here so that the `@if` below can assign it. A
 // `null` default leaves a variable unset for the Bootstrap and Quarto defaults.
@@ -21,14 +21,18 @@ $body-bg: null !default;
 $body-color: null !default;
 $primary: null !default;
 $pre-color: null !default;
+$link-color: null !default;
 
 @if $body-bg == null or tone($body-bg) == "light" {
-  $body-bg: #1b242e;
-  $body-color: #e8edf2;
+  $body-bg: $_atelier-dark-bg;
+  $body-color: $_atelier-dark-fg;
   $pre-color: $body-color;
   @if $primary == null {
-    $primary: #7fa8c4;
+    $primary: $_atelier-dark-accent;
   } @else {
     $primary: atelier-theme-contrast($primary, $body-bg);
+  }
+  @if $link-color != null {
+    $link-color: atelier-theme-contrast($link-color, $body-bg);
   }
 }
