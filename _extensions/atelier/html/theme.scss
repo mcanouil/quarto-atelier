@@ -947,8 +947,10 @@ a code.sourceCode:not(pre code) {
   color: var(--atelier-accent-ink);
 }
 
-// The icon keeps one colour, so the frame marks the hover and the focus.
-html .code-copy-button:is(:hover, :focus-visible) {
+// The icon keeps one colour, so the frame marks the hover and the focus. The
+// second selector matches the annotated-code border rule in content.scss.
+html .code-copy-button:is(:hover, :focus-visible),
+html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button:is(:hover, :focus-visible) {
   border-color: var(--atelier-accent-mark);
 }
 
