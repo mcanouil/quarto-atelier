@@ -14,12 +14,21 @@
 // its defaults are evaluated after the brand defaults and can read them. They
 // are evaluated before `html/chrome.scss`, which derives the chrome from the
 // page, so the colours below repeat the dark chrome palette of that file.
-@if not atelier-meta.variable-exists(body-bg) or tone($body-bg) == "light" {
-  $body-bg: #1b242e !global;
-  $body-color: #e8edf2 !global;
-  @if atelier-meta.variable-exists(primary) {
-    $primary: atelier-theme-contrast($primary, $body-bg) !global;
+//
+// Each variable is declared here so that the `@if` below can assign it. A
+// `null` default leaves a variable unset for the Bootstrap and Quarto defaults.
+$body-bg: null !default;
+$body-color: null !default;
+$primary: null !default;
+$pre-color: null !default;
+
+@if $body-bg == null or tone($body-bg) == "light" {
+  $body-bg: #1b242e;
+  $body-color: #e8edf2;
+  $pre-color: $body-color;
+  @if $primary == null {
+    $primary: #7fa8c4;
   } @else {
-    $primary: #7fa8c4 !global;
+    $primary: atelier-theme-contrast($primary, $body-bg);
   }
 }
