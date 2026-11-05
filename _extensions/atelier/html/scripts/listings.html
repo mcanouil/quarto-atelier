@@ -99,8 +99,9 @@
 		// list.js builds the pagination again after each page change, filter, or
 		// sort, so the changes are applied again from an observer. Class changes
 		// mark the current page and the sorted column. A burst of mutations runs
-		// apply() once, in the next frame. apply() writes only attributes outside
-		// the class filter, so it cannot trigger itself in a loop.
+		// apply() once, in the next frame. apply() cannot trigger itself in a loop:
+		// it writes only attributes outside the class filter, and it builds the
+		// label wrapper once, on the first pass, before the observer starts.
 		listings.forEach(function (listing) {
 			apply(listing);
 			var scheduled = false;

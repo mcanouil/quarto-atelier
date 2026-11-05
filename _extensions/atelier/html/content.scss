@@ -1028,16 +1028,19 @@ table.quarto-listing-table {
 // colour on the page and the page ink, in both schemes, also on hover.
 // Upstream: none filed (WCAG 1.4.3)
 // Remove when: Quarto keeps the Bootstrap variant colours of a table or a row.
+
 // The theme colours that Bootstrap gives a table variant, with the page ink in
 // place of Bootstrap's fixed `$dark`, so that `.table-dark` follows the scheme.
-// Bootstrap's `secondary` and `light` are greys outside the brand, so they keep
-// Quarto's transparent cell.
+// Bootstrap's `secondary` and `light` are greys outside the brand, so they have
+// no tone: they keep a transparent cell and the hairline, with the page ink.
 $_atelier-table-variants: (
   "primary": map-get($theme-colors, "primary"),
+  "secondary": null,
   "success": map-get($theme-colors, "success"),
   "info": map-get($theme-colors, "info"),
   "warning": map-get($theme-colors, "warning"),
   "danger": map-get($theme-colors, "danger"),
+  "light": null,
   "dark": $atelier-chrome-page-fg,
 );
 
@@ -1056,8 +1059,13 @@ $_atelier-variant-cells: ();
 
   #{$_table},
   #{$_row} {
-    --bs-table-bg: #{atelier-mix($tone, $atelier-chrome-page-bg, 16%)};
-    --bs-table-border-color: #{atelier-mix($tone, $atelier-chrome-page-bg, 35%)};
+    @if $tone {
+      --bs-table-bg: #{atelier-mix($tone, $atelier-chrome-page-bg, 16%)};
+      --bs-table-border-color: #{atelier-mix($tone, $atelier-chrome-page-bg, 35%)};
+    } @else {
+      --bs-table-bg: transparent;
+      --bs-table-border-color: var(--atelier-border);
+    }
   }
 }
 
