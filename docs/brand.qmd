@@ -61,17 +61,20 @@ It takes its colours and fonts from your `_brand.yml`, and it has a light and a 
 ### The quarto preset
 
 This preset is close to the look of the Quarto website.
-It has a light and a dark colour scheme, and it sets only a palette and two typefaces.
+It has a light and a dark colour scheme, and it sets only colours and two typefaces.
 
-- The page is `#f8fafc` in light and `#161b22` in dark.
+- The page has a blue tint: `#eef4fa` in light and `#0f1b2a` in dark.
 - The primary colour is `#47709a` in light and `#74aadb` in dark.
-  In light, the accent of the chrome is `#355372`, a darker step that keeps the contrast.
+- The chrome is the navbar, the sidebar, the footer, the table of contents card, and the workshop bar.
+  In light, it is a blue bar, `#365f84`, with white text and a white accent.
+  In dark, it is a navy bar, `#0a1524`, darker than the page, with `#e8edf2` text and a `#75aadb` accent.
+- A brand primary colour also sets the accent of the chrome and the colour of the links.
 - The body and the headings use Alegreya Sans.
   The code uses Fira Code.
 
 | Light | Dark |
 | --- | --- |
-| ![The quarto preset in the light colour scheme: a cool grey page with a blue accent and a humanist sans-serif body font](assets/presets/preset-quarto-light.png) | ![The quarto preset in the dark colour scheme: a dark blue-grey page with light blue links](assets/presets/preset-quarto-dark.png) |
+| ![The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a code block](assets/presets/preset-quarto-light.png) | ![The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links](assets/presets/preset-quarto-dark.png) |
 
 : The quarto preset. {tbl-colwidths="[50,50]"}
 
