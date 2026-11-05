@@ -488,19 +488,24 @@ $input-group-addon-color: $atelier-text-muted !default;
 $input-group-addon-border-color: $atelier-control-border !default;
 
 // Form fields sit on the page, with the page ink and the control border. A
-// disabled field takes the quiet surface and the muted ink, where Bootstrap
-// keeps a fixed light grey under the scheme ink. A ticked box takes the accent.
+// ticked box takes the accent.
 $input-bg: $atelier-chrome-page-bg !default;
 $input-color: $atelier-chrome-page-fg !default;
 $input-placeholder-color: $atelier-text-muted !default;
-$input-disabled-bg: $atelier-surface !default;
-$input-disabled-color: $atelier-text-muted !default;
-$input-disabled-border-color: $atelier-border !default;
 $form-check-input-bg: $atelier-chrome-page-bg !default;
 $form-check-input-border: 1px solid $atelier-control-border !default;
 $form-check-input-checked-color: $atelier-on-accent !default;
 $form-check-input-checked-bg-color: $atelier-accent-fill !default;
 $form-check-input-checked-border-color: $atelier-accent-fill !default;
+
+// Bootstrap paints a disabled field on a fixed light grey and keeps the scheme
+// ink on it, so in the dark scheme the light ink sits on a near-white field.
+// The field takes the quiet surface and the muted ink.
+// Upstream: none filed (WCAG 1.4.3)
+// Remove when: Quarto sets the disabled form field colours per scheme.
+$input-disabled-bg: $atelier-surface !default;
+$input-disabled-color: $atelier-text-muted !default;
+$input-disabled-border-color: $atelier-border !default;
 
 // A card is a box on the page, with the hairline and a quiet header and footer.
 $card-bg: $atelier-chrome-page-bg !default;
