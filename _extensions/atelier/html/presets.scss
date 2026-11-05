@@ -1,0 +1,30 @@
+/*-- scss:defaults --*/
+
+// ===========================================================================
+// PRESET
+// ===========================================================================
+// This file is listed second, so Quarto evaluates it after `brand` and before
+// `html/chrome.scss`. A brand value or a project value therefore wins over any
+// `!default` value set here. Set the preset in `_brand.yml`:
+//
+//   defaults:
+//     bootstrap:
+//       defaults:
+//         atelier-preset: terminal
+//
+//   default   The Atelier look.
+//   quarto    A look close to the Quarto website.
+//   terminal  A dark, monospace look.
+$atelier-preset: default !default;
+
+@if not index((default, quarto, terminal), $atelier-preset) {
+  @error "atelier-preset must be default, quarto, or terminal, but was #{$atelier-preset}.";
+}
+
+// The terminal preset draws a prompt and a cursor. Set this to false to turn
+// that decoration off. It has no effect on the other presets.
+$atelier-terminal-decoration: true !default;
+
+@if $atelier-terminal-decoration != true and $atelier-terminal-decoration != false {
+  @error "atelier-terminal-decoration must be true or false, but was #{$atelier-terminal-decoration}.";
+}
