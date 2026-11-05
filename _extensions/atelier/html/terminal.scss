@@ -1,5 +1,13 @@
 /*-- scss:rules --*/
 
+// The terminal preset is dark in both bundles. The pin script in
+// `html/scripts/chrome.html` reads this property.
+@if $atelier-preset == terminal {
+  :root {
+    --atelier-scheme-pin: dark;
+  }
+}
+
 // The terminal decoration: prompts, a cursor, dashed rules, and bracketed
 // markers. It applies to the terminal preset only, and a brand turns it off
 // with `atelier-terminal-decoration: false`. Each `content` has an empty
@@ -13,15 +21,18 @@
     }
   }
 
+  .quarto-title .title::before,
+  .quarto-title .title::after {
+    color: var(--atelier-accent-ink);
+  }
+
   .quarto-title .title::before {
     content: "$ " / "";
-    color: var(--atelier-accent-ink);
   }
 
   .quarto-title .title::after {
     content: "\2588" / "";
     margin-left: 0.15em;
-    color: var(--atelier-accent-ink);
     animation: atelier-terminal-cursor 1.1s steps(1) 4;
   }
 
@@ -41,14 +52,16 @@
     padding-bottom: 0.5rem;
   }
 
+  main :is(h2, h3):not(.listing-title)::before {
+    color: var(--atelier-muted);
+  }
+
   main h2:not(.listing-title)::before {
     content: "## " / "";
-    color: var(--atelier-muted);
   }
 
   main h3:not(.listing-title)::before {
     content: "### " / "";
-    color: var(--atelier-muted);
   }
 
   .navbar .navbar-nav .nav-link.active::before {

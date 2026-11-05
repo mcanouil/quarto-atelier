@@ -27,80 +27,85 @@
 			// So the dark bundle counts as active only when the alternate (dark)
 			// sheets are enabled and the body is dark.
 			var darkSheets = document.querySelectorAll("link.quarto-color-scheme.quarto-color-alternate");
-			var darkActive = document.body.classList.contains("quarto-dark") &&
-				[].every.call(darkSheets, function (sheet) { return sheet.rel === "stylesheet"; });
-			if (darkSheets.length && !darkActive) {
-				// Quarto saves the choice under a key that every Quarto site on this
-				// origin shares. The stored value is put back after the toggle, so the
-				// reader's choice on other sites does not change.
-				var storageKey = "quarto-color-scheme";
-				var stored = null;
-				var canRestore = false;
-				try {
-					stored = window.localStorage.getItem(storageKey);
-					canRestore = true;
-				} catch (readError) {
-					canRestore = false;
-				}
-				var problem = null;
-				try {
-					window.quartoToggleColorScheme();
-					if (canRestore) {
-						try {
-							if (stored === null) {
-								window.localStorage.removeItem(storageKey);
-							} else {
-								window.localStorage.setItem(storageKey, stored);
-							}
-						} catch (writeError) {
-							problem = {
-								message: "Atelier: the stored colour scheme choice cannot be restored.",
-								error: writeError,
-							};
-						}
-					}
-				} catch (error) {
-					// Quarto reads and writes the choice in localStorage, which can
-					// throw. The toggle runs again with a stand-in that stores nothing.
-					// One warning says what happened, with the error that caused it.
-					problem = {
-						message: "Atelier: the colour scheme choice cannot be stored in this browser.",
-						error: error,
-					};
-					var original = Object.getOwnPropertyDescriptor(window, "localStorage");
-					var swapped = false;
-					try {
-						Object.defineProperty(window, "localStorage", {
-							configurable: true,
-							value: { getItem: function () { return null; }, setItem: function () {}, removeItem: function () {} },
-						});
-						swapped = true;
-						window.quartoToggleColorScheme();
-					} catch (retryError) {
-						problem = {
-							message: "Atelier: the dark colour scheme cannot be applied.",
-							error: retryError,
-						};
-					}
-					if (swapped && original) {
-						try {
-							Object.defineProperty(window, "localStorage", original);
-						} catch (restoreError) {
-							problem = {
-								message: "Atelier: the browser storage cannot be restored after applying the dark colour scheme.",
-								error: restoreError,
-							};
-						}
-					}
-				}
-				if (problem) {
-					console.warn(problem.message, problem.error);
-				}
+			var needsToggle = darkSheets.length > 0 && !(
+				document.body.classList.contains("quarto-dark") &&
+				[].every.call(darkSheets, function (sheet) { return sheet.rel === "stylesheet"; })
+			);
+			if (needsToggle) {
+				applyDarkScheme();
 			}
 			document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
 				toggle.hidden = true;
-				toggle.style.display = "none";
 			});
+		}
+
+		// Quarto saves the choice under a key that every Quarto site on this origin
+		// shares. The stored value is put back after the toggle, so the reader's
+		// choice on other sites does not change. Quarto reads and writes that key
+		// in localStorage, which can throw. Then the toggle runs again with a
+		// stand-in that stores nothing. One warning says what happened, with the
+		// error that caused it.
+		function applyDarkScheme() {
+			var storageKey = "quarto-color-scheme";
+			var stored = null;
+			var canRestore = false;
+			var warning = null;
+			function warn(message, error) {
+				warning = [message, error];
+			}
+			try {
+				stored = window.localStorage.getItem(storageKey);
+				canRestore = true;
+			} catch (readError) {
+				canRestore = false;
+			}
+			try {
+				window.quartoToggleColorScheme();
+				if (canRestore) {
+					restoreStored();
+				}
+			} catch (error) {
+				warn("Atelier: the colour scheme choice cannot be stored in this browser.", error);
+				toggleWithoutStorage();
+			}
+			if (warning) {
+				console.warn(warning[0], warning[1]);
+			}
+
+			function restoreStored() {
+				try {
+					if (stored === null) {
+						window.localStorage.removeItem(storageKey);
+					} else {
+						window.localStorage.setItem(storageKey, stored);
+					}
+				} catch (writeError) {
+					warn("Atelier: the stored colour scheme choice cannot be restored.", writeError);
+				}
+			}
+
+			function toggleWithoutStorage() {
+				var original = Object.getOwnPropertyDescriptor(window, "localStorage");
+				var swapped = false;
+				try {
+					Object.defineProperty(window, "localStorage", {
+						configurable: true,
+						value: { getItem: function () { return null; }, setItem: function () {}, removeItem: function () {} },
+					});
+					swapped = true;
+					window.quartoToggleColorScheme();
+				} catch (retryError) {
+					warn("Atelier: the dark colour scheme cannot be applied.", retryError);
+				}
+				if (!swapped || !original) {
+					return;
+				}
+				try {
+					Object.defineProperty(window, "localStorage", original);
+				} catch (restoreError) {
+					warn("Atelier: the browser storage cannot be restored after applying the dark colour scheme.", restoreError);
+				}
+			}
 		}
 
 		// The version pill follows the brand in the navbar and the title link in

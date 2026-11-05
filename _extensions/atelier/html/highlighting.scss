@@ -3,20 +3,13 @@
 // ===========================================================================
 // SYNTAX HIGHLIGHTING
 // ===========================================================================
-// One rule for each token class, from the token maps in
-// `html/highlighting-tokens.scss`. Quarto gives the Comment and Function
-// colours of the active highlighting theme to the copy button variables. This
-// pair tells which theme is in use:
-//
-// - arrow-light in the light bundle or arrow-dark in the dark bundle, the
-//   default themes: the map of the active preset for this bundle.
-// - An Atelier `.theme` file: the map of that file.
-// - Any other theme: no rules, so that theme keeps its own colours.
-//
-// The light bundle stays active under the dark one, so each rule names its
-// scheme. The terminal preset is pinned dark: both bundles have the dark page,
-// and the pin script marks the body dark but can keep the light bundle. There
-// each bundle takes the dark map, and the rules match either scheme class.
+// The rules apply when the active highlighting theme is arrow, or an Atelier
+// `.theme` file. They come from the token maps in
+// `html/highlighting-tokens.scss`: the map of the active preset for arrow, the
+// map of the file for a `.theme` file. Any other theme keeps its own colours.
+// Each rule names its scheme, because the light bundle stays active under the
+// dark one. The terminal preset is pinned dark: both bundles take the dark map
+// and the rules match either scheme class.
 $_atelier-arrow-sentinels: (
   "light": (#5e5e5e, #4758ab),
   "dark": (#f8f8f2, #ffa07a),
@@ -48,10 +41,8 @@ $_atelier-hl-scope: "body.quarto-#{$atelier-scheme}";
 }
 
 // Write the rules of one token map under $scope. Each colour is held at 4.5:1
-// on every background in $bgs, which must share one tone. A token never has a
-// background of its own, because a fixed band does not follow the code
-// surface. Normal is the empty key: it goes on every span, with no class, and
-// the class rules outrank it.
+// on every background in $bgs, which must share one tone. Normal is the empty
+// key: it goes on every span, and the class rules outrank it.
 @mixin atelier-highlighting-rules($tokens, $scope, $bgs, $normal) {
   @each $class, $style in $tokens {
     @if $class != "" or $normal {
@@ -85,22 +76,19 @@ $_atelier-hl-scope: "body.quarto-#{$atelier-scheme}";
 }
 
 @if $_atelier-hl-preset {
-  // The page surfaces: the code block surface (also under inline code, code in
-  // a callout, and linked inline code), the page itself when $code-block-bg is
-  // off, and the accent-soft tint of a highlighted line and of the code
-  // annotation band.
+  $_atelier-hl-maps: map-get($atelier-highlighting, $_atelier-hl-preset);
+
   @include atelier-highlighting-rules(
-    map-get(map-get($atelier-highlighting, $_atelier-hl-preset), $_atelier-hl-scheme),
+    map-get($_atelier-hl-maps, $_atelier-hl-scheme),
     $_atelier-hl-scope,
     ($atelier-surface, body-mix(95%), $atelier-chrome-page-bg, $atelier-accent-soft),
     true
   );
 
-  // The K2 terminal block is dark in both bundles, so it takes the dark map,
-  // held on the terminal background and on its highlight band. Its lines keep
-  // their own colours, so Normal is not written there.
+  // The K2 terminal block is dark in both bundles, so it takes the dark map.
+  // Its lines keep their own colours, so Normal is not written there.
   @include atelier-highlighting-rules(
-    map-get(map-get($atelier-highlighting, $_atelier-hl-preset), "dark"),
+    map-get($_atelier-hl-maps, "dark"),
     "#{$_atelier-hl-scope} .atelier-terminal",
     ($atelier-terminal-bg, $atelier-terminal-highlight),
     false
