@@ -10,8 +10,10 @@
   // scroll box has to be a new element around the table.
   (() => {
     // A box that clips its content does not scroll, so a table in it still
-    // gets a scroll box of its own.
+    // gets a scroll box of its own. A Bootstrap `table-responsive-*` box
+    // scrolls only below its breakpoint, so it counts at every width.
     const SCROLLS = ['auto', 'scroll'];
+    const RESPONSIVE = '[class*="table-responsive"]';
     // Marks the attributes that this script adds, so that it removes only those.
     const MARKER = 'data-atelier-table-scroll';
     // The same selector as Quarto's scrollable-regions.js. Content that the
@@ -27,11 +29,15 @@
     // table holds no focusable content, and the caption that names the box.
     const boxes = new Map();
     let captions = 0;
+    let label = 'Scrollable table';
 
     function scrollsAlready(table, checked) {
       for (let node = table.parentElement; node && node !== document.body; node = node.parentElement) {
         if (!checked.has(node)) {
-          checked.set(node, SCROLLS.includes(getComputedStyle(node).overflowX));
+          checked.set(
+            node,
+            node.matches(RESPONSIVE) || SCROLLS.includes(getComputedStyle(node).overflowX),
+          );
         }
         if (checked.get(node)) return true;
       }
@@ -39,9 +45,10 @@
     }
 
     // A box that scrolls takes the keyboard focus, so that a keyboard user can
-    // scroll it (WCAG 2.1.1), as Quarto does for code. It is a region named by
+    // scroll it (WCAG 2.1.1), as Quarto does for code. It is a group named by
     // the table caption, or the caption of the figure of a cross-referenced
-    // table, so that a screen reader says what gets the focus.
+    // table, or the `atelier-table-scroll` label, so that a screen reader says
+    // what gets the focus. A group adds no landmark for each wide table.
     // A box that fits adds no tab stop. A box keeps its tab stop while it has
     // the focus, so that the focus does not move from under the user.
     function syncFocus(box) {
@@ -51,16 +58,19 @@
       if (scrolls === box.hasAttribute(MARKER)) return;
       if (scrolls) {
         box.setAttribute('tabindex', '0');
+        box.setAttribute('role', 'group');
         if (entry.caption) {
           if (!entry.caption.id) entry.caption.id = `atelier-table-caption-${++captions}`;
-          box.setAttribute('role', 'region');
           box.setAttribute('aria-labelledby', entry.caption.id);
+        } else {
+          box.setAttribute('aria-label', label);
         }
         box.setAttribute(MARKER, '');
       } else if (box !== document.activeElement) {
         box.removeAttribute('tabindex');
         box.removeAttribute('role');
         box.removeAttribute('aria-labelledby');
+        box.removeAttribute('aria-label');
         box.removeAttribute(MARKER);
       }
     }
@@ -68,6 +78,7 @@
     // The box and the table are both observed: a web font that loads late makes
     // the table wider without a change to the size of the box.
     document.addEventListener('DOMContentLoaded', () => {
+      label = ((window.atelierOptions || {}).labels || {})['table-scroll'] || label;
       const checked = new Map();
       const tables = [...document.querySelectorAll('main table')]
         .filter((table) => !scrollsAlready(table, checked));
