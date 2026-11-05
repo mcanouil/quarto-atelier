@@ -688,19 +688,58 @@ body.floating .sidebar.sidebar-navigation {
 
 // Quarto draws each arrow from two triangles, a fill in the page background and
 // an outline in the border colour, both baked in as Sass values. Paint them from
-// the tokens, so the arrow follows the box.
-@each $side in top, bottom, left, right {
-  .tippy-box[data-theme~="quarto"][data-placement^="#{$side}"] > .tippy-arrow::before {
+// the tokens, so the arrow follows the box. The `atelier` theme of the navbar
+// tooltips takes the same two triangles, so its arrow also joins the border.
+// Tippy gives the arrow its own dark grey ink, which the fill triangle inherits
+// on any side that the rules below do not paint.
+.tippy-box:is([data-theme~="quarto"], [data-theme~="atelier"]) > .tippy-arrow {
+  color: var(--atelier-bg);
+}
+
+.tippy-box[data-theme~="atelier"] > .tippy-arrow::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-color: transparent;
+  border-style: solid;
+}
+
+// The offsets and the widths of the outline triangle are Quarto's, for each side.
+$_atelier-arrow-outline: (
+  top: (width: 7px 7px 0, top: 17px, left: 1px),
+  bottom: (width: 0 7px 7px, bottom: 17px, left: 1px),
+  left: (width: 7px 0 7px 7px, left: 17px, top: 1px),
+  right: (width: 7px 7px 7px 0, right: 17px, top: 1px),
+);
+
+@each $side, $outline in $_atelier-arrow-outline {
+  .tippy-box:is([data-theme~="quarto"], [data-theme~="atelier"])[data-placement^="#{$side}"] > .tippy-arrow::before {
     border-#{$side}-color: var(--atelier-bg);
   }
 
-  .tippy-box[data-theme~="quarto"][data-placement^="#{$side}"] > .tippy-arrow::after {
+  .tippy-box:is([data-theme~="quarto"], [data-theme~="atelier"])[data-placement^="#{$side}"] > .tippy-arrow::after {
     border-#{$side}-color: var(--atelier-control-border);
+  }
+
+  .tippy-box[data-theme~="atelier"][data-placement^="#{$side}"] > .tippy-arrow::after {
+    border-width: map-get($outline, width);
+
+    @each $edge in top, bottom, left, right {
+      @if map-has-key($outline, $edge) {
+        #{$edge}: map-get($outline, $edge);
+      }
+    }
   }
 }
 
-.tippy-box[data-theme~="atelier"] > .tippy-arrow {
-  color: var(--atelier-bg);
+// Quarto moves the fill triangle of the bottom and right arrows towards the
+// box, so that the outline shows around it. The `atelier` theme does the same.
+.tippy-box[data-theme~="atelier"][data-placement^="bottom"] > .tippy-arrow::before {
+  bottom: 16px;
+}
+
+.tippy-box[data-theme~="atelier"][data-placement^="right"] > .tippy-arrow::before {
+  right: 16px;
 }
 
 :is(main, #title-block-header) .dropdown-menu {

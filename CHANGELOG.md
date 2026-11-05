@@ -42,6 +42,7 @@
 - feat: Draw a code block with the `.terminal` class as a dark terminal in both colour schemes, with a `$` prompt before each command that screen readers and the copy button skip. (#78)
 - feat: Add two starter templates, one for documentation with a navbar and one for a workshop with the sidebar only.
   Install Atelier with `quarto add`, then run `quarto use template mcanouil/quarto-atelier/templates/<name>`. (#79)
+- feat: Show an arrow on every popup and navbar tooltip, joined to the popup border.
 
 ### Bug Fixes
 
