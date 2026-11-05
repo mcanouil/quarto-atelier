@@ -1,0 +1,27 @@
+/*-- scss:defaults --*/
+
+// ===========================================================================
+// DARK PAGE FALLBACK
+// ===========================================================================
+// The dark theme reuses the files of the light theme, so a page with no brand,
+// or with a brand that gives light colours only, compiles a dark bundle with a
+// light page. Quarto then marks that bundle as light and keeps the body
+// `quarto-light`, but it still switches to the dark syntax highlighting, whose
+// tokens are pale on the light page. This file gives the dark bundle a dark
+// page when the page colours are still light here.
+//
+// This file is in the dark theme list only, and it comes before `brand`, so
+// its defaults are evaluated after the brand defaults and can read them.
+$atelier-dark-page-bg: #1b242e !default;
+$atelier-dark-page-fg: #e8edf2 !default;
+$atelier-dark-page-accent: #7fa8c4 !default;
+
+@if not atelier-meta.variable-exists(body-bg) or tone($body-bg) == "light" {
+  $body-bg: $atelier-dark-page-bg !global;
+  $body-color: $atelier-dark-page-fg !global;
+  @if atelier-meta.variable-exists(primary) {
+    $primary: atelier-theme-contrast($primary, $body-bg) !global;
+  } @else {
+    $primary: $atelier-dark-page-accent !global;
+  }
+}

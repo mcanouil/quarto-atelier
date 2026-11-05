@@ -65,6 +65,7 @@ contributes:
           - html/workshop.scss
         dark:
           - html/chrome.scss
+          - html/dark.scss
           - brand
           - html/theme.scss
           - html/navigation.scss

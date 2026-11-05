@@ -67,6 +67,8 @@
 - fix: Keep the listing filter and sort icon boxes in place, with their rounded corners, beside their visible labels. (#87)
 - fix: Paint form fields, check boxes, cards, and menus in the page text from the brand, so that a disabled field stays readable in dark mode. (#87)
 - fix: Keep the fill of Bootstrap table and row variant classes, such as `.table-primary`, with readable text in both colour schemes. (#87)
+- fix: Give a page with no brand, or with a light-only brand, a dark page in the dark scheme.
+  Its code no longer shows the pale dark-scheme highlighting on a light page.
 
 ### Documentation
 
