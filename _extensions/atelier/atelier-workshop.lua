@@ -750,17 +750,27 @@ local function style_proof(proof)
   return solution_block(proof.div, title, proof.identifier or '')
 end
 
---- Tell whether a code block has a class that can name a language.
---- The classes `terminal`, `numberLines`, and `number-lines` do not name one.
+--- Pandoc can highlight a language when it writes a highlighted block for it.
+--- Pandoc also highlights a block whose only class turns on line numbers, but
+--- these classes do not name a language, so they start as false.
+--- @type table<string, boolean>
+local highlights = { number = false, numberLines = false, ['number-lines'] = false }
+
+--- Find the first class of a code block that names a language Pandoc can
+--- highlight.
 --- @param block pandoc.CodeBlock The code block
---- @return boolean True when the block has a language class
-local function has_language_class(block)
-  for _, class in ipairs(block.classes) do
-    if class ~= 'terminal' and class ~= 'numberLines' and class ~= 'number-lines' then
-      return true
+--- @return integer|nil The position of the class, or nil when there is none
+local function highlighted_class_index(block)
+  for index, class in ipairs(block.classes) do
+    if highlights[class] == nil then
+      local html = pandoc.write(pandoc.Pandoc({ pandoc.CodeBlock('x', { class = class }) }), 'html')
+      highlights[class] = html:find('sourceCode', 1, true) ~= nil
+    end
+    if highlights[class] then
+      return index
     end
   end
-  return false
+  return nil
 end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.
@@ -773,24 +783,33 @@ end
 --- A command that ends with `\` goes on to the next line. The numbers of these
 --- next lines join `atelier-continuation`, and the style gives them the command
 --- colour with no prompt. An indented `$` line is output, as in usage text.
---- Code Window draws the header from `filename`, which this filter sets to the
---- `terminal` label when the block has none. The class `cw-auto` makes the Code
---- Window script build the window. This filter runs before Code Window.
---- A block with no language class is not highlighted, so the prompt and the dark
---- style cannot apply. The filter then logs a warning and leaves the block as it is.
+--- A block with no `filename`, or an empty one, gets the `terminal` label in
+--- `code-window-auto-label`, so Code Window draws a window with that label.
+--- This filter runs before Code Window. A `filename`, `code-window-auto-label`,
+--- `code-window-enabled`, or `code-window-no-auto-filename` on the block still
+--- wins.
+--- A block with no class that Pandoc can highlight is not highlighted, so the
+--- prompt and the dark style cannot apply. The filter then logs a warning and
+--- leaves the block as it is.
 --- @param block pandoc.CodeBlock The code block
 --- @return pandoc.CodeBlock|nil The block, or nil to keep it
 local function style_terminal(block)
   if not quarto.doc.is_format('html') or not block.classes:includes('terminal') then
     return nil
   end
-  if not has_language_class(block) then
+  local language = highlighted_class_index(block)
+  if language == nil then
     log.log_warning(
       EXTENSION_NAME,
       'The .terminal block in ' .. (quarto.doc.input_file or '') .. ' has no language class, so it is not highlighted and shows no prompt. ' ..
       'Add a language class such as `bash`, for example `{.bash .terminal}`.'
     )
     return nil
+  end
+  -- Code Window takes the first class as the language, and renames it
+  -- `default` when it is not one, so the language class goes first.
+  if language > 1 then
+    block.classes:insert(1, block.classes:remove(language))
   end
   local lines = {}
   local prompts = {}
@@ -823,9 +842,8 @@ local function style_terminal(block)
   if #continuations > 0 then
     block.attributes['atelier-continuation'] = table.concat(continuations, ',')
   end
-  if block.attributes.filename == nil then
-    block.attributes.filename = state.labels.terminal
-    block.classes:insert('cw-auto')
+  if (block.attributes.filename or '') == '' and (block.attributes['code-window-auto-label'] or '') == '' then
+    block.attributes['code-window-auto-label'] = state.labels.terminal
   end
   return block
 end
