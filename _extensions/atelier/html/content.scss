@@ -872,7 +872,6 @@ div.quarto-post {
 }
 
 .listing-actions-group .atelier-listing-label {
-  margin: 0;
   color: var(--atelier-muted);
   font-size: 0.82rem;
   white-space: nowrap;
@@ -1029,6 +1028,10 @@ table.quarto-listing-table {
 // colour on the page and the page ink, in both schemes, also on hover.
 // Upstream: none filed (WCAG 1.4.3)
 // Remove when: Quarto keeps the Bootstrap variant colours of a table or a row.
+// The theme colours that Bootstrap gives a table variant, with the page ink in
+// place of Bootstrap's fixed `$dark`, so that `.table-dark` follows the scheme.
+// Bootstrap's `secondary` and `light` are greys outside the brand, so they keep
+// Quarto's transparent cell.
 $_atelier-table-variants: (
   "primary": map-get($theme-colors, "primary"),
   "success": map-get($theme-colors, "success"),
@@ -1038,27 +1041,42 @@ $_atelier-table-variants: (
   "dark": $atelier-chrome-page-fg,
 );
 
-@each $name, $tone in $_atelier-table-variants {
-  main table.table.table-#{$name},
-  main table.table > * > tr.table-#{$name} {
-    --bs-table-bg: #{atelier-mix($tone, $atelier-chrome-page-bg, 16%)};
-    --bs-table-striped-bg: var(--bs-table-bg);
-    --bs-table-hover-bg: var(--bs-table-bg);
-    --bs-table-active-bg: var(--bs-table-bg);
-    --bs-table-border-color: #{atelier-mix($tone, $atelier-chrome-page-bg, 35%)};
-    --bs-table-color: var(--atelier-fg);
-    --bs-table-striped-color: var(--atelier-fg);
-    --bs-table-hover-color: var(--atelier-fg);
-    --bs-table-active-color: var(--atelier-fg);
-  }
+$_atelier-variant-owners: ();
+$_atelier-variant-cells: ();
 
-  main table.table.table-#{$name} > :not(caption) > * > *,
-  main table.table.table-#{$name} > tbody > tr:hover > *,
-  main table.table > * > tr.table-#{$name} > * {
-    border-bottom-color: var(--bs-table-border-color);
-    background-color: var(--bs-table-bg);
-    color: var(--bs-table-color);
+@each $name, $tone in $_atelier-table-variants {
+  $_table: "main table.table.table-#{$name}";
+  $_row: "main table.table > * > tr.table-#{$name}";
+  $_atelier-variant-owners: append($_atelier-variant-owners, "#{$_table}, #{$_row}", comma);
+  $_atelier-variant-cells: append(
+    $_atelier-variant-cells,
+    "#{$_table} > :not(caption) > * > *, #{$_table} > tbody > tr:hover > *, #{$_row} > *",
+    comma
+  );
+
+  #{$_table},
+  #{$_row} {
+    --bs-table-bg: #{atelier-mix($tone, $atelier-chrome-page-bg, 16%)};
+    --bs-table-border-color: #{atelier-mix($tone, $atelier-chrome-page-bg, 35%)};
   }
+}
+
+// Bootstrap sets the stripe, hover, and active pairs of a variant to its own
+// fill and ink, so they take the tint and the page ink too.
+#{$_atelier-variant-owners} {
+  --bs-table-striped-bg: var(--bs-table-bg);
+  --bs-table-hover-bg: var(--bs-table-bg);
+  --bs-table-active-bg: var(--bs-table-bg);
+  --bs-table-color: var(--atelier-fg);
+  --bs-table-striped-color: var(--atelier-fg);
+  --bs-table-hover-color: var(--atelier-fg);
+  --bs-table-active-color: var(--atelier-fg);
+}
+
+#{$_atelier-variant-cells} {
+  border-bottom-color: var(--bs-table-border-color);
+  background-color: var(--bs-table-bg);
+  color: var(--bs-table-color);
 }
 
 figure.quarto-float-tbl > figcaption {
