@@ -966,12 +966,15 @@ html .code-copy-button > .bi::before {
   display: block;
   background-color: currentcolor;
   background-image: none !important;
-  mask-image: $atelier-icon-copy;
-  mask-repeat: no-repeat;
-  mask-size: 1rem 1rem;
-  -webkit-mask-image: $atelier-icon-copy;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: 1rem 1rem;
+  mask: $atelier-icon-copy center / 1rem no-repeat;
+  -webkit-mask: $atelier-icon-copy center / 1rem no-repeat;
+
+  // In forced colours the system replaces the fill under the mask, which
+  // hides the icon. Paint it in the button text colour of the system.
+  @media (forced-colors: active) {
+    forced-color-adjust: none;
+    background-color: ButtonText;
+  }
 }
 
 html .code-copy-button-checked > .bi::before {
