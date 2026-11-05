@@ -6,6 +6,11 @@
   :root {
     --atelier-scheme-pin: dark;
   }
+
+  // !important is needed: Quarto adds the floating toggle after the pin script runs, and the gitlink widget sets display on the navbar toggle.
+  .quarto-color-scheme-toggle {
+    display: none !important;
+  }
 }
 
 // The terminal decoration: prompts, a cursor, dashed rules, and bracketed
@@ -83,7 +88,7 @@
     border-left-width: 1ch;
   }
 
-  html div.sourceCode:not(.atelier-terminal) {
+  html div.sourceCode:not(:has(> pre.atelier-terminal)) {
     border-color: var(--atelier-control-border);
   }
 

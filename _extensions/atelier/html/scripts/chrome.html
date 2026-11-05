@@ -18,7 +18,7 @@
 
 		// A preset can pin one colour scheme. The terminal preset is dark, so its
 		// SCSS sets --atelier-scheme-pin on the root. The dark bundle becomes the
-		// active one through Quarto's own toggle, and the toggles are hidden
+		// active one through Quarto's own toggle. The SCSS hides the toggles,
 		// because they would only switch to a look the preset does not have.
 		// A page without the property does nothing here.
 		if (getComputedStyle(document.documentElement).getPropertyValue("--atelier-scheme-pin").trim() === "dark") {
@@ -34,9 +34,6 @@
 			if (needsToggle) {
 				applyDarkScheme();
 			}
-			document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
-				toggle.hidden = true;
-			});
 		}
 
 		// Quarto saves the choice under a key that every Quarto site on this origin
