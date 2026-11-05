@@ -29,6 +29,24 @@ local LABELS = {
   { key = 'toc-link-copied', default = 'Link copied' },
 }
 
+--- Version of the font files, as published on npm by Fontsource.
+local FONTS_VERSION = '5.3.0'
+
+--- Font files that `fonts/fonts.css` refers to, relative to this file.
+--- @type table<integer, { name: string, path: string }>
+local FONT_FILES = {}
+for _, file in ipairs({
+  'alegreya-sans-latin-400-normal',
+  'alegreya-sans-latin-400-italic',
+  'alegreya-sans-latin-500-normal',
+  'alegreya-sans-latin-700-normal',
+  'fira-code-latin-wght-normal',
+  'jetbrains-mono-latin-wght-normal',
+  'jetbrains-mono-latin-wght-italic',
+}) do
+  table.insert(FONT_FILES, { name = file .. '.woff2', path = 'fonts/' .. file .. '.woff2' })
+end
+
 --- Read the version from `extensions.atelier.version`.
 --- @param meta table The document metadata
 --- @return string|nil The version, or nil when it is unset or empty
@@ -60,6 +78,17 @@ local function resolve_labels()
   return labels
 end
 
+--- Add the font stylesheet and the font files that the presets use.
+--- @return nil
+local function add_fonts()
+  quarto.doc.add_html_dependency({
+    name = 'atelier-fonts',
+    version = FONTS_VERSION,
+    stylesheets = { 'fonts/fonts.css' },
+    resources = FONT_FILES,
+  })
+end
+
 --- Add the options block to the head.
 --- @param meta table The document metadata
 --- @return nil
@@ -67,6 +96,7 @@ local function publish_options(meta)
   if not quarto.doc.is_format('html') then
     return nil
   end
+  add_fonts()
   local options = { labels = resolve_labels(), version = read_version(meta) }
   local json = quarto.json.encode(options):gsub('</', '<\\/')
   quarto.doc.include_text(
