@@ -478,8 +478,8 @@ $text-muted: $atelier-text-muted;
 // disappears in the dark scheme. The box takes the strong surface and the muted
 // ink, which is held at 4.5:1 there. The pagination variables below have the
 // same fault, as their light greys come from `$gray-*`.
-// Upstream: none filed (WCAG 1.4.3)
-// Remove when: Quarto sets the input group and pagination colours per scheme.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15301
+// Remove when: the minimum Quarto version includes the fix.
 $input-group-addon-bg: $atelier-surface-strong !default;
 $input-group-addon-color: $atelier-text-muted !default;
 $input-group-addon-border-color: $atelier-control-border !default;
