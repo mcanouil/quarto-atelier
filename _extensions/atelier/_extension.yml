@@ -141,3 +141,4 @@ contributes:
         - file: html/scripts/title-block.html
         - file: html/scripts/code-blocks.html
         - file: html/scripts/listings.html
+        - file: html/scripts/table-scroll.html

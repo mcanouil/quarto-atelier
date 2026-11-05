@@ -73,6 +73,8 @@
   Its code no longer shows the pale dark-scheme highlighting on a light page. (#92)
 - fix: Draw the copy button icon in the accent colour of the button, and in the terminal text colour on a terminal block.
   The icon no longer shows a dark grey on the dark terminal in the light scheme, and sits in the middle of its frame. (#95)
+- fix: Keep pages within the width of a phone screen: long links, words, and code names now wrap, and media with a `width` attribute shrinks to fit.
+  Wide tables and display maths scroll in their own box, so table words stay whole, and the notebook preview bar puts its buttons on a second row.
 
 ### Documentation
 
