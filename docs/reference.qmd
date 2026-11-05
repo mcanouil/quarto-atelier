@@ -119,9 +119,12 @@ Set these variables under `defaults.bootstrap.defaults` in `_brand.yml`.
 | ------------------------------ | --------- | -------------------------------------------------------------------------------------------- |
 | `atelier-preset`               | `default` | The preset: `default`, `quarto`, or `terminal`. Any other value stops the build.            |
 | `atelier-terminal-decoration`  | `true`    | The decoration of the `terminal` preset. `false` turns it off. It has no effect on the other presets. |
-| `atelier-highlighting`         | A map     | The token colours and styles of each preset and colour scheme. Atelier generates it from the `.theme` files in `_extensions/atelier/highlighting/`. |
 
 : Variables that set the preset. {.striped .hover tbl-colwidths="[28,14,58]"}
+
+The variable `atelier-highlighting` is a map of the token colours of each preset and colour scheme.
+Do not set it.
+The script `scripts/generate-highlighting.py` writes it from the `.theme` files in `_extensions/atelier/highlighting/`.
 
 ## Embedded extensions
 

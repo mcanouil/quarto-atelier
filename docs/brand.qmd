@@ -79,13 +79,17 @@ It has a light and a dark colour scheme, and it sets only a palette and two type
 
 This preset is a modern dark terminal.
 It is pinned to the dark colour scheme: a script hides the colour scheme toggle and switches the page to the dark scheme.
-For this reason, the light values of your brand have no effect in practice.
+The preset stays dark, and the reader cannot change it.
 
 - The font is JetBrains Mono everywhere, and the corners are square.
 - The title shows a prompt and a cursor.
   The cursor stops blinking within 5 seconds, and it does not blink if the reader asks for reduced motion.
-- Headings have a prefix, task lists use `[ ]`, block quotes use `>`, and list items use `-`.
-- Borders are dashed, and links have a dotted underline.
+- Second-level and third-level headings have the prefix `##` and `###`.
+- List items use `-` as the marker.
+- The current sidebar item has the marker `>`, and the current navbar link has brackets around it.
+- The rules under headings and the borders of callouts are dashed.
+  Code blocks have a solid border.
+- Links have a dotted underline.
 
 ![The terminal preset: a near-black page with green accents, a prompt in the title, and monospace text](assets/presets/preset-terminal-dark.png)
 
