@@ -5,6 +5,11 @@
 # the navbar chrome is exercised.
 #
 # Render it with `quarto render docs --profile navbar`.
+project:
+  # A separate output directory keeps the default render in _site/, so both
+  # layouts can be served side by side.
+  output-dir: _site-navbar
+
 website:
   # A scalar in _quarto.yml switched the navbar off, so it has to be declared
   # again here rather than merged into: there is nothing left to merge with.
