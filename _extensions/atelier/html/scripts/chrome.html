@@ -16,6 +16,39 @@
 		window.atelierOptions = options;
 		var labels = options.labels || {};
 
+		// A preset can pin one colour scheme. The terminal preset is dark, so its
+		// SCSS sets --atelier-scheme-pin on the root. The dark bundle becomes the
+		// active one through Quarto's own toggle, and the toggles are hidden
+		// because they would only switch to a look the preset does not have.
+		// A page without the property does nothing here.
+		if (getComputedStyle(document.documentElement).getPropertyValue("--atelier-scheme-pin").trim() === "dark") {
+			if (document.body && !document.body.classList.contains("quarto-dark")) {
+				try {
+					window.quartoToggleColorScheme();
+				} catch (error) {
+					// Quarto reads and writes the choice in localStorage, which can
+					// throw. The toggle runs again with a stand-in that stores nothing.
+					console.warn("Atelier: the colour scheme choice cannot be stored in this browser.", error);
+					var original = Object.getOwnPropertyDescriptor(window, "localStorage");
+					try {
+						Object.defineProperty(window, "localStorage", {
+							configurable: true,
+							value: { getItem: function () { return null; }, setItem: function () {} },
+						});
+						window.quartoToggleColorScheme();
+					} catch (retryError) {
+						console.warn("Atelier: the dark colour scheme cannot be applied.", retryError);
+					} finally {
+						if (original) Object.defineProperty(window, "localStorage", original);
+					}
+				}
+			}
+			document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
+				toggle.hidden = true;
+				toggle.style.display = "none";
+			});
+		}
+
 		// The version pill follows the brand in the navbar and the title link in
 		// the sidebar. Without a version, neither is added. A navbar with a logo
 		// has two brand links in one container, so the pill goes once after the
