@@ -106,7 +106,7 @@ defaults:
 
 ### Fonts
 
-The fonts are part of the extension, in `_extensions/atelier/fonts/`.
+The fonts are part of the extension, in `_extensions/mcanouil/atelier/fonts/` of your site.
 The pages do not make a request to Google or to any other third party.
 The fonts are Alegreya Sans, Fira Code, and JetBrains Mono.
 Each one is under the SIL Open Font License, and the licence text is next to the font files.
@@ -114,7 +114,7 @@ Each one is under the SIL Open Font License, and the licence text is next to the
 ### Syntax highlighting
 
 Each preset has a highlighting theme for each colour scheme.
-The six `.theme` files are in `_extensions/atelier/highlighting/`, and they are named `atelier-<preset>-<light|dark>.theme`.
+The six `.theme` files are in `_extensions/mcanouil/atelier/highlighting/` of your site, and they are named `atelier-<preset>-<light|dark>.theme`.
 Each file gives a colour and a style for the 31 token types.
 
 Atelier holds each token colour to WCAG AA (4.5:1) on the code surface.
