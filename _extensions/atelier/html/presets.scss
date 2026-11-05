@@ -28,3 +28,29 @@ $atelier-terminal-decoration: true !default;
 @if $atelier-terminal-decoration != true and $atelier-terminal-decoration != false {
   @error "atelier-terminal-decoration must be true or false, but was #{$atelier-terminal-decoration}.";
 }
+
+// ===========================================================================
+// QUARTO PRESET
+// ===========================================================================
+// A palette and two typefaces, with no rules of its own. The light primary is
+// darker than the Quarto blue #4f789e, so that it already reaches 4.5:1
+// on the page, on the surfaces, and on the bars. The contrast functions in
+// `html/chrome.scss` then move nothing. Every value is a default, so a brand
+// colour or font wins.
+@if $atelier-preset == quarto {
+  @if $atelier-scheme == dark {
+    $body-bg: #161b22 !default !global;
+    $body-color: #dbe6f0 !default !global;
+    $primary: #74aadb !default !global;
+  } @else {
+    $body-bg: #f8fafc !default !global;
+    $body-color: #1f2a36 !default !global;
+    $primary: #355372 !default !global;
+  }
+
+  $pre-color: $body-color !default !global;
+
+  $font-family-sans-serif: "Alegreya Sans", sans-serif !default !global;
+  $headings-font-family: "Alegreya Sans", sans-serif !default !global;
+  $font-family-monospace: "Fira Code", monospace !default !global;
+}
