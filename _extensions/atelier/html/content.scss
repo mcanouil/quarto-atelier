@@ -24,6 +24,51 @@
 
 /*-- scss:rules --*/
 
+// ===========================================================================
+// NARROW SCREENS
+// ===========================================================================
+// A long URL, email, word or name has no break point, so on a phone it makes
+// the page wider than the screen. `break-word` breaks such a string only when
+// it cannot fit on its line, so the words of normal prose never split.
+// Remove when: never.
+body {
+  overflow-wrap: break-word;
+}
+
+// A flex item does not shrink below its longest word, so `break-word` leaves
+// these rows wider than the screen. `anywhere` lets them shrink. A word still
+// splits only when it cannot fit on a line of its own. Bootstrap gives inline
+// code its own `break-word`, so the code in these rows takes the rule too.
+.quarto-page-breadcrumbs,
+html div.callout > .callout-header .callout-title-container,
+.page-navigation .nav-page,
+.quarto-category {
+  &,
+  code {
+    overflow-wrap: anywhere;
+  }
+}
+
+// Media with a `width` attribute keeps that width on a narrow screen. Images,
+// videos and drawings with a `viewBox` keep their aspect ratio; an embed keeps
+// the height it was given.
+main :is(img, svg, video, canvas, iframe, embed, object) {
+  max-width: 100%;
+}
+
+main :is(img, video, svg[viewBox]) {
+  height: auto;
+}
+
+// Display maths and wide tables cannot wrap, so they scroll in their own box,
+// and the page keeps the width of the screen. A script puts each table that
+// is not in a box that scrolls into a box that does (`atelier-table-scroll`).
+mjx-container[display="true"],
+.katex-display,
+.atelier-table-scroll {
+  overflow-x: auto;
+}
+
 // Quarto shifts each numbered code line left by 4em, so that its number hangs
 // into the 3em margin of the pre, or out of a code window.
 $_atelier-number-shift: 4em;
@@ -993,7 +1038,6 @@ table.quarto-listing-table {
   > :not(caption) > * > * {
     padding: 0.55rem 0.75rem;
     border-bottom: 1px solid var(--atelier-border);
-    overflow-wrap: anywhere;
   }
 
   code {

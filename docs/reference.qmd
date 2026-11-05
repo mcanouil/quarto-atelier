@@ -207,6 +207,7 @@ language:
 | `atelier-toc-updated`            | `Updated {date}`                     |
 | `atelier-toc-copy-link`          | `Copy link`                          |
 | `atelier-toc-link-copied`        | `Link copied`                        |
+| `atelier-table-scroll`           | `Scrollable table`                   |
 | `atelier-duration-minutes`       | `{m} min`                            |
 | `atelier-duration-hours`         | `{h} h`                              |
 | `atelier-duration-hours-minutes` | `{h} h {m} min`                      |

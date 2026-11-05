@@ -1044,6 +1044,18 @@ $atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
   border-bottom-color: var(--atelier-navbar-border);
 }
 
+// On a narrow screen, the buttons of that bar go to a second row, instead of
+// past the edge of the screen. Quarto gives the bar a fixed height of 3em, so
+// the bar grows from that height to hold the second row.
+// Remove when: never.
+#quarto-embed-header {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  height: auto;
+  min-height: 3em;
+  padding-block: 0.4rem;
+}
+
 // The title of that bar is an h6, which takes the heading ink and so reads
 // dark on a dark bar. It takes the ink of the bar.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15306

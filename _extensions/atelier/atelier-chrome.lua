@@ -27,6 +27,7 @@ local LABELS = {
   { key = 'toc-updated', default = 'Updated {date}' },
   { key = 'toc-copy-link', default = 'Copy link' },
   { key = 'toc-link-copied', default = 'Link copied' },
+  { key = 'table-scroll', default = 'Scrollable table' },
 }
 
 --- Version of the `site_libs` folder of the fonts, not of one package.
