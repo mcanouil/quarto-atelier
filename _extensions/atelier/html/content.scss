@@ -39,11 +39,14 @@ body {
 // these rows wider than the screen. `anywhere` lets them shrink. A word still
 // splits only when it cannot fit on a line of its own. Bootstrap gives inline
 // code its own `break-word`, so the code in these rows takes the rule too.
-$_atelier-flex-text: ".quarto-page-breadcrumbs, html div.callout > .callout-header .callout-title-container, .page-navigation .nav-page, .quarto-category";
-
-#{$_atelier-flex-text},
-:is(#{$_atelier-flex-text}) code {
-  overflow-wrap: anywhere;
+.quarto-page-breadcrumbs,
+html div.callout > .callout-header .callout-title-container,
+.page-navigation .nav-page,
+.quarto-category {
+  &,
+  code {
+    overflow-wrap: anywhere;
+  }
 }
 
 // Media with a `width` attribute keeps that width on a narrow screen. Images
@@ -62,7 +65,6 @@ main :is(img, video) {
 mjx-container[display="true"],
 .katex-display,
 .atelier-table-scroll {
-  max-width: 100%;
   overflow-x: auto;
 }
 

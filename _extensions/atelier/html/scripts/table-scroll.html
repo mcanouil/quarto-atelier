@@ -10,52 +10,77 @@
   // scroll box has to be a new element around the table.
   (() => {
     const SCROLLS = ['auto', 'scroll', 'hidden', 'clip'];
-    // Content the keyboard reaches already scrolls the box, so a box that holds
-    // some needs no tab stop of its own, as in Quarto's scrollable-regions.js.
+    // Marks the attributes that this script adds, so that it removes only those.
+    const MARKER = 'data-atelier-table-scroll';
+    // The same selector as Quarto's scrollable-regions.js. Content that the
+    // keyboard reaches already scrolls the box, so the box needs no tab stop.
     const FOCUSABLE =
-      'a[href]:not([tabindex="-1"]), button:not(:disabled), input:not(:disabled), ' +
-      'select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
+      'a[href]:not([tabindex="-1"]), ' +
+      'button:not([tabindex="-1"]):not(:disabled), ' +
+      'input:not([tabindex="-1"]):not(:disabled), ' +
+      'select:not([tabindex="-1"]):not(:disabled), ' +
+      'textarea:not([tabindex="-1"]):not(:disabled), ' +
+      '[tabindex]:not([tabindex="-1"]):not(:disabled)';
+    // The caption of each box, or null when the table holds focusable content.
+    const boxes = new Map();
     let captions = 0;
 
-    function scrollsAlready(table) {
+    function scrollsAlready(table, checked) {
       for (let node = table.parentElement; node && node !== document.body; node = node.parentElement) {
-        if (SCROLLS.includes(getComputedStyle(node).overflowX)) return true;
+        if (!checked.has(node)) {
+          checked.set(node, SCROLLS.includes(getComputedStyle(node).overflowX));
+        }
+        if (checked.get(node)) return true;
       }
       return false;
     }
 
-    // A box that scrolls must take the keyboard focus, so that a keyboard user
-    // can scroll it (WCAG 2.1.1). It is a region named by the table caption,
-    // so that a screen reader says what gets the focus. The attributes are set
-    // only while the box scrolls, so a table that fits adds no tab stop.
+    // A box that scrolls takes the keyboard focus, so that a keyboard user can
+    // scroll it (WCAG 2.1.1), as Quarto does for code. It is a region named by
+    // the table caption, so that a screen reader says what gets the focus.
+    // A box that fits adds no tab stop. A box keeps its tab stop while it has
+    // the focus, so that the focus does not move from under the user.
     function syncFocus(box) {
-      const caption = box.querySelector(':scope > table > caption');
-      if (box.scrollWidth > box.clientWidth && !box.querySelector(FOCUSABLE)) {
+      const entry = boxes.get(box);
+      if (!entry.reachable) return;
+      const scrolls = box.scrollWidth - box.clientWidth > 1 && box.clientHeight > 1;
+      if (scrolls === box.hasAttribute(MARKER)) return;
+      if (scrolls) {
         box.setAttribute('tabindex', '0');
-        if (caption) {
-          if (!caption.id) caption.id = `atelier-table-caption-${++captions}`;
+        if (entry.caption) {
+          if (!entry.caption.id) entry.caption.id = `atelier-table-caption-${++captions}`;
           box.setAttribute('role', 'region');
-          box.setAttribute('aria-labelledby', caption.id);
+          box.setAttribute('aria-labelledby', entry.caption.id);
         }
-      } else {
+        box.setAttribute(MARKER, '');
+      } else if (box !== document.activeElement) {
         box.removeAttribute('tabindex');
         box.removeAttribute('role');
         box.removeAttribute('aria-labelledby');
+        box.removeAttribute(MARKER);
       }
     }
 
     // The box and the table are both observed: a web font that loads late makes
     // the table wider without a change to the size of the box.
     document.addEventListener('DOMContentLoaded', () => {
+      const checked = new Map();
+      const tables = [...document.querySelectorAll('main table')]
+        .filter((table) => !scrollsAlready(table, checked));
       const resize = new ResizeObserver((entries) => {
-        entries.forEach((entry) => syncFocus(entry.target.closest('.atelier-table-scroll')));
+        new Set(entries.map((entry) => entry.target.closest('.atelier-table-scroll')))
+          .forEach(syncFocus);
       });
-      document.querySelectorAll('main table').forEach((table) => {
-        if (scrollsAlready(table)) return;
+      tables.forEach((table) => {
         const box = document.createElement('div');
         box.className = 'atelier-table-scroll';
         table.before(box);
         box.append(table);
+        boxes.set(box, {
+          reachable: !table.querySelector(FOCUSABLE),
+          caption: table.querySelector(':scope > caption'),
+        });
+        box.addEventListener('focusout', () => syncFocus(box));
         resize.observe(box);
         resize.observe(table);
       });
