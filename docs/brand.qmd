@@ -65,10 +65,12 @@ It has a light and a dark colour scheme, and it sets only colours and two typefa
 
 - The page has a blue tint: `#eef4fa` in light and `#0f1b2a` in dark.
 - The primary colour is `#47709a` in light and `#74aadb` in dark.
+  In light, links use `#406993`, one step darker, so that they keep a margin above the contrast minimum on the tinted page.
 - The chrome is the navbar, the sidebar, the footer, the table of contents card, and the workshop bar.
   In light, it is a blue bar, `#365f84`, with white text and a white accent.
   In dark, it is a navy bar, `#0a1524`, darker than the page, with `#e8edf2` text and a `#75aadb` accent.
 - A brand primary colour also sets the accent of the chrome and the colour of the links.
+  In light, if that colour cannot reach the contrast minimum on the blue bar, the accent of the chrome stays white.
 - The body and the headings use Alegreya Sans.
   The code uses Fira Code.
 
