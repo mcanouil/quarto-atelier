@@ -452,17 +452,6 @@ html .code-with-filename .code-with-filename-file .code-with-filename-lines {
   border-color: var(--atelier-border);
 }
 
-// The line box keeps room for descenders that a label such as `L3` does not
-// have, so the text sits high in the chip. Trim the box to the cap height and
-// pad it the same on both sides. A browser without text-box keeps Code
-// Window's padding.
-@supports (text-box: trim-both cap alphabetic) {
-  html .code-with-filename .code-with-filename-file .code-with-filename-lines {
-    padding-block: 0.3em;
-    text-box: trim-both cap alphabetic;
-  }
-}
-
 html .code-with-filename .atelier-code-language {
   margin-left: auto;
   font-size: 0.7rem;
