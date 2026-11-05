@@ -476,8 +476,7 @@ $text-muted: $atelier-text-muted;
 // Bootstrap paints the icon box of an input group (the listing filter and sort
 // icons) on a fixed light grey, and keeps the scheme ink on it, so the icon
 // disappears in the dark scheme. The box takes the strong surface and the muted
-// ink, which is held at 4.5:1 there. The pagination variables below have the
-// same fault, as their light greys come from `$gray-*`.
+// ink, which is held at 4.5:1 there.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15301
 // Remove when: the minimum Quarto version includes the fix.
 $input-group-addon-bg: $atelier-surface-strong !default;
@@ -539,6 +538,8 @@ $dropdown-header-color: $atelier-text-muted !default;
 // fixed light greys, so in the dark scheme the light ink sits on a near-white
 // box. The boxes stay on the page, with the control border, and the current
 // box is filled with the accent.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15301
+// Remove when: the minimum Quarto version includes the fix.
 $pagination-color: $atelier-chrome-page-fg !default;
 $pagination-bg: $atelier-chrome-page-bg !default;
 $pagination-border-color: $atelier-control-border !default;
