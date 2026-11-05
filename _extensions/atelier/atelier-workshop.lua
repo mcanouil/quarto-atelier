@@ -750,27 +750,27 @@ local function style_proof(proof)
   return solution_block(proof.div, title, proof.identifier or '')
 end
 
---- Pandoc can highlight a language when it writes a highlighted block for it.
---- Pandoc also highlights a block whose only class turns on line numbers, but
---- these classes do not name a language, so they start as false.
+--- Pandoc can highlight a language when it names the language on the `code`
+--- element of a block. A class that only turns on line numbers gives a
+--- `sourceCode` class with no language after it.
 --- @type table<string, boolean>
-local highlights = { number = false, numberLines = false, ['number-lines'] = false }
+local highlights = {}
 
---- Find the first class of a code block that names a language Pandoc can
+--- Check that a code block has a class that names a language Pandoc can
 --- highlight.
 --- @param block pandoc.CodeBlock The code block
---- @return integer|nil The position of the class, or nil when there is none
-local function highlighted_class_index(block)
-  for index, class in ipairs(block.classes) do
+--- @return boolean
+local function has_highlighted_class(block)
+  for _, class in ipairs(block.classes) do
     if highlights[class] == nil then
       local html = pandoc.write(pandoc.Pandoc({ pandoc.CodeBlock('x', { class = class }) }), 'html')
-      highlights[class] = html:find('sourceCode', 1, true) ~= nil
+      highlights[class] = html:find('<code%s+class="sourceCode%s+[^"]') ~= nil
     end
     if highlights[class] then
-      return index
+      return true
     end
   end
-  return nil
+  return false
 end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.
@@ -797,19 +797,13 @@ local function style_terminal(block)
   if not quarto.doc.is_format('html') or not block.classes:includes('terminal') then
     return nil
   end
-  local language = highlighted_class_index(block)
-  if language == nil then
+  if not has_highlighted_class(block) then
     log.log_warning(
       EXTENSION_NAME,
       'The .terminal block in ' .. (quarto.doc.input_file or '') .. ' has no language class, so it is not highlighted and shows no prompt. ' ..
       'Add a language class such as `bash`, for example `{.bash .terminal}`.'
     )
     return nil
-  end
-  -- Code Window takes the first class as the language, and renames it
-  -- `default` when it is not one, so the language class goes first.
-  if language > 1 then
-    block.classes:insert(1, block.classes:remove(language))
   end
   local lines = {}
   local prompts = {}
