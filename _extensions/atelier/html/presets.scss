@@ -37,6 +37,8 @@ $atelier-terminal-decoration: true !default;
 // Quarto tests if `$body-bg`, `$body-color`, and `$primary` exist. A `null`
 // value then breaks a site with no preset, so these three are not declared
 // here. A preset sets them with `!global`.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15304
+// Remove when: the minimum Quarto version accepts a `null` value for them.
 $blue: null !default;
 $green: null !default;
 $red: null !default;
@@ -172,6 +174,10 @@ $atelier-terminal-prompt: null !default;
   $font-family-sans-serif: $_terminal-font !default;
   $headings-font-family: $_terminal-font !default;
 
+  // Quarto does not show a Sass `@warn` in the render log, so a reader does
+  // not see this warning yet.
+  // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15307
+  // Remove when: Quarto shows the warning. Then remove only this note.
   @if $atelier-scheme == light and tone($body-bg) == "light" {
     @warn "The terminal preset is dark; brand light values are ignored.";
   }

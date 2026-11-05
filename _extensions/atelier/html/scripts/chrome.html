@@ -46,6 +46,9 @@
 		// stand-in that stores nothing, but only when the first toggle did not
 		// already switch the sheets before it failed. One warning says what
 		// happened, with the error that caused it.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15305
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15296
+		// Remove when: the minimum Quarto version includes both fixes.
 		function applyDarkScheme(darkBundleInactive) {
 			var storageKey = "quarto-color-scheme";
 			var stored = null;
