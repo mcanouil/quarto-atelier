@@ -110,6 +110,22 @@ The code surface comes from the brand colours, so the contrast of the syntax hig
 The muted text that Quarto styles on the page, such as the previous and next page links, comes from the page colours and has a contrast of at least 4.5:1 against the page.
 To change it, set `$atelier-text-muted` in a project stylesheet under `format.atelier-html.theme`.
 
+## Preset variables
+
+Set these variables under `defaults.bootstrap.defaults` in `_brand.yml`.
+[Presets](brand.qmd#presets) describes the three presets.
+
+| Variable                       | Default   | Effect                                                                                       |
+| ------------------------------ | --------- | -------------------------------------------------------------------------------------------- |
+| `atelier-preset`               | `default` | The preset: `default`, `quarto`, or `terminal`. Any other value stops the build.            |
+| `atelier-terminal-decoration`  | `true`    | The decoration of the `terminal` preset. `false` turns it off. It has no effect on the other presets. |
+
+: Variables that set the preset. {.striped .hover tbl-colwidths="[28,14,58]"}
+
+The variable `atelier-highlighting` is a map of the token colours of each preset and colour scheme.
+Do not set it.
+The script `scripts/generate-highlighting.py` writes it from the `.theme` files in `_extensions/atelier/highlighting/`.
+
 ## Embedded extensions
 
 Atelier contains five extensions, so you do not install them yourself.

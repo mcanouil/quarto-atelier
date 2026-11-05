@@ -1,0 +1,31 @@
+name: Highlighting
+
+# The Sass token map in `html/highlighting-tokens.scss` is generated from the
+# `.theme` files. This check fails when the map is stale, so a hand edit to a
+# theme file cannot leave the page and the Sass rules with different colours.
+# The script uses the Python standard library only, so the runner's own
+# Python is enough.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "_extensions/atelier/highlighting/**"
+      - "_extensions/atelier/html/highlighting-tokens.scss"
+      - "scripts/generate-highlighting.py"
+      - ".github/workflows/highlighting.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the token map against the theme files
+        run: python3 scripts/generate-highlighting.py --check

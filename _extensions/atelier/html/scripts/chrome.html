@@ -16,6 +16,108 @@
 		window.atelierOptions = options;
 		var labels = options.labels || {};
 
+		// A preset can pin one colour scheme. The terminal preset is dark, so its
+		// SCSS sets --atelier-scheme-pin on the root. The dark bundle becomes the
+		// active one through Quarto's own toggle. The SCSS hides the toggles,
+		// because they would only switch to a look the preset does not have.
+		// A page without the property does nothing here.
+		if (getComputedStyle(document.documentElement).getPropertyValue("--atelier-scheme-pin").trim() === "dark") {
+			// The body class alone cannot tell: Quarto takes it from the data-mode of
+			// the light bundle, and that bundle is already dark under this preset.
+			// So the dark bundle counts as active only when the alternate (dark)
+			// sheets are enabled and the body is dark.
+			var darkSheets = document.querySelectorAll("link.quarto-color-scheme.quarto-color-alternate");
+			var darkBundleInactive = function () {
+				return darkSheets.length > 0 && !(
+					document.body.classList.contains("quarto-dark") &&
+					[].every.call(darkSheets, function (sheet) { return sheet.rel === "stylesheet"; })
+				);
+			};
+			var needsToggle = darkBundleInactive();
+			if (needsToggle) {
+				applyDarkScheme(darkBundleInactive);
+			}
+		}
+
+		// Quarto saves the choice under a key that every Quarto site on this origin
+		// shares. The stored value is put back after the toggle, so the reader's
+		// choice on other sites does not change. Quarto reads and writes that key
+		// in localStorage, which can throw. Then the toggle runs again with a
+		// stand-in that stores nothing, but only when the first toggle did not
+		// already switch the sheets before it failed. One warning says what
+		// happened, with the error that caused it.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15305
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15296
+		// Remove when: the minimum Quarto version includes both fixes.
+		function applyDarkScheme(darkBundleInactive) {
+			var storageKey = "quarto-color-scheme";
+			var stored = null;
+			var canRestore = false;
+			var warning = null;
+			function warn(message, error) {
+				warning = [message, error];
+			}
+			try {
+				stored = window.localStorage.getItem(storageKey);
+				canRestore = true;
+			} catch (readError) {
+				canRestore = false;
+			}
+			try {
+				window.quartoToggleColorScheme();
+				if (canRestore) {
+					restoreStored();
+				}
+			} catch (error) {
+				warn("Atelier: the dark colour scheme could not be applied cleanly.", error);
+				if (darkBundleInactive()) {
+					toggleWithoutStorage();
+				}
+			}
+			if (warning) {
+				console.warn(warning[0], warning[1]);
+			}
+
+			function restoreStored() {
+				try {
+					if (stored === null) {
+						window.localStorage.removeItem(storageKey);
+					} else {
+						window.localStorage.setItem(storageKey, stored);
+					}
+				} catch (writeError) {
+					warn("Atelier: the stored colour scheme choice cannot be restored.", writeError);
+				}
+			}
+
+			function toggleWithoutStorage() {
+				var original = Object.getOwnPropertyDescriptor(window, "localStorage");
+				var swapped = false;
+				try {
+					Object.defineProperty(window, "localStorage", {
+						configurable: true,
+						value: { getItem: function () { return null; }, setItem: function () {}, removeItem: function () {} },
+					});
+					swapped = true;
+					window.quartoToggleColorScheme();
+				} catch (retryError) {
+					warn("Atelier: the dark colour scheme cannot be applied.", retryError);
+				}
+				if (!swapped) {
+					return;
+				}
+				try {
+					if (original) {
+						Object.defineProperty(window, "localStorage", original);
+					} else {
+						delete window.localStorage;
+					}
+				} catch (restoreError) {
+					warn("Atelier: the browser storage cannot be restored after applying the dark colour scheme.", restoreError);
+				}
+			}
+		}
+
 		// The version pill follows the brand in the navbar and the title link in
 		// the sidebar. Without a version, neither is added. A navbar with a logo
 		// has two brand links in one container, so the pill goes once after the

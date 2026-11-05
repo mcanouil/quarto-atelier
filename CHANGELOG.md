@@ -43,6 +43,8 @@
 - feat: Add two starter templates, one for documentation with a navbar and one for a workshop with the sidebar only.
   Install Atelier with `quarto add`, then run `quarto use template mcanouil/quarto-atelier/templates/<name>`. (#79)
 - feat: Show an arrow on every popup and navbar tooltip, joined to the popup border. (#87)
+- feat: Add the `default`, `quarto`, and `terminal` presets, chosen with `atelier-preset` in `_brand.yml`.
+  Each preset has its own highlighting themes that hold every token to WCAG AA. (#96)
 
 ### Bug Fixes
 

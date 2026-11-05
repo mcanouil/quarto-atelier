@@ -27,6 +27,120 @@ It calculates the colours of the navbar, the sidebar, the bars, and the cards fr
 
 : How Atelier uses each key of `_brand.yml`. {.striped .hover tbl-colwidths="[30,70]"}
 
+## Presets
+
+A preset sets a complete look: the colours, the fonts, and the syntax highlighting.
+Atelier has three presets: `default`, `quarto`, and `terminal`.
+To choose one, set `atelier-preset` in `_brand.yml`:
+
+```{.yaml filename="_brand.yml"}
+defaults:
+  bootstrap:
+    defaults:
+      atelier-preset: quarto
+```
+
+The default is `default`.
+Any other value stops the build, and the error names the three presets.
+
+Every value of a preset is a default.
+A `color` key, a `typography` key, or a `defaults.bootstrap.defaults` value in your `_brand.yml` wins over the preset.
+The preset fills in only what the brand leaves out.
+
+### The default preset
+
+This is the Atelier look.
+It takes its colours and fonts from your `_brand.yml`, and it has a light and a dark colour scheme.
+
+| Light | Dark |
+| --- | --- |
+| ![The default preset in the light colour scheme: a pale page with a navbar, a sidebar, and a code block](assets/presets/preset-default-light.png) | ![The default preset in the dark colour scheme: a dark page with a navbar, a sidebar, and a code block](assets/presets/preset-default-dark.png) |
+
+: The default preset. {tbl-colwidths="[50,50]"}
+
+### The quarto preset
+
+This preset is close to the look of the Quarto website.
+It has a light and a dark colour scheme, and it sets only colours and two typefaces.
+
+- The page has a blue tint: `#eef4fa` in light and `#0f1b2a` in dark.
+- The primary colour is `#47709a` in light and `#74aadb` in dark.
+  In light, links use `#406993`, one step darker, so that they keep a margin above the contrast minimum on the tinted page.
+- The chrome is the navbar, the sidebar, the footer, the table of contents card, and the workshop bar.
+  In light, it is a blue bar, `#365f84`, with white text and a white accent.
+  In dark, it is a navy bar, `#0a1524`, darker than the page, with `#e8edf2` text and a `#75aadb` accent.
+- A brand primary colour also sets the accent of the chrome and the colour of the links.
+  In light, if that colour cannot reach the contrast minimum on the blue bar, the accent of the chrome stays white.
+- The body and the headings use Alegreya Sans.
+  The code uses Fira Code.
+
+| Light | Dark |
+| --- | --- |
+| ![The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a code block](assets/presets/preset-quarto-light.png) | ![The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links](assets/presets/preset-quarto-dark.png) |
+
+: The quarto preset. {tbl-colwidths="[50,50]"}
+
+### The terminal preset
+
+This preset is a modern dark terminal.
+It is pinned to the dark colour scheme.
+The stylesheet hides the colour scheme toggle, and a script switches the page to the dark scheme.
+The preset stays dark, and the reader cannot change it.
+
+- The font is JetBrains Mono everywhere, and the corners are square.
+- The title shows a prompt and a cursor.
+  The cursor stops blinking within 5 seconds, and it does not blink if the reader asks for reduced motion.
+- Second-level and third-level headings have the prefix `##` and `###`.
+- List items use `-` as the marker.
+- The current sidebar item has the marker `>`, and the current navbar link has brackets around it.
+- The rules under headings and the borders of callouts are dashed.
+  Code blocks have a solid border.
+- Links have a dotted underline.
+
+![The terminal preset: a near-black page with green accents, a prompt in the title, and monospace text](assets/presets/preset-terminal-dark.png)
+
+To turn the decoration off, set `atelier-terminal-decoration` to `false`.
+This setting has no effect on the other presets.
+
+```{.yaml filename="_brand.yml"}
+defaults:
+  bootstrap:
+    defaults:
+      atelier-preset: terminal
+      atelier-terminal-decoration: false
+```
+
+### Fonts
+
+The fonts are part of the extension, in `_extensions/mcanouil/atelier/fonts/` of your site.
+The pages do not make a request to Google or to any other third party.
+The fonts are Alegreya Sans, Fira Code, and JetBrains Mono.
+Each one is under the SIL Open Font License, and the licence text is next to the font files.
+
+### Syntax highlighting
+
+Each preset has a highlighting theme for each colour scheme.
+The six `.theme` files are in `_extensions/mcanouil/atelier/highlighting/` of your site, and they are named `atelier-<preset>-<light|dark>.theme`.
+Each file gives a colour and a style for the 31 token types.
+
+Atelier holds each token colour to WCAG AA (4.5:1) on the code surface.
+It does this when the format uses the default `arrow` theme, or one of the Atelier themes.
+For any other theme, Atelier changes nothing, so that theme keeps its own colours.
+
+To use a theme in another format, point `syntax-highlighting` at the file.
+The path below is for an extension that you install with `quarto add`:
+
+```{.yaml filename="_quarto.yml"}
+format:
+  html:
+    syntax-highlighting:
+      light: _extensions/mcanouil/atelier/highlighting/atelier-quarto-light.theme
+      dark: _extensions/mcanouil/atelier/highlighting/atelier-quarto-dark.theme
+```
+
+The script `scripts/generate-highlighting.py` in the repository writes `html/highlighting-tokens.scss` from the `.theme` files.
+Run it with `--check` to find a difference between the two.
+
 ## Contrast
 
 Atelier targets WCAG 2.2 AA in both colour schemes, for each brand.
