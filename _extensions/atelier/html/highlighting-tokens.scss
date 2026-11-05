@@ -80,18 +80,18 @@ $atelier-highlighting: (
         "bn": ("color": #a0461f, "bold": false, "italic": false, "underline": false), // BaseN
         "fl": ("color": #a0461f, "bold": false, "italic": false, "underline": false), // Float
         "cn": ("color": #a0461f, "bold": false, "italic": false, "underline": false), // Constant
-        "ch": ("color": #2f6f4f, "bold": false, "italic": false, "underline": false), // Char
+        "ch": ("color": #2a6848, "bold": false, "italic": false, "underline": false), // Char
         "sc": ("color": #8a5300, "bold": false, "italic": false, "underline": false), // SpecialChar
-        "st": ("color": #2f6f4f, "bold": false, "italic": false, "underline": false), // String
-        "vs": ("color": #2f6f4f, "bold": false, "italic": false, "underline": false), // VerbatimString
+        "st": ("color": #2a6848, "bold": false, "italic": false, "underline": false), // String
+        "vs": ("color": #2a6848, "bold": false, "italic": false, "underline": false), // VerbatimString
         "ss": ("color": #8a5300, "bold": false, "italic": false, "underline": false), // SpecialString
         "im": ("color": #7a3f8a, "bold": false, "italic": false, "underline": false), // Import
-        "co": ("color": #596673, "bold": false, "italic": true, "underline": false), // Comment
-        "do": ("color": #596673, "bold": false, "italic": true, "underline": false), // Documentation
-        "an": ("color": #596673, "bold": false, "italic": false, "underline": false), // Annotation
-        "cv": ("color": #596673, "bold": false, "italic": true, "underline": false), // CommentVar
+        "co": ("color": #4f5c69, "bold": false, "italic": true, "underline": false), // Comment
+        "do": ("color": #4f5c69, "bold": false, "italic": true, "underline": false), // Documentation
+        "an": ("color": #4f5c69, "bold": false, "italic": false, "underline": false), // Annotation
+        "cv": ("color": #4f5c69, "bold": false, "italic": true, "underline": false), // CommentVar
         "ot": ("color": #1f2a36, "bold": false, "italic": false, "underline": false), // Other
-        "fu": ("color": #3d6690, "bold": false, "italic": false, "underline": false), // Function
+        "fu": ("color": #365e88, "bold": false, "italic": false, "underline": false), // Function
         "va": ("color": #273848, "bold": false, "italic": false, "underline": false), // Variable
         "cf": ("color": #2a5680, "bold": true, "italic": false, "underline": false), // ControlFlow
         "op": ("color": #4a5866, "bold": false, "italic": false, "underline": false), // Operator
@@ -99,8 +99,8 @@ $atelier-highlighting: (
         "ex": ("color": #22629a, "bold": true, "italic": false, "underline": false), // Extension
         "pp": ("color": #7a3f8a, "bold": false, "italic": false, "underline": false), // Preprocessor
         "at": ("color": #6f5a00, "bold": false, "italic": false, "underline": false), // Attribute
-        "re": ("color": #596673, "bold": false, "italic": false, "underline": false), // RegionMarker
-        "in": ("color": #596673, "bold": false, "italic": false, "underline": false), // Information
+        "re": ("color": #4f5c69, "bold": false, "italic": false, "underline": false), // RegionMarker
+        "in": ("color": #4f5c69, "bold": false, "italic": false, "underline": false), // Information
         "wa": ("color": #8a5300, "bold": true, "italic": false, "underline": false), // Warning
         "al": ("color": #b0302a, "bold": true, "italic": false, "underline": false), // Alert
         "er": ("color": #b0302a, "bold": true, "italic": false, "underline": true), // Error
@@ -212,7 +212,7 @@ $atelier-highlighting: (
 $atelier-highlighting-sentinels: (
   "default-light": (#595959, #4758ab),
   "default-dark": (#e6e6dc, #ffa07a),
-  "quarto-light": (#596673, #3d6690),
+  "quarto-light": (#4f5c69, #365e88),
   "quarto-dark": (#9aa8b6, #9cc6ec),
   "terminal-light": (#57606a, #0969da),
   "terminal-dark": (#8b949e, #6cb6ff),

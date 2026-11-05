@@ -49,7 +49,14 @@ $font-family-monospace: null !default;
 $headings-font-family: null !default;
 $pre-color: null !default;
 $atelier-chrome: null !default;
+$atelier-chrome-bg: null !default;
+$atelier-chrome-fg: null !default;
+$atelier-chrome-muted: null !default;
 $atelier-chrome-accent: null !default;
+$atelier-chrome-accent-soft-alpha: null !default;
+$atelier-text-muted: null !default;
+$atelier-code-ink: null !default;
+$link-color: null !default;
 $atelier-chrome-dark-bg: null !default;
 $atelier-chrome-dark-fg: null !default;
 $atelier-chrome-dark-accent: null !default;
@@ -59,24 +66,56 @@ $atelier-terminal-prompt: null !default;
 // ===========================================================================
 // QUARTO PRESET
 // ===========================================================================
-// A palette and two typefaces, with no rules of its own. The light primary
-// #47709a reaches 4.5:1 on the page and on the page surfaces. On the chrome it
-// sits on the accent-soft tint over the dropdown surface, where it falls short,
-// so the light chrome accent is a darker step of it. The contrast functions in
-// `html/chrome.scss` then move no colour. Every value is a default, so a brand
-// colour or font wins. A brand primary also drives the chrome accent.
+// A blue tinted page, a filled blue chrome, and two typefaces, with no rules of
+// its own. The chrome values are set here as they are, so the contrast
+// functions in `html/chrome.scss` skip them: each one already passes AA. A
+// brand colour or font wins over every value, because each is a default. A
+// brand primary also drives the chrome accent, so the chrome accent here is
+// only set when the brand has no primary.
 @if $atelier-preset == quarto {
+  // The guard reads `$primary` before this block assigns it, so it sees only a
+  // primary that the brand or the project has set.
+  $_quarto-brand-primary: atelier-meta.variable-exists(primary) and $primary != null;
+
   @if $atelier-scheme == dark {
-    $body-bg: #161b22 !default !global;
+    @if not $_quarto-brand-primary {
+      $atelier-chrome-accent: #75aadb !default;
+    }
+    $body-bg: #0f1b2a !default !global;
     $body-color: #dbe6f0 !default !global;
     $primary: #74aadb !default !global;
+    $atelier-chrome-bg: #0a1524 !default;
+    $atelier-chrome-fg: #e8edf2 !default;
+    $atelier-chrome-accent-soft-alpha: 0.16 !default;
   } @else {
-    @if not atelier-meta.variable-exists(primary) or $primary == null {
-      $atelier-chrome-accent: #355372 !default;
+    @if not $_quarto-brand-primary {
+      $atelier-chrome-accent: #ffffff !default;
+      $atelier-code-ink: #325c83 !default;
+      $link-color: #406993 !default;
     }
-    $body-bg: #f8fafc !default !global;
+    $body-bg: #eef4fa !default !global;
     $body-color: #1f2a36 !default !global;
     $primary: #47709a !default !global;
+    $atelier-chrome-bg: #365f84 !default;
+    $atelier-chrome-fg: #ffffff !default;
+    $atelier-chrome-muted: #f4f8fb !default;
+    $atelier-chrome-accent-soft-alpha: 0.12 !default;
+
+    // The Bootstrap yellow and orange fall under 4.5:1 as callout ink on the
+    // tinted page, so the chrome would have to correct them. These two steps
+    // pass without it. A brand colour of the same name wins.
+    @if not atelier-meta.variable-exists("brand-yellow") {
+      $yellow: #b8860b !default;
+    }
+    @if not atelier-meta.variable-exists("brand-orange") {
+      $orange: #e8590c !default;
+    }
+
+    // The derived muted ink reaches 4.5:1 only by correction, so it is set to
+    // a value with a margin. A brand secondary colour wins.
+    @if not atelier-meta.variable-exists(secondary) {
+      $atelier-text-muted: #55626f !default;
+    }
   }
 
   $font-family-sans-serif: "Alegreya Sans", sans-serif !default;
