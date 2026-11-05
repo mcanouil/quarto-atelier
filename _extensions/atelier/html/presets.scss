@@ -32,20 +32,24 @@ $atelier-terminal-decoration: true !default;
 // ===========================================================================
 // QUARTO PRESET
 // ===========================================================================
-// A palette and two typefaces, with no rules of its own. The light primary is
-// darker than the Quarto blue #4f789e, so that it already reaches 4.5:1
-// on the page, on the surfaces, and on the bars. The contrast functions in
-// `html/chrome.scss` then move nothing. Every value is a default, so a brand
-// colour or font wins.
+// A palette and two typefaces, with no rules of its own. The light primary
+// #47709a reaches 4.5:1 on the page and on the page surfaces. On the chrome it
+// sits on the accent-soft tint over the dropdown surface, where it falls short,
+// so the light chrome accent is a darker step of it. The contrast functions in
+// `html/chrome.scss` then move no colour. Every value is a default, so a brand
+// colour or font wins. A brand primary also drives the chrome accent.
 @if $atelier-preset == quarto {
   @if $atelier-scheme == dark {
     $body-bg: #161b22 !default !global;
     $body-color: #dbe6f0 !default !global;
     $primary: #74aadb !default !global;
   } @else {
+    @if not atelier-meta.variable-exists(primary) {
+      $atelier-chrome-accent: #355372 !default !global;
+    }
     $body-bg: #f8fafc !default !global;
     $body-color: #1f2a36 !default !global;
-    $primary: #355372 !default !global;
+    $primary: #47709a !default !global;
   }
 
   $pre-color: $body-color !default !global;
