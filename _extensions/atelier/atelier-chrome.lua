@@ -96,6 +96,7 @@ local function publish_options(meta)
   if not quarto.doc.is_format('html') then
     return nil
   end
+  -- The preset is a Sass default, which Lua cannot read, so every page ships the fonts. The browser downloads a face only when a stylesheet names it.
   add_fonts()
   local options = { labels = resolve_labels(), version = read_version(meta) }
   local json = quarto.json.encode(options):gsub('</', '<\\/')

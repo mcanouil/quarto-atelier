@@ -16,7 +16,8 @@
 // The terminal decoration: prompts, a cursor, dashed rules, and bracketed
 // markers. It applies to the terminal preset only, and a brand turns it off
 // with `atelier-terminal-decoration: false`. Each `content` has an empty
-// alternative text, so a screen reader skips the decoration.
+// alternative text, so a screen reader skips the decoration. A browser without
+// alternative text reads the first declaration of each pair.
 @if $atelier-preset == terminal and $atelier-terminal-decoration {
   // The cursor blinks four times, 1.1 s each, and then stays steady. This is
   // slower than three flashes a second and stops within five seconds.
@@ -32,10 +33,12 @@
   }
 
   .quarto-title .title::before {
+    content: "$ ";
     content: "$ " / "";
   }
 
   .quarto-title .title::after {
+    content: "\2588";
     content: "\2588" / "";
     margin-left: 0.15em;
     animation: atelier-terminal-cursor 1.1s steps(1) 4;
@@ -62,22 +65,27 @@
   }
 
   main h2:not(.listing-title)::before {
+    content: "## ";
     content: "## " / "";
   }
 
   main h3:not(.listing-title)::before {
+    content: "### ";
     content: "### " / "";
   }
 
   .navbar .navbar-nav .nav-link.active::before {
+    content: "[";
     content: "[" / "";
   }
 
   .navbar .navbar-nav .nav-link.active::after {
+    content: "]";
     content: "]" / "";
   }
 
   .sidebar-navigation .sidebar-menu-container:not(.atelier-stepper) .sidebar-link:is(.active, [aria-current="page"])::before {
+    content: "> ";
     content: "> " / "";
     color: var(--atelier-sidebar-accent);
   }
@@ -98,6 +106,7 @@
   }
 
   main ul:not([class]) > li::marker {
+    content: "- ";
     content: "- " / "";
     color: var(--atelier-accent-ink);
   }
