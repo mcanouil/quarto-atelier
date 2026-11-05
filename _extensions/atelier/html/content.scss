@@ -856,17 +856,29 @@ div.quarto-post {
   }
 }
 
-// The script adds the label before the icon box, so Bootstrap's join rules for
-// an input group would square the box and pull it one pixel left.
-.listing-actions-group .input-group > .atelier-listing-label {
-  margin: 0 0.45rem 0 0;
+// The script puts each label and its input group in one wrapper, which takes
+// the place of the group in the row: the sort field on the left, the filter
+// field pushed to the right.
+.listing-actions-group .atelier-listing-field {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+
+  &:has(> .quarto-listing-filter) {
+    margin-left: auto;
+  }
+
+  > .input-group {
+    margin: 0;
+  }
+}
+
+.listing-actions-group .atelier-listing-label {
+  margin: 0;
   color: var(--atelier-muted);
   font-size: 0.82rem;
   white-space: nowrap;
-
-  + .input-group-text {
-    margin-left: 0;
-  }
 }
 
 // Pagination boxes are 32 px, and the current page is set in a heavier

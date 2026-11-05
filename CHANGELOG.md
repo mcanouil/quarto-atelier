@@ -63,6 +63,7 @@
 - fix: Give the colour scheme toggle its themed tooltip again, in the navbar, in the sidebar, and floating at the top right. (#81)
 - fix: Show the floating colour scheme toggle below the announcement bar on a page with no navbar or sidebar. (#82)
 - fix: Check text contrast on the colours the browser paints, so that muted text and the derived inks keep 4.5:1 once their channels are rounded. (#84)
+- fix: Keep the listing filter and sort icon boxes in place, with their rounded corners, beside their visible labels.
 
 ### Documentation
 

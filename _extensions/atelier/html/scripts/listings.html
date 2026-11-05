@@ -12,13 +12,16 @@
 
 		// The filter and sort controls have a placeholder or an aria-label, but no
 		// visible label, so the name disappears when the user types. Add a label
-		// before the icon box, with the text that Quarto already gives the control.
+		// before the input group, with the text that Quarto already gives the
+		// control. The label sits outside the group, so the Bootstrap join rules do
+		// not move the icon box or square its corners. The label and the group share
+		// a wrapper, so they stay on one line when the row wraps.
 		// Upstream: none filed (WCAG 3.3.2)
 		// Remove when: Quarto gives the listing filter and sort controls a visible label.
 		function labelControl(control, text, suffix) {
 			if (!control || !text) return;
 			var group = control.closest(".input-group");
-			if (!group || group.querySelector(".atelier-listing-label")) return;
+			if (!group || group.parentElement.classList.contains("atelier-listing-field")) return;
 			if (!control.id) {
 				generatedIds += 1;
 				control.id = "atelier-listing-" + suffix + "-" + generatedIds;
@@ -27,7 +30,11 @@
 			label.className = "atelier-listing-label";
 			label.htmlFor = control.id;
 			label.textContent = text;
-			group.insertBefore(label, group.firstElementChild);
+			var field = document.createElement("div");
+			field.className = "atelier-listing-field";
+			group.parentElement.insertBefore(field, group);
+			field.appendChild(label);
+			field.appendChild(group);
 		}
 
 		// Quarto marks the current page of a listing by a class only, so a screen
