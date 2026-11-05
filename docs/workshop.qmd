@@ -223,7 +223,8 @@ Atelier reads each line of the block as follows:
 
 - A line that starts with `$` and a space is a command.
 - A line that is only `$` shows an empty prompt.
-- If a command ends with `\`, the next line continues the command. This line has the command colour and no prompt.
+- If a command ends with `\`, the next line continues the command.
+  This line has the command colour and no prompt.
 - A line that starts with spaces before the `$` is output, as in usage text.
 - Each other line is output.
 

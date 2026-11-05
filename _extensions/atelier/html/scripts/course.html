@@ -268,14 +268,21 @@
 		// =====================================================================
 		// The Lua filter writes a checkbox for each objective, with an id made
 		// from the objective text. The ticked boxes are stored under the page in
-		// the course progress, as these ids.
+		// the course progress, as these ids. Only the ids of the boxes that are
+		// on the page now count, so the id of a changed objective goes on the
+		// next save.
 		(function () {
 			var boxes = document.querySelectorAll(".atelier-objectives input[data-atelier-objective]");
 			if (!boxes.length) return;
 
 			var key = course.current !== -1 ? course.pages[course.current].href : location.pathname;
 			var stored = course.progress.objectives[key];
-			var ticked = Array.isArray(stored) ? stored : [];
+			var ids = Array.prototype.map.call(boxes, function (box) {
+				return box.getAttribute("data-atelier-objective");
+			});
+			var ticked = (Array.isArray(stored) ? stored : []).filter(function (value) {
+				return ids.indexOf(value) !== -1;
+			});
 
 			boxes.forEach(function (box) {
 				var id = box.getAttribute("data-atelier-objective");

@@ -25,14 +25,15 @@ local MODE_WORKSHOP = 'workshop'
 --- @type string
 local EXTENSION_NAME = 'atelier'
 
---- Page file extensions whose front matter holds a duration.
+--- Page file extensions whose front matter holds a duration, in lower case.
 --- @type table<string, boolean>
-local FRONT_MATTER_EXTENSIONS = { qmd = true, md = true, Rmd = true }
+local FRONT_MATTER_EXTENSIONS = { qmd = true, md = true, rmd = true }
 
 --- Page file extensions that Quarto renders through this filter, so such a
 --- page can be in workshop mode. A notebook reads its metadata from a raw cell.
+--- The extensions are in lower case.
 --- @type table<string, boolean>
-local RENDERED_EXTENSIONS = { qmd = true, md = true, Rmd = true, ipynb = true }
+local RENDERED_EXTENSIONS = { qmd = true, md = true, rmd = true, ipynb = true }
 
 --- Labels and their default text, in output order.
 --- @type table<integer, { key: string, default: string }>
@@ -389,12 +390,13 @@ local function read_front_matter(path, report)
 end
 
 --- Tell whether the extension of a page is in a set of extensions.
+--- The letter case of the extension has no effect, so `.Rmd` and `.rmd` match.
 --- @param path string The page path
 --- @param extensions table<string, boolean> The set, such as `FRONT_MATTER_EXTENSIONS`
 --- @return boolean True when the extension of the page is in the set
 local function has_extension(path, extensions)
   local extension = path:match('%.(%w+)$')
-  return extension ~= nil and extensions[extension] == true
+  return extension ~= nil and extensions[extension:lower()] == true
 end
 
 --- Find the page of a sidebar that logs the warnings for the whole sidebar.
