@@ -79,8 +79,34 @@
 				header.append(label);
 			});
 		}
-		labelWindows();
+		// The style centres the copy button on the window header, which grows
+		// when its items wrap. Keep the header height in a variable on the window.
+		// Code Window replaces the header of a collapsible window with a
+		// `summary`, so a header that has left its window is no longer observed.
+		var headerHeights = new ResizeObserver(function (entries) {
+			entries.forEach(function (entry) {
+				if (!entry.target.parentElement) {
+					headerHeights.unobserve(entry.target);
+					return;
+				}
+				entry.target.parentElement.style.setProperty(
+					"--atelier-code-header-height",
+					entry.target.clientHeight + "px"
+				);
+			});
+		});
+		function trackHeaders() {
+			document.querySelectorAll(".code-with-filename > .code-with-filename-file").forEach(function (header) {
+				headerHeights.observe(header);
+			});
+		}
+
+		function setUpWindows() {
+			labelWindows();
+			trackHeaders();
+		}
+		setUpWindows();
 		// Code Window builds the wrappers for auto-filename blocks on DOMContentLoaded.
-		document.addEventListener("DOMContentLoaded", labelWindows);
+		document.addEventListener("DOMContentLoaded", setUpWindows);
 	})();
 </script>

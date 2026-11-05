@@ -468,18 +468,40 @@ html .code-copy-button {
   border-radius: 5px;
 }
 
+// For annotated code, Quarto moves the copy button to the top edge and pads
+// only its top, which suits its own frameless button. The framed button keeps
+// the size and the inset that it has on other code blocks. Quarto's right
+// margin, which keeps the button clear of the annotation markers, stays. In a
+// Code Window, the button is in the header, so the top margin does not apply.
+html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+}
+
+html :not(.code-with-filename) > .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
+  margin-top: 5px;
+}
+
 html .code-with-filename .code-copy-outer-scaffold {
   position: relative;
   overflow: visible;
 }
 
+// Quarto's copy handler reads the code from the parent of the button, so the
+// button stays in the scaffold and is drawn over the header above it. The
+// code-blocks script puts the height of the header in
+// --atelier-code-header-height, because the header grows when its items wrap.
+// The button is centred on the header, above its 1px bottom border. It is as
+// far from the right edge as the file name is from the left edge: Code Window
+// pads the header by 1em, and the header font size is 0.78rem.
 html .code-with-filename .code-copy-outer-scaffold > .code-copy-button {
   position: absolute;
-  top: 0;
+  top: calc(-1px - var(--atelier-code-header-height, 2.25rem) / 2);
   bottom: auto;
-  right: 0.8rem;
+  right: 0.78rem;
   z-index: 2;
-  transform: translateY(calc(-100% - 0.35rem));
+  margin: 0;
+  transform: translateY(-50%);
 }
 
 // Line numbers are muted and are not copied with the code.
