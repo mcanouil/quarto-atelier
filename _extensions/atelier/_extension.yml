@@ -54,24 +54,31 @@ contributes:
       # `html/chrome.scss` comes before `brand` on purpose: Quarto evaluates
       # user layer defaults in reverse list order, so a file placed first is
       # evaluated last, after the brand palette it derives the chrome from.
+      # `html/presets.scss` comes second, so it is evaluated after `brand` and
+      # before `html/chrome.scss`. The scheme flag comes last, so it is
+      # evaluated first and tells every other file which bundle it builds.
       theme:
         light:
           - html/chrome.scss
+          - html/presets.scss
           - brand
           - html/theme.scss
           - html/navigation.scss
           - html/content.scss
           - html/pages.scss
           - html/workshop.scss
+          - html/scheme-light.scss
         dark:
           - html/chrome.scss
           - html/dark.scss
+          - html/presets.scss
           - brand
           - html/theme.scss
           - html/navigation.scss
           - html/content.scss
           - html/pages.scss
           - html/workshop.scss
+          - html/scheme-dark.scss
       syntax-highlighting:
         light: arrow-light
         dark: arrow-dark
