@@ -49,13 +49,14 @@ html div.callout > .callout-header .callout-title-container,
   }
 }
 
-// Media with a `width` attribute keeps that width on a narrow screen. Images
-// and videos keep their aspect ratio; an embed keeps the height it was given.
+// Media with a `width` attribute keeps that width on a narrow screen. Images,
+// videos and drawings with a `viewBox` keep their aspect ratio; an embed keeps
+// the height it was given.
 main :is(img, svg, video, canvas, iframe, embed, object) {
   max-width: 100%;
 }
 
-main :is(img, video) {
+main :is(img, video, svg[viewBox]) {
   height: auto;
 }
 

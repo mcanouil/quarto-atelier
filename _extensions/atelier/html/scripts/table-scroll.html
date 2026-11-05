@@ -9,7 +9,9 @@
   // Not SCSS: a table that scrolls by itself loses its table layout, so the
   // scroll box has to be a new element around the table.
   (() => {
-    const SCROLLS = ['auto', 'scroll', 'hidden', 'clip'];
+    // A box that clips its content does not scroll, so a table in it still
+    // gets a scroll box of its own.
+    const SCROLLS = ['auto', 'scroll'];
     // Marks the attributes that this script adds, so that it removes only those.
     const MARKER = 'data-atelier-table-scroll';
     // The same selector as Quarto's scrollable-regions.js. Content that the
@@ -21,7 +23,8 @@
       'select:not([tabindex="-1"]):not(:disabled), ' +
       'textarea:not([tabindex="-1"]):not(:disabled), ' +
       '[tabindex]:not([tabindex="-1"]):not(:disabled)';
-    // The caption of each box, or null when the table holds focusable content.
+    // For each box: whether the box needs a tab stop of its own, because the
+    // table holds no focusable content, and the caption that names the box.
     const boxes = new Map();
     let captions = 0;
 
@@ -37,12 +40,13 @@
 
     // A box that scrolls takes the keyboard focus, so that a keyboard user can
     // scroll it (WCAG 2.1.1), as Quarto does for code. It is a region named by
-    // the table caption, so that a screen reader says what gets the focus.
+    // the table caption, or the caption of the figure of a cross-referenced
+    // table, so that a screen reader says what gets the focus.
     // A box that fits adds no tab stop. A box keeps its tab stop while it has
     // the focus, so that the focus does not move from under the user.
     function syncFocus(box) {
       const entry = boxes.get(box);
-      if (!entry.reachable) return;
+      if (!entry.needsTabStop) return;
       const scrolls = box.scrollWidth - box.clientWidth > 1 && box.clientHeight > 1;
       if (scrolls === box.hasAttribute(MARKER)) return;
       if (scrolls) {
@@ -77,8 +81,9 @@
         table.before(box);
         box.append(table);
         boxes.set(box, {
-          reachable: !table.querySelector(FOCUSABLE),
-          caption: table.querySelector(':scope > caption'),
+          needsTabStop: !table.querySelector(FOCUSABLE),
+          caption: table.querySelector(':scope > caption')
+            || table.closest('figure.quarto-float-tbl')?.querySelector(':scope > figcaption'),
         });
         box.addEventListener('focusout', () => syncFocus(box));
         resize.observe(box);
