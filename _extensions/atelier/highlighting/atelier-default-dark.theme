@@ -110,10 +110,10 @@
             "underline": false
         },
         "Documentation": {
-            "text-color": "#f8f8f2",
+            "text-color": "#a8a8a0",
             "background-color": null,
             "bold": false,
-            "italic": false,
+            "italic": true,
             "underline": false
         },
         "Annotation": {

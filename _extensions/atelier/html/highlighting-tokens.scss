@@ -52,7 +52,7 @@ $atelier-highlighting: (
         "ss": ("color": #abe338, "bold": false, "italic": false, "underline": false), // SpecialString
         "im": ("color": #abe338, "bold": false, "italic": false, "underline": false), // Import
         "co": ("color": #a8a8a0, "bold": false, "italic": true, "underline": false), // Comment
-        "do": ("color": #f8f8f2, "bold": false, "italic": false, "underline": false), // Documentation
+        "do": ("color": #a8a8a0, "bold": false, "italic": true, "underline": false), // Documentation
         "an": ("color": #d4d0ab, "bold": false, "italic": false, "underline": false), // Annotation
         "cv": ("color": #ffd700, "bold": false, "italic": false, "underline": false), // CommentVar
         "ot": ("color": #00e0e0, "bold": false, "italic": false, "underline": false), // Other
