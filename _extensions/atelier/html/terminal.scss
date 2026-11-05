@@ -31,8 +31,14 @@
     }
   }
 
-  main :is(h2, h3):not(.listing-title) {
+  main h2:not(.listing-title) {
     border-bottom-style: dashed;
+  }
+
+  // Quarto gives an h3 no rule, so it takes the rule of an h2 in full.
+  main h3:not(.listing-title) {
+    border-bottom: 1px dashed var(--atelier-border);
+    padding-bottom: 0.5rem;
   }
 
   main h2:not(.listing-title)::before {
