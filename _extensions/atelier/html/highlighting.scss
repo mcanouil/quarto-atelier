@@ -34,7 +34,12 @@ $_atelier-arrow: map-get($_atelier-arrow-sentinels, "#{$atelier-scheme}");
   }
 }
 
-$_atelier-hl-scope: "body.quarto-#{$atelier-scheme}";
+// Quarto sets the body class from the tone of the bundle background, so a
+// bundle with a dark background gets the dark class, whatever its name.
+$_atelier-hl-scope: "body.quarto-light";
+@if tone($body-bg) == "dark" {
+  $_atelier-hl-scope: "body.quarto-dark";
+}
 @if $atelier-preset == terminal {
   $_atelier-hl-scheme: dark;
   $_atelier-hl-scope: "body:is(.quarto-light, .quarto-dark)";
@@ -57,17 +62,25 @@ $_atelier-hl-scope: "body.quarto-#{$atelier-scheme}";
         }
         @if map-get($style, "bold") {
           font-weight: bold;
-        } @else {
-          font-weight: normal;
         }
         @if map-get($style, "italic") {
           font-style: italic;
-        } @else {
-          font-style: normal;
         }
         @if map-get($style, "underline") {
           text-decoration: underline;
-        } @else {
+        }
+      }
+
+      // Only a code block resets the weight, the style, and the decoration.
+      // Inline code in a heading or in bold text keeps what it inherits.
+      #{$selector}:is(pre *) {
+        @if not map-get($style, "bold") {
+          font-weight: normal;
+        }
+        @if not map-get($style, "italic") {
+          font-style: normal;
+        }
+        @if not map-get($style, "underline") {
           text-decoration: none;
         }
       }

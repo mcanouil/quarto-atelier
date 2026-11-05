@@ -280,7 +280,7 @@ $atelier-chrome-surface: atelier-mix($atelier-chrome-bg, $atelier-chrome-fg, 90%
 $atelier-chrome-accent-soft-alpha: 0.16 !default;
 // A project or brand that sets $atelier-chrome-accent wins, so the mark follows it.
 $_atelier-chrome-accent-source: $atelier-chrome-page-accent;
-@if atelier-meta.variable-exists(atelier-chrome-accent) {
+@if atelier-meta.variable-exists(atelier-chrome-accent) and $atelier-chrome-accent != null {
   $_atelier-chrome-accent-source: $atelier-chrome-accent;
 } @else if $atelier-chrome == dark {
   $_atelier-chrome-accent-source: $atelier-chrome-dark-accent;

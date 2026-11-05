@@ -29,6 +29,32 @@ $atelier-terminal-decoration: true !default;
   @error "atelier-terminal-decoration must be true or false, but was #{$atelier-terminal-decoration}.";
 }
 
+// A preset assigns these inside an `@if`, which cannot declare a new global.
+// Each is declared here as `null`. A `null` value counts as unset for
+// `!default`, so a brand or Bootstrap value still wins, and a later check
+// must test for `null` instead of for existence.
+$body-bg: null !default;
+$body-color: null !default;
+$primary: null !default;
+$blue: null !default;
+$green: null !default;
+$red: null !default;
+$orange: null !default;
+$yellow: null !default;
+$border-radius: null !default;
+$font-size-base: null !default;
+$font-family-sans-serif: null !default;
+$font-family-monospace: null !default;
+$headings-font-family: null !default;
+$pre-color: null !default;
+$atelier-chrome: null !default;
+$atelier-chrome-accent: null !default;
+$atelier-chrome-dark-bg: null !default;
+$atelier-chrome-dark-fg: null !default;
+$atelier-chrome-dark-accent: null !default;
+$atelier-terminal-bg: null !default;
+$atelier-terminal-prompt: null !default;
+
 // ===========================================================================
 // QUARTO PRESET
 // ===========================================================================
@@ -40,21 +66,21 @@ $atelier-terminal-decoration: true !default;
 // colour or font wins. A brand primary also drives the chrome accent.
 @if $atelier-preset == quarto {
   @if $atelier-scheme == dark {
-    $body-bg: #161b22 !default !global;
-    $body-color: #dbe6f0 !default !global;
-    $primary: #74aadb !default !global;
+    $body-bg: #161b22 !default;
+    $body-color: #dbe6f0 !default;
+    $primary: #74aadb !default;
   } @else {
-    @if not atelier-meta.variable-exists(primary) {
-      $atelier-chrome-accent: #355372 !default !global;
+    @if $primary == null {
+      $atelier-chrome-accent: #355372 !default;
     }
-    $body-bg: #f8fafc !default !global;
-    $body-color: #1f2a36 !default !global;
-    $primary: #47709a !default !global;
+    $body-bg: #f8fafc !default;
+    $body-color: #1f2a36 !default;
+    $primary: #47709a !default;
   }
 
-  $font-family-sans-serif: "Alegreya Sans", sans-serif !default !global;
-  $headings-font-family: "Alegreya Sans", sans-serif !default !global;
-  $font-family-monospace: "Fira Code", monospace !default !global;
+  $font-family-sans-serif: "Alegreya Sans", sans-serif !default;
+  $headings-font-family: "Alegreya Sans", sans-serif !default;
+  $font-family-monospace: "Fira Code", monospace !default;
 }
 
 // ===========================================================================
@@ -71,28 +97,28 @@ $atelier-terminal-decoration: true !default;
   $_terminal-fg: #d8dee9;
   $_terminal-font: "JetBrains Mono", monospace;
 
-  $body-bg: #101216 !default !global;
-  $body-color: $_terminal-fg !default !global;
-  $primary: $_terminal-green !default !global;
+  $body-bg: #101216 !default;
+  $body-color: $_terminal-fg !default;
+  $primary: $_terminal-green !default;
 
-  $blue: #6cb6ff !default !global;
-  $green: $_terminal-green !default !global;
-  $red: #ff7b72 !default !global;
-  $orange: #f0a35e !default !global;
-  $yellow: #e3c45c !default !global;
+  $blue: #6cb6ff !default;
+  $green: $_terminal-green !default;
+  $red: #ff7b72 !default;
+  $orange: #f0a35e !default;
+  $yellow: #e3c45c !default;
 
-  $atelier-chrome: dark !default !global;
-  $atelier-chrome-dark-bg: $_terminal-bg !default !global;
-  $atelier-chrome-dark-fg: $_terminal-fg !default !global;
-  $atelier-chrome-dark-accent: $_terminal-green !default !global;
-  $atelier-terminal-bg: $_terminal-bg !default !global;
-  $atelier-terminal-prompt: $_terminal-green !default !global;
+  $atelier-chrome: dark !default;
+  $atelier-chrome-dark-bg: $_terminal-bg !default;
+  $atelier-chrome-dark-fg: $_terminal-fg !default;
+  $atelier-chrome-dark-accent: $_terminal-green !default;
+  $atelier-terminal-bg: $_terminal-bg !default;
+  $atelier-terminal-prompt: $_terminal-green !default;
 
-  $border-radius: 0 !default !global;
-  $font-size-base: 0.95rem !default !global;
-  $font-family-monospace: $_terminal-font !default !global;
-  $font-family-sans-serif: $_terminal-font !default !global;
-  $headings-font-family: $_terminal-font !default !global;
+  $border-radius: 0 !default;
+  $font-size-base: 0.95rem !default;
+  $font-family-monospace: $_terminal-font !default;
+  $font-family-sans-serif: $_terminal-font !default;
+  $headings-font-family: $_terminal-font !default;
 
   @if $atelier-scheme == light and tone($body-bg) == "light" {
     @warn "The terminal preset is dark; brand light values are ignored.";
@@ -100,5 +126,5 @@ $atelier-terminal-decoration: true !default;
 }
 
 @if $atelier-preset != default {
-  $pre-color: $body-color !default !global;
+  $pre-color: $body-color !default;
 }
