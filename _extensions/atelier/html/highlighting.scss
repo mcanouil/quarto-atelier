@@ -10,6 +10,13 @@
 // Each rule names its scheme, because the light bundle stays active under the
 // dark one. The terminal preset is pinned dark: both bundles take the dark map
 // and the rules match either scheme class.
+// With arrow active, the map of the preset replaces every arrow token. This
+// fills the tokens that arrow-light leaves without a colour (BuiltIn,
+// Extension, RegionMarker) and removes the light band that arrow-dark paints
+// under RegionMarker (1.54:1).
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14299
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15222
+// Remove when: arrow sets every token at AA. Keep the rules for the presets.
 $_atelier-arrow-sentinels: (
   "light": (#5e5e5e, #4758ab),
   "dark": (#f8f8f2, #ffa07a),
@@ -36,6 +43,12 @@ $_atelier-arrow: map-get($_atelier-arrow-sentinels, "#{$atelier-scheme}");
 
 // Quarto sets the body class from the tone of the bundle background, so a
 // bundle with a dark background gets the dark class, whatever its name.
+// Quarto picks the highlighting variant from the slot of the theme, not from
+// its tone, so a dark light bundle gets light tokens. The scope follows the
+// tone, so the rules give that bundle a map that reads on its background.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14640
+// Remove when: Quarto picks the highlighting variant from the tone. Keep the
+// tone-based scope, which the body class needs.
 $_atelier-hl-scope: "body.quarto-light";
 @if tone($body-bg) == "dark" {
   $_atelier-hl-scope: "body.quarto-dark";
