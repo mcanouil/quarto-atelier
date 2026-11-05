@@ -32,6 +32,10 @@
 			return path.indexOf(root) === 0 ? path.slice(root.length) : path;
 		}
 
+		function hrefOf(raw) {
+			return toHref(new URL(raw, location.href));
+		}
+
 		// A page of the course is a link to this site, below the site root.
 		function isPage(url) {
 			return url.origin === location.origin && url.pathname.indexOf(root) === 0;
@@ -69,8 +73,7 @@
 		var moduleItems = [];
 		var indexByHref = {};
 
-		function pageIndex(link, url) {
-			var href = toHref(url);
+		function pageIndex(link, href) {
 			if (!(href in indexByHref)) {
 				var minutes = durations[href];
 				indexByHref[href] = pages.length;
@@ -92,7 +95,7 @@
 				if (raw === "#") return;
 				var url = new URL(raw, location.href);
 				if (!isPage(url)) return;
-				var index = pageIndex(link, url);
+				var index = pageIndex(link, toHref(url));
 				if (indices.indexOf(index) === -1) indices.push(index);
 			});
 			if (!indices.length) return;
@@ -104,13 +107,13 @@
 			});
 		});
 
-		var here = toHref(new URL(location.href));
+		var here = hrefOf(location.href);
 		var current = Object.prototype.hasOwnProperty.call(indexByHref, here) ? indexByHref[here] : -1;
 
 		function neighbour(selector) {
 			var link = document.querySelector(selector);
 			if (!link) return null;
-			return { href: toHref(new URL(link.getAttribute("href"), location.href)), title: textOf(link.querySelector(".nav-page-text") || link) };
+			return { href: hrefOf(link.getAttribute("href")), title: textOf(link.querySelector(".nav-page-text") || link) };
 		}
 
 		var course = {
