@@ -1022,6 +1022,45 @@ table.quarto-listing-table {
   }
 }
 
+// Quarto unsets the fill and the ink of every table cell, so that the colours
+// a table sets on itself reach its cells. That also removes the fill of a
+// Bootstrap variant class on a table or a row, and in the dark scheme a row
+// keeps Bootstrap's black ink on the dark page. A variant takes a tint of its
+// colour on the page and the page ink, in both schemes, also on hover.
+// Upstream: none filed (WCAG 1.4.3)
+// Remove when: Quarto keeps the Bootstrap variant colours of a table or a row.
+$_atelier-table-variants: (
+  "primary": map-get($theme-colors, "primary"),
+  "success": map-get($theme-colors, "success"),
+  "info": map-get($theme-colors, "info"),
+  "warning": map-get($theme-colors, "warning"),
+  "danger": map-get($theme-colors, "danger"),
+  "dark": $atelier-chrome-page-fg,
+);
+
+@each $name, $tone in $_atelier-table-variants {
+  main table.table.table-#{$name},
+  main table.table > * > tr.table-#{$name} {
+    --bs-table-bg: #{atelier-mix($tone, $atelier-chrome-page-bg, 16%)};
+    --bs-table-striped-bg: var(--bs-table-bg);
+    --bs-table-hover-bg: var(--bs-table-bg);
+    --bs-table-active-bg: var(--bs-table-bg);
+    --bs-table-border-color: #{atelier-mix($tone, $atelier-chrome-page-bg, 35%)};
+    --bs-table-color: var(--atelier-fg);
+    --bs-table-striped-color: var(--atelier-fg);
+    --bs-table-hover-color: var(--atelier-fg);
+    --bs-table-active-color: var(--atelier-fg);
+  }
+
+  main table.table.table-#{$name} > :not(caption) > * > *,
+  main table.table.table-#{$name} > tbody > tr:hover > *,
+  main table.table > * > tr.table-#{$name} > * {
+    border-bottom-color: var(--bs-table-border-color);
+    background-color: var(--bs-table-bg);
+    color: var(--bs-table-color);
+  }
+}
+
 figure.quarto-float-tbl > figcaption {
   color: var(--atelier-muted);
   font-size: 0.82rem;
