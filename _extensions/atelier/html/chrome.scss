@@ -352,14 +352,11 @@ $atelier-workshop-bar-on-accent: atelier-on(
   $atelier-workshop-bar-fg,
   4.5
 ) !default;
-$atelier-workshop-bar-accent-soft: rgba($atelier-workshop-bar-accent, $atelier-chrome-accent-soft-alpha) !default;
 
-// The accent as text, which is also the focus ring of the bar, and the accent
-// as a mark are the chrome ones. The chrome holds them on its surface.
+// The accent as text, which is also the focus ring of the bar, is the chrome
+// one. The chrome holds it on its surface.
 $atelier-workshop-bar-accent-text: $atelier-chrome-accent !default;
-$atelier-workshop-bar-accent-mark: $atelier-chrome-accent-mark !default;
 $atelier-workshop-bar-border: $atelier-chrome-border !default;
-$atelier-workshop-bar-control-border: $atelier-chrome-control-border !default;
 
 // The terminal block is dark in both colour schemes, so these are fixed
 // colours. Each ink is at least 4.5:1 on the terminal background, and the
