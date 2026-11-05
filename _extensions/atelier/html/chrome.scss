@@ -487,6 +487,51 @@ $input-group-addon-bg: $atelier-surface-strong !default;
 $input-group-addon-color: $atelier-text-muted !default;
 $input-group-addon-border-color: $atelier-control-border !default;
 
+// Form fields sit on the page, with the page ink and the control border. A
+// disabled field takes the quiet surface and the muted ink, where Bootstrap
+// keeps a fixed light grey under the scheme ink. A ticked box takes the accent.
+$input-bg: $atelier-chrome-page-bg !default;
+$input-color: $atelier-chrome-page-fg !default;
+$input-placeholder-color: $atelier-text-muted !default;
+$input-disabled-bg: $atelier-surface !default;
+$input-disabled-color: $atelier-text-muted !default;
+$input-disabled-border-color: $atelier-border !default;
+$form-check-input-bg: $atelier-chrome-page-bg !default;
+$form-check-input-border: 1px solid $atelier-control-border !default;
+$form-check-input-checked-color: $atelier-on-accent !default;
+$form-check-input-checked-bg-color: $atelier-accent-fill !default;
+$form-check-input-checked-border-color: $atelier-accent-fill !default;
+
+// A card is a box on the page, with the hairline and a quiet header and footer.
+$card-bg: $atelier-chrome-page-bg !default;
+$card-color: $atelier-chrome-page-fg !default;
+$card-title-color: $atelier-chrome-page-fg !default;
+$card-border-color: $atelier-border !default;
+$card-cap-bg: $atelier-surface !default;
+
+// Tables in the page text are transparent, with a quiet stripe and hover row.
+$table-color: $atelier-chrome-page-fg !default;
+$table-bg: transparent !default;
+$table-striped-color: $atelier-chrome-page-fg !default;
+$table-striped-bg: $atelier-surface !default;
+$table-hover-color: $atelier-chrome-page-fg !default;
+$table-hover-bg: $atelier-surface !default;
+
+// Dropdown menus in the page body take the page, with the control border. The
+// hover and active items take the accent pair, and a disabled item the muted
+// ink. The menus on the navbar and the sidebar take their own bar tokens.
+$dropdown-bg: $atelier-chrome-page-bg !default;
+$dropdown-color: $atelier-chrome-page-fg !default;
+$dropdown-border-color: $atelier-control-border !default;
+$dropdown-divider-bg: $atelier-border !default;
+$dropdown-link-color: $atelier-chrome-page-fg !default;
+$dropdown-link-hover-color: $atelier-accent-ink !default;
+$dropdown-link-hover-bg: $atelier-accent-soft !default;
+$dropdown-link-active-color: $atelier-accent-ink !default;
+$dropdown-link-active-bg: $atelier-accent-soft !default;
+$dropdown-link-disabled-color: $atelier-text-muted !default;
+$dropdown-header-color: $atelier-text-muted !default;
+
 // Bootstrap fills pagination boxes on hover, focus, and when disabled with
 // fixed light greys, so in the dark scheme the light ink sits on a near-white
 // box. The boxes stay on the page, with the control border, and the current

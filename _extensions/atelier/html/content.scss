@@ -838,9 +838,6 @@ div.quarto-post {
 
   .form-control,
   .form-select {
-    border-color: var(--atelier-control-border);
-    background-color: var(--atelier-bg);
-    color: var(--atelier-fg);
     border-top-right-radius: $border-radius-sm;
     border-bottom-right-radius: $border-radius-sm;
   }
@@ -911,10 +908,7 @@ div.quarto-post {
 // card reads as one target. The lift needs the motion guard.
 .quarto-grid-item.card {
   overflow: hidden;
-  border: 1px solid var(--atelier-border);
   border-radius: $border-radius-lg;
-  background: var(--atelier-bg);
-  color: var(--atelier-fg);
 
   p.card-img-top > img {
     border: 0;
@@ -926,7 +920,6 @@ div.quarto-post {
   }
 
   .card-title {
-    color: var(--atelier-fg);
     font-weight: 700;
   }
 
@@ -967,20 +960,10 @@ div.quarto-post {
 // One style for the table listing and the tables in the page text: a small
 // upper-case header over a 2 px rule, hairline rows, and a tinted hover row.
 // Tables of a component (code annotations, listings other than the table
-// listing) keep their own rules.
-// The transparent default sits in `:where()`, so that a Bootstrap variant
-// class on the table (`.table-dark`, `.table-primary`) still sets its own.
-:where(main table.table, table.quarto-listing-table) {
-  --bs-table-bg: transparent;
-}
-
+// listing) keep their own rules. The colours come from the `$table-*` defaults
+// in `chrome.scss`.
 main table.table,
 table.quarto-listing-table {
-  --bs-table-color: var(--atelier-fg);
-  --bs-table-striped-bg: var(--atelier-surface);
-  --bs-table-striped-color: var(--atelier-fg);
-  --bs-table-hover-bg: var(--atelier-surface);
-  --bs-table-hover-color: var(--atelier-fg);
   width: 100%;
   border-top: 0;
   border-bottom: 0;

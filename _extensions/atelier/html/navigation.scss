@@ -692,13 +692,17 @@ body.floating .sidebar.sidebar-navigation {
   padding: 0.2rem 0.55rem;
 }
 
+.tippy-box:is([data-theme~="quarto"], [data-theme~="atelier"]) {
+  border: 1px solid var(--atelier-control-border);
+  background-color: var(--atelier-bg);
+  color: var(--atelier-fg);
+}
+
+// The menu colours come from the `$dropdown-*` defaults in `chrome.scss`.
 .tippy-box:is([data-theme~="quarto"], [data-theme~="atelier"]),
 :is(main, #title-block-header) .dropdown-menu {
-  border: 1px solid var(--atelier-control-border);
   border-radius: $border-radius;
-  background-color: var(--atelier-bg);
   box-shadow: 0 14px 30px -16px var(--atelier-shadow);
-  color: var(--atelier-fg);
 }
 
 .tippy-box[data-theme~="quarto"] > .tippy-backdrop {
@@ -727,27 +731,16 @@ body.floating .sidebar.sidebar-navigation {
   font-size: 0.86rem;
 
   .dropdown-header {
-    color: var(--atelier-muted);
     font-size: 0.74rem;
     font-weight: 650;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  .dropdown-divider {
-    border-top-color: var(--atelier-border);
-  }
-
   .dropdown-item {
     padding: 0.38rem 0.55rem;
     border-radius: $border-radius-sm;
-    color: var(--atelier-fg);
     font-size: 0.86rem;
-
-    &:is(:hover, :focus, :active, .active) {
-      background-color: var(--atelier-accent-soft);
-      color: var(--atelier-accent-ink);
-    }
   }
 }
 
