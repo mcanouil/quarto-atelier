@@ -78,7 +78,8 @@ It has a light and a dark colour scheme, and it sets only a palette and two type
 ### The terminal preset
 
 This preset is a modern dark terminal.
-It is pinned to the dark colour scheme: a script hides the colour scheme toggle and switches the page to the dark scheme.
+It is pinned to the dark colour scheme.
+The stylesheet hides the colour scheme toggle, and a script switches the page to the dark scheme.
 The preset stays dark, and the reader cannot change it.
 
 - The font is JetBrains Mono everywhere, and the corners are square.

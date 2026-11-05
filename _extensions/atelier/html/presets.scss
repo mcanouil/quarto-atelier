@@ -101,11 +101,23 @@ $atelier-terminal-prompt: null !default;
   $body-color: $_terminal-fg !default;
   $primary: $_terminal-green !default;
 
-  $blue: #6cb6ff !default;
-  $green: $_terminal-green !default;
-  $red: #ff7b72 !default;
-  $orange: #f0a35e !default;
-  $yellow: #e3c45c !default;
+  // `html/chrome.scss` maps a brand palette colour to these names, and it runs
+  // after this file. A name that the brand sets is left unset here.
+  @if not atelier-meta.variable-exists("brand-blue") {
+    $blue: #6cb6ff !default;
+  }
+  @if not atelier-meta.variable-exists("brand-green") {
+    $green: $_terminal-green !default;
+  }
+  @if not atelier-meta.variable-exists("brand-red") {
+    $red: #ff7b72 !default;
+  }
+  @if not atelier-meta.variable-exists("brand-orange") {
+    $orange: #f0a35e !default;
+  }
+  @if not atelier-meta.variable-exists("brand-yellow") {
+    $yellow: #e3c45c !default;
+  }
 
   $atelier-chrome: dark !default;
   $atelier-chrome-dark-bg: $_terminal-bg !default;

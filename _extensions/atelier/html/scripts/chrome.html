@@ -94,11 +94,15 @@
 				} catch (retryError) {
 					warn("Atelier: the dark colour scheme cannot be applied.", retryError);
 				}
-				if (!swapped || !original) {
+				if (!swapped) {
 					return;
 				}
 				try {
-					Object.defineProperty(window, "localStorage", original);
+					if (original) {
+						Object.defineProperty(window, "localStorage", original);
+					} else {
+						delete window.localStorage;
+					}
 				} catch (restoreError) {
 					warn("Atelier: the browser storage cannot be restored after applying the dark colour scheme.", restoreError);
 				}
