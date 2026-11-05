@@ -633,13 +633,13 @@ html pre.sourceCode.atelier-terminal {
     overflow-wrap: anywhere;
   }
 
-  // A line that continues a command takes the command colour, with no prompt.
-  code > span.atelier-command-line {
+  // A prompt line and a line that continues a command take the command colour.
+  // Only the prompt line draws the prompt.
+  code > span:is(.atelier-prompt-line, .atelier-command-line) {
     color: var(--atelier-terminal-fg);
   }
 
   code > span.atelier-prompt-line {
-    color: var(--atelier-terminal-fg);
 
     // The empty alternative text keeps the prompt out of the accessible text.
     // A browser without alternative text reads the first declaration.

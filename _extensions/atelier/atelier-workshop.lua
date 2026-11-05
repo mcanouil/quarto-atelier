@@ -383,6 +383,14 @@ local function read_front_matter(path, report)
   return meta, true
 end
 
+--- Tell whether a page has front matter that the filter can read.
+--- @param path string The page path
+--- @return boolean True for a `.qmd`, `.md`, or `.Rmd` page
+local function has_front_matter(path)
+  local extension = path:match('%.(%w+)$')
+  return extension ~= nil and FRONT_MATTER_EXTENSIONS[extension] == true
+end
+
 --- Find the page of a sidebar that logs the warnings for the whole sidebar.
 --- Each page renders on its own, so one page must log each problem. It is the
 --- first page that exists and has front matter, because only such a page can
@@ -392,8 +400,7 @@ end
 --- @return string|nil The path of that page, or nil when there is none
 local function first_front_matter_page(paths, directory)
   for _, path in ipairs(paths) do
-    local extension = path:match('%.(%w+)$')
-    if extension and FRONT_MATTER_EXTENSIONS[extension] and file_exists(directory .. '/' .. path) then
+    if has_front_matter(path) and file_exists(directory .. '/' .. path) then
       return path
     end
   end
@@ -413,8 +420,7 @@ local function read_durations(paths, page)
   local directory = quarto.project.directory or '.'
   local first = first_front_matter_page(paths, directory)
   for _, path in ipairs(paths) do
-    local extension = path:match('%.(%w+)$')
-    if extension and FRONT_MATTER_EXTENSIONS[extension] then
+    if has_front_matter(path) then
       local meta, exists = read_front_matter(directory .. '/' .. path, page == first)
       if not exists then
         if page == first then
