@@ -33,9 +33,10 @@ $atelier-terminal-decoration: true !default;
 // Each is declared here as `null`. A `null` value counts as unset for
 // `!default`, so a brand or Bootstrap value still wins, and a later check
 // must test for `null` instead of for existence.
-$body-bg: null !default;
-$body-color: null !default;
-$primary: null !default;
+//
+// Quarto tests if `$body-bg`, `$body-color`, and `$primary` exist. A `null`
+// value then breaks a site with no preset, so these three are not declared
+// here. A preset sets them with `!global`.
 $blue: null !default;
 $green: null !default;
 $red: null !default;
@@ -66,16 +67,16 @@ $atelier-terminal-prompt: null !default;
 // colour or font wins. A brand primary also drives the chrome accent.
 @if $atelier-preset == quarto {
   @if $atelier-scheme == dark {
-    $body-bg: #161b22 !default;
-    $body-color: #dbe6f0 !default;
-    $primary: #74aadb !default;
+    $body-bg: #161b22 !default !global;
+    $body-color: #dbe6f0 !default !global;
+    $primary: #74aadb !default !global;
   } @else {
-    @if $primary == null {
+    @if not atelier-meta.variable-exists(primary) or $primary == null {
       $atelier-chrome-accent: #355372 !default;
     }
-    $body-bg: #f8fafc !default;
-    $body-color: #1f2a36 !default;
-    $primary: #47709a !default;
+    $body-bg: #f8fafc !default !global;
+    $body-color: #1f2a36 !default !global;
+    $primary: #47709a !default !global;
   }
 
   $font-family-sans-serif: "Alegreya Sans", sans-serif !default;
@@ -97,9 +98,9 @@ $atelier-terminal-prompt: null !default;
   $_terminal-fg: #d8dee9;
   $_terminal-font: "JetBrains Mono", monospace;
 
-  $body-bg: #101216 !default;
-  $body-color: $_terminal-fg !default;
-  $primary: $_terminal-green !default;
+  $body-bg: #101216 !default !global;
+  $body-color: $_terminal-fg !default !global;
+  $primary: $_terminal-green !default !global;
 
   // `html/chrome.scss` maps a brand palette colour to these names, and it runs
   // after this file. A name that the brand sets is left unset here.
