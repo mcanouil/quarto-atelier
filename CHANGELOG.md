@@ -71,6 +71,7 @@
   Its code no longer shows the pale dark-scheme highlighting on a light page. (#92)
 - fix: Draw the copy button icon in the accent colour of the button, and in the terminal text colour on a terminal block.
   The icon no longer shows a dark grey on the dark terminal in the light scheme, and sits in the middle of its frame. (#95)
+- fix: Centre the label of the highlighted-lines chip, such as `L3`, in the header of a code window. (#95)
 
 ### Documentation
 
