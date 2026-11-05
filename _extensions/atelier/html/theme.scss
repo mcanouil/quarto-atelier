@@ -43,16 +43,33 @@ $border-color: null;
 
 /*-- scss:mixins --*/
 
-// Dropdown menus render on both bars, each from its own tokens.
-@mixin atelier-dropdown($surface, $border, $fg, $accent, $accent-soft) {
+// The navbar and the docked sidebar are two bars with the same parts, each
+// painted from its own tokens: `$bar` is `navbar` or `sidebar`, the prefix of
+// the `--atelier-<bar>-*` properties.
+@mixin atelier-bar($bar) {
+  // The gitlink widget pill, trigger, and menu take the tokens of the bar they
+  // sit on. The menu takes the page colours. Inert when the gitlink extension
+  // is not installed.
+  --gitlink-widget-menu-bg: var(--atelier-bg);
+  --gitlink-widget-menu-fg: var(--atelier-fg);
+  --gitlink-widget-border: var(--atelier-#{$bar}-control-border);
+  --gitlink-widget-accent: var(--atelier-#{$bar}-accent);
+  --gitlink-widget-accent-soft: var(--atelier-#{$bar}-accent-soft);
+
+  // One 2px ring, in the bar's accent, so that it holds 3:1 on the bar.
+  :is(a, button):focus-visible {
+    outline-color: var(--atelier-#{$bar}-accent);
+  }
+
+  // Dropdown menus on the bar.
   .dropdown-menu {
-    background: $surface;
-    border: 1px solid $border;
+    background: var(--atelier-#{$bar}-surface);
+    border: 1px solid var(--atelier-#{$bar}-border);
     border-radius: $border-radius-sm;
   }
 
   .dropdown-item {
-    color: $fg;
+    color: var(--atelier-#{$bar}-fg);
   }
 
   // The colour above outranks Bootstrap's colour for the active item but not
@@ -61,8 +78,8 @@ $border-color: null;
   .dropdown-item:focus,
   .dropdown-item.active,
   .dropdown-item:active {
-    background: $accent-soft;
-    color: $accent;
+    background: var(--atelier-#{$bar}-accent-soft);
+    color: var(--atelier-#{$bar}-accent);
   }
 }
 
@@ -1084,15 +1101,10 @@ body.docked {
     color: var(--atelier-sidebar-accent);
   }
 
-  // A sidebar tool with a `menu` opens a Bootstrap dropdown on the dark column.
+  // The sidebar is the second bar. A sidebar tool with a `menu` opens a
+  // Bootstrap dropdown on the column.
   .sidebar-navigation {
-    @include atelier-dropdown(
-      var(--atelier-sidebar-surface),
-      var(--atelier-sidebar-border),
-      var(--atelier-sidebar-fg),
-      var(--atelier-sidebar-accent),
-      var(--atelier-sidebar-accent-soft)
-    );
+    @include atelier-bar(sidebar);
   }
 
   // Inline sidebar search (`website.sidebar.search: true` with a textbox
@@ -1155,7 +1167,7 @@ body.docked {
   // The page focus ring is the page accent ink, which is held to the page and
   // not to the sidebar column. Keep its geometry and swap the colour for the
   // sidebar accent.
-  :is(#quarto-sidebar, .quarto-secondary-nav) :is(a, button):focus-visible {
+  .quarto-secondary-nav :is(a, button):focus-visible {
     outline-color: var(--atelier-sidebar-accent);
   }
 
@@ -1230,13 +1242,7 @@ body.docked {
 .navbar {
   border-bottom: 1px solid var(--atelier-navbar-border);
 
-  @include atelier-dropdown(
-    var(--atelier-navbar-surface),
-    var(--atelier-navbar-border),
-    var(--atelier-navbar-fg),
-    var(--atelier-navbar-accent),
-    var(--atelier-navbar-accent-soft)
-  );
+  @include atelier-bar(navbar);
 }
 
 // Quarto gives the sidebar `overflow-y: auto` and leaves `overflow-x` at

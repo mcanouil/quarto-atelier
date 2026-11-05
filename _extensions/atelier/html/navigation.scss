@@ -149,11 +149,6 @@
   border-bottom: 3px solid var(--atelier-navbar-accent-mark);
 }
 
-// One 2px ring, in the bar's accent so that it holds 3:1 on a pinned dark bar.
-.navbar :is(a, button):focus-visible {
-  outline-color: var(--atelier-navbar-accent);
-}
-
 // ===========================================================================
 // GITLINK WIDGET
 // ===========================================================================
@@ -161,26 +156,8 @@
 // border and its hover fill, ship with the gitlink widget
 // (widget-navbar-tools.css via `widget.style-navbar-tools`); their geometry
 // comes from the control tokens in `html/theme.scss`. Bridge the tokens onto
-// the widget's own custom properties so the pill, trigger, and menu match the
-// bar they sit on. The menu takes the page colours. Inert when the gitlink
-// extension is not installed.
-.navbar,
-body.docked .sidebar-navigation {
-  --gitlink-widget-menu-bg: var(--atelier-bg);
-  --gitlink-widget-menu-fg: var(--atelier-fg);
-}
-
-.navbar {
-  --gitlink-widget-border: var(--atelier-navbar-control-border);
-  --gitlink-widget-accent: var(--atelier-navbar-accent);
-  --gitlink-widget-accent-soft: var(--atelier-navbar-accent-soft);
-}
-
-body.docked .sidebar-navigation {
-  --gitlink-widget-border: var(--atelier-sidebar-control-border);
-  --gitlink-widget-accent: var(--atelier-sidebar-accent);
-  --gitlink-widget-accent-soft: var(--atelier-sidebar-accent-soft);
-}
+// the widget's own custom properties, in the `atelier-bar` mixin of
+// `html/theme.scss`.
 
 // The widget menu shadow is fixed in widget.css, with no property to set, so
 // it is repainted from the shadow token here. The sidebar form of the menu
