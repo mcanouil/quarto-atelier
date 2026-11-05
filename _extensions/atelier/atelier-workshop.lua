@@ -750,19 +750,6 @@ local function style_proof(proof)
   return solution_block(proof.div, title, proof.identifier or '')
 end
 
---- Tell whether a code block has a class that can name a language.
---- The classes `terminal`, `numberLines`, and `number-lines` do not name one.
---- @param block pandoc.CodeBlock The code block
---- @return boolean True when the block has a language class
-local function has_language_class(block)
-  for _, class in ipairs(block.classes) do
-    if class ~= 'terminal' and class ~= 'numberLines' and class ~= 'number-lines' then
-      return true
-    end
-  end
-  return false
-end
-
 --- Pandoc can highlight a language when it writes a highlighted block for it.
 --- @type table<string, boolean>
 local highlights = {}
@@ -793,19 +780,21 @@ end
 --- A command that ends with `\` goes on to the next line. The numbers of these
 --- next lines join `atelier-continuation`, and the style gives them the command
 --- colour with no prompt. An indented `$` line is output, as in usage text.
---- A block with no `filename` gets the `terminal` label in
+--- A block with no `filename`, or an empty one, gets the `terminal` label in
 --- `code-window-auto-label`, so Code Window draws a window with that label.
 --- This filter runs before Code Window. A `filename`, `code-window-enabled`, or
 --- `code-window-no-auto-filename` on the block still wins.
---- A block with no language class is not highlighted, so the prompt and the dark
---- style cannot apply. The filter then logs a warning and leaves the block as it is.
+--- A block with no class that Pandoc can highlight is not highlighted, so the
+--- prompt and the dark style cannot apply. The filter then logs a warning and
+--- leaves the block as it is.
 --- @param block pandoc.CodeBlock The code block
 --- @return pandoc.CodeBlock|nil The block, or nil to keep it
 local function style_terminal(block)
   if not quarto.doc.is_format('html') or not block.classes:includes('terminal') then
     return nil
   end
-  if not has_language_class(block) then
+  local language = highlighted_class_index(block)
+  if language == nil then
     log.log_warning(
       EXTENSION_NAME,
       'The .terminal block in ' .. (quarto.doc.input_file or '') .. ' has no language class, so it is not highlighted and shows no prompt. ' ..
@@ -815,8 +804,7 @@ local function style_terminal(block)
   end
   -- Code Window takes the first class as the language, and renames it
   -- `default` when it is not one, so the language class goes first.
-  local language = highlighted_class_index(block)
-  if language and language > 1 then
+  if language > 1 then
     block.classes:insert(1, block.classes:remove(language))
   end
   local lines = {}
@@ -850,7 +838,7 @@ local function style_terminal(block)
   if #continuations > 0 then
     block.attributes['atelier-continuation'] = table.concat(continuations, ',')
   end
-  if block.attributes.filename == nil then
+  if (block.attributes.filename or '') == '' then
     block.attributes['code-window-auto-label'] = state.labels.terminal
   end
   return block
