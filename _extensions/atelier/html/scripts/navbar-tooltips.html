@@ -4,12 +4,29 @@
 	 * @copyright 2026 Mickaël Canouil
 	 * @author Mickaël Canouil
 	 */
+	// Every popup has an arrow that points at its trigger, the navbar tooltips
+	// included. Quarto turns the arrow off for each of its popups
+	// (cross-references, footnotes, citations, code annotations), so wrap tippy to
+	// turn it on again. This runs before Quarto makes its popups, on
+	// DOMContentLoaded.
+	// Remove when: never, because the arrow is Atelier design.
+	(function () {
+		if (typeof window.tippy !== "function") return;
+		var quartoTippy = window.tippy;
+		var arrowTippy = function (targets, props) {
+			return quartoTippy(targets, Object.assign({}, props, { arrow: true }));
+		};
+		Object.assign(arrowTippy, quartoTippy);
+		window.tippy = arrowTippy;
+	})();
+
 	document.addEventListener("DOMContentLoaded", function () {
 		var hasTippy = typeof window.tippy === "function";
 		var config = {
-			theme: "atelier",
+			// The `quarto` theme gives the popup surface and the arrow, and `atelier`
+			// the smaller type of a tooltip.
+			theme: "quarto atelier",
 			placement: "bottom",
-			arrow: false,
 			delay: [100, 0],
 			offset: [0, 6],
 			allowHTML: false,

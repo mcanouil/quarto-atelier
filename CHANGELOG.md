@@ -42,6 +42,7 @@
 - feat: Draw a code block with the `.terminal` class as a dark terminal in both colour schemes, with a `$` prompt before each command that screen readers and the copy button skip. (#78)
 - feat: Add two starter templates, one for documentation with a navbar and one for a workshop with the sidebar only.
   Install Atelier with `quarto add`, then run `quarto use template mcanouil/quarto-atelier/templates/<name>`. (#79)
+- feat: Show an arrow on every popup and navbar tooltip, joined to the popup border. (#87)
 
 ### Bug Fixes
 
@@ -63,6 +64,9 @@
 - fix: Give the colour scheme toggle its themed tooltip again, in the navbar, in the sidebar, and floating at the top right. (#81)
 - fix: Show the floating colour scheme toggle below the announcement bar on a page with no navbar or sidebar. (#82)
 - fix: Check text contrast on the colours the browser paints, so that muted text and the derived inks keep 4.5:1 once their channels are rounded. (#84)
+- fix: Keep the listing filter and sort icon boxes in place, with their rounded corners, beside their visible labels. (#87)
+- fix: Paint form fields, check boxes, cards, and menus in the page text from the brand, so that a disabled field stays readable in dark mode. (#87)
+- fix: Keep the fill of Bootstrap table and row variant classes, such as `.table-primary`, with readable text in both colour schemes. (#87)
 
 ### Documentation
 
