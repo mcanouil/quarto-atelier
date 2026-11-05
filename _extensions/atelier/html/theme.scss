@@ -947,6 +947,11 @@ a code.sourceCode:not(pre code) {
   color: var(--atelier-accent-ink);
 }
 
+// The icon keeps one colour, so the frame marks the hover and the focus.
+html .code-copy-button:is(:hover, :focus-visible) {
+  border-color: var(--atelier-accent-mark);
+}
+
 // Quarto bakes a grey fill into the copy and copied icons, so they ignore the
 // button colour. Draw each icon as a mask over the current colour. Quarto's
 // hover rules outrank these selectors, hence the !important.
@@ -961,10 +966,14 @@ html .code-copy-button > .bi::before {
   mask-image: $atelier-icon-copy;
   mask-repeat: no-repeat;
   mask-size: 1rem 1rem;
+  -webkit-mask-image: $atelier-icon-copy;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 1rem 1rem;
 }
 
 html .code-copy-button-checked > .bi::before {
   mask-image: $atelier-icon-copied;
+  -webkit-mask-image: $atelier-icon-copied;
 }
 
 // ===========================================================================
