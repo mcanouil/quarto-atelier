@@ -40,7 +40,7 @@ $atelier-highlighting: (
     "dark": (
         "": ("color": #f8f8f2, "bold": false, "italic": false, "underline": false), // Normal
         "kw": ("color": #ffa07a, "bold": true, "italic": false, "underline": false), // Keyword
-        "dt": ("color": #ffa07a, "bold": false, "italic": false, "underline": false), // DataType
+        "dt": ("color": #c792ea, "bold": false, "italic": false, "underline": false), // DataType
         "dv": ("color": #d4d0ab, "bold": false, "italic": false, "underline": false), // DecVal
         "bn": ("color": #d4d0ab, "bold": false, "italic": false, "underline": false), // BaseN
         "fl": ("color": #d4d0ab, "bold": false, "italic": false, "underline": false), // Float
@@ -51,15 +51,15 @@ $atelier-highlighting: (
         "vs": ("color": #abe338, "bold": false, "italic": false, "underline": false), // VerbatimString
         "ss": ("color": #abe338, "bold": false, "italic": false, "underline": false), // SpecialString
         "im": ("color": #abe338, "bold": false, "italic": false, "underline": false), // Import
-        "co": ("color": #e6e6dc, "bold": false, "italic": true, "underline": false), // Comment
-        "do": ("color": #f8f8f2, "bold": false, "italic": false, "underline": false), // Documentation
+        "co": ("color": #a8a8a0, "bold": false, "italic": true, "underline": false), // Comment
+        "do": ("color": #a8a8a0, "bold": false, "italic": true, "underline": false), // Documentation
         "an": ("color": #d4d0ab, "bold": false, "italic": false, "underline": false), // Annotation
         "cv": ("color": #ffd700, "bold": false, "italic": false, "underline": false), // CommentVar
         "ot": ("color": #00e0e0, "bold": false, "italic": false, "underline": false), // Other
-        "fu": ("color": #ffa07a, "bold": false, "italic": false, "underline": false), // Function
+        "fu": ("color": #82aaff, "bold": false, "italic": false, "underline": false), // Function
         "va": ("color": #00e0e0, "bold": false, "italic": false, "underline": false), // Variable
         "cf": ("color": #ffa07a, "bold": true, "italic": false, "underline": false), // ControlFlow
-        "op": ("color": #ffa07a, "bold": false, "italic": false, "underline": false), // Operator
+        "op": ("color": #d4d0ab, "bold": false, "italic": false, "underline": false), // Operator
         "bu": ("color": #abe338, "bold": false, "italic": false, "underline": false), // BuiltIn
         "ex": ("color": #00e0e0, "bold": true, "italic": false, "underline": false), // Extension
         "pp": ("color": #dcc6e0, "bold": false, "italic": false, "underline": false), // Preprocessor
@@ -211,7 +211,7 @@ $atelier-highlighting: (
 
 $atelier-highlighting-sentinels: (
   "default-light": (#595959, #4758ab),
-  "default-dark": (#e6e6dc, #ffa07a),
+  "default-dark": (#a8a8a0, #82aaff),
   "quarto-light": (#4f5c69, #365e88),
   "quarto-dark": (#9aa8b6, #9cc6ec),
   "terminal-light": (#57606a, #0969da),

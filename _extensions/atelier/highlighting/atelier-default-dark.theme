@@ -26,7 +26,7 @@
             "underline": false
         },
         "DataType": {
-            "text-color": "#ffa07a",
+            "text-color": "#c792ea",
             "background-color": null,
             "bold": false,
             "italic": false,
@@ -103,17 +103,17 @@
             "underline": false
         },
         "Comment": {
-            "text-color": "#e6e6dc",
+            "text-color": "#a8a8a0",
             "background-color": null,
             "bold": false,
             "italic": true,
             "underline": false
         },
         "Documentation": {
-            "text-color": "#f8f8f2",
+            "text-color": "#a8a8a0",
             "background-color": null,
             "bold": false,
-            "italic": false,
+            "italic": true,
             "underline": false
         },
         "Annotation": {
@@ -138,7 +138,7 @@
             "underline": false
         },
         "Function": {
-            "text-color": "#ffa07a",
+            "text-color": "#82aaff",
             "background-color": null,
             "bold": false,
             "italic": false,
@@ -152,7 +152,7 @@
             "underline": false
         },
         "Operator": {
-            "text-color": "#ffa07a",
+            "text-color": "#d4d0ab",
             "background-color": null,
             "bold": false,
             "italic": false,
