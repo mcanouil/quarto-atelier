@@ -8,6 +8,12 @@
 
 /*-- scss:functions --*/
 
+// The dark palette of Atelier. It sits here, ahead of every defaults section,
+// so that `html/dark.scss` can read it before this file sets its defaults.
+$_atelier-dark-bg: #1b242e;
+$_atelier-dark-fg: #e8edf2;
+$_atelier-dark-accent: #7fa8c4;
+
 // $color with each channel rounded to a whole number, as the browser paints it.
 // Dart Sass keeps fractional channels, so a colour that reaches a ratio in Sass
 // can fall just under it once rendered.
@@ -188,9 +194,9 @@ $atelier-chrome: auto !default;
 // The pinned palettes, each a background, a foreground, and an accent that
 // every other chrome colour is derived from. Only the palette matching
 // $atelier-chrome is used, so pinning light leaves the dark values inert.
-$atelier-chrome-dark-bg: #1b242e !default;
-$atelier-chrome-dark-fg: #e8edf2 !default;
-$atelier-chrome-dark-accent: #7fa8c4 !default;
+$atelier-chrome-dark-bg: $_atelier-dark-bg !default;
+$atelier-chrome-dark-fg: $_atelier-dark-fg !default;
+$atelier-chrome-dark-accent: $_atelier-dark-accent !default;
 
 $atelier-chrome-light-bg: #eef1f5 !default;
 $atelier-chrome-light-fg: #1b242e !default;
@@ -200,17 +206,21 @@ $atelier-chrome-light-accent: #1f5f80 !default;
 // variables are only defined in the Bootstrap layer that follows this one;
 // fall back to the Bootstrap defaults so `auto` still resolves.
 $atelier-chrome-page-bg: #fff;
-@if atelier-meta.variable-exists(body-bg) {
+@if atelier-meta.variable-exists(body-bg) and $body-bg != null {
   $atelier-chrome-page-bg: $body-bg;
 }
 $atelier-chrome-page-fg: #212529;
-@if atelier-meta.variable-exists(body-color) {
+@if atelier-meta.variable-exists(body-color) and $body-color != null {
   $atelier-chrome-page-fg: $body-color;
 }
 $atelier-chrome-page-accent: #0d6efd;
-@if atelier-meta.variable-exists(primary) {
+@if atelier-meta.variable-exists(primary) and $primary != null {
   $atelier-chrome-page-accent: $primary;
 }
+
+// Bootstrap paints a plain `pre` in `$body-emphasis-color`, which is black on
+// any page. Paint it in the page text, as the brand does when it sets one.
+$pre-color: $atelier-chrome-page-fg !default;
 
 // ===========================================================================
 // RADIUS AND MERMAID TOKENS
