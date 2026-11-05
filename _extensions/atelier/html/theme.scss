@@ -102,6 +102,9 @@ $border-color: null;
 // a bar; re-point the Sass variables instead when the change should also reach
 // the colours Quarto bakes into its own markup.
 :root {
+  @if $atelier-preset == terminal {
+    --atelier-scheme-pin: dark;
+  }
   --atelier-bg: #{$atelier-chrome-page-bg};
   --atelier-fg: #{$atelier-chrome-page-fg};
   --atelier-surface: #{$atelier-surface};

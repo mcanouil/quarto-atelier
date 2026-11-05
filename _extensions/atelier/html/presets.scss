@@ -58,3 +58,41 @@ $atelier-terminal-decoration: true !default;
   $headings-font-family: "Alegreya Sans", sans-serif !default !global;
   $font-family-monospace: "Fira Code", monospace !default !global;
 }
+
+// ===========================================================================
+// TERMINAL PRESET
+// ===========================================================================
+// A dark, monospace look, pinned: both bundles get the same values, so a
+// reader whose system prefers light still gets the dark look. The chrome is
+// pinned dark, and the terminal block takes the chrome background and the
+// accent. Every value is a default, so a brand colour or font wins. A brand
+// light value in the light bundle is kept, and a warning says so.
+@if $atelier-preset == terminal {
+  $body-bg: #101216 !default !global;
+  $body-color: #d8dee9 !default !global;
+  $primary: #7ee08a !default !global;
+  $pre-color: $body-color !default !global;
+
+  $blue: #6cb6ff !default !global;
+  $green: #7ee08a !default !global;
+  $red: #ff7b72 !default !global;
+  $orange: #f0a35e !default !global;
+  $yellow: #e3c45c !default !global;
+
+  $atelier-chrome: dark !default !global;
+  $atelier-chrome-dark-bg: #16191e !default !global;
+  $atelier-chrome-dark-fg: #d8dee9 !default !global;
+  $atelier-chrome-dark-accent: #7ee08a !default !global;
+  $atelier-terminal-bg: #16191e !default !global;
+  $atelier-terminal-prompt: #7ee08a !default !global;
+
+  $border-radius: 0 !default !global;
+  $font-size-base: 0.95rem !default !global;
+  $font-family-sans-serif: "JetBrains Mono", monospace !default !global;
+  $headings-font-family: "JetBrains Mono", monospace !default !global;
+  $font-family-monospace: "JetBrains Mono", monospace !default !global;
+
+  @if $atelier-scheme == light and tone($body-bg) == "light" {
+    @warn "The terminal preset is dark; brand light values are ignored.";
+  }
+}
