@@ -22,7 +22,14 @@
 		// because they would only switch to a look the preset does not have.
 		// A page without the property does nothing here.
 		if (getComputedStyle(document.documentElement).getPropertyValue("--atelier-scheme-pin").trim() === "dark") {
-			if (document.body && !document.body.classList.contains("quarto-dark")) {
+			// The body class alone cannot tell: Quarto takes it from the data-mode of
+			// the light bundle, and that bundle is already dark under this preset.
+			// So the dark bundle counts as active only when the alternate (dark)
+			// sheets are enabled and the body is dark.
+			var darkSheets = document.querySelectorAll("link.quarto-color-scheme.quarto-color-alternate");
+			var darkActive = document.body.classList.contains("quarto-dark") &&
+				[].every.call(darkSheets, function (sheet) { return sheet.rel === "stylesheet"; });
+			if (darkSheets.length && !darkActive) {
 				try {
 					window.quartoToggleColorScheme();
 				} catch (error) {
