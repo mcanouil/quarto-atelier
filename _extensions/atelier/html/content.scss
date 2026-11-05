@@ -462,13 +462,17 @@ html .code-with-filename .atelier-code-language {
 // The copy button is always visible, whatever the pointer does. For annotated
 // code, Quarto sets the size and the top inset of its own frameless button,
 // with a selector that outranks the first one here; the second selector keeps
-// the framed button the same on every block.
+// the framed button the same on every block. Quarto sits the icon on the text
+// baseline, which leaves it high in the frame, so the button centres it.
 html .code-copy-button,
 html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   opacity: 1;
   min-width: 24px;
   min-height: 24px;
-  padding: 0.15rem 0.5rem;
+  padding: 0 0.5rem;
   font-size: 0.72rem;
   border: 1px solid var(--atelier-control-border);
   border-radius: 5px;

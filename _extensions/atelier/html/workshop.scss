@@ -619,6 +619,10 @@ html .code-with-filename.atelier-terminal {
     color: var(--atelier-terminal-fg);
     background-color: transparent;
     border-color: var(--atelier-terminal-control-border);
+
+    &:is(:hover, :focus-visible) {
+      border-color: var(--atelier-terminal-fg);
+    }
   }
 }
 

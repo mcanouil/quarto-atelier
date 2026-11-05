@@ -941,10 +941,45 @@ a code.sourceCode:not(pre code) {
   }
 }
 
-// Quarto bakes a fixed grey into the copy button, which reads poorly on the
-// body-mix() code surface; use the palette accent in both schemes.
+// The copy button takes the palette accent in both schemes. The terminal
+// block in workshop.scss sets its own colour.
 .code-copy-button {
   color: var(--atelier-accent-ink);
+}
+
+// The icon keeps one colour, so the frame marks the hover and the focus. The
+// second selector matches the annotated-code border rule in content.scss.
+html .code-copy-button:is(:hover, :focus-visible),
+html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button:is(:hover, :focus-visible) {
+  border-color: var(--atelier-accent-mark);
+}
+
+// Quarto bakes a grey fill into the copy and copied icons, so they ignore the
+// button colour. Draw each icon as a mask over the current colour. Quarto's
+// hover rules outrank these selectors, hence the !important.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15303
+// Remove when: the minimum Quarto version includes the fix.
+$atelier-icon-copy: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>');
+$atelier-icon-copied: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>');
+
+html .code-copy-button > .bi::before {
+  display: block;
+  background-color: currentcolor;
+  background-image: none !important;
+  mask: $atelier-icon-copy center / 1rem no-repeat;
+  -webkit-mask: $atelier-icon-copy center / 1rem no-repeat;
+
+  // In forced colours the system replaces the fill under the mask, which
+  // hides the icon. Paint it in the button text colour of the system.
+  @media (forced-colors: active) {
+    forced-color-adjust: none;
+    background-color: ButtonText;
+  }
+}
+
+html .code-copy-button-checked > .bi::before {
+  mask-image: $atelier-icon-copied;
+  -webkit-mask-image: $atelier-icon-copied;
 }
 
 // ===========================================================================
