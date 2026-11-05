@@ -29,6 +29,11 @@ local EXTENSION_NAME = 'atelier'
 --- @type table<string, boolean>
 local FRONT_MATTER_EXTENSIONS = { qmd = true, md = true, Rmd = true }
 
+--- Page file extensions that Quarto renders through this filter, so such a
+--- page can be in workshop mode. A notebook reads its metadata from a raw cell.
+--- @type table<string, boolean>
+local RENDERED_EXTENSIONS = { qmd = true, md = true, Rmd = true, ipynb = true }
+
 --- Labels and their default text, in output order.
 --- @type table<integer, { key: string, default: string }>
 local LABELS = {
@@ -383,24 +388,25 @@ local function read_front_matter(path, report)
   return meta, true
 end
 
---- Tell whether a page has front matter that the filter can read.
+--- Tell whether the extension of a page is in a set of extensions.
 --- @param path string The page path
---- @return boolean True for a `.qmd`, `.md`, or `.Rmd` page
-local function has_front_matter(path)
+--- @param extensions table<string, boolean> The set, such as `FRONT_MATTER_EXTENSIONS`
+--- @return boolean True when the extension of the page is in the set
+local function has_extension(path, extensions)
   local extension = path:match('%.(%w+)$')
-  return extension ~= nil and FRONT_MATTER_EXTENSIONS[extension] == true
+  return extension ~= nil and extensions[extension] == true
 end
 
 --- Find the page of a sidebar that logs the warnings for the whole sidebar.
 --- Each page renders on its own, so one page must log each problem. It is the
---- first page that exists and has front matter, because only such a page can
---- be in workshop mode and read the sidebar.
+--- first page that exists and that Quarto renders through this filter, because
+--- only such a page can be in workshop mode and read the sidebar.
 --- @param paths string[] The page paths relative to the project
 --- @param directory string The project folder
 --- @return string|nil The path of that page, or nil when there is none
-local function first_front_matter_page(paths, directory)
+local function reporting_page(paths, directory)
   for _, path in ipairs(paths) do
-    if has_front_matter(path) and file_exists(directory .. '/' .. path) then
+    if has_extension(path, RENDERED_EXTENSIONS) and file_exists(directory .. '/' .. path) then
       return path
     end
   end
@@ -410,17 +416,17 @@ end
 --- Read the duration of each page of a sidebar.
 --- Each page of the sidebar reads all the durations, so each problem must log
 --- one warning only. The render of a page warns for its own duration. The
---- render of the page that `first_front_matter_page` gives warns for the files
---- that do not exist.
+--- render of the page that `reporting_page` gives warns for the files that do
+--- not exist.
 --- @param paths string[] The page paths relative to the project
 --- @param page string The page path relative to the project
 --- @return table<string, integer> The minutes by output path
 local function read_durations(paths, page)
   local durations = {}
   local directory = quarto.project.directory or '.'
-  local first = first_front_matter_page(paths, directory)
+  local first = reporting_page(paths, directory)
   for _, path in ipairs(paths) do
-    if has_front_matter(path) then
+    if has_extension(path, FRONT_MATTER_EXTENSIONS) then
       local meta, exists = read_front_matter(directory .. '/' .. path, page == first)
       if not exists then
         if page == first then
@@ -457,13 +463,13 @@ local state = { objectives = {} }
 
 --- Log the warning for a listed sidebar that has no id.
 --- Each page of the sidebar finds the same problem, so only the page that
---- `first_front_matter_page` gives warns.
+--- `reporting_page` gives warns.
 --- @param source string The input file, for the warning
 --- @param paths string[] The page paths of the sidebar
 --- @param page string The page path relative to the project
 --- @return nil
 local function warn_sidebar_without_id(source, paths, page)
-  if page ~= first_front_matter_page(paths, quarto.project.directory or '.') then
+  if page ~= reporting_page(paths, quarto.project.directory or '.') then
     return nil
   end
   log.log_warning(
