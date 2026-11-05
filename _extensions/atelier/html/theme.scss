@@ -72,6 +72,13 @@ $border-color: null;
     color: var(--atelier-#{$bar}-fg);
   }
 
+  // A menu header and a disabled item take the muted ink of the bar, where the
+  // `$dropdown-*` defaults give the muted ink of the page.
+  .dropdown-header,
+  .dropdown-item.disabled {
+    color: var(--atelier-#{$bar}-muted);
+  }
+
   // The colour above outranks Bootstrap's colour for the active item but not
   // its fill, so the active item takes the hover pair too, which stays AA.
   .dropdown-item:hover,

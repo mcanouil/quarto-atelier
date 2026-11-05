@@ -10,14 +10,15 @@
 	// turn it on again. This runs before Quarto makes its popups, on
 	// DOMContentLoaded.
 	// Remove when: never, because the arrow is Atelier design.
-	if (typeof window.tippy === "function") {
+	(function () {
+		if (typeof window.tippy !== "function") return;
 		var quartoTippy = window.tippy;
 		var arrowTippy = function (targets, props) {
 			return quartoTippy(targets, Object.assign({}, props, { arrow: true }));
 		};
 		Object.assign(arrowTippy, quartoTippy);
 		window.tippy = arrowTippy;
-	}
+	})();
 
 	document.addEventListener("DOMContentLoaded", function () {
 		var hasTippy = typeof window.tippy === "function";

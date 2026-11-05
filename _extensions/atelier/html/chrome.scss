@@ -488,7 +488,7 @@ $input-group-addon-color: $atelier-text-muted !default;
 $input-group-addon-border-color: $atelier-control-border !default;
 
 // Form fields sit on the page, with the page ink and the control border. A
-// ticked box takes the accent.
+// ticked or indeterminate box takes the accent.
 $input-bg: $atelier-chrome-page-bg !default;
 $input-color: $atelier-chrome-page-fg !default;
 $input-placeholder-color: $atelier-text-muted !default;
@@ -497,6 +497,9 @@ $form-check-input-border: 1px solid $atelier-control-border !default;
 $form-check-input-checked-color: $atelier-on-accent !default;
 $form-check-input-checked-bg-color: $atelier-accent-fill !default;
 $form-check-input-checked-border-color: $atelier-accent-fill !default;
+$form-check-input-indeterminate-color: $atelier-on-accent !default;
+$form-check-input-indeterminate-bg-color: $atelier-accent-fill !default;
+$form-check-input-indeterminate-border-color: $atelier-accent-fill !default;
 
 // Bootstrap paints a disabled field on a fixed light grey and keeps the scheme
 // ink on it, so in the dark scheme the light ink sits on a near-white field.
