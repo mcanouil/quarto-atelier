@@ -46,7 +46,7 @@
     // the focus, so that the focus does not move from under the user.
     function syncFocus(box) {
       const entry = boxes.get(box);
-      if (!entry.needsTabStop) return;
+      if (!entry || !entry.needsTabStop) return;
       const scrolls = box.scrollWidth - box.clientWidth > 1 && box.clientHeight > 1;
       if (scrolls === box.hasAttribute(MARKER)) return;
       if (scrolls) {
@@ -75,7 +75,9 @@
         new Set(entries.map((entry) => entry.target.closest('.atelier-table-scroll')))
           .forEach(syncFocus);
       });
+      // A table in the cell of a wrapped table scrolls with the outer box.
       tables.forEach((table) => {
+        if (table.parentElement.closest('.atelier-table-scroll')) return;
         const box = document.createElement('div');
         box.className = 'atelier-table-scroll';
         table.before(box);
