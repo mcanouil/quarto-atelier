@@ -501,8 +501,8 @@ $form-check-input-indeterminate-border-color: $atelier-accent-fill !default;
 // Bootstrap paints a disabled field on a fixed light grey and keeps the scheme
 // ink on it, so in the dark scheme the light ink sits on a near-white field.
 // The field takes the quiet surface and the muted ink.
-// Upstream: none filed (WCAG 1.4.3)
-// Remove when: Quarto sets the disabled form field colours per scheme.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15301
+// Remove when: the minimum Quarto version includes the fix.
 $input-disabled-bg: $atelier-surface !default;
 $input-disabled-color: $atelier-text-muted !default;
 $input-disabled-border-color: $atelier-border !default;
