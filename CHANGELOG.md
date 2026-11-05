@@ -70,7 +70,7 @@
 - fix: Give a page with no brand, or with a light-only brand, a dark page in the dark scheme.
   Its code no longer shows the pale dark-scheme highlighting on a light page. (#92)
 - fix: Draw the copy button icon in the accent colour of the button, and in the terminal text colour on a terminal block.
-  The icon no longer shows a dark grey on the dark terminal in the light scheme.
+  The icon no longer shows a dark grey on the dark terminal in the light scheme. (#95)
 
 ### Documentation
 
