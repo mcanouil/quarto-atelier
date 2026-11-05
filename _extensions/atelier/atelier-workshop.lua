@@ -751,10 +751,13 @@ local function style_proof(proof)
 end
 
 --- Pandoc can highlight a language when it writes a highlighted block for it.
+--- Pandoc also highlights a block whose only class turns on line numbers, but
+--- these classes do not name a language, so they start as false.
 --- @type table<string, boolean>
-local highlights = {}
+local highlights = { number = false, numberLines = false, ['number-lines'] = false }
 
---- Find the first class of a code block that Pandoc can highlight.
+--- Find the first class of a code block that names a language Pandoc can
+--- highlight.
 --- @param block pandoc.CodeBlock The code block
 --- @return integer|nil The position of the class, or nil when there is none
 local function highlighted_class_index(block)
@@ -782,8 +785,9 @@ end
 --- colour with no prompt. An indented `$` line is output, as in usage text.
 --- A block with no `filename`, or an empty one, gets the `terminal` label in
 --- `code-window-auto-label`, so Code Window draws a window with that label.
---- This filter runs before Code Window. A `filename`, `code-window-enabled`, or
---- `code-window-no-auto-filename` on the block still wins.
+--- This filter runs before Code Window. A `filename`, `code-window-auto-label`,
+--- `code-window-enabled`, or `code-window-no-auto-filename` on the block still
+--- wins.
 --- A block with no class that Pandoc can highlight is not highlighted, so the
 --- prompt and the dark style cannot apply. The filter then logs a warning and
 --- leaves the block as it is.
@@ -838,7 +842,7 @@ local function style_terminal(block)
   if #continuations > 0 then
     block.attributes['atelier-continuation'] = table.concat(continuations, ',')
   end
-  if (block.attributes.filename or '') == '' then
+  if (block.attributes.filename or '') == '' and (block.attributes['code-window-auto-label'] or '') == '' then
     block.attributes['code-window-auto-label'] = state.labels.terminal
   end
   return block
