@@ -25,9 +25,15 @@ local MODE_WORKSHOP = 'workshop'
 --- @type string
 local EXTENSION_NAME = 'atelier'
 
---- Page file extensions whose front matter holds a duration.
+--- Page file extensions whose front matter holds a duration, in lower case.
 --- @type table<string, boolean>
-local FRONT_MATTER_EXTENSIONS = { qmd = true, md = true, Rmd = true }
+local FRONT_MATTER_EXTENSIONS = { qmd = true, md = true, rmd = true }
+
+--- Page file extensions that Quarto renders through this filter, so such a
+--- page can be in workshop mode. A notebook reads its metadata from a raw cell.
+--- The extensions are in lower case.
+--- @type table<string, boolean>
+local RENDERED_EXTENSIONS = { qmd = true, md = true, rmd = true, ipynb = true }
 
 --- Labels and their default text, in output order.
 --- @type table<integer, { key: string, default: string }>
@@ -383,13 +389,26 @@ local function read_front_matter(path, report)
   return meta, true
 end
 
---- Find the first page of a list that exists.
+--- Tell whether the extension of a page is in a set of extensions.
+--- The letter case of the extension has no effect, so `.Rmd` and `.rmd` match.
+--- @param path string The page path
+--- @param extensions table<string, boolean> The set, such as `FRONT_MATTER_EXTENSIONS`
+--- @return boolean True when the extension of the page is in the set
+local function has_extension(path, extensions)
+  local extension = path:match('%.(%w+)$')
+  return extension ~= nil and extensions[extension:lower()] == true
+end
+
+--- Find the page of a sidebar that logs the warnings for the whole sidebar.
+--- Each page renders on its own, so one page must log each problem. It is the
+--- first page that exists and that Quarto renders through this filter, because
+--- only such a page can be in workshop mode and read the sidebar.
 --- @param paths string[] The page paths relative to the project
 --- @param directory string The project folder
---- @return string|nil The first path whose file exists
-local function first_existing(paths, directory)
+--- @return string|nil The path of that page, or nil when there is none
+local function reporting_page(paths, directory)
   for _, path in ipairs(paths) do
-    if file_exists(directory .. '/' .. path) then
+    if has_extension(path, RENDERED_EXTENSIONS) and file_exists(directory .. '/' .. path) then
       return path
     end
   end
@@ -399,17 +418,17 @@ end
 --- Read the duration of each page of a sidebar.
 --- Each page of the sidebar reads all the durations, so each problem must log
 --- one warning only. The render of a page warns for its own duration. The
---- render of the first page that exists warns for the files that do not exist.
+--- render of the page that `reporting_page` gives warns for the files that do
+--- not exist.
 --- @param paths string[] The page paths relative to the project
 --- @param page string The page path relative to the project
 --- @return table<string, integer> The minutes by output path
 local function read_durations(paths, page)
   local durations = {}
   local directory = quarto.project.directory or '.'
-  local first = first_existing(paths, directory)
+  local first = reporting_page(paths, directory)
   for _, path in ipairs(paths) do
-    local extension = path:match('%.(%w+)$')
-    if extension and FRONT_MATTER_EXTENSIONS[extension] then
+    if has_extension(path, FRONT_MATTER_EXTENSIONS) then
       local meta, exists = read_front_matter(directory .. '/' .. path, page == first)
       if not exists then
         if page == first then
@@ -439,18 +458,20 @@ end
 
 --- The mode, page duration, and labels that the `Div` handler reads.
 --- `publish_workshop` fills it in the first filter pass.
---- `objectives` counts the checkboxes written so far, so the numbers run on across the page.
---- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil, objectives: integer }
-local state = { objectives = 0 }
+--- `objectives` counts the objectives written so far on the page by base id,
+--- so a repeated objective text gets its own id.
+--- @type { mode: string|nil, duration: integer|nil, labels: table<string, string>|nil, objectives: table<string, integer> }
+local state = { objectives = {} }
 
 --- Log the warning for a listed sidebar that has no id.
---- Each page of the sidebar finds the same problem, so only the first page that exists warns.
+--- Each page of the sidebar finds the same problem, so only the page that
+--- `reporting_page` gives warns.
 --- @param source string The input file, for the warning
 --- @param paths string[] The page paths of the sidebar
 --- @param page string The page path relative to the project
 --- @return nil
 local function warn_sidebar_without_id(source, paths, page)
-  if page ~= first_existing(paths, quarto.project.directory or '.') then
+  if page ~= reporting_page(paths, quarto.project.directory or '.') then
     return nil
   end
   log.log_warning(
@@ -472,7 +493,7 @@ local function publish_workshop(meta)
   local options = read_options(meta)
   local mode = read_mode(meta, source)
   local duration = read_duration(meta, source)
-  state = { mode = mode, duration = duration, labels = resolve_labels(), objectives = 0 }
+  state = { mode = mode, duration = duration, labels = resolve_labels(), objectives = {} }
   local data = {
     mode = mode,
     offset = quarto.project.offset or '',
@@ -548,16 +569,31 @@ local function attribute_duration(div, class)
   return format_duration(minutes, state.labels)
 end
 
+--- Make the id of an objective from its text.
+--- The browser stores the ticked objectives by these ids, so a tick stays on
+--- its objective when the author adds, removes, or moves other objectives.
+--- The second and later objectives with the same text on the page get `-2`,
+--- `-3`, and so on.
+--- @param inlines pandoc.Inlines The text of the objective
+--- @return string The id, such as `o-1a2b3c4d`
+local function objective_id(inlines)
+  local base = 'o-' .. pandoc.utils.sha1(pandoc.utils.stringify(inlines)):sub(1, 8)
+  local count = (state.objectives[base] or 0) + 1
+  state.objectives[base] = count
+  if count == 1 then
+    return base
+  end
+  return base .. '-' .. count
+end
+
 --- Turn each item of a bullet list into a checkbox label.
---- The checkboxes are numbered from 1 across the whole page. The empty span
---- after each checkbox holds the tick that the style draws.
+--- Each checkbox has the id of its objective text. The empty span after each
+--- checkbox holds the tick that the style draws.
 --- @param list pandoc.BulletList The list
 --- @return pandoc.Blocks The labels, followed by any further blocks of the items
 local function objective_labels(list)
   local blocks = pandoc.Blocks({})
   for _, item in ipairs(list.content) do
-    state.objectives = state.objectives + 1
-    local index = state.objectives
     local first = item[1]
     local inlines = pandoc.Inlines({})
     local rest = 1
@@ -568,7 +604,7 @@ local function objective_labels(list)
     local label = pandoc.Inlines({
       pandoc.RawInline(
         'html',
-        '<label><input type="checkbox" data-atelier-objective="' .. index .. '">' ..
+        '<label><input type="checkbox" data-atelier-objective="' .. objective_id(inlines) .. '">' ..
         '<span class="atelier-check" aria-hidden="true"></span> '
       ),
     })
@@ -729,9 +765,14 @@ end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.
 --- Each line that starts with `$` and a space loses those two characters, and
---- its number joins `atelier-prompt`, a line spec. The code-blocks script marks
---- those lines, and the style draws the `$` prompt before them. The prompt is
---- not in the text, so screen readers and the copy button skip it.
+--- its number joins `atelier-prompt`, a line spec. A line that is only `$`,
+--- with or without spaces after it, becomes one space and is a prompt line
+--- too. The code-blocks script marks those lines, and the style draws the `$`
+--- prompt before them. The prompt is not in the text, so screen readers and
+--- the copy button skip it.
+--- A command that ends with `\` goes on to the next line. The numbers of these
+--- next lines join `atelier-continuation`, and the style gives them the command
+--- colour with no prompt. An indented `$` line is output, as in usage text.
 --- Code Window draws the header from `filename`, which this filter sets to the
 --- `terminal` label when the block has none. The class `cw-auto` makes the Code
 --- Window script build the window. This filter runs before Code Window.
@@ -753,19 +794,34 @@ local function style_terminal(block)
   end
   local lines = {}
   local prompts = {}
+  local continuations = {}
+  local continued = false
   local number = 0
   for line in (block.text .. '\n'):gmatch('(.-)\n') do
     number = number + 1
-    if line:sub(1, 2) == '$ ' then
+    local command = true
+    if continued then
+      continuations[#continuations + 1] = tostring(number)
+    elseif line:match('^%$%s*$') then
+      -- A space, not an empty line: the highlighter drops an empty last line.
+      line = ' '
+      prompts[#prompts + 1] = tostring(number)
+    elseif line:sub(1, 2) == '$ ' then
       line = line:sub(3)
       prompts[#prompts + 1] = tostring(number)
+    else
+      command = false
     end
+    continued = command and line:sub(-1) == '\\'
     lines[#lines + 1] = line
   end
   block.text = table.concat(lines, '\n')
   block.classes:insert('atelier-terminal')
   if #prompts > 0 then
     block.attributes['atelier-prompt'] = table.concat(prompts, ',')
+  end
+  if #continuations > 0 then
+    block.attributes['atelier-continuation'] = table.concat(continuations, ',')
   end
   if block.attributes.filename == nil then
     block.attributes.filename = state.labels.terminal

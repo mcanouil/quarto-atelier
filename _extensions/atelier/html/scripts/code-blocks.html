@@ -26,33 +26,32 @@
 			return numbers;
 		}
 
-		document.querySelectorAll("[data-atelier-highlight]").forEach(function (block) {
-			var prefix = block.id;
-			if (!prefix) {
-				return;
-			}
-			parseSpec(block.getAttribute("data-atelier-highlight")).forEach(function (line) {
-				var span = document.getElementById(prefix + "-" + line);
-				if (span) {
-					span.classList.add("atelier-line-highlight");
+		// Add a class to each line that the spec in the attribute lists. A line
+		// is the span with the id of the block, a dash, and the line number.
+		function markLines(attribute, className) {
+			document.querySelectorAll("[" + attribute + "]").forEach(function (block) {
+				var prefix = block.id;
+				if (!prefix) {
+					return;
 				}
+				parseSpec(block.getAttribute(attribute)).forEach(function (line) {
+					var span = document.getElementById(prefix + "-" + line);
+					if (span) {
+						span.classList.add(className);
+					}
+				});
 			});
-		});
+		}
+
+		markLines("data-atelier-highlight", "atelier-line-highlight");
 
 		// The terminal block lists the lines that had a `$` prompt in
 		// `data-atelier-prompt`, and the style draws the prompt before them.
-		document.querySelectorAll("[data-atelier-prompt]").forEach(function (block) {
-			var prefix = block.id;
-			if (!prefix) {
-				return;
-			}
-			parseSpec(block.getAttribute("data-atelier-prompt")).forEach(function (line) {
-				var span = document.getElementById(prefix + "-" + line);
-				if (span) {
-					span.classList.add("atelier-prompt-line");
-				}
-			});
-		});
+		markLines("data-atelier-prompt", "atelier-prompt-line");
+
+		// The lines that continue a command after a `\` are in
+		// `data-atelier-continuation`. They take the command colour, with no prompt.
+		markLines("data-atelier-continuation", "atelier-command-line");
 
 		// The window header shows the language beside the file name. The language
 		// is the first class of the code that is not a Quarto or Pandoc class.

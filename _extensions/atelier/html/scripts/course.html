@@ -174,6 +174,7 @@
 						if (!link) return;
 						var done = read.indexOf(heading.href) !== -1;
 						var hidden = link.querySelector(":scope > .atelier-read-text");
+						link.classList.add("atelier-toc-tracked");
 						link.classList.toggle("atelier-read", done);
 						if (done && !hidden) {
 							link.appendChild(element("span", "visually-hidden atelier-read-text", " " + course.label("toc-read")));
@@ -223,13 +224,23 @@
 					mark(headings.map(function (heading) { return heading.href; }));
 				}
 			}
-			window.addEventListener("scroll", checkEnd, { passive: true });
+			// A scroll fires many events in one frame, so the check runs once a frame.
+			var endCheckQueued = false;
+			function onScroll() {
+				if (endCheckQueued) return;
+				endCheckQueued = true;
+				window.requestAnimationFrame(function () {
+					endCheckQueued = false;
+					checkEnd();
+				});
+			}
+			window.addEventListener("scroll", onScroll, { passive: true });
 
 			// Once every heading is read, nothing is left to watch.
 			function stopWatchingWhenRead() {
 				if (read.length < headings.length) return;
 				observer.disconnect();
-				window.removeEventListener("scroll", checkEnd);
+				window.removeEventListener("scroll", onScroll);
 			}
 			checkEnd();
 			stopWatchingWhenRead();
@@ -255,24 +266,31 @@
 		// =====================================================================
 		// W1 OBJECTIVES
 		// =====================================================================
-		// The Lua filter writes a checkbox for each objective. The ticked
-		// boxes are stored under the page in the course progress, as the
-		// numbers of the boxes.
+		// The Lua filter writes a checkbox for each objective, with an id made
+		// from the objective text. The ticked boxes are stored under the page in
+		// the course progress, as these ids. Only the ids of the boxes that are
+		// on the page now count, so the id of a changed objective goes on the
+		// next save.
 		(function () {
 			var boxes = document.querySelectorAll(".atelier-objectives input[data-atelier-objective]");
 			if (!boxes.length) return;
 
 			var key = course.current !== -1 ? course.pages[course.current].href : location.pathname;
 			var stored = course.progress.objectives[key];
-			var ticked = Array.isArray(stored) ? stored : [];
+			var ids = Array.prototype.map.call(boxes, function (box) {
+				return box.getAttribute("data-atelier-objective");
+			});
+			var ticked = (Array.isArray(stored) ? stored : []).filter(function (value) {
+				return ids.indexOf(value) !== -1;
+			});
 
 			boxes.forEach(function (box) {
-				var number = Number(box.getAttribute("data-atelier-objective"));
-				box.checked = ticked.indexOf(number) !== -1;
+				var id = box.getAttribute("data-atelier-objective");
+				box.checked = ticked.indexOf(id) !== -1;
 				box.addEventListener("change", function () {
-					ticked = ticked.filter(function (value) { return value !== number; });
-					if (box.checked) ticked.push(number);
-					course.progress.objectives[key] = ticked.slice().sort(function (a, b) { return a - b; });
+					ticked = ticked.filter(function (value) { return value !== id; });
+					if (box.checked) ticked.push(id);
+					course.progress.objectives[key] = ticked.slice().sort();
 					course.save();
 				});
 			});

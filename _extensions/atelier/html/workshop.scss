@@ -263,6 +263,14 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
     }
   }
 
+  // A module title that is a page link, such as a one-page module, takes the
+  // ink of a section button, not the muted ink of a page link. Only the docked
+  // sidebar gives page links the muted ink, and the floating sidebar keeps its
+  // hover colour. The current page keeps its own colour.
+  body.docked & > .sidebar-item-container > a.sidebar-link:not(.active) {
+    color: var(--atelier-sidebar-fg);
+  }
+
   > .sidebar-item-container > .sidebar-item-toggle:not(.sidebar-link) {
     align-self: center;
   }
@@ -385,6 +393,11 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
       background: var(--atelier-toc-bg);
     }
 
+    // An entry with no heading on the page cannot be read, so it gets no dot.
+    &:not(.atelier-toc-tracked)::before {
+      content: none;
+    }
+
     &.atelier-read {
       color: var(--atelier-toc-fg);
 
@@ -475,8 +488,15 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
 
   // The box comes from the tokens, so its border holds 3:1 on the block. The
   // span after the box holds the tick, drawn as a mask in the on-accent colour
-  // over the accent fill. The global focus ring stays.
+  // over the accent fill. The global focus ring stays. Only the objective
+  // checkboxes have the tick span, so a task list keeps the native box.
+  // The browser gives a form control its own text colour. Every checkbox in
+  // the block takes the colour of its label.
   input[type="checkbox"] {
+    color: inherit;
+  }
+
+  input[data-atelier-objective] {
     flex: none;
     width: 18px;
     height: 18px;
@@ -484,8 +504,6 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
     border: 2px solid var(--atelier-control-border);
     border-radius: $border-radius-sm;
     background-color: var(--atelier-bg);
-    // The browser gives a form control its own text colour. Use the colour of the label.
-    color: inherit;
     appearance: none;
 
     &:checked {
@@ -508,17 +526,17 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
     pointer-events: none;
   }
 
-  input[type="checkbox"]:checked + .atelier-check {
+  input[data-atelier-objective]:checked + .atelier-check {
     display: block;
   }
 
   // In forced colours the system draws the box and its tick.
   @media (forced-colors: active) {
-    input[type="checkbox"] {
+    input[data-atelier-objective] {
       appearance: auto;
     }
 
-    input[type="checkbox"]:checked + .atelier-check {
+    input[data-atelier-objective]:checked + .atelier-check {
       display: none;
     }
   }
@@ -616,8 +634,13 @@ html pre.sourceCode.atelier-terminal {
     overflow-wrap: anywhere;
   }
 
-  code > span.atelier-prompt-line {
+  // A prompt line and a line that continues a command take the command colour.
+  // Only the prompt line draws the prompt.
+  code > span:is(.atelier-prompt-line, .atelier-command-line) {
     color: var(--atelier-terminal-fg);
+  }
+
+  code > span.atelier-prompt-line {
 
     // The empty alternative text keeps the prompt out of the accessible text.
     // A browser without alternative text reads the first declaration.
