@@ -31,7 +31,7 @@
   padding: 0 1rem;
   border: 1px solid var(--mobile-toc-edge, var(--bs-border-color, #dee2e6));
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--mobile-toc-shadow, 0 2px 8px rgba(0, 0, 0, 0.15));
   font-family: var(--bs-font-sans-serif, system-ui, sans-serif);
   font-size: 0.75rem;
   font-weight: 700;
@@ -76,12 +76,12 @@ body:has(> .mobile-toc-pill) #quarto-back-to-top {
   border-top: 1px solid var(--mobile-toc-edge, var(--bs-border-color, #dee2e6));
   border-radius: var(--mobile-toc-radius, var(--bs-border-radius-lg, 0.5rem))
     var(--mobile-toc-radius, var(--bs-border-radius-lg, 0.5rem)) 0 0;
-  box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--mobile-toc-sheet-shadow, 0 -4px 18px rgba(0, 0, 0, 0.18));
   transition: transform 0.2s ease-out;
 }
 
 .mobile-toc-sheet::backdrop {
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--mobile-toc-backdrop, rgba(0, 0, 0, 0.45));
 }
 
 .mobile-toc-sheet ul {
