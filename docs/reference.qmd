@@ -128,7 +128,7 @@ The script `scripts/generate-highlighting.py` writes it from the `.theme` files 
 
 ## Embedded extensions
 
-Atelier contains five extensions, so you do not install them yourself.
+Atelier contains twelve extensions, so you do not install them yourself.
 The `atelier-html` format runs their filters and shortcodes on each HTML page.
 The shortcodes work on HTML pages only: on a page in another format, such as Typst, Quarto stops with "Shortcode 'iconify' not found".
 Atelier needs Quarto 1.11.9 or later, the first stable 1.11 release.
@@ -142,13 +142,21 @@ Older releases remove the `extensions` options of the project from a page that s
 | [toc-depth](https://github.com/mcanouil/quarto-toc-depth)             | Sets the table of contents depth below a heading, with the `toc-depth` attribute.                    | `extensions.toc-depth`       |
 | [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc)           | Shows the table of contents in a bottom sheet on narrow screens, opened from a pill.                 | none                         |
 | [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option.                         | `extensions.collapse-output` |
+| [div-reuse](https://github.com/mcanouil/quarto-div-reuse)             | Shows the content of one div again in another, with the `reuse` attribute.                          | `extensions.div-reuse`       |
+| [highlight-text](https://github.com/mcanouil/quarto-highlight-text)   | Colours a span of text, with the `fg`, `bg`, and `bc` attributes.                                    | `extensions.highlight-text`  |
+| [offset-headings](https://github.com/mcanouil/quarto-offset-headings) | Moves a heading and the headings below it, with the `offset-headings-by` attribute.                  | `extensions.offset-headings` |
+| [preview-colour](https://github.com/mcanouil/quarto-preview-colour)   | Shows a swatch next to a colour in inline code. The swatch is a button that copies the colour.       | `extensions.preview-colour`  |
+| [prism](https://github.com/mcanouil/quarto-prism)                     | Applies an attribute in one format only, with a format prefix such as `atelier-html:style`.          | `extensions.prism`           |
+| [remember](https://github.com/mcanouil/quarto-remember)               | Offers to return a reader to the place where they stopped, in a banner below the page title.         | `extensions.remember`        |
 
 : Extensions that Atelier contains. {.striped .hover tbl-colwidths="[22,56,22]"}
 
 Each extension keeps its own defaults, and its repository lists its options.
-Atelier changes two defaults.
+Atelier changes four defaults.
 gitlink shows only its widget, and does not change the references in your text.
 Code Window shows a window only for a block that has a `filename`, and does not make a label from the language of the other blocks.
+remember does not offer to resume on the home page (`index.qmd`) or the 404 page (`404.qmd`).
+offset-headings does not show its warning about the heading shift of Quarto.
 To turn reference rewriting on, or to give every block a window, set:
 
 ```yaml
@@ -159,9 +167,25 @@ extensions:
     auto-filename: true
 ```
 
+Quarto adds a `page-exclude` list of your site to the list of Atelier.
+You can exclude more pages, but you cannot make remember work on the home page or the 404 page again.
+Write each entry as a source file, relative to the project:
+
+```yaml
+extensions:
+  remember:
+    page-exclude:
+      - changelog.qmd
+      - drafts/*.qmd
+```
+
+prism compares its prefix with the name of the output format.
+On an Atelier site, that name is `atelier-html`, so write `atelier-html:style`.
+The prefix `html:` does not match an Atelier page.
+
 ### Upgrade from separate copies
 
-If your project has its own copy of one of these five extensions, remove it from `_extensions/` and remove its name from your `filters` list.
+If your project has its own copy of one of these extensions, remove it from `_extensions/` and remove its name from your `filters` list.
 Quarto looks up the names in your `filters` list in your own `_extensions/` only, so it then runs your copy and the embedded copy, and your copy's shortcodes replace the embedded ones.
 Keep your options under `extensions:`: the embedded copies read them.
 
