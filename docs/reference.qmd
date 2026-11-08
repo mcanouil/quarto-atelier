@@ -140,6 +140,7 @@ Older releases remove the `extensions` options of the project from a page that s
 | [gitlink](https://github.com/mcanouil/quarto-gitlink)                 | Shows a repository widget in place of a navbar item or sidebar tool with the href `#gitlink-widget`. | `extensions.gitlink`         |
 | [code-window](https://github.com/mcanouil/quarto-code-window)         | Shows a code block that has a `filename` in a window frame with a title bar.                         | `extensions.code-window`     |
 | [toc-depth](https://github.com/mcanouil/quarto-toc-depth)             | Sets the table of contents depth below a heading, with the `toc-depth` attribute.                    | `extensions.toc-depth`       |
+| [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc)           | Shows the table of contents in a bottom sheet on narrow screens, opened from a pill.                 | none                         |
 | [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option.                         | `extensions.collapse-output` |
 
 : Extensions that Atelier contains. {.striped .hover tbl-colwidths="[22,56,22]"}

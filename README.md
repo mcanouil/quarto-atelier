@@ -47,6 +47,7 @@ Atelier ships with the extensions below, so you don't install them yourself.
 | [gitlink](https://github.com/mcanouil/quarto-gitlink) | Shows a repository widget in place of a navbar item or sidebar tool with the href `#gitlink-widget`. |
 | [code-window](https://github.com/mcanouil/quarto-code-window) | Shows a code block that has a `filename` in a window frame with a title bar. |
 | [toc-depth](https://github.com/mcanouil/quarto-toc-depth) | Sets the table of contents depth below a heading, with the `toc-depth` attribute. |
+| [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc) | Shows the table of contents in a bottom sheet on narrow screens, opened from a pill. |
 | [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option. |
 
 Each one lives in `_extensions/atelier/_extensions/mcanouil/<name>/`, and its `_extension.yml` records the release it came from.

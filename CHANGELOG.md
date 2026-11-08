@@ -45,6 +45,7 @@
 - feat: Show an arrow on every popup and navbar tooltip, joined to the popup border. (#87)
 - feat: Add the `default`, `quarto`, and `terminal` presets, chosen with `atelier-preset` in `_brand.yml`.
   Each preset has its own highlighting themes that hold every token to WCAG AA. (#96)
+- feat: Show the table of contents in a bottom sheet on narrow screens. (#100)
 
 ### Bug Fixes
 

@@ -186,6 +186,18 @@ $border-color: null;
   --atelier-toc-control-border: var(--atelier-sidebar-control-border);
   --atelier-toc-surface-strong: var(--atelier-sidebar-surface-strong);
   --atelier-toc-accent-fill: var(--atelier-sidebar-accent-fill);
+
+  // The mobile-toc extension reads these in its pill and its bottom sheet.
+  --mobile-toc-bg: var(--atelier-toc-bg);
+  --mobile-toc-fg: var(--atelier-toc-fg);
+  --mobile-toc-muted: var(--atelier-toc-muted);
+  --mobile-toc-edge: var(--atelier-toc-control-border);
+  --mobile-toc-accent: var(--atelier-toc-accent);
+  --mobile-toc-active-bg: var(--atelier-toc-accent-soft);
+  --mobile-toc-radius: #{$border-radius};
+  --mobile-toc-shadow: 0 6px 20px var(--atelier-shadow);
+  --mobile-toc-sheet-shadow: 0 -6px 20px var(--atelier-shadow);
+  --mobile-toc-backdrop: var(--atelier-overlay);
 }
 
 // Quarto inks breadcrumb links with the raw link colour, which a pale or deep

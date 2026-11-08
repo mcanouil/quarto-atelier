@@ -112,6 +112,7 @@ contributes:
         - code-window
         - gitlink
         - toc-depth
+        - mobile-toc
         - collapse-output
       # Each embedded extension keeps its own defaults, set per site under
       # `extensions:`, with two exceptions. gitlink shows its repository widget,
