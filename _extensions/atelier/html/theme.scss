@@ -191,12 +191,12 @@ $border-color: null;
   --mobile-toc-bg: var(--atelier-toc-bg);
   --mobile-toc-fg: var(--atelier-toc-fg);
   --mobile-toc-muted: var(--atelier-toc-muted);
-  --mobile-toc-edge: var(--atelier-toc-border);
+  --mobile-toc-edge: var(--atelier-toc-control-border);
   --mobile-toc-accent: var(--atelier-toc-accent);
   --mobile-toc-active-bg: var(--atelier-toc-accent-soft);
   --mobile-toc-radius: #{$border-radius};
-  --mobile-toc-shadow: var(--atelier-shadow);
-  --mobile-toc-sheet-shadow: var(--atelier-shadow);
+  --mobile-toc-shadow: 0 6px 20px var(--atelier-shadow);
+  --mobile-toc-sheet-shadow: 0 -6px 20px var(--atelier-shadow);
   --mobile-toc-backdrop: var(--atelier-overlay);
 }
 
