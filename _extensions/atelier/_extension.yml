@@ -114,12 +114,25 @@ contributes:
         - toc-depth
         - mobile-toc
         - collapse-output
+        - prism
+        - div-reuse
+        - highlight-text
+        - offset-headings
+        - preview-colour
+        - remember
       # Each embedded extension keeps its own defaults, set per site under
-      # `extensions:`, with two exceptions. gitlink shows its repository widget,
-      # but does not rewrite references in prose. The widget shows only where a
-      # navbar item or sidebar tool has the href `#gitlink-widget`. Code Window
-      # draws a window only where a block has a `filename`, and does not make a
-      # label from the language of every other block.
+      # `extensions:`, with these exceptions. gitlink shows its repository
+      # widget, but does not rewrite references in prose. The widget shows only
+      # where a navbar item or sidebar tool has the href `#gitlink-widget`. Code
+      # Window draws a window only where a block has a `filename`, and does not
+      # make a label from the language of every other block. remember offers no
+      # resume on the home page and the 404 page; Quarto joins this list with a
+      # site's own `page-exclude` list, so a site can add pages but cannot
+      # remove these two. prism and offset-headings both run in the pre-AST
+      # stage, where list order decides which runs first. prism stays before
+      # offset-headings, so a format-scoped attribute such as
+      # `atelier-html:offset-headings-by` is promoted before offset-headings
+      # reads it.
       extensions:
         gitlink:
           enabled: false
@@ -127,6 +140,10 @@ contributes:
             enabled: true
         code-window:
           auto-filename: false
+        remember:
+          page-exclude:
+            - index.qmd
+            - 404.qmd
       include-after-body:
         - file: html/scripts/current-year.html
         - file: html/scripts/external-links.html

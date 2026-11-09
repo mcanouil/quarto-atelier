@@ -49,6 +49,12 @@ Atelier ships with the extensions below, so you don't install them yourself.
 | [toc-depth](https://github.com/mcanouil/quarto-toc-depth) | Sets the table of contents depth below a heading, with the `toc-depth` attribute. |
 | [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc) | Shows the table of contents in a bottom sheet on narrow screens, opened from a pill. |
 | [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option. |
+| [div-reuse](https://github.com/mcanouil/quarto-div-reuse) | Shows the content of one div again in another, with the `reuse` attribute. |
+| [highlight-text](https://github.com/mcanouil/quarto-highlight-text) | Colours a span of text, with the `fg`, `bg`, and `bc` attributes. |
+| [offset-headings](https://github.com/mcanouil/quarto-offset-headings) | Moves a heading and the headings below it up or down, with the `offset-headings-by` attribute. |
+| [preview-colour](https://github.com/mcanouil/quarto-preview-colour) | Shows a swatch next to a colour in inline code, which copies the colour when you select it. |
+| [prism](https://github.com/mcanouil/quarto-prism) | Applies an attribute in one format only, with a format prefix such as `atelier-html:style`. |
+| [remember](https://github.com/mcanouil/quarto-remember) | Offers to return a reader to the place where they stopped, in a banner below the page title. |
 
 Each one lives in `_extensions/atelier/_extensions/mcanouil/<name>/`, and its `_extension.yml` records the release it came from.
 The [reference page](https://m.canouil.dev/quarto-atelier/reference.html) lists their options and the defaults that Atelier changes.

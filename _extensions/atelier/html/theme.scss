@@ -1614,9 +1614,12 @@ $scrollbar-thumb: body-mix(72%);
 // ===========================================================================
 // BOOTSTRAP BUTTONS AND ALERTS
 // ===========================================================================
-// Bootstrap derives the primary button text from the primary colour and the
-// secondary alert from its grey. Both read the page tokens instead: the fill is
-// the accent held to 3:1 with its ink at 4.5:1, and the alert is a quiet panel.
+// Bootstrap derives the primary button text from the primary colour, the
+// outline secondary button from the secondary colour, and the secondary alert
+// from its grey. All three read the page tokens instead: the fill is the accent
+// held to 3:1 with its ink at 4.5:1, the outline button is a neutral control
+// in the page ink, and the alert is a quiet panel. A brand secondary colour is
+// not held to 4.5:1 against the page, so it cannot be the text of a button.
 .btn-primary {
   --bs-btn-color: var(--atelier-on-accent);
   --bs-btn-bg: var(--atelier-accent-fill);
@@ -1627,6 +1630,19 @@ $scrollbar-thumb: body-mix(72%);
   --bs-btn-active-color: var(--atelier-bg);
   --bs-btn-active-bg: var(--atelier-accent-text);
   --bs-btn-active-border-color: var(--atelier-accent-text);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--atelier-fg);
+  --bs-btn-border-color: var(--atelier-control-border);
+  --bs-btn-hover-color: var(--atelier-fg);
+  --bs-btn-hover-bg: var(--atelier-surface-strong);
+  --bs-btn-hover-border-color: var(--atelier-fg);
+  --bs-btn-active-color: var(--atelier-fg);
+  --bs-btn-active-bg: var(--atelier-surface-strong);
+  --bs-btn-active-border-color: var(--atelier-fg);
+  --bs-btn-disabled-color: var(--atelier-fg);
+  --bs-btn-disabled-border-color: var(--atelier-control-border);
 }
 
 .alert-secondary {

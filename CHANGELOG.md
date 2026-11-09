@@ -6,6 +6,7 @@
 
 - fix: Atelier needs Quarto 1.11.9 or later.
   Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode. (#79)
+- feat: If your project has its own copy of div-reuse, highlight-text, offset-headings, preview-colour, prism or remember, remove it and its `filters` entry. Otherwise both copies run. (#101)
 
 ### New Features
 
@@ -46,6 +47,8 @@
 - feat: Add the `default`, `quarto`, and `terminal` presets, chosen with `atelier-preset` in `_brand.yml`.
   Each preset has its own highlighting themes that hold every token to WCAG AA. (#96)
 - feat: Show the table of contents in a bottom sheet on narrow screens. (#100)
+- feat: Include the div-reuse, highlight-text, offset-headings, preview-colour, prism and remember extensions, styled from the page theme.
+  remember offers to resume in a banner below the page title, and not on the home page or the 404 page. (#101)
 
 ### Bug Fixes
 
@@ -76,6 +79,7 @@
   The icon no longer shows a dark grey on the dark terminal in the light scheme, and sits in the middle of its frame. (#95)
 - fix: Keep pages within the width of a phone screen, so long links, words, code names, and media with a `width` attribute wrap or shrink to fit.
   Wide tables and display maths scroll in their own box, and the `atelier-table-scroll` language key names a table box that has no caption. (#99)
+- fix: Draw outline secondary buttons in the page text colour with a control border, so the label holds 4.5:1 and the border 3:1 with any brand secondary colour. (#101)
 
 ### Documentation
 

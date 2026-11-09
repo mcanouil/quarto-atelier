@@ -1,9 +1,8 @@
 name: Quarto Extensions Updates
 
 # Keeps the extensions that Atelier embeds in _extensions/atelier/_extensions/
-# current: iconify, gitlink, code-window, toc-depth, mobile-toc and
-# collapse-output. The docs website uses these embedded copies, so docs/ has no
-# extensions of its own.
+# current, every folder under its mcanouil/ directory. The docs website uses
+# these embedded copies, so docs/ has no extensions of its own.
 on:
   workflow_dispatch:
   # schedule:
