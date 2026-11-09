@@ -114,11 +114,11 @@ contributes:
         - toc-depth
         - mobile-toc
         - collapse-output
+        - prism
         - div-reuse
         - highlight-text
         - offset-headings
         - preview-colour
-        - prism
         - remember
       # Each embedded extension keeps its own defaults, set per site under
       # `extensions:`, with these exceptions. gitlink shows its repository
@@ -128,8 +128,10 @@ contributes:
       # make a label from the language of every other block. remember offers no
       # resume on the home page and the 404 page; Quarto joins this list with a
       # site's own `page-exclude` list, so a site can add pages but cannot
-      # remove these two. offset-headings does not warn about Quarto's own
-      # heading shift on every render.
+      # remove these two. prism comes first among the embedded filters, because
+      # it turns a format-scoped attribute, such as
+      # `atelier-html:offset-headings-by`, into the attribute that offset-headings
+      # reads in the same pre-AST stage.
       extensions:
         gitlink:
           enabled: false
@@ -141,8 +143,6 @@ contributes:
           page-exclude:
             - index.qmd
             - 404.qmd
-        offset-headings:
-          quarto-shift-warning: false
       include-after-body:
         - file: html/scripts/current-year.html
         - file: html/scripts/external-links.html
