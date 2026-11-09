@@ -79,7 +79,7 @@
   The icon no longer shows a dark grey on the dark terminal in the light scheme, and sits in the middle of its frame. (#95)
 - fix: Keep pages within the width of a phone screen, so long links, words, code names, and media with a `width` attribute wrap or shrink to fit.
   Wide tables and display maths scroll in their own box, and the `atelier-table-scroll` language key names a table box that has no caption. (#99)
-- fix: Draw outline secondary buttons in the page text colour, so their label holds 4.5:1 with any brand secondary colour. (#101)
+- fix: Draw outline secondary buttons in the page text colour with a control border, so the label holds 4.5:1 and the border 3:1 with any brand secondary colour. (#101)
 
 ### Documentation
 
