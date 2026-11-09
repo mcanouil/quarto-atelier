@@ -128,10 +128,11 @@ contributes:
       # make a label from the language of every other block. remember offers no
       # resume on the home page and the 404 page; Quarto joins this list with a
       # site's own `page-exclude` list, so a site can add pages but cannot
-      # remove these two. prism comes first among the embedded filters, because
-      # it turns a format-scoped attribute, such as
-      # `atelier-html:offset-headings-by`, into the attribute that offset-headings
-      # reads in the same pre-AST stage.
+      # remove these two. prism and offset-headings both run in the pre-AST
+      # stage, where list order decides which runs first. prism stays before
+      # offset-headings, so a format-scoped attribute such as
+      # `atelier-html:offset-headings-by` is promoted before offset-headings
+      # reads it.
       extensions:
         gitlink:
           enabled: false
