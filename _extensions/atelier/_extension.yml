@@ -117,6 +117,7 @@ contributes:
         - div-reuse
         - highlight-text
         - offset-headings
+        - preview-colour
         - prism
         - remember
       # Each embedded extension keeps its own defaults, set per site under
