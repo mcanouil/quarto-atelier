@@ -1634,7 +1634,7 @@ $scrollbar-thumb: body-mix(72%);
 
 .btn-outline-secondary {
   --bs-btn-color: var(--atelier-fg);
-  --bs-btn-border-color: var(--atelier-border);
+  --bs-btn-border-color: var(--atelier-control-border);
   --bs-btn-hover-color: var(--atelier-fg);
   --bs-btn-hover-bg: var(--atelier-surface-strong);
   --bs-btn-hover-border-color: var(--atelier-fg);
@@ -1642,7 +1642,7 @@ $scrollbar-thumb: body-mix(72%);
   --bs-btn-active-bg: var(--atelier-surface-strong);
   --bs-btn-active-border-color: var(--atelier-fg);
   --bs-btn-disabled-color: var(--atelier-fg);
-  --bs-btn-disabled-border-color: var(--atelier-border);
+  --bs-btn-disabled-border-color: var(--atelier-control-border);
 }
 
 .alert-secondary {
