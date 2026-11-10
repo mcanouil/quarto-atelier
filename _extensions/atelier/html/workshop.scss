@@ -618,7 +618,10 @@ html .code-with-filename.atelier-terminal {
     border-color: var(--atelier-terminal-border);
   }
 
-  .code-copy-button {
+  // The second selector matches the annotated-code rules in content.scss and
+  // theme.scss, which otherwise outrank this block.
+  .code-copy-button,
+  .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
     color: var(--atelier-terminal-fg);
     background-color: transparent;
     border-color: var(--atelier-terminal-control-border);
