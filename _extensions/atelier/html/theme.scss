@@ -90,6 +90,39 @@ $border-color: null;
   }
 }
 
+// An icon drawn as a mask over a fill colour, for an icon whose image bakes in
+// a fixed colour. A browser without the unprefixed `mask` keeps Quarto's own
+// icon, because the fill without the mask paints a solid square.
+// In forced colours the system replaces the fill, which hides the icon, so
+// `$forced` names the system colour of the text of the control, or is `null`
+// when the system draws the control itself. `currentcolor` does not work here,
+// because it keeps the author colour once the icon opts out of forced colours.
+@mixin atelier-icon-mask(
+  $icon: none,
+  $size: 1rem,
+  $colour: currentcolor,
+  $important: false,
+  $forced: ButtonText
+) {
+  @supports (mask-image: none) {
+    background-color: $colour;
+    mask: $icon center / $size no-repeat;
+
+    @if $important {
+      background-image: none !important;
+    } @else {
+      background-image: none;
+    }
+
+    @if $forced {
+      @media (forced-colors: active) {
+        forced-color-adjust: none;
+        background-color: $forced;
+      }
+    }
+  }
+}
+
 /*-- scss:rules --*/
 
 // ===========================================================================
@@ -948,22 +981,11 @@ $atelier-icon-copied: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
 
 html .code-copy-button > .bi::before {
   display: block;
-  background-color: currentcolor;
-  background-image: none !important;
-  mask: $atelier-icon-copy center / 1rem no-repeat;
-  -webkit-mask: $atelier-icon-copy center / 1rem no-repeat;
-
-  // In forced colours the system replaces the fill under the mask, which
-  // hides the icon. Paint it in the button text colour of the system.
-  @media (forced-colors: active) {
-    forced-color-adjust: none;
-    background-color: ButtonText;
-  }
+  @include atelier-icon-mask($atelier-icon-copy, $important: true);
 }
 
 html .code-copy-button-checked > .bi::before {
   mask-image: $atelier-icon-copied;
-  -webkit-mask-image: $atelier-icon-copied;
 }
 
 // ===========================================================================
@@ -1453,13 +1475,14 @@ body .navbar .gitlink-widget-dropdown {
 .btn-close,
 .btn-close:hover {
   color: inherit;
-}
 
-.btn-close {
-  background-image: none;
-  background-color: currentcolor;
-  mask: var(--bs-btn-close-bg) center / $btn-close-width auto no-repeat;
-  -webkit-mask: var(--bs-btn-close-bg) center / $btn-close-width auto no-repeat;
+  // Bootstrap fades the button, which would also fade the system colour of
+  // the icon in forced colours.
+  @media (forced-colors: active) {
+    opacity: 1;
+  }
+
+  @include atelier-icon-mask(var(--bs-btn-close-bg), $btn-close-width auto);
 }
 
 // ===========================================================================
@@ -1519,14 +1542,7 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   width: 1rem;
   height: 1rem;
   vertical-align: -0.125em;
-  background-image: none;
-  background-color: currentcolor;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
+  @include atelier-icon-mask($size: contain);
 }
 
 // Quarto ships its own glyph at the same specificity, so scope to every place
@@ -1538,15 +1554,11 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   // wins on order); otherwise its glyph paints through and is clipped by the
   // mask, leaving a shape that does not fill on hover.
   &:not(.alternate) .bi::before {
-    background-image: none;
-    mask-image: $atelier-icon-sun;
-    -webkit-mask-image: $atelier-icon-sun;
+    @include atelier-icon-mask($atelier-icon-sun, contain);
   }
 
   &.alternate .bi::before {
-    background-image: none;
-    mask-image: $atelier-icon-moon;
-    -webkit-mask-image: $atelier-icon-moon;
+    @include atelier-icon-mask($atelier-icon-moon, contain);
   }
 }
 

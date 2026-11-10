@@ -1175,10 +1175,7 @@ table.quarto-listing-table th a.sort {
 // Upstream: none filed (WCAG 1.4.11)
 // Remove when: Quarto draws the sort arrow from the current colour.
 table.quarto-listing-table th a.sort:is(.asc, .desc)::after {
-  background-color: var(--atelier-muted);
-  background-image: none;
-  mask-repeat: no-repeat;
-  mask-size: 1rem 1rem;
+  @include atelier-icon-mask($colour: var(--atelier-muted), $forced: CanvasText);
 }
 
 table.quarto-listing-table th a.sort.asc::after {

@@ -520,10 +520,13 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
     width: 18px;
     height: 18px;
     margin-top: -9px;
-    background-color: var(--atelier-on-accent);
-    mask: $_atelier-icon-check center / 14px no-repeat;
-    -webkit-mask: $_atelier-icon-check center / 14px no-repeat;
     pointer-events: none;
+    @include atelier-icon-mask(
+      $_atelier-icon-check,
+      14px,
+      var(--atelier-on-accent),
+      $forced: null
+    );
   }
 
   input[data-atelier-objective]:checked + .atelier-check {

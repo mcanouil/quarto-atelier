@@ -80,6 +80,8 @@
 - fix: Keep pages within the width of a phone screen, so long links, words, code names, and media with a `width` attribute wrap or shrink to fit.
   Wide tables and display maths scroll in their own box, and the `atelier-table-scroll` language key names a table box that has no caption. (#99)
 - fix: Draw outline secondary buttons in the page text colour with a control border, so the label holds 4.5:1 and the border 3:1 with any brand secondary colour. (#101)
+- fix: Show the close, colour scheme, reader, code tools, and listing sort icons in forced colours, in the system text colour.
+  Browsers without the unprefixed CSS `mask` keep Quarto's own icons. (#102)
 
 ### Documentation
 
