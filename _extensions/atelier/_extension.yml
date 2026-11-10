@@ -37,6 +37,12 @@ contributes:
           Powered by [Quarto](https://quarto.org){target="_blank" rel="noopener noreferrer"}.
         center: |
           &copy; []{#current-year} [Mickaël CANOUIL](https://mickael.canouil.fr){target="_blank" rel="noopener noreferrer"}.
+    # Quarto renders a notebook preview page with the plain `html` format, so
+    # the page loses the `formats.html` options below. The project metadata
+    # still reaches it, so this repeats the scheme option at the project level.
+    # Upstream: https://github.com/quarto-dev/quarto-cli/issues/14954
+    # Remove when: the minimum Quarto version includes the fix.
+    respect-user-color-scheme: true
     format: atelier-html
   formats:
     common:
