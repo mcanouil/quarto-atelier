@@ -91,18 +91,14 @@ $border-color: null;
 }
 
 // An icon drawn as a mask over a fill colour, for an icon whose image bakes in
-// a fixed colour. `$icon` is the image, or `none` when each state sets its own
-// `mask-image`. `$important` lets the fill win over a Quarto rule that sets a
-// `background-image` with a higher specificity.
-// A browser without the unprefixed `mask` keeps Quarto's own icon, because the
-// fill without the mask paints a solid square.
-// In forced colours the system replaces the fill, which hides the icon.
-// `$forced` is the system colour of the text of the control (`ButtonText` for a
-// button, `LinkText` for a link, `CanvasText` for other text), or `null` when
-// the system draws the control itself. `currentcolor` does not work here,
+// a fixed colour. A browser without the unprefixed `mask` keeps Quarto's own
+// icon, because the fill without the mask paints a solid square.
+// In forced colours the system replaces the fill, which hides the icon, so
+// `$forced` names the system colour of the text of the control, or is `null`
+// when the system draws the control itself. `currentcolor` does not work here,
 // because it keeps the author colour once the icon opts out of forced colours.
 @mixin atelier-icon-mask(
-  $icon,
+  $icon: none,
   $size: 1rem,
   $colour: currentcolor,
   $important: false,
@@ -1485,9 +1481,7 @@ body .navbar .gitlink-widget-dropdown {
   @media (forced-colors: active) {
     opacity: 1;
   }
-}
 
-.btn-close {
   @include atelier-icon-mask(var(--bs-btn-close-bg), $btn-close-width auto);
 }
 
@@ -1548,7 +1542,7 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   width: 1rem;
   height: 1rem;
   vertical-align: -0.125em;
-  @include atelier-icon-mask(none, contain);
+  @include atelier-icon-mask($size: contain);
 }
 
 // Quarto ships its own glyph at the same specificity, so scope to every place
@@ -1558,18 +1552,13 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 .top-right.quarto-color-scheme-toggle {
   // Clear Quarto's own toggle-switch background-image (same specificity, so this
   // wins on order); otherwise its glyph paints through and is clipped by the
-  // mask, leaving a shape that does not fill on hover. Only where the mask
-  // works, as for `atelier-icon-mask`, so that other browsers keep the glyph.
-  @supports (mask-image: none) {
-    &:not(.alternate) .bi::before {
-      background-image: none;
-      mask-image: $atelier-icon-sun;
-    }
+  // mask, leaving a shape that does not fill on hover.
+  &:not(.alternate) .bi::before {
+    @include atelier-icon-mask($atelier-icon-sun, contain);
+  }
 
-    &.alternate .bi::before {
-      background-image: none;
-      mask-image: $atelier-icon-moon;
-    }
+  &.alternate .bi::before {
+    @include atelier-icon-mask($atelier-icon-moon, contain);
   }
 }
 
