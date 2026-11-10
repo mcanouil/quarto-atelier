@@ -618,7 +618,10 @@ html .code-with-filename.atelier-terminal {
     border-color: var(--atelier-terminal-border);
   }
 
-  .code-copy-button {
+  // The scaffold in the selector outranks the annotated-code rules for the
+  // button in content.scss and theme.scss. Without it, an annotated block takes
+  // the page border.
+  .code-copy-outer-scaffold > .code-copy-button {
     color: var(--atelier-terminal-fg);
     background-color: transparent;
     border-color: var(--atelier-terminal-control-border);
