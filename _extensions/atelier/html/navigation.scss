@@ -1024,21 +1024,18 @@ $atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
 }
 
 // Quarto paints the bar of a notebook preview page in the brand colour, with
-// the Bootstrap class `bg-primary` or `text-bg-primary`. The bar takes the
-// chrome surface and ink instead, as the navbar above it does. The ID selector
-// matches the two classes. The `!important` answers the one on each utility.
+// the Bootstrap class `bg-primary` or `text-bg-primary`. By design, Atelier
+// gives the bar the chrome surface and ink, as the navbar above it has. The ID
+// selector matches the two classes. The `!important` answers the one on each
+// utility.
+// On a narrow screen, the buttons of the bar go to a second row, instead of
+// past the edge of the screen. Quarto gives the bar a fixed height of 3em, so
+// the bar grows from that height to hold the second row.
 // Remove when: never.
 #quarto-embed-header {
   background-color: var(--atelier-navbar-bg) !important;
   color: var(--atelier-navbar-fg) !important;
   border-bottom-color: var(--atelier-navbar-border);
-}
-
-// On a narrow screen, the buttons of that bar go to a second row, instead of
-// past the edge of the screen. Quarto gives the bar a fixed height of 3em, so
-// the bar grows from that height to hold the second row.
-// Remove when: never.
-#quarto-embed-header {
   flex-wrap: wrap;
   gap: 0.5rem;
   height: auto;
