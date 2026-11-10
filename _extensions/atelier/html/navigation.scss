@@ -1023,23 +1023,19 @@ $atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
   min-height: 24px;
 }
 
-// The bar of a notebook preview page is a Bootstrap `bg-primary` block with
-// white text, which takes the brand colour whatever its contrast with white.
-// It takes the chrome surface and ink instead, as the navbar above it does.
-// The `!important` answers the one on Bootstrap's background utility.
-// Upstream: none filed (WCAG 1.4.3)
-// Remove when: Quarto inks the notebook preview bar from a contrast-checked colour.
-#quarto-embed-header.bg-primary {
-  background-color: var(--atelier-navbar-bg) !important;
-  color: var(--atelier-navbar-fg);
-  border-bottom-color: var(--atelier-navbar-border);
-}
-
-// On a narrow screen, the buttons of that bar go to a second row, instead of
+// Quarto paints the bar of a notebook preview page in the brand colour, with
+// the Bootstrap class `bg-primary` or `text-bg-primary`. By design, Atelier
+// gives the bar the chrome surface and ink, as the navbar above it has. The ID
+// selector matches the two classes. The `!important` answers the one on each
+// utility.
+// On a narrow screen, the buttons of the bar go to a second row, instead of
 // past the edge of the screen. Quarto gives the bar a fixed height of 3em, so
 // the bar grows from that height to hold the second row.
 // Remove when: never.
 #quarto-embed-header {
+  background-color: var(--atelier-navbar-bg) !important;
+  color: var(--atelier-navbar-fg) !important;
+  border-bottom-color: var(--atelier-navbar-border);
   flex-wrap: wrap;
   gap: 0.5rem;
   height: auto;
@@ -1051,7 +1047,7 @@ $atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
 // dark on a dark bar. It takes the ink of the bar.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15306
 // Remove when: the minimum Quarto version includes the fix.
-#quarto-embed-header.bg-primary h6 {
+#quarto-embed-header h6 {
   color: inherit;
 }
 
