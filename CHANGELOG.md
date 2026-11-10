@@ -82,6 +82,7 @@
 - fix: Draw outline secondary buttons in the page text colour with a control border, so the label holds 4.5:1 and the border 3:1 with any brand secondary colour. (#101)
 - fix: Show the close, colour scheme, reader, code tools, and listing sort icons in forced colours, in the system text colour.
   Browsers without the unprefixed CSS `mask` keep Quarto's own icons. (#102)
+- fix: Follow the reader's colour scheme on the preview page of an embedded notebook, as on every other page. (#104)
 
 ### Documentation
 

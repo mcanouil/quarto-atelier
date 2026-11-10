@@ -60,6 +60,8 @@ The project type sets these under `website`, and any of them can be overridden i
 : Keys the project type sets under `website`. {.striped .hover tbl-colwidths="[46,54]"}
 
 It also sets `project.output-dir` to `_site`.
+It also sets `respect-user-color-scheme: true` at the project level, so that the preview page of an embedded notebook follows the colour scheme of the reader.
+As a result, this value applies to every format in the project, not only to `atelier-html`.
 
 Neither bar sets `background` or `foreground`: the chrome palette drives both, and `$atelier-chrome` decides whether it follows the colour scheme or is pinned to `light` or `dark`.
 
