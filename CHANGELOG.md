@@ -83,6 +83,7 @@
 - fix: Show the close, colour scheme, reader, code tools, and listing sort icons in forced colours, in the system text colour.
   Browsers without the unprefixed CSS `mask` keep Quarto's own icons. (#102)
 - fix: Follow the reader's colour scheme on the preview page of an embedded notebook, as on every other page. (#104)
+- fix: Keep the terminal frame on the copy button of an annotated terminal block, at rest and on hover. (#105)
 
 ### Documentation
 
