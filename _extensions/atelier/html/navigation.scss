@@ -748,11 +748,7 @@ $atelier-icon-code: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 .code-tools-button:hover > .bi::before,
 .quarto-title-banner .code-tools-button > .bi::before,
 .quarto-title-banner .code-tools-button:hover > .bi::before {
-  background-color: currentcolor;
-  background-image: none;
-  mask-image: $atelier-icon-code;
-  mask-repeat: no-repeat;
-  mask-size: 1rem 1rem;
+  @include atelier-icon-mask($atelier-icon-code);
 }
 
 // Search. The panel of the sidebar field and the modal of the overlay button
@@ -993,12 +989,7 @@ $atelier-icon-reader: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000
 
 .navbar .quarto-reader-toggle:is(.reader, :not(.reader)) .bi::before,
 .sidebar-navigation .quarto-reader-toggle:is(.reader, :not(.reader)) .bi::before {
-  background-image: none;
-  background-color: currentcolor;
-  mask-image: $atelier-icon-reader;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
+  @include atelier-icon-mask($atelier-icon-reader, contain, $forced: LinkText);
 }
 
 // The active toggle sits on the soft accent tint of its bar, in the accent ink
