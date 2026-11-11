@@ -4,8 +4,8 @@
 
 ### Breaking Changes
 
-- fix: Atelier needs Quarto 1.11.9 or later.
-  Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode. (#79)
+- build: Atelier needs Quarto 1.12.1 or later.
+  Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode, and draw the announcement dismiss control so that the keyboard cannot reach it. (#79)
 - feat: If your project has its own copy of div-reuse, highlight-text, offset-headings, preview-colour, prism or remember, remove it and its `filters` entry. Otherwise both copies run. (#101)
 
 ### New Features
