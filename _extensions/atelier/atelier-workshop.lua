@@ -549,7 +549,14 @@ local function publish_workshop(meta)
   if mode == MODE_WORKSHOP then
     data.duration = duration
     local page = project_relative_input()
-    -- A page that no sidebar lists, such as `404.qmd`, gets no sidebar data and shows no course.
+    if type(options.sidebars) ~= 'table' or next(options.sidebars) == nil then
+      log.log_warning(
+        EXTENSION_NAME,
+        source .. ' is in workshop mode, but extensions.atelier.sidebars lists no sidebar, so no page shows the course. ' ..
+        'Add a YAML anchor to the website.sidebar entry of the workshop and list the alias in extensions.atelier.sidebars.'
+      )
+    end
+    -- A page that no listed sidebar holds, such as `404.qmd`, gets no sidebar data and shows no course.
     local sidebar, paths = find_sidebar(options, page)
     if sidebar ~= nil then
       data.listed = true

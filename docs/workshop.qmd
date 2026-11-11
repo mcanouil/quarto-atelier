@@ -277,5 +277,6 @@ If the workshop sidebar has no `id`, Atelier logs a warning, and the progress al
   Atelier reads durations from `.qmd`, `.md`, and `.Rmd` pages only.
 - If no sidebar of `extensions.atelier.sidebars` lists a workshop page, the page shows the plain sidebar, with no workshop bar, timer, or progress.
   Atelier logs no warning for this page.
+- If `extensions.atelier.sidebars` lists no sidebar, Atelier logs a warning for each page in workshop mode.
 - The anchor and the alias of a sidebar must be in the same YAML file.
 - There is no control to reset the progress.
