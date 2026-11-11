@@ -271,11 +271,11 @@ If the workshop sidebar has no `id`, Atelier logs a warning, and the progress al
 
 ## Limits
 
-- Atelier does not resolve `auto` or glob entries in the sidebar `contents`, so their pages have no duration.
+- Atelier does not resolve `auto` or glob entries in the sidebar `contents`, so their pages are not part of the course.
   List each page by its path.
 - A `.ipynb` page has no duration.
   Atelier reads durations from `.qmd`, `.md`, and `.Rmd` pages only.
-- If a workshop page is in a sidebar that `extensions.atelier.sidebars` does not list, Atelier logs a warning.
-  The page then shows no durations, and its progress stays in memory only.
+- If no sidebar of `extensions.atelier.sidebars` lists a workshop page, the page shows the plain sidebar, with no workshop bar, timer, or progress.
+  Atelier logs no warning for this page.
 - The anchor and the alias of a sidebar must be in the same YAML file.
 - There is no control to reset the progress.
