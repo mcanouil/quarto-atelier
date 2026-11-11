@@ -1,9 +1,0 @@
-extensions:
-  atelier:
-    mode: workshop
-
-language:
-  title-block-author-single: Instructor
-  title-block-author-plural: Instructors
-  title-block-published: Session
-  title-block-modified: Materials updated

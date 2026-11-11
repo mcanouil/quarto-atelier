@@ -105,11 +105,10 @@ Change it before you publish the site, because the edit and issue links of each 
 
 | File                     | Content                                                                                       |
 | ------------------------ | --------------------------------------------------------------------------------------------- |
-| `_quarto.yml`            | The project type, `navbar: false`, the search in the sidebar, and `metadata-files`.           |
+| `_quarto.yml`            | The project type, `mode: workshop`, `navbar: false`, the search in the sidebar, and `metadata-files`. |
 | `_sidebars.yml`          | The workshop sidebar with its anchor, and the alias in `extensions.atelier.sidebars`.         |
 | `_brand.yml`             | The colours, with a comment on each key.                                                      |
-| `index.qmd`              | The welcome page. It is a module of one page, and it sets `mode: workshop` in its front matter. |
-| `workshop/_metadata.yml` | `mode: workshop` and the title block labels for each page in the `workshop` folder.           |
+| `index.qmd`              | The welcome page. It is a module of one page.                                                 |
 | `workshop/setup/`        | The "Set-up" module: two pages.                                                               |
 | `workshop/first-site/`   | The "Your first site" module: a page and an exercise page.                                    |
 | `workshop/publish/`      | The "Publish" module: one page.                                                               |
@@ -117,7 +116,5 @@ Change it before you publish the site, because the edit and issue links of each 
 
 : Files of the workshop template. {.striped .hover tbl-colwidths="[28,72]"}
 
-The welcome page is outside the `workshop` folder, so the `_metadata.yml` of that folder does not apply to it.
-For this reason, the welcome page sets the mode itself.
 To add a module, add a section to `contents` in `_sidebars.yml`, then add its pages.
 The [Workshop mode](workshop.qmd) page tells how.

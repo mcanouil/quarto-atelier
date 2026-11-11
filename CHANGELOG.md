@@ -33,7 +33,8 @@
 - feat: Restyle the appendix as labelled groups with the BibTeX entry in a code block, lay the footer out in three aligned columns, and restyle notebook links and the reader toggle from the brand. (#77)
 - feat: Restyle the floating sidebar, the narrow-screen sidebar toggle and backdrop, and the lightbox overlay from the brand, and fit SVG images to the screen in the lightbox. (#77)
 - feat: Restyle the five about page templates from the brand, with link buttons held to 4.5:1. (#77)
-- feat: Add the `extensions: atelier: mode: workshop` option, set in the `_metadata.yml` of a workshop folder, the `extensions: atelier: duration` page option, and `extensions: atelier: sidebars`, which lists the workshop sidebars through a YAML alias. (#78)
+- feat: Add the `extensions: atelier: mode: workshop` option, set once in `_quarto.yml`, the `extensions: atelier: duration` page option, and `extensions: atelier: sidebars`, which lists the workshop sidebars through a YAML alias.
+  Workshop pages label the title block "Instructor", "Session", and "Materials updated", and the `atelier-workshop-*` language keys change that text. (#78)
 - feat: Show a bar at the top of the content in the sidebar-only layout, with the section and page, previous and next links, and "Page n of m".
   In workshop mode, it shows "Module n of m" and a session timer that can be paused. (#78)
 - feat: In workshop mode with a navbar, add a module row under the navbar with the breadcrumb, the timer, previous and next links, and the module progress. (#78)

@@ -59,6 +59,10 @@ local LABELS = {
   { key = 'exercise-title', default = 'Exercise' },
   { key = 'solution-summary', default = 'Show the solution' },
   { key = 'terminal', default = 'Terminal' },
+  { key = 'workshop-author-single', default = 'Instructor' },
+  { key = 'workshop-author-plural', default = 'Instructors' },
+  { key = 'workshop-published', default = 'Session' },
+  { key = 'workshop-modified', default = 'Materials updated' },
 }
 
 --- Resolve every label, taking a non-empty `language` override over the default.
@@ -160,6 +164,20 @@ local function read_duration(meta, source, quiet)
   return minutes
 end
 
+-- Quarto rewrites a project metadata string as a path relative to the page when a file or folder of that name exists, so `workshop` reaches pages under `workshop/` as `../../workshop`. Strip the leading `../` and `./` segments to get the value back, for the mode and the sidebar id.
+-- The mode default stays in this file and never in `_extension.yml`, where the offset also holds the extension folder.
+-- Upstream: https://github.com/quarto-dev/quarto-cli/issues/12963
+-- Remove when: the minimum Quarto version includes the fix.
+--- @param value string The value as the filter reads it
+--- @return string The value without the leading `../` and `./` segments
+local function strip_rewrite(value)
+  local text, count = value, 1
+  while count > 0 do
+    text, count = text:gsub('^%.%.?/', '')
+  end
+  return text
+end
+
 --- Read the mode option, falling back to documentation with a warning.
 --- @param meta table The metadata
 --- @param source string The input file, for the warning
@@ -169,7 +187,7 @@ local function read_mode(meta, source)
   if value == nil then
     return MODE_DOCUMENTATION
   end
-  local text = pandoc.utils.stringify(value)
+  local text = strip_rewrite(pandoc.utils.stringify(value))
   if text == MODE_DOCUMENTATION or text == MODE_WORKSHOP then
     return text
   end
@@ -296,15 +314,6 @@ local function collect_paths(contents, base, paths)
   return paths
 end
 
---- Read the id of a sidebar.
---- Quarto also rewrites the id as a path relative to the page, so the leading
---- `../` parts are removed.
---- @param sidebar table The sidebar map
---- @return string The id
-local function read_sidebar_id(sidebar)
-  local id = pandoc.utils.stringify(sidebar.id or '')
-  return (id:gsub('^[%./]+', ''))
-end
 
 --- Find the first sidebar in `extensions.atelier.sidebars` that lists the page.
 --- @param options table The `extensions.atelier` options
@@ -321,7 +330,7 @@ local function find_sidebar(options, page)
       local paths = collect_paths(sidebar.contents, base, {})
       for _, path in ipairs(paths) do
         if path == page then
-          return read_sidebar_id(sidebar), paths
+          return strip_rewrite(pandoc.utils.stringify(sidebar.id or '')), paths
         end
       end
     end
@@ -482,9 +491,46 @@ local function warn_sidebar_without_id(source, paths, page)
   )
 end
 
---- Add the workshop data block to the head.
+--- Count the authors of a page, as Quarto does for the author label.
 --- @param meta table The document metadata
+--- @return integer The number of authors
+local function count_authors(meta)
+  local authors = meta['by-author'] or meta.author
+  if authors == nil then
+    return 0
+  end
+  if pandoc.utils.type(authors) == 'List' then
+    return #authors
+  end
+  return 1
+end
+
+--- Set the title-block labels of a workshop page.
+--- Quarto fills `meta.labels` from the `language` keys before this filter runs.
+--- A label that the page sets with `author-title`, `published-title`, or
+--- `modified-title` stays as it is.
+--- @param meta table The document metadata
+--- @param labels table<string, string> The resolved Atelier labels
 --- @return nil
+local function apply_title_labels(meta, labels)
+  local values = meta.labels or {}
+  if meta['author-title'] == nil then
+    local key = count_authors(meta) == 1 and 'workshop-author-single' or 'workshop-author-plural'
+    values.authors = pandoc.Inlines(labels[key])
+  end
+  if meta['published-title'] == nil then
+    values.published = pandoc.Inlines(labels['workshop-published'])
+  end
+  if meta['modified-title'] == nil then
+    values.modified = pandoc.Inlines(labels['workshop-modified'])
+  end
+  meta.labels = values
+end
+
+--- Add the workshop data block to the head, and the title-block labels of a
+--- workshop page.
+--- @param meta table The document metadata
+--- @return table|nil The changed metadata of a workshop page, or nil
 local function publish_workshop(meta)
   if not quarto.doc.is_format('html') then
     return nil
@@ -499,18 +545,21 @@ local function publish_workshop(meta)
     offset = quarto.project.offset or '',
     labels = state.labels,
   }
+  local changed = nil
   if mode == MODE_WORKSHOP then
     data.duration = duration
     local page = project_relative_input()
-    local sidebar, paths = find_sidebar(options, page)
-    if sidebar == nil then
+    if type(options.sidebars) ~= 'table' or next(options.sidebars) == nil then
       log.log_warning(
         EXTENSION_NAME,
-        source .. ' is in workshop mode, but no sidebar in extensions.atelier.sidebars lists it. ' ..
-        'Add a YAML anchor to its website.sidebar entry and list the alias in extensions.atelier.sidebars. ' ..
-        'The extension does not resolve contents: auto or glob patterns, so list the page by its path.'
+        source .. ' is in workshop mode, but extensions.atelier.sidebars lists no sidebar, so no page shows the course. ' ..
+        'Add a YAML anchor to the website.sidebar entry of the workshop and list the alias in extensions.atelier.sidebars.'
       )
-    else
+    end
+    -- A page that no listed sidebar holds, such as `404.qmd`, gets no sidebar data and shows no course.
+    local sidebar, paths = find_sidebar(options, page)
+    if sidebar ~= nil then
+      data.listed = true
       if sidebar == '' then
         warn_sidebar_without_id(source, paths, page)
       else
@@ -525,12 +574,14 @@ local function publish_workshop(meta)
       'in-header',
       '<script>document.documentElement.classList.add("atelier-workshop");</script>'
     )
+    apply_title_labels(meta, state.labels)
+    changed = meta
   end
   quarto.doc.include_text(
     'in-header',
     '<script type="application/json" id="atelier-workshop">' .. encode(data) .. '</script>'
   )
-  return nil
+  return changed
 end
 
 --- Build the head line of a block.
