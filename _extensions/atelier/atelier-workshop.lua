@@ -59,6 +59,10 @@ local LABELS = {
   { key = 'exercise-title', default = 'Exercise' },
   { key = 'solution-summary', default = 'Show the solution' },
   { key = 'terminal', default = 'Terminal' },
+  { key = 'workshop-author-single', default = 'Instructor' },
+  { key = 'workshop-author-plural', default = 'Instructors' },
+  { key = 'workshop-published', default = 'Session' },
+  { key = 'workshop-modified', default = 'Materials updated' },
 }
 
 --- Resolve every label, taking a non-empty `language` override over the default.
@@ -493,9 +497,46 @@ local function warn_sidebar_without_id(source, paths, page)
   )
 end
 
---- Add the workshop data block to the head.
+--- Count the authors of a page, as Quarto does for the author label.
 --- @param meta table The document metadata
+--- @return integer The number of authors
+local function count_authors(meta)
+  local authors = meta['by-author'] or meta.author
+  if authors == nil then
+    return 0
+  end
+  if pandoc.utils.type(authors) == 'List' then
+    return #authors
+  end
+  return 1
+end
+
+--- Set the title-block labels of a workshop page.
+--- Quarto fills `meta.labels` from the `language` keys before this filter runs.
+--- A label that the page sets with `author-title`, `published-title`, or
+--- `modified-title` stays as it is.
+--- @param meta table The document metadata
+--- @param labels table<string, string> The resolved Atelier labels
 --- @return nil
+local function apply_title_labels(meta, labels)
+  local values = meta.labels or {}
+  if meta['author-title'] == nil then
+    local key = count_authors(meta) == 1 and 'workshop-author-single' or 'workshop-author-plural'
+    values.authors = pandoc.Inlines(labels[key])
+  end
+  if meta['published-title'] == nil then
+    values.published = pandoc.Inlines(labels['workshop-published'])
+  end
+  if meta['modified-title'] == nil then
+    values.modified = pandoc.Inlines(labels['workshop-modified'])
+  end
+  meta.labels = values
+end
+
+--- Add the workshop data block to the head, and the title-block labels of a
+--- workshop page.
+--- @param meta table The document metadata
+--- @return table|nil The changed metadata of a workshop page, or nil
 local function publish_workshop(meta)
   if not quarto.doc.is_format('html') then
     return nil
@@ -531,11 +572,15 @@ local function publish_workshop(meta)
       'in-header',
       '<script>document.documentElement.classList.add("atelier-workshop");</script>'
     )
+    apply_title_labels(meta, state.labels)
   end
   quarto.doc.include_text(
     'in-header',
     '<script type="application/json" id="atelier-workshop">' .. encode(data) .. '</script>'
   )
+  if mode == MODE_WORKSHOP then
+    return meta
+  end
   return nil
 end
 
