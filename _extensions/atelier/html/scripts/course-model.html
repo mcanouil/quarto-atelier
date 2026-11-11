@@ -8,7 +8,8 @@
 		// The workshop bar, the stepper, the table of contents, and the objectives
 		// read the course from window.atelierCourse. It is built here once, from the
 		// workshop data block and Quarto's own sidebar. A page without a sidebar menu
-		// gets null.
+		// gets null. A workshop page that no sidebar of extensions.atelier.sidebars
+		// lists also gets null, so it keeps the plain sidebar.
 		window.atelierCourse = null;
 		var menu = document.querySelector("#quarto-sidebar .sidebar-menu-container");
 		if (!menu) return;
@@ -21,6 +22,7 @@
 		}
 		var labels = data.labels || {};
 		var workshop = data.mode === "workshop";
+		if (workshop && data.listed !== true) return;
 		var durations = data.durations || {};
 
 		// The site root path is the page path with the offset applied. A folder

@@ -513,15 +513,10 @@ local function publish_workshop(meta)
   if mode == MODE_WORKSHOP then
     data.duration = duration
     local page = project_relative_input()
+    -- A page that no sidebar lists, such as `404.qmd`, gets no sidebar data and shows no course.
     local sidebar, paths = find_sidebar(options, page)
-    if sidebar == nil then
-      log.log_warning(
-        EXTENSION_NAME,
-        source .. ' is in workshop mode, but no sidebar in extensions.atelier.sidebars lists it. ' ..
-        'Add a YAML anchor to its website.sidebar entry and list the alias in extensions.atelier.sidebars. ' ..
-        'The extension does not resolve contents: auto or glob patterns, so list the page by its path.'
-      )
-    else
+    if sidebar ~= nil then
+      data.listed = true
       if sidebar == '' then
         warn_sidebar_without_id(source, paths, page)
       else
