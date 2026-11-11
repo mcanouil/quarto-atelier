@@ -171,9 +171,9 @@ end
 --- @param value string The value as the filter reads it
 --- @return string The value without the leading `../` and `./` segments
 local function strip_rewrite(value)
-  local text = value
-  while text:sub(1, 3) == '../' or text:sub(1, 2) == './' do
-    text = text:sub(1, 3) == '../' and text:sub(4) or text:sub(3)
+  local text, count = value, 1
+  while count > 0 do
+    text, count = text:gsub('^%.%.?/', '')
   end
   return text
 end
@@ -314,12 +314,6 @@ local function collect_paths(contents, base, paths)
   return paths
 end
 
---- Read the id of a sidebar, without the path rewrite of `strip_rewrite`.
---- @param sidebar table The sidebar map
---- @return string The id
-local function read_sidebar_id(sidebar)
-  return strip_rewrite(pandoc.utils.stringify(sidebar.id or ''))
-end
 
 --- Find the first sidebar in `extensions.atelier.sidebars` that lists the page.
 --- @param options table The `extensions.atelier` options
@@ -336,7 +330,7 @@ local function find_sidebar(options, page)
       local paths = collect_paths(sidebar.contents, base, {})
       for _, path in ipairs(paths) do
         if path == page then
-          return read_sidebar_id(sidebar), paths
+          return strip_rewrite(pandoc.utils.stringify(sidebar.id or '')), paths
         end
       end
     end
@@ -551,6 +545,7 @@ local function publish_workshop(meta)
     offset = quarto.project.offset or '',
     labels = state.labels,
   }
+  local changed = nil
   if mode == MODE_WORKSHOP then
     data.duration = duration
     local page = project_relative_input()
@@ -573,15 +568,13 @@ local function publish_workshop(meta)
       '<script>document.documentElement.classList.add("atelier-workshop");</script>'
     )
     apply_title_labels(meta, state.labels)
+    changed = meta
   end
   quarto.doc.include_text(
     'in-header',
     '<script type="application/json" id="atelier-workshop">' .. encode(data) .. '</script>'
   )
-  if mode == MODE_WORKSHOP then
-    return meta
-  end
-  return nil
+  return changed
 end
 
 --- Build the head line of a block.
