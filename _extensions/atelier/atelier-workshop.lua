@@ -160,6 +160,20 @@ local function read_duration(meta, source, quiet)
   return minutes
 end
 
+-- Quarto rewrites a project metadata string as a path relative to the page when a file or folder of that name exists, so `workshop` reaches pages under `workshop/` as `../../workshop`. Strip the leading `../` and `./` segments to get the value back, for the mode and the sidebar id.
+-- The mode default stays in this file and never in `_extension.yml`, where the offset also holds the extension folder.
+-- Upstream: https://github.com/quarto-dev/quarto-cli/issues/12963
+-- Remove when: the minimum Quarto version includes the fix.
+--- @param value string The value as the filter reads it
+--- @return string The value without the leading `../` and `./` segments
+local function strip_rewrite(value)
+  local text = value
+  while text:sub(1, 3) == '../' or text:sub(1, 2) == './' do
+    text = text:sub(1, 3) == '../' and text:sub(4) or text:sub(3)
+  end
+  return text
+end
+
 --- Read the mode option, falling back to documentation with a warning.
 --- @param meta table The metadata
 --- @param source string The input file, for the warning
@@ -169,7 +183,7 @@ local function read_mode(meta, source)
   if value == nil then
     return MODE_DOCUMENTATION
   end
-  local text = pandoc.utils.stringify(value)
+  local text = strip_rewrite(pandoc.utils.stringify(value))
   if text == MODE_DOCUMENTATION or text == MODE_WORKSHOP then
     return text
   end
@@ -296,14 +310,11 @@ local function collect_paths(contents, base, paths)
   return paths
 end
 
---- Read the id of a sidebar.
---- Quarto also rewrites the id as a path relative to the page, so the leading
---- `../` parts are removed.
+--- Read the id of a sidebar, without the path rewrite of `strip_rewrite`.
 --- @param sidebar table The sidebar map
 --- @return string The id
 local function read_sidebar_id(sidebar)
-  local id = pandoc.utils.stringify(sidebar.id or '')
-  return (id:gsub('^[%./]+', ''))
+  return strip_rewrite(pandoc.utils.stringify(sidebar.id or ''))
 end
 
 --- Find the first sidebar in `extensions.atelier.sidebars` that lists the page.
