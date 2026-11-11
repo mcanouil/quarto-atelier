@@ -17,7 +17,7 @@ Each icon and manifest tag is emitted only when its key is set, while `theme-col
 | `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.                         |
 | `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
 | `version`          | Text of the version pill, shown next to the title in the navbar or at the top of the sidebar. With no `version`, there is no pill. |
-| `mode`             | `documentation` (the default) or `workshop`. Set it once in `_quarto.yml`. See [Workshop mode](workshop.qmd). |
+| `mode`             | `documentation` (the default) or `workshop`. Set it once in `_quarto.yml`. A folder `_metadata.yml` or a page front matter can also set it. See [Workshop mode](workshop.qmd). |
 | `sidebars`         | The aliases of the `website.sidebar` entries that Atelier reads, such as `- *course`. Each alias must be in the same YAML file as its anchor. |
 | `theme-color`      | Browser UI tint (Safari toolbar, Android address bar, installed web app title bar), one colour per scheme, each emitted with a `prefers-color-scheme` media query. Each scheme falls back to `color.background` of the `_brand.yml` for that mode, which is the page background of the matching bundle; set a scheme only to override it. |
 
