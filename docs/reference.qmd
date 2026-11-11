@@ -340,7 +340,7 @@ The [Landing page](landing.qmd) guide shows each block and its Markdown, and the
 | Block        | Classes                                                                                                                 | Modifiers                                                |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | Container    | `.atelier-landing`                                                                                                      | None.                                                    |
-| Hero         | `.atelier-hero`, with the parts `.atelier-hero-text`, `.atelier-hero-figure`, `.atelier-eyebrow`, `.atelier-lead` and `.atelier-actions` | `.split`, `.centred`, `.banner`, `.gradient` and `.glow` |
+| Hero         | `.atelier-hero`, with the parts `.atelier-hero-text`, `.atelier-hero-figure`, `.atelier-eyebrow`, `.atelier-lead` and `.atelier-actions` | `.split`, `.centred`, `.banner` and `.gradient`           |
 | Feature row  | `.atelier-feature`, with the parts `.atelier-feature-text` and `.atelier-feature-figure`                                 | `.reverse`                                               |
 | Legend       | `.atelier-legend` around an ordered list, with `.atelier-detail` spans                                                  | None.                                                    |
 | Cards        | `.atelier-cards`, which holds `.atelier-card` divs                                                                       | `.compact`                                               |
@@ -353,7 +353,6 @@ The [Landing page](landing.qmd) guide shows each block and its Markdown, and the
 | `.centred`  | Centres the text part, in one column. A centred hero has no figure part.                                  |
 | `.banner`   | Puts the hero on a tinted surface with a border.                                                          |
 | `.gradient` | Fills the hero title (the h1 or the h2) with a gradient that starts at the primary colour.               |
-| `.glow`     | Puts a soft glow of the primary colour behind the figure.                                                 |
 | `.reverse`  | Puts the figure part of a feature row on the left.                                                        |
 | `.compact`  | Makes smaller cards, with the icon and the heading on one line.                                           |
 
@@ -366,7 +365,7 @@ Each block stacks into one column below the `md` breakpoint, and a reversed feat
 
 Each colour of the gradient has a contrast of 4.5:1 or more against the page, in each colour scheme.
 If a colour cannot have this contrast, the hero title uses the primary colour only.
-In print and in forced colours mode, the hero title is plain text and the glow is removed.
+In print and in forced colours mode, the hero title is plain text.
 Nothing in the blocks moves, so the reduced motion setting has no effect on them.
 
 A card holds an icon, a heading, one sentence and one link.
@@ -403,6 +402,5 @@ The gradient check above also applies to gradient colours that you set.
 | `$atelier-hero-gradient-start`   | `$atelier-landing-accent`                               | First colour of the title gradient.    |
 | `$atelier-hero-gradient-middle`  | The mix of the first and last colours, moved to 4.5:1   | Middle colour of the title gradient.   |
 | `$atelier-hero-gradient-end`     | `$primary` with the hue shift, moved to 4.5:1           | Last colour of the title gradient.     |
-| `$atelier-hero-glow-color`       | `$primary` at 25% opacity                               | Colour of the glow behind the figure.  |
 
 : Colour variables of the landing page blocks. {.striped .hover tbl-colwidths="[34,40,26]"}

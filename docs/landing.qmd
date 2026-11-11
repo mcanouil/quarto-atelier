@@ -248,18 +248,15 @@ You can use it with the split hero or with `.centred`.
 :::
 ````
 
-## Gradient and glow
+## Gradient
 
 The `.gradient` modifier fills the hero title, the h1 or the h2, with a gradient that starts at the primary colour.
 Atelier calculates each colour of the gradient to have a contrast of 4.5:1 or more against the page, in each colour scheme.
 If a colour cannot have this contrast, the title uses the primary colour only.
 In print and in forced colours mode, the title is plain text.
+The gradient does not move.
 
-The `.glow` modifier puts a soft glow of the primary colour behind the figure.
-In forced colours mode, Atelier removes the glow.
-Neither modifier moves.
-
-::: {.atelier-hero .gradient .glow}
+::: {.atelier-hero .gradient}
 
 ::: {.atelier-hero-text}
 
@@ -278,7 +275,7 @@ Neither modifier moves.
 :::
 
 ````markdown
-::: {.atelier-hero .gradient .glow}
+::: {.atelier-hero .gradient}
 
 ::: {.atelier-hero-text}
 
@@ -623,7 +620,7 @@ anchor-sections: false
 
 ::: {.atelier-landing}
 
-::: {.atelier-hero .gradient .glow}
+::: {.atelier-hero .gradient}
 
 ::: {.atelier-hero-text}
 
