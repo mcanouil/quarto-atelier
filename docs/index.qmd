@@ -15,7 +15,7 @@ anchor-sections: false
 
 ::: {.atelier-landing}
 
-::: {.atelier-hero .gradient .glow}
+::: {.atelier-hero .gradient}
 
 ::: {.atelier-hero-text}
 

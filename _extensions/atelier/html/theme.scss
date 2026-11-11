@@ -400,7 +400,6 @@ $atelier-landing-surface: atelier-rendered(body-mix(95%)) !default;
 $atelier-landing-border: var(--atelier-border) !default;
 $atelier-card-muted: atelier-theme-contrast($text-muted, $atelier-landing-surface) !default;
 $atelier-card-link: atelier-theme-contrast($link-color, $atelier-landing-surface) !default;
-$atelier-hero-glow-color: rgba($primary, 0.25) !default;
 
 :root {
   --atelier-card-link: #{$atelier-card-link};
@@ -493,12 +492,10 @@ main:has(> .atelier-landing) > #title-block-header {
 }
 
 .atelier-hero-figure {
-  position: relative;
   display: grid;
   place-items: center;
 
   img {
-    position: relative;
     width: 100%;
     max-width: $atelier-hero-figure-max-width;
     height: auto;
@@ -559,24 +556,12 @@ main:has(> .atelier-landing) > #title-block-header {
   }
 }
 
-.atelier-hero.glow .atelier-hero-figure::before {
-  content: "";
-  position: absolute;
-  inset: -10% 0;
-  background: radial-gradient(circle, $atelier-hero-glow-color, transparent 65%);
-  pointer-events: none;
-}
-
 // A browser prints without background images by default, which would leave a
 // transparent title with no gradient behind it.
 @media print, (forced-colors: active) {
   .atelier-hero.gradient :is(h1, h2) {
     background: none;
     -webkit-text-fill-color: currentcolor;
-  }
-
-  .atelier-hero.glow .atelier-hero-figure::before {
-    display: none;
   }
 }
 
