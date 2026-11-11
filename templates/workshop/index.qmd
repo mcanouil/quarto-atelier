@@ -2,7 +2,6 @@
 title: "Welcome"
 extensions:
   atelier:
-    mode: workshop
     duration: 5
 ---
 

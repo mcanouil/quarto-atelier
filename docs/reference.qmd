@@ -17,7 +17,7 @@ Each icon and manifest tag is emitted only when its key is set, while `theme-col
 | `apple-touch-icon` | Path to a 180x180 PNG, emitted as `rel="apple-touch-icon"`.                         |
 | `manifest`         | Path to a web app manifest, emitted as `rel="manifest"`.                            |
 | `version`          | Text of the version pill, shown next to the title in the navbar or at the top of the sidebar. With no `version`, there is no pill. |
-| `mode`             | `documentation` (the default) or `workshop`. Set it in the `_metadata.yml` of a folder, or in the front matter of a page. See [Workshop mode](workshop.qmd). |
+| `mode`             | `documentation` (the default) or `workshop`. Set it once in `_quarto.yml`. See [Workshop mode](workshop.qmd). |
 | `sidebars`         | The aliases of the `website.sidebar` entries that Atelier reads, such as `- *course`. Each alias must be in the same YAML file as its anchor. |
 | `theme-color`      | Browser UI tint (Safari toolbar, Android address bar, installed web app title bar), one colour per scheme, each emitted with a `prefers-color-scheme` media query. Each scheme falls back to `color.background` of the `_brand.yml` for that mode, which is the page background of the matching bundle; set a scheme only to override it. |
 
@@ -255,11 +255,15 @@ language:
 | `atelier-exercise-title`         | `Exercise`                           |
 | `atelier-solution-summary`       | `Show the solution`                  |
 | `atelier-terminal`               | `Terminal`                           |
+| `atelier-workshop-author-single` | `Instructor`                         |
+| `atelier-workshop-author-plural` | `Instructors`                        |
+| `atelier-workshop-published`     | `Session`                            |
+| `atelier-workshop-modified`      | `Materials updated`                  |
 
 : The `language` keys of Atelier and their default text. {.striped .hover tbl-colwidths="[50,50]"}
 
 Quarto provides the keys of the title block labels.
-A workshop can set them in its `_metadata.yml`, as the [Workshop mode](workshop.qmd#title-block-labels) page shows.
+In workshop mode, the `atelier-workshop-*` keys above replace them, as the [Workshop mode](workshop.qmd#title-block-labels) page shows.
 
 | Key                              | Default                              |
 | -------------------------------- | ------------------------------------ |

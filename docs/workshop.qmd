@@ -5,7 +5,7 @@ description: "Turn a sidebar into a course of modules, with durations, a timer, 
 
 Workshop mode turns one sidebar of a site into a course.
 Each top-level item of that sidebar is a module.
-The pages that set `mode: workshop` get the workshop chrome, and the other pages of the site keep the documentation chrome.
+The pages in workshop mode get the workshop chrome.
 
 The [example workshop](workshop-example/index.qmd) of this site uses each part that this page describes.
 The [workshop template](templates.qmd) gives you a workshop site to start from.
@@ -15,16 +15,19 @@ Workshop mode needs Quarto 1.11.9 or later.
 
 The mode option is `extensions.atelier.mode`.
 Its values are `documentation` (the default) and `workshop`.
-Set it once, in the `_metadata.yml` of the folder that holds the workshop pages:
+A site is a workshop or a documentation site.
+Set the mode once for the whole site, in `_quarto.yml`:
 
-```{.yaml filename="workshop/_metadata.yml"}
+```{.yaml filename="_quarto.yml"}
 extensions:
   atelier:
     mode: workshop
 ```
 
-A page outside that folder can set the same option in its own front matter.
-The workshop template does this for its welcome page, `index.qmd`.
+The `_metadata.yml` of a folder and the front matter of a page can also set the option.
+This site uses a folder `_metadata.yml` to show its [example workshop](workshop-example/index.qmd) inside the documentation.
+
+A page in workshop mode that no sidebar of `extensions.atelier.sidebars` lists, such as `404.qmd`, shows no workshop chrome.
 
 ## Declare the sidebar
 
@@ -238,16 +241,18 @@ The [Set up](workshop-example/setup.qmd#check-the-version) page of the example s
 
 ## Title block labels
 
-Quarto has `language` keys for the labels of the title block.
-A workshop can change them in its `_metadata.yml`:
+In workshop mode, the title block shows "Instructor" (or "Instructors"), "Session", and "Materials updated" in place of the Quarto labels.
+To change this text for the whole site, set the `atelier-workshop-*` keys in `language`:
 
-```{.yaml filename="workshop/_metadata.yml"}
+```{.yaml filename="_quarto.yml"}
 language:
-  title-block-author-single: Instructor
-  title-block-author-plural: Instructors
-  title-block-published: Session
-  title-block-modified: Materials updated
+  atelier-workshop-author-single: Trainer
+  atelier-workshop-author-plural: Trainers
+  atelier-workshop-published: Date
+  atelier-workshop-modified: Last change
 ```
+
+To change one label on one page, set `author-title`, `published-title`, or `modified-title` in the front matter of the page.
 
 The [Practice](workshop-example/practice.qmd) page of the example shows the "Instructors" label.
 The [Reference](reference.qmd#language-keys) lists the `language` keys of Atelier, which change the text of the workshop chrome.

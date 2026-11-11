@@ -29,13 +29,10 @@ quarto preview
 
 ## How the files fit together
 
-- `_quarto.yml` holds the title, the description, and the repository address.
+- `_quarto.yml` holds the title, the description, the repository address, and `mode: workshop`, which turns on the workshop mode for every page.
 - `_sidebars.yml` holds the sidebar and the list of modules.
-- `workshop/_metadata.yml` turns on the workshop mode for every page in the folder `workshop`, and sets the labels of the title block.
 - `_brand.yml` holds the colours.
   Each key has a comment that says what it changes.
-
-The page `index.qmd` sits outside the folder `workshop`, so it turns on the workshop mode in its own front matter.
 
 Keep the anchor `&workshop` and the alias `*workshop` in the same file, `_sidebars.yml`.
 If you move the alias into `_quarto.yml`, Quarto stops with `YAMLException: unidentified alias`.

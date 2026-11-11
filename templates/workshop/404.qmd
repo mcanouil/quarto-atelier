@@ -1,6 +1,7 @@
 ---
 title: "Page not found"
 canonical-url: false
+sidebar: false
 ---
 
 This page does not exist.

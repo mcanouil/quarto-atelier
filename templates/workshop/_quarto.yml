@@ -18,3 +18,4 @@ brand: _brand.yml
 extensions:
   atelier:
     version: "2026"
+    mode: workshop
