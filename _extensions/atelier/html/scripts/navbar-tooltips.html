@@ -21,6 +21,7 @@
 	})();
 
 	document.addEventListener("DOMContentLoaded", function () {
+		var labels = (window.atelierOptions || {}).labels || {};
 		var hasTippy = typeof window.tippy === "function";
 		var config = {
 			// The `quarto` theme gives the popup surface and the arrow, and `atelier`
@@ -91,14 +92,14 @@
 
 		document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
 			// Hover-only and hide on click, so the tooltip does not linger after toggling.
-			bind(toggle, toggle.getAttribute("aria-label") || toggle.getAttribute("title") || "Toggle dark mode", {
+			bind(toggle, toggle.getAttribute("aria-label") || toggle.getAttribute("title") || labels["toggle-dark-mode"], {
 				trigger: "mouseenter",
 				hideOnClick: true,
 			});
 		});
 
 		document.querySelectorAll("a.navbar-brand, a.navbar-brand-logo").forEach(function (logo) {
-			bind(logo, "Home");
+			bind(logo, labels.home);
 		});
 	});
 </script>

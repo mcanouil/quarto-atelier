@@ -29,6 +29,12 @@ local LABELS = {
   'table-scroll',
   'previous',
   'next',
+  'site-banner',
+  'listing-filters',
+  'page-metadata',
+  'home',
+  'logo-link',
+  'footnote-back',
 }
 
 --- Version of the `site_libs` folder of the fonts, not of one package.

@@ -5,6 +5,8 @@
 	 * @author Mickaël Canouil
 	 */
 	document.addEventListener("DOMContentLoaded", () => {
+		const labels = (window.atelierOptions || {}).labels || {};
+
 		// Logo link: Quarto emits <a class="navbar-brand"> with an inner <img alt>,
 		// but the accessible name is lost when the image is styled away.
 		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/14660
@@ -14,12 +16,14 @@
 		const siteName = (
 			document.querySelector(".navbar-title")?.textContent ||
 			document.title ||
-			"Site"
+			labels["navigation-site-label"] ||
+			""
 		).trim();
+		const logoName = (labels["logo-link"] || "").replace("{site}", siteName);
 		document
 			.querySelectorAll("a.navbar-brand:not([aria-label]), a.navbar-brand-logo:not([aria-label])")
 			.forEach((a) => {
-				a.setAttribute("aria-label", `${siteName} — home`);
+				if (logoName) a.setAttribute("aria-label", logoName);
 			});
 
 		// Author email link: Quarto emits <a class="quarto-title-author-email"> around an
@@ -40,17 +44,9 @@
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15062
 		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: the name sits on a label and on host-rendered inputs, which CSS cannot name.
-		const searchName = (() => {
-			try {
-				const options = document.getElementById("quarto-search-options");
-				return (options && JSON.parse(options.textContent).language?.["search-label"]) || "Search";
-			} catch (error) {
-				console.warn("Atelier: cannot read the search options; the search field keeps the name \"Search\".", error);
-				return "Search";
-			}
-		})();
+		const searchName = labels["search-label"];
 		const setSearchName = (element) => {
-			if (element.getAttribute("aria-label") !== searchName) {
+			if (searchName && element.getAttribute("aria-label") !== searchName) {
 				element.setAttribute("aria-label", searchName);
 			}
 		};
@@ -186,8 +182,8 @@
 		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: ARIA roles and labels are attributes, which CSS cannot set.
 		const siteHeader = document.getElementById("quarto-header");
-		if (siteHeader && !siteHeader.getAttribute("aria-label")) {
-			siteHeader.setAttribute("aria-label", "Site banner");
+		if (siteHeader && labels["site-banner"] && !siteHeader.getAttribute("aria-label")) {
+			siteHeader.setAttribute("aria-label", labels["site-banner"]);
 		}
 		const titleHeader = document.querySelector("header#title-block-header, header.quarto-title-block");
 		if (titleHeader) {
@@ -220,7 +216,7 @@
 		const labelOnce = (el, role, label) => {
 			if (!el || el.getAttribute("role") || insideLandmark(el.parentElement)) return;
 			el.setAttribute("role", role);
-			if (!el.getAttribute("aria-label")) el.setAttribute("aria-label", label);
+			if (label && !el.getAttribute("aria-label")) el.setAttribute("aria-label", label);
 		};
 
 		document.querySelectorAll(".quarto-listing-category-title").forEach((title) => {
@@ -228,7 +224,7 @@
 			if (next && next.classList.contains("quarto-listing-category") && !insideLandmark(title.parentElement)) {
 				const wrap = document.createElement("div");
 				wrap.setAttribute("role", "complementary");
-				wrap.setAttribute("aria-label", "Listing filters");
+				if (labels["listing-filters"]) wrap.setAttribute("aria-label", labels["listing-filters"]);
 				title.parentNode.insertBefore(wrap, title);
 				wrap.appendChild(title);
 				wrap.appendChild(next);
@@ -236,11 +232,11 @@
 		});
 		document.querySelectorAll(".quarto-listing-category").forEach((el) => {
 			if (inToggleClone(el)) return;
-			labelOnce(el, "complementary", "Listing filters");
+			labelOnce(el, "complementary", labels["listing-filters"]);
 		});
 		// An empty strip (Quarto writes it with whitespace only) is hidden by SCSS and has no landmark.
 		document.querySelectorAll(".quarto-title-meta").forEach((el) => {
-			if (el.firstElementChild) labelOnce(el, "region", "Page metadata");
+			if (el.firstElementChild) labelOnce(el, "region", labels["page-metadata"]);
 		});
 
 		// Listing categories: Quarto emits <div> elements with a click handler, so
@@ -294,14 +290,14 @@
 		// Footnote back-links: Quarto renders only an arrow glyph, which a screen
 		// reader reads as "return" or nothing. Name each one after its note.
 		// Quarto exposes no localised string for this link in the page, so the
-		// name is in English.
+		// name comes from the `atelier-footnote-back` label.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15064
 		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
 		document.querySelectorAll("section.footnotes .footnote-back:not([aria-label])").forEach((a) => {
 			const number = (a.closest("li[id^='fn']")?.id || "").replace("fn", "");
-			if (/^\d+$/.test(number)) {
-				a.setAttribute("aria-label", `Back to note ${number} in the text`);
+			if (/^\d+$/.test(number) && labels["footnote-back"]) {
+				a.setAttribute("aria-label", labels["footnote-back"].replace("{n}", number));
 			}
 		});
 
@@ -406,9 +402,10 @@
 		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: the accessible name is an attribute, which CSS cannot set.
 		[
-			[".nav-page-previous", "Previous"],
-			[".nav-page-next", "Next"],
+			[".nav-page-previous", labels.previous],
+			[".nav-page-next", labels.next],
 		].forEach(([side, direction]) => {
+			if (!direction) return;
 			document.querySelectorAll(`.page-navigation ${side} a.pagination-link`).forEach((link) => {
 				const title = (link.getAttribute("aria-label") || link.textContent).trim();
 				if (!title.startsWith(`${direction}:`)) {
@@ -442,9 +439,9 @@
 		// Not SCSS: roles, states and key handlers are DOM changes, which CSS cannot make.
 		const enhancedToggles = new WeakSet();
 		const toggleNames = {
-			"quarto-toc-toggle": "On this page",
-			"quarto-lefttoc-toggle": "On this page",
-			"quarto-sidebarnav-toggle": document.querySelector("nav#quarto-sidebar")?.getAttribute("aria-label") || "Site",
+			"quarto-toc-toggle": labels["toc-title-website"],
+			"quarto-lefttoc-toggle": labels["toc-title-website"],
+			"quarto-sidebarnav-toggle": document.querySelector("nav#quarto-sidebar")?.getAttribute("aria-label") || labels["navigation-site-label"],
 		};
 		const enhanceToggle = (title) => {
 			if (enhancedToggles.has(title)) return;
@@ -454,7 +451,8 @@
 			title.setAttribute("role", "button");
 			title.setAttribute("tabindex", "0");
 			if (!title.textContent.trim() && !title.hasAttribute("aria-label")) {
-				title.setAttribute("aria-label", toggleNames[toggle.id] || "Toggle navigation");
+				const name = toggleNames[toggle.id] || labels["toggle-navigation"];
+				if (name) title.setAttribute("aria-label", name);
 			}
 			title.querySelectorAll(".quarto-sidebar-toggle-icon").forEach((icon) => {
 				icon.setAttribute("aria-hidden", "true");
