@@ -22,7 +22,6 @@ local LABELS = {
   { key = 'announcement-success', default = 'Success' },
   { key = 'announcement-notice', default = 'Notice' },
   { key = 'announcement-region', default = 'Announcement' },
-  { key = 'announcement-dismiss', default = 'Dismiss the announcement' },
   { key = 'toc-reading-time', default = '{n} min read' },
   { key = 'toc-updated', default = 'Updated {date}' },
   { key = 'toc-copy-link', default = 'Copy link' },

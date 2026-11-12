@@ -29,23 +29,8 @@
 		if (labels[key]) label.appendChild(document.createTextNode(labels[key]));
 		bar.insertBefore(label, bar.firstChild);
 
-		// Quarto draws the dismiss control as an <i>, which the keyboard cannot
-		// reach and which has no name. The button keeps the class that Quarto
-		// binds its handler to when the DOM is ready, and this script runs before.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15235
-		// Remove when: the minimum Quarto version includes the fix.
-		var action = bar.querySelector(".quarto-announcement-action");
-		if (action) {
-			var button = document.createElement("button");
-			button.type = "button";
-			button.className = "quarto-announcement-action atelier-announcement-dismiss";
-			if (labels["announcement-dismiss"]) button.setAttribute("aria-label", labels["announcement-dismiss"]);
-			var cross = document.createElement("i");
-			cross.className = "bi bi-x-lg";
-			cross.setAttribute("aria-hidden", "true");
-			button.appendChild(cross);
-			action.replaceWith(button);
-
+		var button = bar.querySelector("button.quarto-announcement-action");
+		if (button) {
 			// Quarto removes the bar on dismissal, and the focused button goes with it,
 			// so focus would fall to the body. This runs before Quarto's handler and only moves focus.
 			function isVisible(element) {
