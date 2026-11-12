@@ -50,6 +50,8 @@
 - feat: Show the table of contents in a bottom sheet on narrow screens. (#100)
 - feat: Include the div-reuse, highlight-text, offset-headings, preview-colour, prism and remember extensions, styled from the page theme.
   remember offers to resume in a banner below the page title, and not on the home page or the 404 page. (#101)
+- feat: Ship the interface text in English and in French, in `_language.yml` and `_language-fr.yml`, so a site with `lang: fr` is in French with no extra setup.
+  The scripts now take their text from `language` keys too, and Atelier uses Quarto's own key wherever Quarto has one.
 
 ### Bug Fixes
 
