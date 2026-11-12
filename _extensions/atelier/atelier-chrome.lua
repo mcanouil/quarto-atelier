@@ -6,27 +6,29 @@
 --- @brief Publish the page options that the chrome scripts read.
 --- @description Writes one JSON block into the head of each HTML page. It
 --- holds the version from `extensions.atelier.version` and the translated
---- labels. A label is the default text, or the `language` key `atelier-<key>`
---- when the project or the page sets one.
+--- labels: the `language` keys `atelier-<key>`, and the Quarto keys that the
+--- scripts need.
 
 --- Load modules
 local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
 
---- Labels and their default text, in output order.
---- @type table<integer, { key: string, default: string }>
+--- Keys of the labels, without the `atelier-` prefix, in output order.
+--- The text comes from the `language` files.
+--- @type table<integer, string>
 local LABELS = {
-  { key = 'search', default = 'Search' },
-  { key = 'announcement-info', default = 'Info' },
-  { key = 'announcement-warning', default = 'Warning' },
-  { key = 'announcement-danger', default = 'Danger' },
-  { key = 'announcement-success', default = 'Success' },
-  { key = 'announcement-notice', default = 'Notice' },
-  { key = 'announcement-region', default = 'Announcement' },
-  { key = 'toc-reading-time', default = '{n} min read' },
-  { key = 'toc-updated', default = 'Updated {date}' },
-  { key = 'toc-copy-link', default = 'Copy link' },
-  { key = 'toc-link-copied', default = 'Link copied' },
-  { key = 'table-scroll', default = 'Scrollable table' },
+  'announcement-info',
+  'announcement-warning',
+  'announcement-danger',
+  'announcement-success',
+  'announcement-notice',
+  'announcement-region',
+  'toc-reading-time',
+  'toc-updated',
+  'toc-copy-link',
+  'toc-link-copied',
+  'table-scroll',
+  'previous',
+  'next',
 }
 
 --- Version of the `site_libs` folder of the fonts, not of one package.
@@ -66,18 +68,39 @@ local function read_version(meta)
   return version
 end
 
---- Resolve every label, taking a non-empty `language` override over the default.
+--- Keys that Quarto translates, passed on under their own name.
+--- @type table<integer, string>
+local QUARTO_KEYS = {
+  'toggle-dark-mode',
+  'toggle-navigation',
+  'search-label',
+  'search-submit-button-title',
+  'navigation-site-label',
+  'toc-title-website',
+}
+
+--- Read one `language` value, or an empty string when it is missing.
+--- @param language table The `language` table of the document
+--- @param key string The full key
+--- @return string The text
+local function language_text(language, key)
+  local value = language[key]
+  if type(value) == 'string' then
+    return value
+  end
+  return ''
+end
+
+--- Resolve every label from the `language` files and overrides.
 --- @return table<string, string> The label text by key
 local function resolve_labels()
   local language = quarto.doc.language or {}
   local labels = {}
-  for _, label in ipairs(LABELS) do
-    local value = language['atelier-' .. label.key]
-    if type(value) == 'string' and value ~= '' then
-      labels[label.key] = value
-    else
-      labels[label.key] = label.default
-    end
+  for _, key in ipairs(LABELS) do
+    labels[key] = language_text(language, 'atelier-' .. key)
+  end
+  for _, key in ipairs(QUARTO_KEYS) do
+    labels[key] = language_text(language, key)
   end
   return labels
 end

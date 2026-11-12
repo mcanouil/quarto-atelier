@@ -35,48 +35,46 @@ local FRONT_MATTER_EXTENSIONS = { qmd = true, md = true, rmd = true }
 --- @type table<string, boolean>
 local RENDERED_EXTENSIONS = { qmd = true, md = true, rmd = true, ipynb = true }
 
---- Labels and their default text, in output order.
---- @type table<integer, { key: string, default: string }>
+--- Keys of the labels, without the `atelier-` prefix, in output order.
+--- The text comes from the `language` files.
+--- @type table<integer, string>
 local LABELS = {
-  { key = 'duration-minutes', default = '{m} min' },
-  { key = 'duration-hours', default = '{h} h' },
-  { key = 'duration-hours-minutes', default = '{h} h {m} min' },
-  { key = 'reading-bar', default = 'Reading navigation' },
-  { key = 'reading-progress', default = 'Reading progress' },
-  { key = 'reading-position', default = 'Page {n} of {m}' },
-  { key = 'workshop-bar', default = 'Module navigation' },
-  { key = 'workshop-progress', default = 'Workshop progress' },
-  { key = 'workshop-position', default = 'Module {n} of {m}' },
-  { key = 'workshop-total', default = 'about {time}' },
-  { key = 'workshop-completed', default = '(completed)' },
-  { key = 'previous', default = 'Previous' },
-  { key = 'next', default = 'Next' },
-  { key = 'timer-label', default = 'Session time left' },
-  { key = 'timer-pause', default = 'Pause the session timer' },
-  { key = 'toc-read', default = '(read)' },
-  { key = 'toc-module-read', default = '{n}% of this module read' },
-  { key = 'objectives-title', default = 'By the end of this module, you can' },
-  { key = 'exercise-title', default = 'Exercise' },
-  { key = 'solution-summary', default = 'Show the solution' },
-  { key = 'terminal', default = 'Terminal' },
-  { key = 'workshop-author-single', default = 'Instructor' },
-  { key = 'workshop-author-plural', default = 'Instructors' },
-  { key = 'workshop-published', default = 'Session' },
-  { key = 'workshop-modified', default = 'Materials updated' },
+  'duration-minutes',
+  'duration-hours',
+  'duration-hours-minutes',
+  'reading-bar',
+  'reading-progress',
+  'reading-position',
+  'workshop-bar',
+  'workshop-progress',
+  'workshop-position',
+  'workshop-total',
+  'workshop-completed',
+  'previous',
+  'next',
+  'timer-label',
+  'timer-pause',
+  'toc-read',
+  'toc-module-read',
+  'objectives-title',
+  'exercise-title',
+  'solution-summary',
+  'terminal',
+  'workshop-author-single',
+  'workshop-author-plural',
+  'workshop-published',
+  'workshop-modified',
 }
 
---- Resolve every label, taking a non-empty `language` override over the default.
+--- Resolve every label from the `language` files and overrides.
+--- A missing value gives an empty string.
 --- @return table<string, string> The label text by key
 local function resolve_labels()
   local language = quarto.doc.language or {}
   local labels = {}
-  for _, label in ipairs(LABELS) do
-    local value = language['atelier-' .. label.key]
-    if type(value) == 'string' and value ~= '' then
-      labels[label.key] = value
-    else
-      labels[label.key] = label.default
-    end
+  for _, key in ipairs(LABELS) do
+    local value = language['atelier-' .. key]
+    labels[key] = type(value) == 'string' and value or ''
   end
   return labels
 end
