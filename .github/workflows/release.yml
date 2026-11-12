@@ -11,10 +11,11 @@ on:
           - "patch"
           - "minor"
           - "major"
+      # `quarto-required` is 1.12.1, which is a pre-release until Quarto 1.12 is stable.
       quarto:
         type: choice
         description: "Quarto version"
-        default: "release"
+        default: "pre-release"
         options:
           - "release"
           - "pre-release"
