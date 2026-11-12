@@ -4,8 +4,8 @@
 
 ### Breaking Changes
 
-- fix: Atelier needs Quarto 1.11.9 or later.
-  Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode. (#79)
+- build: Atelier needs Quarto 1.12.1 or later, which is a pre-release until Quarto 1.12 is out.
+  Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode, and draw the announcement dismiss control so that the keyboard cannot reach it. (#79)
 - feat: If your project has its own copy of div-reuse, highlight-text, offset-headings, preview-colour, prism or remember, remove it and its `filters` entry. Otherwise both copies run. (#101)
 
 ### New Features
@@ -53,7 +53,7 @@
 
 ### Bug Fixes
 
-- fix: Make the announcement dismiss control a named button that the keyboard can reach, and mark the bar as a landmark. (#76)
+- fix: Mark the announcement bar as a landmark, and move the focus to the next control when you dismiss the bar. (#76)
 - fix: Map the `color.palette` names `blue`, `green`, `red`, `orange`, and `yellow` to the Bootstrap colours for every brand, not only for a brand with `defaults.bootstrap`.
   The callouts and the theme colours that Bootstrap derives from them follow the palette. (#76)
 - fix: Keep the "Back to home" link of the 404 page readable when the primary colour is very pale or very deep. (#76)

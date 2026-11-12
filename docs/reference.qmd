@@ -228,7 +228,6 @@ language:
 | `atelier-announcement-success`   | `Success`                            |
 | `atelier-announcement-notice`    | `Notice`                             |
 | `atelier-announcement-region`    | `Announcement`                       |
-| `atelier-announcement-dismiss`   | `Dismiss the announcement`           |
 | `atelier-toc-reading-time`       | `{n} min read`                       |
 | `atelier-toc-updated`            | `Updated {date}`                     |
 | `atelier-toc-copy-link`          | `Copy link`                          |
