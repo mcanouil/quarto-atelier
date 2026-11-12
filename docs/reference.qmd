@@ -257,8 +257,8 @@ language:
 | `atelier-exercise-title`         | `Exercise`                           | `Exercice`                                  |
 | `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
 | `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
-| `atelier-workshop-author-single` | `Instructor`                         | `Formateur`                                 |
-| `atelier-workshop-author-plural` | `Instructors`                        | `Formateurs`                                |
+| `atelier-workshop-author-single` | `Instructor`                         | `Animation`                                 |
+| `atelier-workshop-author-plural` | `Instructors`                        | `Animation`                                 |
 | `atelier-workshop-published`     | `Session`                            | `Session`                                   |
 | `atelier-workshop-modified`      | `Materials updated`                  | `Supports mis à jour`                       |
 | `atelier-site-banner`            | `Site banner`                        | `Bandeau du site`                           |
