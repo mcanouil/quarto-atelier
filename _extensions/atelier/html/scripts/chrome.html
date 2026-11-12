@@ -195,11 +195,11 @@
 
 		function decorate(button) {
 			if (button.querySelector(".atelier-search-label")) return;
-			if (labels.search) {
+			if (labels["search-label"]) {
 				var label = document.createElement("span");
 				label.className = "atelier-search-label";
 				label.setAttribute("aria-hidden", "true");
-				label.textContent = labels.search;
+				label.textContent = labels["search-label"];
 				button.appendChild(label);
 			}
 			if (shortcut) {

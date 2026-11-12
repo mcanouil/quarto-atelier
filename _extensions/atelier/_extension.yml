@@ -47,6 +47,7 @@ contributes:
   formats:
     common:
       lang: en-GB
+      language: _language.yml
       date-format: "dddd[, the] Do [of] MMMM, YYYY"
       code-copy: true
       code-overflow: wrap

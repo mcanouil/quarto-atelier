@@ -209,57 +209,79 @@ A page with none of the first three gets no description tag at all, so give ever
 ## Language keys
 
 Atelier writes the text of its chrome from `language` keys.
-Set a key under `language` in `_quarto.yml`, in a `_metadata.yml`, or in the front matter of a page, to translate or change its text.
-In a default, `{n}`, `{m}`, `{h}`, `{date}`, and `{time}` are placeholders that Atelier replaces with a value.
+Atelier ships this text in English and in French, in `_language.yml` and `_language-fr.yml`.
+Quarto uses the French file when `lang` starts with `fr`, and the English file for all other languages.
+
+To change a text, set its key under `language` in `_quarto.yml`, in a `_metadata.yml`, or in the front matter of a page.
+In the text, `{n}`, `{m}`, `{h}`, `{date}`, `{time}`, and `{site}` are placeholders that Atelier replaces with a value.
 Keep each placeholder in your own text.
+An empty value removes the text.
 
 ```{.yaml filename="_quarto.yml"}
 language:
-  atelier-next: "Suivant"
-  atelier-previous: "Précédent"
+  atelier-next: "Next page"
+  atelier-previous: "Previous page"
 ```
 
-| Key                              | Default                              |
-| -------------------------------- | ------------------------------------ |
-| `atelier-search`                 | `Search`                             |
-| `atelier-announcement-info`      | `Info`                               |
-| `atelier-announcement-warning`   | `Warning`                            |
-| `atelier-announcement-danger`    | `Danger`                             |
-| `atelier-announcement-success`   | `Success`                            |
-| `atelier-announcement-notice`    | `Notice`                             |
-| `atelier-announcement-region`    | `Announcement`                       |
-| `atelier-toc-reading-time`       | `{n} min read`                       |
-| `atelier-toc-updated`            | `Updated {date}`                     |
-| `atelier-toc-copy-link`          | `Copy link`                          |
-| `atelier-toc-link-copied`        | `Link copied`                        |
-| `atelier-table-scroll`           | `Scrollable table`                   |
-| `atelier-duration-minutes`       | `{m} min`                            |
-| `atelier-duration-hours`         | `{h} h`                              |
-| `atelier-duration-hours-minutes` | `{h} h {m} min`                      |
-| `atelier-reading-bar`            | `Reading navigation`                 |
-| `atelier-reading-progress`       | `Reading progress`                   |
-| `atelier-reading-position`       | `Page {n} of {m}`                    |
-| `atelier-workshop-bar`           | `Module navigation`                  |
-| `atelier-workshop-progress`      | `Workshop progress`                  |
-| `atelier-workshop-position`      | `Module {n} of {m}`                  |
-| `atelier-workshop-total`         | `about {time}`                       |
-| `atelier-workshop-completed`     | `(completed)`                        |
-| `atelier-previous`               | `Previous`                           |
-| `atelier-next`                   | `Next`                               |
-| `atelier-timer-label`            | `Session time left`                  |
-| `atelier-timer-pause`            | `Pause the session timer`            |
-| `atelier-toc-read`               | `(read)`                             |
-| `atelier-toc-module-read`        | `{n}% of this module read`           |
-| `atelier-objectives-title`       | `By the end of this module, you can` |
-| `atelier-exercise-title`         | `Exercise`                           |
-| `atelier-solution-summary`       | `Show the solution`                  |
-| `atelier-terminal`               | `Terminal`                           |
-| `atelier-workshop-author-single` | `Instructor`                         |
-| `atelier-workshop-author-plural` | `Instructors`                        |
-| `atelier-workshop-published`     | `Session`                            |
-| `atelier-workshop-modified`      | `Materials updated`                  |
+| Key                              | English                              | French                                      |
+| -------------------------------- | ------------------------------------ | ------------------------------------------- |
+| `atelier-announcement-info`      | `Info`                               | `Information`                               |
+| `atelier-announcement-warning`   | `Warning`                            | `Avertissement`                             |
+| `atelier-announcement-danger`    | `Danger`                             | `Danger`                                    |
+| `atelier-announcement-success`   | `Success`                            | `Succès`                                    |
+| `atelier-announcement-notice`    | `Notice`                             | `Avis`                                      |
+| `atelier-announcement-region`    | `Announcement`                       | `Annonce`                                   |
+| `atelier-toc-reading-time`       | `{n} min read`                       | `{n} min de lecture`                        |
+| `atelier-toc-updated`            | `Updated {date}`                     | `Mis à jour le {date}`                      |
+| `atelier-toc-copy-link`          | `Copy link`                          | `Copier le lien`                            |
+| `atelier-toc-link-copied`        | `Link copied`                        | `Lien copié`                                |
+| `atelier-table-scroll`           | `Scrollable table`                   | `Tableau défilant`                          |
+| `atelier-duration-minutes`       | `{m} min`                            | `{m} min`                                   |
+| `atelier-duration-hours`         | `{h} h`                              | `{h} h`                                     |
+| `atelier-duration-hours-minutes` | `{h} h {m} min`                      | `{h} h {m} min`                             |
+| `atelier-reading-bar`            | `Reading navigation`                 | `Navigation de lecture`                     |
+| `atelier-reading-progress`       | `Reading progress`                   | `Progression de la lecture`                 |
+| `atelier-reading-position`       | `Page {n} of {m}`                    | `Page {n} sur {m}`                          |
+| `atelier-workshop-bar`           | `Module navigation`                  | `Navigation des modules`                    |
+| `atelier-workshop-progress`      | `Workshop progress`                  | `Progression de l'atelier`                  |
+| `atelier-workshop-position`      | `Module {n} of {m}`                  | `Module {n} sur {m}`                        |
+| `atelier-workshop-total`         | `about {time}`                       | `environ {time}`                            |
+| `atelier-workshop-completed`     | `(completed)`                        | `(terminé)`                                 |
+| `atelier-previous`               | `Previous`                           | `Précédent`                                 |
+| `atelier-next`                   | `Next`                               | `Suivant`                                   |
+| `atelier-timer-label`            | `Session time left`                  | `Temps de la session restant`               |
+| `atelier-timer-pause`            | `Pause the session timer`            | `Mettre en pause le minuteur de la session` |
+| `atelier-toc-read`               | `(read)`                             | `(lu)`                                      |
+| `atelier-toc-module-read`        | `{n}% of this module read`           | `{n} % de ce module lu`                     |
+| `atelier-objectives-title`       | `By the end of this module, you can` | `Objectifs de ce module`                    |
+| `atelier-exercise-title`         | `Exercise`                           | `Exercice`                                  |
+| `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
+| `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
+| `atelier-workshop-author-single` | `Instructor`                         | `Formateur·rice`                            |
+| `atelier-workshop-author-plural` | `Instructors`                        | `Formateur·rice·s`                          |
+| `atelier-workshop-published`     | `Session`                            | `Session`                                   |
+| `atelier-workshop-modified`      | `Materials updated`                  | `Supports mis à jour`                       |
+| `atelier-site-banner`            | `Site banner`                        | `Bandeau du site`                           |
+| `atelier-listing-filters`        | `Listing filters`                    | `Filtres de la liste`                       |
+| `atelier-page-metadata`          | `Page metadata`                      | `Métadonnées de la page`                    |
+| `atelier-home`                   | `Home`                               | `Accueil`                                   |
+| `atelier-logo-link`              | `{site} — home`                      | `{site} — accueil`                          |
+| `atelier-footnote-back`          | `Back to note {n} in the text`       | `Retour à la note {n} dans le texte`        |
 
-: The `language` keys of Atelier and their default text. {.striped .hover tbl-colwidths="[50,50]"}
+: The `language` keys of Atelier and their text in English and in French. {.striped .hover tbl-colwidths="[34,33,33]"}
+
+These Quarto keys also change text in the chrome of Atelier: `toggle-dark-mode`, `toggle-navigation`, `search-label`, `navigation-site-label`, `toc-title-website`, and `announcement-dismiss-label`.
+Quarto translates them.
+To change one of these texts, set the Quarto key.
+
+### Add a language
+
+1. Copy `_language-fr.yml` from `_extensions/mcanouil/atelier/` to the root of your project, for example as `_language-de.yml`.
+2. Translate each value, and keep the placeholders.
+3. Set `language: _language-de.yml` in `_quarto.yml`.
+
+The default `date-format` of Atelier has the English words "the" and "of".
+For a site in another language, set your own format, for example `date-format: "dddd D MMMM YYYY"`.
 
 Quarto provides the keys of the title block labels.
 In workshop mode, the `atelier-workshop-*` keys above replace them, as the [Workshop mode](workshop.qmd#title-block-labels) page shows.

@@ -28,6 +28,10 @@
 			if (text) node.textContent = text;
 			return node;
 		}
+		// An empty label sets no attribute, so a control never gets an empty name.
+		function setLabel(node, name, text) {
+			if (text) node.setAttribute(name, text);
+		}
 
 		function icon(name) {
 			var node = element("i", "bi " + name);
@@ -36,7 +40,7 @@
 		}
 
 		var bar = element("nav", "atelier-bar");
-		bar.setAttribute("aria-label", course.label(workshop ? "workshop-bar" : "reading-bar"));
+		setLabel(bar, "aria-label", course.label(workshop ? "workshop-bar" : "reading-bar"));
 
 		var row = element("div", "atelier-bar-row");
 		var crumb = element("p", "atelier-bar-crumb");
@@ -59,8 +63,11 @@
 		function navLink(kind, target, iconName) {
 			if (!target) return;
 			var link = element("a", "atelier-bar-" + kind);
-			link.href = document.querySelector(".page-navigation .nav-page-" + kind + " a").href;
-			var text = document.createTextNode(course.label(kind));
+			var quartoLink = document.querySelector(".page-navigation .nav-page-" + kind + " a");
+			link.href = quartoLink.href;
+			var label = course.label(kind);
+			if (!label) setLabel(link, "aria-label", quartoLink.textContent.trim());
+			var text = document.createTextNode(label);
 			if (kind === "previous") {
 				link.appendChild(icon(iconName));
 				link.appendChild(text);
@@ -79,11 +86,11 @@
 		var m = workshop ? course.modules.length : course.pages.length;
 		var progress = element("div", "atelier-bar-progress");
 		progress.setAttribute("role", "progressbar");
-		progress.setAttribute("aria-label", course.label(workshop ? "workshop-progress" : "reading-progress"));
+		setLabel(progress, "aria-label", course.label(workshop ? "workshop-progress" : "reading-progress"));
 		progress.setAttribute("aria-valuemin", "0");
 		progress.setAttribute("aria-valuemax", String(m));
 		progress.setAttribute("aria-valuenow", String(n));
-		progress.setAttribute("aria-valuetext", course.label(workshop ? "workshop-position" : "reading-position", { n: n, m: m }));
+		setLabel(progress, "aria-valuetext", course.label(workshop ? "workshop-position" : "reading-position", { n: n, m: m }));
 		var fill = element("span");
 		fill.style.width = (m ? (n / m) * 100 : 0) + "%";
 		progress.appendChild(fill);
@@ -112,13 +119,13 @@
 			var toggle = element("button", "atelier-timer-toggle");
 			toggle.type = "button";
 			toggle.setAttribute("aria-pressed", "false");
-			toggle.setAttribute("aria-label", course.label("timer-pause"));
+			setLabel(toggle, "aria-label", course.label("timer-pause"));
 			var glyph = icon("bi-pause-fill");
 			toggle.appendChild(glyph);
 
 			var display = element("span", "atelier-timer");
 			display.setAttribute("role", "timer");
-			display.setAttribute("aria-label", course.label("timer-label"));
+			setLabel(display, "aria-label", course.label("timer-label"));
 
 			var remaining = total;
 			var end = 0;

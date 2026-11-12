@@ -29,7 +29,7 @@
     // table holds no focusable content, and the caption that names the box.
     const boxes = new Map();
     let captions = 0;
-    let label = 'Scrollable table';
+    let label = '';
 
     function scrollsAlready(table, checked) {
       for (let node = table.parentElement; node && node !== document.body; node = node.parentElement) {
@@ -62,7 +62,7 @@
         if (entry.caption) {
           if (!entry.caption.id) entry.caption.id = `atelier-table-caption-${++captions}`;
           box.setAttribute('aria-labelledby', entry.caption.id);
-        } else {
+        } else if (label) {
           box.setAttribute('aria-label', label);
         }
         box.setAttribute(MARKER, '');
@@ -78,7 +78,7 @@
     // The box and the table are both observed: a web font that loads late makes
     // the table wider without a change to the size of the box.
     document.addEventListener('DOMContentLoaded', () => {
-      label = ((window.atelierOptions || {}).labels || {})['table-scroll'] || label;
+      label = ((window.atelierOptions || {}).labels || {})['table-scroll'] || '';
       const checked = new Map();
       const tables = [...document.querySelectorAll('main table')]
         .filter((table) => !scrollsAlready(table, checked));
