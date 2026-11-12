@@ -13,7 +13,7 @@
 - feat: Derive the page surfaces, muted text, and accent inks from `_brand.yml` in each colour scheme, held to WCAG AA.
   Use `color.secondary` for muted text when the brand sets it. (#76)
 - feat: Split the navbar into two rows, with the brand, the `extensions: atelier: version` pill, the search pill with its keyboard shortcut, and the tools on top, and the section tabs below.
-  The current tab has a 3 px accent underline, and the `atelier-search` language key sets the search label. (#76)
+  The current tab has a 3 px accent underline, and Quarto's `search-label` language key sets the search label. (#76)
 - feat: Restyle the docked sidebar with the brand, search, and tools on top and filled section headers.
   The current page sits on a tinted band with a 3 px accent marker. (#76)
 - feat: Show the table of contents as a card with the reading time, the modified date, and a tinted current entry.

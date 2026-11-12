@@ -80,7 +80,6 @@ local QUARTO_KEYS = {
   'toggle-dark-mode',
   'toggle-navigation',
   'search-label',
-  'search-submit-button-title',
   'navigation-site-label',
   'toc-title-website',
 }

@@ -270,7 +270,8 @@ language:
 
 : The `language` keys of Atelier and their text in English and in French. {.striped .hover tbl-colwidths="[34,33,33]"}
 
-Atelier also uses these Quarto keys, which Quarto translates: `toggle-dark-mode`, `toggle-navigation`, `search-label`, `search-submit-button-title`, `navigation-site-label`, `toc-title-website`, and `announcement-dismiss-label`.
+These Quarto keys also change text in the chrome of Atelier: `toggle-dark-mode`, `toggle-navigation`, `search-label`, `navigation-site-label`, `toc-title-website`, and `announcement-dismiss-label`.
+Quarto translates them.
 To change one of these texts, set the Quarto key.
 
 ### Add a language
