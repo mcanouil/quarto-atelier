@@ -219,15 +219,15 @@ local function inject_dependencies(meta)
 
   checker:options(meta)
 
-  -- An excluded page gets no script, no stylesheet and no configuration, so
-  -- it carries no remember code at all.
-  if is_excluded(as_string_list(checker:option('page-exclude'))) then
+  -- A disabled filter or an excluded page gets no script, no stylesheet and
+  -- no configuration, so it carries no remember code at all.
+  if checker:option('enabled') == false
+      or is_excluded(as_string_list(checker:option('page-exclude'))) then
     return meta
   end
 
   html_mod.ensure_html_dependency({
     name = EXTENSION_NAME,
-    version = '1.0.0',
     scripts = { 'remember.js' },
     stylesheets = { 'remember.css' },
   })
