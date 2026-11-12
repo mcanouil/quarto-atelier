@@ -94,6 +94,7 @@
 
 - docs: Document workshop mode, the starter templates, the language keys, and how each `_brand.yml` key reaches the chrome.
   Add an example workshop to the website. (#79)
+- docs: Tell French sites to put their own `language` keys under `fr`, because Quarto otherwise lets the French text of Atelier win (quarto-dev/quarto-cli#15349). (#112)
 
 ## 0.11.0 (2026-10-29)
 
