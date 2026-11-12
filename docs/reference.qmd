@@ -223,6 +223,19 @@ language:
   atelier-previous: "Previous page"
 ```
 
+On a site in French, put your keys under `fr`.
+Quarto applies the French file of Atelier after the keys at the top level of `language`, so the French text replaces them ([quarto-dev/quarto-cli#15349](https://github.com/quarto-dev/quarto-cli/issues/15349)).
+Quarto applies the keys under `fr` last.
+This is also true in a `_metadata.yml`, in the front matter of a page, and in your own language file.
+
+```{.yaml filename="_quarto.yml"}
+lang: fr
+language:
+  fr:
+    atelier-next: "Page suivante"
+    atelier-previous: "Page précédente"
+```
+
 | Key                              | English                              | French                                      |
 | -------------------------------- | ------------------------------------ | ------------------------------------------- |
 | `atelier-announcement-info`      | `Info`                               | `Information`                               |
