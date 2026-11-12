@@ -252,7 +252,7 @@ language:
 | `atelier-timer-label`            | `Session time left`                  | `Temps de la session restant`               |
 | `atelier-timer-pause`            | `Pause the session timer`            | `Mettre en pause le minuteur de la session` |
 | `atelier-toc-read`               | `(read)`                             | `(lu)`                                      |
-| `atelier-toc-module-read`        | `{n}% of this module read`           | `{n} % de ce module lu`                     |
+| `atelier-toc-module-read`        | `{n}% of this module read`           | `{n} % de ce module lu`                     |
 | `atelier-objectives-title`       | `By the end of this module, you can` | `Objectifs de ce module`                    |
 | `atelier-exercise-title`         | `Exercise`                           | `Exercice`                                  |
 | `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
