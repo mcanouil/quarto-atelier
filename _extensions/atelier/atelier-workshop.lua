@@ -742,14 +742,16 @@ local function exercise_block(div)
   )
 end
 
---- Build the closed solution disclosure.
+--- Build the closed solution disclosure. When the div has other classes or
+--- attributes, a div that carries them wraps the disclosure, so that a filter
+--- that runs later still finds them, for example Veil with `.veil group="..."`.
 --- @param div pandoc.Div The solution content
 --- @param title string The summary text
 --- @param identifier string The identifier, or an empty string
 --- @return pandoc.Blocks The disclosure
 local function solution_block(div, title, identifier)
   local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
-  return pandoc.Blocks({
+  local disclosure = pandoc.Blocks({
     pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
     pandoc.Plain({
       pandoc.RawInline('html', '<summary>'),
@@ -759,6 +761,12 @@ local function solution_block(div, title, identifier)
     block_body(div.content),
     pandoc.RawBlock('html', '</details>'),
   })
+  local attr = block_attr(div, 'solution')
+  table.remove(attr.classes, 1)
+  if #attr.classes == 0 and #attr.attributes == 0 then
+    return disclosure
+  end
+  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', attr.classes, attr.attributes)) })
 end
 
 --- Turn the workshop divs into blocks, in workshop mode only.
