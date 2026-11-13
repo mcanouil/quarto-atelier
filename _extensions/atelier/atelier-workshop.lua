@@ -667,15 +667,15 @@ local function objective_labels(list)
   return blocks
 end
 
---- Build the attributes of a workshop block from the attributes of its div.
---- The author's identifier, other classes, and other attributes stay. The
---- block class replaces the div class, and `title` and `duration` go, as the
+--- Collect the author's classes and attributes of a workshop div: every class
+--- but the div class, and every attribute but `title` and `duration`, as the
 --- head shows them.
 --- @param div pandoc.Div The div
 --- @param class string The div class, such as `objectives`
---- @return pandoc.Attr The attributes
-local function block_attr(div, class)
-  local classes = { 'atelier-' .. class }
+--- @return table classes The other classes
+--- @return table attributes The other attributes
+local function other_attr(div, class)
+  local classes = {}
   for _, name in ipairs(div.classes) do
     if name ~= class then
       classes[#classes + 1] = name
@@ -687,6 +687,18 @@ local function block_attr(div, class)
       attributes[#attributes + 1] = pair
     end
   end
+  return classes, attributes
+end
+
+--- Build the attributes of a workshop block from the attributes of its div.
+--- The author's identifier, other classes, and other attributes stay, and the
+--- block class replaces the div class.
+--- @param div pandoc.Div The div
+--- @param class string The div class, such as `objectives`
+--- @return pandoc.Attr The attributes
+local function block_attr(div, class)
+  local classes, attributes = other_attr(div, class)
+  table.insert(classes, 1, 'atelier-' .. class)
   return pandoc.Attr(div.identifier, classes, attributes)
 end
 
@@ -761,12 +773,11 @@ local function solution_block(div, title, identifier)
     block_body(div.content),
     pandoc.RawBlock('html', '</details>'),
   })
-  local attr = block_attr(div, 'solution')
-  table.remove(attr.classes, 1)
-  if #attr.classes == 0 and #attr.attributes == 0 then
+  local classes, attributes = other_attr(div, 'solution')
+  if #classes == 0 and #attributes == 0 then
     return disclosure
   end
-  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', attr.classes, attr.attributes)) })
+  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, attributes)) })
 end
 
 --- Turn the workshop divs into blocks, in workshop mode only.
