@@ -55,6 +55,7 @@ Atelier ships with the extensions below, so you don't install them yourself.
 | [preview-colour](https://github.com/mcanouil/quarto-preview-colour) | Shows a swatch next to a colour in inline code, which copies the colour when you select it. |
 | [prism](https://github.com/mcanouil/quarto-prism) | Applies an attribute in one format only, with a format prefix such as `atelier-html:style`. |
 | [remember](https://github.com/mcanouil/quarto-remember) | Offers to return a reader to the place where they stopped, in a banner below the page title. |
+| [veil](https://github.com/mcanouil/quarto-veil) | Shows or hides content by group, from a button on the page, with the `veil` class and the `group` attribute. |
 
 Each one lives in `_extensions/atelier/_extensions/mcanouil/<name>/`, and its `_extension.yml` records the release it came from.
 The [reference page](https://m.canouil.dev/quarto-atelier/reference.html) lists their options and the defaults that Atelier changes.

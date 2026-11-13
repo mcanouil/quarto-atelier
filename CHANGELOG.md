@@ -7,6 +7,7 @@
 - build: Atelier needs Quarto 1.12.1 or later, which is a pre-release until Quarto 1.12 is out.
   Older releases drop the project's `extensions` options on a page that sets its own, which breaks workshop mode, and draw the announcement dismiss control so that the keyboard cannot reach it. (#79)
 - feat: If your project has its own copy of div-reuse, highlight-text, offset-headings, preview-colour, prism or remember, remove it and its `filters` entry. Otherwise both copies run. (#101)
+- feat: If your project has its own copy of veil, remove it and its `filters` entry. Otherwise both copies run.
 
 ### New Features
 
@@ -52,6 +53,8 @@
   remember offers to resume in a banner below the page title, and not on the home page or the 404 page. (#101)
 - feat: Ship the interface text in English and in French, in `_language.yml` and `_language-fr.yml`, so a site with `lang: fr` is in French with no extra setup.
   The scripts now take their text from `language` keys too, and Atelier uses Quarto's own key wherever Quarto has one.
+- feat: Include the veil extension, so readers can show or hide content by group from a button on the page.
+  It needs no options, and its panel is in English or French to match the page.
 
 ### Bug Fixes
 
