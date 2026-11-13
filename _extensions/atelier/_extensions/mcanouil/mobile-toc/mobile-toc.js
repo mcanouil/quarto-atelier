@@ -28,13 +28,12 @@
   };
 
   const start = () => {
-    const toc = document.querySelector("nav#TOC");
+    const toc = document.querySelector("#quarto-margin-sidebar nav#TOC, #quarto-sidebar-toc-left nav#TOC");
     const list = toc?.querySelector(":scope > ul");
     if (
       !list ||
       document.getElementById("TOC-body") ||
-      toc.closest("main") ||
-      !Object.hasOwn(HTMLElement.prototype, "popover") ||
+      typeof window.HTMLDialogElement?.prototype.showModal !== "function" ||
       list.querySelectorAll("a").length < 2
     ) {
       return;
@@ -47,11 +46,9 @@
     const narrow = window.matchMedia(`(width < ${breakpoint})`);
 
     const build = () => {
-      const sheet = document.createElement("div");
+      const sheet = document.createElement("dialog");
       sheet.id = SHEET_ID;
       sheet.className = "mobile-toc-sheet";
-      sheet.popover = "auto";
-      sheet.setAttribute("role", "navigation");
       sheet.setAttribute("aria-labelledby", "mobile-toc-sheet-label");
 
       const header = document.createElement("div");
@@ -63,12 +60,12 @@
       const close = document.createElement("button");
       close.type = "button";
       close.className = "mobile-toc-close";
-      close.setAttribute("popovertarget", SHEET_ID);
-      close.setAttribute("popovertargetaction", "hide");
       close.setAttribute("aria-label", closeLabel);
       close.innerHTML = '<i class="bi bi-x-lg" aria-hidden="true"></i>';
       header.append(sheetLabel, close);
-      sheet.append(header);
+      const landmark = document.createElement("nav");
+      landmark.setAttribute("aria-labelledby", "mobile-toc-sheet-label");
+      sheet.append(header, landmark);
 
       let copy = null;
       const mount = () => {
@@ -81,7 +78,7 @@
           ? document.activeElement.getAttribute("href")
           : null;
         if (copy) copy.replaceWith(fresh);
-        else sheet.append(fresh);
+        else landmark.append(fresh);
         copy = fresh;
         markCurrent();
         if (focusedHref) {
@@ -93,12 +90,18 @@
         const active = copy.querySelectorAll("a.active");
         active[active.length - 1]?.setAttribute("aria-current", "location");
       };
-      const mirrorClasses = () => {
+      const MIRRORED = ["class", "hidden"];
+      const mirrorState = () => {
         const selector = "ul, li, a";
         const source = list.querySelectorAll(selector);
         const target = copy.querySelectorAll(selector);
         source.forEach((el, index) => {
-          if (target[index].className !== el.className) target[index].className = el.className;
+          for (const name of MIRRORED) {
+            const value = el.getAttribute(name);
+            if (target[index].getAttribute(name) === value) continue;
+            if (value === null) target[index].removeAttribute(name);
+            else target[index].setAttribute(name, value);
+          }
         });
         markCurrent();
       };
@@ -119,10 +122,23 @@
         !event.defaultPrevented &&
         !(event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) &&
         link.origin + link.pathname === location.origin + location.pathname;
+      // A click on the backdrop targets the dialog itself, as does a click on its padding.
+      // Close only when the point is outside the dialog box.
+      const onBackdrop = (event) => {
+        if (event.target !== sheet) return false;
+        const box = sheet.getBoundingClientRect();
+        return (
+          event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom
+        );
+      };
       sheet.addEventListener("click", (event) => {
+        if (onBackdrop(event)) {
+          sheet.close();
+          return;
+        }
         const link = event.target.closest("a");
         if (!link) return;
-        sheet.hidePopover();
+        sheet.close();
         if (!isPlainSamePageClick(event, link)) return;
         let id;
         try {
@@ -134,7 +150,7 @@
       });
 
       // Other scripts may add children inside TOC links, so a copy paired by position can drift.
-      // Clone the list again on any child change, and copy only classes otherwise.
+      // Clone the list again on any child change, and copy only classes and hidden otherwise.
       // Both are coalesced to one update for each animation frame.
       let frame = 0;
       let reclone = false;
@@ -144,7 +160,7 @@
         frame = requestAnimationFrame(() => {
           frame = 0;
           if (reclone) mount();
-          else mirrorClasses();
+          else mirrorState();
           reclone = false;
         });
       });
@@ -152,19 +168,24 @@
         subtree: true,
         childList: true,
         attributes: true,
-        attributeFilter: ["class"],
+        attributeFilter: MIRRORED,
       });
 
       const pill = document.createElement("button");
       pill.type = "button";
       pill.className = "mobile-toc-pill";
-      pill.setAttribute("popovertarget", SHEET_ID);
+      pill.setAttribute("aria-haspopup", "dialog");
+      pill.setAttribute("aria-controls", SHEET_ID);
+      pill.setAttribute("aria-expanded", "false");
       pill.innerHTML = '<i class="bi bi-list-nested" aria-hidden="true"></i>';
       const pillLabel = document.createElement("span");
       pillLabel.className = "mobile-toc-pill-label";
       pillLabel.textContent = label;
       pill.append(pillLabel);
-      document.body.append(pill, sheet);
+      close.addEventListener("click", () => sheet.close());
+      const main = document.querySelector("#quarto-content > main") ?? document.querySelector("main");
+      if (main) main.before(pill, sheet);
+      else document.body.append(pill, sheet);
 
       const root = document.documentElement;
       const writePillHeight = () => {
@@ -212,14 +233,27 @@
         apply();
       }
 
-      sheet.addEventListener("toggle", (event) => {
-        if (event.newState !== "open") return;
-        const link = sheet.querySelector("a.active");
+      // showModal() focuses the first control while the sheet still slides in from below the screen,
+      // and on a zoomed page that focus pans the visual viewport.
+      // A hidden sheet has no control to focus, so focus the start link afterwards, without a scroll.
+      pill.addEventListener("click", () => {
+        if (sheet.open) return;
+        sheet.style.visibility = "hidden";
+        sheet.showModal();
+        sheet.style.removeProperty("visibility");
+        pill.setAttribute("aria-expanded", "true");
+        const link = copy.querySelector("a[aria-current]") || copy.querySelector("a");
         if (!link) return;
-        const top = link.offsetTop;
-        const bottom = top + link.offsetHeight;
-        if (top < sheet.scrollTop) sheet.scrollTop = top;
-        else if (bottom > sheet.scrollTop + sheet.clientHeight) sheet.scrollTop = bottom - sheet.clientHeight;
+        const box = sheet.getBoundingClientRect();
+        const linkBox = link.getBoundingClientRect();
+        if (linkBox.top < box.top) sheet.scrollTop += linkBox.top - box.top;
+        else if (linkBox.bottom > box.bottom) sheet.scrollTop += linkBox.bottom - box.bottom;
+        link.focus({ preventScroll: true });
+      });
+      sheet.addEventListener("close", () => {
+        pill.setAttribute("aria-expanded", "false");
+        // Safari does not focus a button on tap, so close() would otherwise leave focus on the body.
+        if (document.activeElement === document.body || sheet.contains(document.activeElement)) pill.focus();
       });
 
       return () => {
@@ -232,7 +266,7 @@
         );
         observer.disconnect();
         cancelAnimationFrame(frame);
-        if (sheet.matches(":popover-open")) sheet.hidePopover();
+        if (sheet.open) sheet.close();
         pill.remove();
         sheet.remove();
       };

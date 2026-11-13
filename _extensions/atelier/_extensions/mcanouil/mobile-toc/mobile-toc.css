@@ -52,7 +52,14 @@
   outline-offset: 2px;
 }
 
-body:has(> .mobile-toc-pill) #quarto-back-to-top {
+:root:has(.mobile-toc-pill) {
+  scroll-padding-bottom: calc(
+    var(--mobile-toc-pill-height, 44px) + var(--mobile-toc-inset-block, 1rem) + env(safe-area-inset-bottom) +
+      var(--mobile-toc-offset-y, 0px)
+  );
+}
+
+body:has(.mobile-toc-pill) #quarto-back-to-top {
   left: calc(50% + (var(--mobile-toc-offset-left, 0px) - var(--mobile-toc-offset-x, 0px)) / 2);
   bottom: calc(
     var(--mobile-toc-inset-block, 1rem) + env(safe-area-inset-bottom) + var(--mobile-toc-offset-y, 0px) +
@@ -134,7 +141,7 @@ body:has(> .mobile-toc-pill) #quarto-back-to-top {
 }
 
 @starting-style {
-  .mobile-toc-sheet:popover-open {
+  dialog.mobile-toc-sheet[open] {
     transform: translateY(100%);
   }
 }
@@ -171,6 +178,21 @@ body:has(> .mobile-toc-pill) #quarto-back-to-top {
 @media (prefers-reduced-motion: reduce) {
   .mobile-toc-sheet {
     transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .mobile-toc-sheet a.active {
+    border-inline-start: 3px solid Highlight;
+    padding-inline-start: calc(0.5rem - 3px);
+  }
+
+  .mobile-toc-sheet ul ul a.active {
+    padding-inline-start: calc(1.2rem - 3px);
+  }
+
+  .mobile-toc-sheet ul ul ul a.active {
+    padding-inline-start: calc(1.9rem - 3px);
   }
 }
 
