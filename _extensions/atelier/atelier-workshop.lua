@@ -667,15 +667,15 @@ local function objective_labels(list)
   return blocks
 end
 
---- Build the attributes of a workshop block from the attributes of its div.
---- The author's identifier, other classes, and other attributes stay. The
---- block class replaces the div class, and `title` and `duration` go, as the
+--- Collect the author's classes and attributes of a workshop div: every class
+--- but the div class, and every attribute but `title` and `duration`, as the
 --- head shows them.
 --- @param div pandoc.Div The div
 --- @param class string The div class, such as `objectives`
---- @return pandoc.Attr The attributes
-local function block_attr(div, class)
-  local classes = { 'atelier-' .. class }
+--- @return table classes The other classes
+--- @return table attributes The other attributes
+local function other_attr(div, class)
+  local classes = {}
   for _, name in ipairs(div.classes) do
     if name ~= class then
       classes[#classes + 1] = name
@@ -687,6 +687,18 @@ local function block_attr(div, class)
       attributes[#attributes + 1] = pair
     end
   end
+  return classes, attributes
+end
+
+--- Build the attributes of a workshop block from the attributes of its div.
+--- The author's identifier, other classes, and other attributes stay, and the
+--- block class replaces the div class.
+--- @param div pandoc.Div The div
+--- @param class string The div class, such as `objectives`
+--- @return pandoc.Attr The attributes
+local function block_attr(div, class)
+  local classes, attributes = other_attr(div, class)
+  table.insert(classes, 1, 'atelier-' .. class)
   return pandoc.Attr(div.identifier, classes, attributes)
 end
 
@@ -742,14 +754,16 @@ local function exercise_block(div)
   )
 end
 
---- Build the closed solution disclosure.
+--- Build the closed solution disclosure. When the div has other classes or
+--- attributes, a div that carries them wraps the disclosure, so that a filter
+--- that runs later still finds them, for example Veil with `.veil group="..."`.
 --- @param div pandoc.Div The solution content
 --- @param title string The summary text
 --- @param identifier string The identifier, or an empty string
 --- @return pandoc.Blocks The disclosure
 local function solution_block(div, title, identifier)
   local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
-  return pandoc.Blocks({
+  local disclosure = pandoc.Blocks({
     pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
     pandoc.Plain({
       pandoc.RawInline('html', '<summary>'),
@@ -759,6 +773,11 @@ local function solution_block(div, title, identifier)
     block_body(div.content),
     pandoc.RawBlock('html', '</details>'),
   })
+  local classes, attributes = other_attr(div, 'solution')
+  if #classes == 0 and #attributes == 0 then
+    return disclosure
+  end
+  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, attributes)) })
 end
 
 --- Turn the workshop divs into blocks, in workshop mode only.

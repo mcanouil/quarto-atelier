@@ -127,6 +127,7 @@ contributes:
         - offset-headings
         - preview-colour
         - remember
+        - veil
       # Each embedded extension keeps its own defaults, set per site under
       # `extensions:`, with these exceptions. gitlink shows its repository
       # widget, but does not rewrite references in prose. The widget shows only

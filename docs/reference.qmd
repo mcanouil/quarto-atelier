@@ -130,7 +130,7 @@ The script `scripts/generate-highlighting.py` writes it from the `.theme` files 
 
 ## Embedded extensions
 
-Atelier contains twelve extensions, so you do not install them yourself.
+Atelier contains thirteen extensions, so you do not install them yourself.
 The `atelier-html` format runs their filters and shortcodes on each HTML page.
 The shortcodes work on HTML pages only: on a page in another format, such as Typst, Quarto stops with "Shortcode 'iconify' not found".
 Atelier needs Quarto 1.11.9 or later, the first stable 1.11 release.
@@ -150,6 +150,7 @@ Older releases remove the `extensions` options of the project from a page that s
 | [preview-colour](https://github.com/mcanouil/quarto-preview-colour)   | Shows a swatch next to a colour in inline code. The swatch is a button that copies the colour.       | `extensions.preview-colour`  |
 | [prism](https://github.com/mcanouil/quarto-prism)                     | Applies an attribute in one format only, with a format prefix such as `atelier-html:style`.          | `extensions.prism`           |
 | [remember](https://github.com/mcanouil/quarto-remember)               | Offers to return a reader to the place where they stopped, in a banner below the page title.         | `extensions.remember`        |
+| [veil](https://github.com/mcanouil/quarto-veil)                       | Shows or hides content by group, with the `veil` class and the `group` attribute.                    | `extensions.veil`            |
 
 : Extensions that Atelier contains. {.striped .hover tbl-colwidths="[22,56,22]"}
 
@@ -183,6 +184,21 @@ extensions:
 prism compares its prefix with the name of the output format.
 On an Atelier site, that name is `atelier-html`, so write `atelier-html:style`.
 The prefix `html:` does not match an Atelier page.
+
+Veil needs no options.
+Give the `veil` class and a `group` attribute to a section or to a block:
+
+```markdown
+## Proof {.veil group="expert"}
+
+This section is for experts.
+```
+
+A button at the bottom left of the page opens the Veil panel, and the `u` key also opens it.
+In the panel, each group has a switch that shows or hides its content.
+A group that you do not declare starts shown.
+To set the order, the labels, the levels, or the start state of the groups, declare them under `extensions.veil.groups`.
+The [Veil documentation](https://m.canouil.dev/quarto-veil/) lists all of the options.
 
 ### Upgrade from separate copies
 
