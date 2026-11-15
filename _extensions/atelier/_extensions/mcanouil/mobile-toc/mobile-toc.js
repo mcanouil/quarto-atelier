@@ -80,10 +80,19 @@
         if (copy) copy.replaceWith(fresh);
         else landmark.append(fresh);
         copy = fresh;
+        uncollapse();
         markCurrent();
         if (focusedHref) {
           [...copy.querySelectorAll("a")].find((a) => a.getAttribute("href") === focusedHref)?.focus();
         }
+      };
+      // The side table of contents collapses the branches away from the reading position.
+      // The sheet has no control to expand them, so it lists every entry, also during a collapse animation.
+      const uncollapse = () => {
+        copy.querySelectorAll("ul.collapse, ul.collapsing").forEach((ul) => {
+          ul.classList.remove("collapse", "collapsing");
+          ul.style.removeProperty("height");
+        });
       };
       const markCurrent = () => {
         copy.querySelectorAll("a[aria-current]").forEach((a) => a.removeAttribute("aria-current"));
@@ -103,6 +112,7 @@
             else target[index].setAttribute(name, value);
           }
         });
+        uncollapse();
         markCurrent();
       };
       mount();
@@ -118,6 +128,16 @@
         }
         heading.focus({ preventScroll: true });
       };
+      // An id may hold a stray percent sign that is not an escape, so try the raw id before decoding.
+      const targetId = (hash) => {
+        const raw = hash.slice(1);
+        if (document.getElementById(raw)) return raw;
+        try {
+          return decodeURIComponent(raw);
+        } catch {
+          return null;
+        }
+      };
       const isPlainSamePageClick = (event, link) =>
         !event.defaultPrevented &&
         !(event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) &&
@@ -131,6 +151,7 @@
           event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom
         );
       };
+      let pendingHash = null;
       sheet.addEventListener("click", (event) => {
         if (onBackdrop(event)) {
           sheet.close();
@@ -140,13 +161,25 @@
         if (!link) return;
         sheet.close();
         if (!isPlainSamePageClick(event, link)) return;
-        let id;
-        try {
-          id = decodeURIComponent(link.hash.slice(1));
-        } catch {
+        const id = targetId(link.hash);
+        if (id === null) return;
+        // Firefox runs the fragment navigation after the next frame, and it blurs a heading focused before.
+        // Focus after the hash changes, or after the frame and its tasks when the hash stays the same.
+        const focusLater = () => setTimeout(() => focusHeading(id), 0);
+        pendingHash?.abort();
+        if (link.hash === location.hash) {
+          requestAnimationFrame(focusLater);
           return;
         }
-        requestAnimationFrame(() => focusHeading(id));
+        // Another script can cancel the navigation, so stop waiting after a second.
+        const pending = new AbortController();
+        pendingHash = pending;
+        const onHashChange = () => {
+          pending.abort();
+          if (location.hash === link.hash) focusLater();
+        };
+        window.addEventListener("hashchange", onHashChange, { signal: pending.signal });
+        setTimeout(() => pending.abort(), 1000);
       });
 
       // Other scripts may add children inside TOC links, so a copy paired by position can drift.
@@ -258,6 +291,7 @@
 
       return () => {
         listeners.abort();
+        pendingHash?.abort();
         pillObserver.disconnect();
         cancelAnimationFrame(placeFrame);
         area?.remove();

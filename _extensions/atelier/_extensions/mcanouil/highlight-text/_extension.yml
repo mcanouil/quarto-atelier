@@ -6,4 +6,4 @@ contributes:
   filters:
     - highlight-text.lua
 source: mcanouil/quarto-highlight-text@3.0.0
-source-type: registry
+source-type: github

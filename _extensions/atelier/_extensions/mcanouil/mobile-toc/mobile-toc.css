@@ -53,18 +53,21 @@
 }
 
 :root:has(.mobile-toc-pill) {
-  scroll-padding-bottom: calc(
-    var(--mobile-toc-pill-height, 44px) + var(--mobile-toc-inset-block, 1rem) + env(safe-area-inset-bottom) +
-      var(--mobile-toc-offset-y, 0px)
+  --mobile-toc-clearance: calc(
+    var(--mobile-toc-pill-height, 44px) + var(--mobile-toc-inset-block, 1rem) + env(safe-area-inset-bottom)
   );
+  scroll-padding-bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-offset-y, 0px));
+}
+
+/* Scroll padding cannot lift the end of the page above the pill, so the page gets room to scroll further.
+   The zoom offset stays out of it, because it changes on every frame of a pan and would resize the page. */
+body:has(.mobile-toc-pill) {
+  padding-bottom: var(--mobile-toc-clearance);
 }
 
 body:has(.mobile-toc-pill) #quarto-back-to-top {
   left: calc(50% + (var(--mobile-toc-offset-left, 0px) - var(--mobile-toc-offset-x, 0px)) / 2);
-  bottom: calc(
-    var(--mobile-toc-inset-block, 1rem) + env(safe-area-inset-bottom) + var(--mobile-toc-offset-y, 0px) +
-      var(--mobile-toc-pill-height, 44px) + 0.75rem
-  );
+  bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-offset-y, 0px) + 0.75rem);
 }
 
 .mobile-toc-sheet {

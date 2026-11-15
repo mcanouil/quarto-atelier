@@ -7,4 +7,4 @@ contributes:
     - path: preview-colour.lua
       at: post-quarto
 source: mcanouil/quarto-preview-colour@2.1.1
-source-type: registry
+source-type: github

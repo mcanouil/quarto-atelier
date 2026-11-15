@@ -7,4 +7,4 @@ contributes:
     - at: pre-quarto
       path: main.lua
 source: mcanouil/quarto-code-window@1.8.3
-source-type: registry
+source-type: github

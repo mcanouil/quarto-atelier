@@ -6,4 +6,4 @@ contributes:
   filters:
     - remember.lua
 source: mcanouil/quarto-remember@2.1.0
-source-type: registry
+source-type: github

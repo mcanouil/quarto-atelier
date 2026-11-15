@@ -6,4 +6,4 @@ contributes:
   filters:
     - collapse-output.lua
 source: mcanouil/quarto-collapse-output@1.6.1
-source-type: registry
+source-type: github

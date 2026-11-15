@@ -7,4 +7,4 @@ contributes:
     - path: prism.lua
       at: pre-ast
 source: mcanouil/quarto-prism@0.6.0
-source-type: registry
+source-type: github

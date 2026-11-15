@@ -6,4 +6,4 @@ contributes:
   filters:
     - toc-depth.lua
 source: mcanouil/quarto-toc-depth@0.7.1
-source-type: registry
+source-type: github

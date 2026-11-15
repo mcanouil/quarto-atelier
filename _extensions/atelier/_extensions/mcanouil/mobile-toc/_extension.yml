@@ -1,9 +1,9 @@
 title: Mobile TOC
 author: Mickaël Canouil
-version: 0.2.2
+version: 0.2.3
 quarto-required: ">=1.11"
 contributes:
   filters:
     - mobile-toc.lua
-source: mcanouil/quarto-mobile-toc@0.2.2
+source: mcanouil/quarto-mobile-toc@0.2.3
 source-type: github
