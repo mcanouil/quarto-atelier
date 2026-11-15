@@ -133,7 +133,7 @@ The script `scripts/generate-highlighting.py` writes it from the `.theme` files 
 Atelier contains thirteen extensions, so you do not install them yourself.
 The `atelier-html` format runs their filters and shortcodes on each HTML page.
 The shortcodes work on HTML pages only: on a page in another format, such as Typst, Quarto stops with "Shortcode 'iconify' not found".
-Atelier needs Quarto 1.11.9 or later, the first stable 1.11 release.
+Atelier needs Quarto 1.12.1 or later.
 Older releases remove the `extensions` options of the project from a page that sets `extensions` in its front matter.
 
 | Extension                                                             | What it does                                                                                         | Options under                |
