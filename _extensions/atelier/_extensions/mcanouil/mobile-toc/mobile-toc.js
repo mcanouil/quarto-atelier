@@ -221,11 +221,17 @@
       else document.body.append(pill, sheet);
 
       const root = document.documentElement;
-      const writePillHeight = () => {
-        root.style.setProperty("--mobile-toc-pill-height", `${pill.getBoundingClientRect().height}px`);
-      };
-      const pillObserver = new ResizeObserver(writePillHeight);
-      pillObserver.observe(pill);
+      // Quarto hides back-to-top until the reader scrolls up, so keep the last height it had on screen.
+      const backToTop = document.getElementById("quarto-back-to-top");
+      const heightObserver = new ResizeObserver((entries) => {
+        for (const { target } of entries) {
+          const height = target.getBoundingClientRect().height;
+          if (target === pill) root.style.setProperty("--mobile-toc-pill-height", `${height}px`);
+          else if (height > 0) root.style.setProperty("--mobile-toc-back-to-top-height", `${height}px`);
+        }
+      });
+      heightObserver.observe(pill);
+      if (backToTop) heightObserver.observe(backToTop);
 
       // Content wider than the screen widens the layout viewport on a phone,
       // and a fixed element follows its far edge off screen.
@@ -289,13 +295,24 @@
         if (document.activeElement === document.body || sheet.contains(document.activeElement)) pill.focus();
       });
 
+      // When the screen widens, the side table of contents shows again and the pill goes away.
+      // Move focus that was on the pill or in the sheet to the current link there, so it does not drop to the body.
+      const handOverFocus = () => {
+        const active = list.querySelectorAll("a.active");
+        for (const link of [active[active.length - 1], list.querySelector("a")]) {
+          link?.focus();
+          if (document.activeElement === link) return;
+        }
+      };
+
       return () => {
+        const hadFocus = document.activeElement === pill || sheet.contains(document.activeElement);
         listeners.abort();
         pendingHash?.abort();
-        pillObserver.disconnect();
+        heightObserver.disconnect();
         cancelAnimationFrame(placeFrame);
         area?.remove();
-        ["pill-height", "offset-x", "offset-y", "offset-left"].forEach((name) =>
+        ["pill-height", "back-to-top-height", "offset-x", "offset-y", "offset-left"].forEach((name) =>
           root.style.removeProperty(`--mobile-toc-${name}`),
         );
         observer.disconnect();
@@ -303,6 +320,7 @@
         if (sheet.open) sheet.close();
         pill.remove();
         sheet.remove();
+        if (hadFocus) handOverFocus();
       };
     };
 
