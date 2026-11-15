@@ -19,18 +19,31 @@
 		var copiedLabel = labels["toc-link-copied"];
 
 		// The meta row sits between the title and the entries. Reading time
-		// counts 200 words a minute, at least one minute.
+		// counts 200 words a minute, at least one minute, of the content that
+		// shows: the veil extension hides content with the hidden attribute.
 		var meta = document.createElement("div");
 		meta.className = "atelier-toc-meta";
 		var content = document.getElementById("quarto-document-content");
 		function countWords(element) {
-			return element ? element.textContent.split(/\s+/).filter(Boolean).length : 0;
+			if (!element) return 0;
+			var copy = element.cloneNode(true);
+			copy.querySelectorAll("[hidden]").forEach(function (hidden) {
+				hidden.remove();
+			});
+			return copy.textContent.split(/\s+/).filter(Boolean).length;
 		}
-		var words = countWords(content) - countWords(document.getElementById("title-block-header"));
 		if (readingTime) {
 			var time = document.createElement("span");
 			time.className = "atelier-toc-reading-time";
-			time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
+			var updateReadingTime = function () {
+				var words = countWords(content) - countWords(document.getElementById("title-block-header"));
+				time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
+			};
+			updateReadingTime();
+			// Veil applies the stored state at start without an event, and
+			// sends veil:change after each later change.
+			window.addEventListener("load", updateReadingTime);
+			document.addEventListener("veil:change", updateReadingTime);
 			meta.appendChild(time);
 		}
 		var modified = document.querySelector(".quarto-title-meta .date-modified");
