@@ -60,15 +60,18 @@
 }
 
 /* Scroll padding cannot lift the end of the page above the pill, so the page gets room to scroll further.
-   The zoom offset stays out of it, because it changes on every frame of a pan and would resize the page. */
-body:has(.mobile-toc-pill) {
-  padding-bottom: var(--mobile-toc-clearance);
-}
+   The zoom offset stays out of it, because it changes on every frame of a pan and would resize the page.
+   Print hides the pill but keeps it in the page, so only the screen query stops the room from printing. */
+@media screen {
+  body:has(.mobile-toc-pill) {
+    padding-bottom: var(--mobile-toc-clearance);
+  }
 
-/* Back-to-top sits above the pill, so the end of the page also needs room for it and a gap on each side.
-   Before Quarto first shows it, its height is not known, and 2.5rem is about its size. */
-body:has(.mobile-toc-pill):has(#quarto-back-to-top) {
-  padding-bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-back-to-top-height, 2.5rem) + 1.5rem);
+  /* Back-to-top sits above the pill, so the end of the page also needs room for it and a gap on each side.
+     Before Quarto first shows it, its height is not known, and 2.5rem is about its size. */
+  body:has(.mobile-toc-pill):has(#quarto-back-to-top) {
+    padding-bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-back-to-top-height, 2.5rem) + 1.5rem);
+  }
 }
 
 body:has(.mobile-toc-pill) #quarto-back-to-top {
