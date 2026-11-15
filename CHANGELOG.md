@@ -92,6 +92,7 @@
 - fix: Keep the terminal frame on the copy button of an annotated terminal block, at rest and on hover. (#105)
 - fix: Remove the `.glow` hero modifier and its `$atelier-hero-glow-color` variable.
   The glow stopped in a hard line above and below the figure when the figure column was wider than the image was tall. (#107)
+- fix: Colour the gitlink count badge from the bar's control border token, so the badge follows the theme. (#114)
 
 ### Documentation
 
