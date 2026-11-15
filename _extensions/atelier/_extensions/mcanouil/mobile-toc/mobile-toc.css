@@ -65,6 +65,12 @@ body:has(.mobile-toc-pill) {
   padding-bottom: var(--mobile-toc-clearance);
 }
 
+/* Back-to-top sits above the pill, so the end of the page also needs room for it and a gap on each side.
+   Before Quarto first shows it, its height is not known, and 2.5rem is about its size. */
+body:has(.mobile-toc-pill):has(#quarto-back-to-top) {
+  padding-bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-back-to-top-height, 2.5rem) + 1.5rem);
+}
+
 body:has(.mobile-toc-pill) #quarto-back-to-top {
   left: calc(50% + (var(--mobile-toc-offset-left, 0px) - var(--mobile-toc-offset-x, 0px)) / 2);
   bottom: calc(var(--mobile-toc-clearance) + var(--mobile-toc-offset-y, 0px) + 0.75rem);
