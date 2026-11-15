@@ -53,7 +53,7 @@ $border-color: null;
   --gitlink-widget-menu-bg: var(--atelier-bg);
   --gitlink-widget-menu-fg: var(--atelier-fg);
   --gitlink-widget-border: var(--atelier-#{$bar}-control-border);
-  --gitlink-widget-count-bg: var(--atelier-#{$bar}-control-border);
+  --gitlink-widget-count-bg: var(--atelier-surface-strong);
   --gitlink-widget-accent: var(--atelier-#{$bar}-accent);
   --gitlink-widget-accent-soft: var(--atelier-#{$bar}-accent-soft);
 
