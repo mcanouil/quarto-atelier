@@ -24,26 +24,35 @@
 		var meta = document.createElement("div");
 		meta.className = "atelier-toc-meta";
 		var content = document.getElementById("quarto-document-content");
-		function countWords(element) {
-			if (!element) return 0;
-			var copy = element.cloneNode(true);
-			copy.querySelectorAll("[hidden]").forEach(function (hidden) {
-				hidden.remove();
+		function countWords() {
+			if (!content) return 0;
+			var walker = document.createTreeWalker(content, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+				acceptNode: function (node) {
+					if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+					if (node.hidden || node.id === "title-block-header") return NodeFilter.FILTER_REJECT;
+					return NodeFilter.FILTER_SKIP;
+				}
 			});
-			return copy.textContent.split(/\s+/).filter(Boolean).length;
+			var text = [];
+			while (walker.nextNode()) {
+				text.push(walker.currentNode.nodeValue);
+			}
+			return text.join("").split(/\s+/).filter(Boolean).length;
 		}
 		if (readingTime) {
 			var time = document.createElement("span");
 			time.className = "atelier-toc-reading-time";
 			var updateReadingTime = function () {
-				var words = countWords(content) - countWords(document.getElementById("title-block-header"));
-				time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
+				time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
 			};
 			updateReadingTime();
-			// Veil applies the stored state at start without an event, and
-			// sends veil:change after each later change.
-			window.addEventListener("load", updateReadingTime);
-			document.addEventListener("veil:change", updateReadingTime);
+			// Veil applies the stored state on DOMContentLoaded, after this
+			// script runs, and without an event. It sends veil:change after
+			// each later change.
+			if (document.getElementById("veil-config")) {
+				window.addEventListener("load", updateReadingTime);
+				document.addEventListener("veil:change", updateReadingTime);
+			}
 			meta.appendChild(time);
 		}
 		var modified = document.querySelector(".quarto-title-meta .date-modified");
