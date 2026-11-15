@@ -232,6 +232,13 @@ $border-color: null;
   --mobile-toc-shadow: 0 6px 20px var(--atelier-shadow);
   --mobile-toc-sheet-shadow: 0 -6px 20px var(--atelier-shadow);
   --mobile-toc-backdrop: var(--atelier-overlay);
+
+  // The veil extension reads these in its button, popover and toast. They sit
+  // on `:root`, because the toast is not inside the button.
+  --veil-border: var(--atelier-control-border);
+  --veil-shadow: var(--atelier-shadow);
+  --veil-toast-bg: var(--atelier-fg);
+  --veil-active-bg: var(--atelier-accent-soft);
 }
 
 // Quarto inks breadcrumb links with the raw link colour, which a pale or deep
