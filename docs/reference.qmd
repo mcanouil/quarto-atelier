@@ -203,9 +203,12 @@ The [Veil documentation](https://m.canouil.dev/quarto-veil/) lists all of the op
 
 ### Upgrade from separate copies
 
-If your project has its own copy of one of these extensions, remove it from `_extensions/` and remove its name from your `filters` list.
-Quarto looks up the names in your `filters` list in your own `_extensions/` only, so it then runs your copy and the embedded copy, and your copy's shortcodes replace the embedded ones.
-Keep your options under `extensions:`: the embedded copies read them.
+You can keep your own copy of one of these extensions, for example to build the documentation of that extension from its source.
+When your project has a copy under `_extensions/`, with any owner such as `_extensions/local/veil/`, the embedded copy does nothing.
+Name your copy in your `filters` list.
+If the list does not name it, neither copy runs.
+The shortcodes of your copy replace the embedded ones.
+Keep your options under `extensions:`: both copies read them.
 
 ## Page keys
 
