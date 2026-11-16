@@ -286,6 +286,7 @@
     document.documentElement.classList.add('veil-ready');
     document.addEventListener('keydown', onKey);
     ui('mount', api, config);
+    document.dispatchEvent(new CustomEvent('veil:ready', { detail: snapshot(resolved) }));
   }
 
   window.Veil = api;
