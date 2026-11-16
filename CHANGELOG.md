@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: The terminal preset sets the `theme-color` tag of both colour schemes, so the browser bar matches the dark page.
+
 ## 0.12.0 (2026-11-16)
 
 ### Breaking Changes
