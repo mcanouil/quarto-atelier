@@ -9,7 +9,7 @@ The pages in workshop mode get the workshop chrome.
 
 The [example workshop](workshop-example/index.qmd) of this site uses each part that this page describes.
 The [workshop template](templates.qmd) gives you a workshop site to start from.
-Workshop mode needs Quarto 1.11.9 or later.
+Workshop mode needs Quarto 1.12.1 or later.
 
 ## Set the mode
 
@@ -218,7 +218,7 @@ It stays dark in both colour schemes.
 ````markdown
 ```{.bash .terminal}
 $ quarto --version
-1.11.9
+1.12.1
 ```
 ````
 

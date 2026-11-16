@@ -19,18 +19,48 @@
 		var copiedLabel = labels["toc-link-copied"];
 
 		// The meta row sits between the title and the entries. Reading time
-		// counts 200 words a minute, at least one minute.
+		// counts 200 words a minute, at least one minute, of the content that
+		// shows: the veil extension hides content with the hidden attribute.
 		var meta = document.createElement("div");
 		meta.className = "atelier-toc-meta";
 		var content = document.getElementById("quarto-document-content");
-		function countWords(element) {
-			return element ? element.textContent.split(/\s+/).filter(Boolean).length : 0;
+		function countWords() {
+			if (!content) return 0;
+			var walker = document.createTreeWalker(content, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+				acceptNode: function (node) {
+					if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+					if (node.hidden || node.id === "title-block-header") return NodeFilter.FILTER_REJECT;
+					return NodeFilter.FILTER_SKIP;
+				}
+			});
+			var text = [];
+			while (walker.nextNode()) {
+				text.push(walker.currentNode.nodeValue);
+			}
+			return text.join("").split(/\s+/).filter(Boolean).length;
 		}
-		var words = countWords(content) - countWords(document.getElementById("title-block-header"));
 		if (readingTime) {
 			var time = document.createElement("span");
 			time.className = "atelier-toc-reading-time";
-			time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(words / 200)));
+			var readingText = function () {
+				return readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
+			};
+			time.textContent = readingText();
+			// Quarto clones the card for narrow screens after this script runs,
+			// so an update writes to each copy.
+			var updateReadingTime = function () {
+				var text = readingText();
+				document.querySelectorAll(".atelier-toc-reading-time").forEach(function (copy) {
+					copy.textContent = text;
+				});
+			};
+			// Veil starts on DOMContentLoaded, after this script runs. It sends
+			// veil:ready once it has applied the start state, and veil:change
+			// after each later change.
+			if (document.getElementById("veil-config")) {
+				document.addEventListener("veil:ready", updateReadingTime);
+				document.addEventListener("veil:change", updateReadingTime);
+			}
 			meta.appendChild(time);
 		}
 		var modified = document.querySelector(".quarto-title-meta .date-modified");

@@ -94,6 +94,7 @@
   The glow stopped in a hard line above and below the figure when the figure column was wider than the image was tall. (#107)
 - fix: Fill the gitlink count badge from the page surface token, so the badge follows the theme. (#114)
 - fix: Colour the veil button, popover and toast from the theme tokens, so they follow the theme in both colour schemes. (#115)
+- fix: Count only the content that shows in the reading time of the table of contents card, and update it when veil hides or shows a group. (#117)
 
 ### Documentation
 
