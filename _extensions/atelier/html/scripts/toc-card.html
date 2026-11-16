@@ -54,12 +54,11 @@
 					copy.textContent = text;
 				});
 			};
-			// Veil applies the stored state on DOMContentLoaded, after this
-			// script runs, and without an event. Its script sits in the head,
-			// so its listener runs before this one. It sends veil:change after
-			// each later change.
+			// Veil starts on DOMContentLoaded, after this script runs. It sends
+			// veil:ready once it has applied the start state, and veil:change
+			// after each later change.
 			if (document.getElementById("veil-config")) {
-				document.addEventListener("DOMContentLoaded", updateReadingTime);
+				document.addEventListener("veil:ready", updateReadingTime);
 				document.addEventListener("veil:change", updateReadingTime);
 			}
 			meta.appendChild(time);
