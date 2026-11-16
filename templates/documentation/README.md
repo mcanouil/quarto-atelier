@@ -5,7 +5,7 @@ It has a navbar, a docked sidebar, and five sample pages that you replace with y
 
 ## Use the template
 
-You need Quarto 1.11.9 or later.
+You need Quarto 1.12.1 or later.
 Make an empty folder and run the two commands in this order, from inside the folder.
 
 ```bash

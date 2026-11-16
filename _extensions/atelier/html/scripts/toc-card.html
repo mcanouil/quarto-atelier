@@ -42,10 +42,18 @@
 		if (readingTime) {
 			var time = document.createElement("span");
 			time.className = "atelier-toc-reading-time";
-			var updateReadingTime = function () {
-				time.textContent = readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
+			var readingText = function () {
+				return readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
 			};
-			updateReadingTime();
+			time.textContent = readingText();
+			// Quarto clones the card for narrow screens after this script runs,
+			// so an update writes to each copy.
+			var updateReadingTime = function () {
+				var text = readingText();
+				document.querySelectorAll(".atelier-toc-reading-time").forEach(function (copy) {
+					copy.textContent = text;
+				});
+			};
 			// Veil applies the stored state on DOMContentLoaded, after this
 			// script runs, and without an event. It sends veil:change after
 			// each later change.

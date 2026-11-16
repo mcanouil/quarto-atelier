@@ -8,6 +8,7 @@ It derives the navbar, the page footer, and a docked sidebar from one `_brand.ym
 
 Atelier needs Quarto 1.12.1 or later.
 Older releases drop the project's `extensions` options from any page that sets `extensions` in its own front matter, which breaks workshop mode.
+They also draw the announcement dismiss control so that the keyboard cannot reach it.
 
 ```bash
 quarto add mcanouil/quarto-atelier@0.11.0
