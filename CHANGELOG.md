@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.12.0 (2026-11-16)
+
 ### Breaking Changes
 
 - build: Atelier needs Quarto 1.12.1 or later, which is a pre-release until Quarto 1.12 is out.
