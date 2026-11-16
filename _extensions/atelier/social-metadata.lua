@@ -163,13 +163,43 @@ local function icon_tags(config)
   return tags
 end
 
+--- The page background of each preset that sets one, for both schemes.
+--- Keep in step with `$body-bg` in `html/presets.scss`.
+--- @type table<string, string>
+local PRESET_BACKGROUNDS = {
+  terminal = '#101216',
+}
+
+--- Read the `atelier-preset` value of the brand for one colour scheme.
+--- The public `quarto.brand` API gives no access to the brand `defaults`, so
+--- this reads the brand data from Quarto's internal `param('brand')`. A mode
+--- without its own brand uses the light brand, as Quarto does.
+--- @param scheme string The colour scheme, `light` or `dark`
+--- @return string|nil The preset, or nil when the brand sets none
+local function brand_preset(scheme)
+  if type(_G.param) ~= 'function' then
+    return nil
+  end
+  local brand = _G.param('brand')
+  local mode = brand and (brand[scheme] or brand.light)
+  local defaults = mode and mode.data and mode.data.defaults
+  local bootstrap = defaults and defaults.bootstrap and defaults.bootstrap.defaults
+  local preset = bootstrap and bootstrap['atelier-preset']
+  if preset == nil then
+    return nil
+  end
+  return tostring(preset)
+end
+
 --- The browser UI tint for one colour scheme.
 --- Falls back to the brand background of that mode, which is the colour Quarto
 --- compiles into `$body-bg` for the matching theme bundle, and so the colour
---- the page is actually painted with. A configured value wins per scheme.
+--- the page is actually painted with. Without a brand background, a preset
+--- that paints the page gives its own background. A configured value wins per
+--- scheme.
 --- @param config table|nil The `extensions.atelier` configuration table
 --- @param scheme string The colour scheme, `light` or `dark`
---- @return string|nil The colour, or nil when neither source supplies one
+--- @return string|nil The colour, or nil when no source supplies one
 local function theme_colour(config, scheme)
   local colours = config and config['theme-color']
   local configured = colours and colours[scheme] and str.stringify(colours[scheme])
@@ -177,9 +207,13 @@ local function theme_colour(config, scheme)
     return configured
   end
   if quarto.brand.has_mode(scheme) then
-    return quarto.brand.get_color_css(scheme, BRAND_BACKGROUND_COLOUR)
+    local background = quarto.brand.get_color_css(scheme, BRAND_BACKGROUND_COLOUR)
+    if not str.is_empty(background) then
+      return background
+    end
   end
-  return nil
+  local preset = brand_preset(scheme)
+  return preset and PRESET_BACKGROUNDS[preset]
 end
 
 --- Collect the `theme-color` tags for the page.
