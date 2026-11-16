@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: A hero image that is at least 1.5 times as wide as it is high goes below the text, at the full width of the hero, so the text of a social card stays readable.
+
 ## 0.12.0 (2026-11-16)
 
 ### Breaking Changes
