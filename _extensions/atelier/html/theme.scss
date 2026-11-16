@@ -513,6 +513,10 @@ main:has(> .atelier-landing) > #title-block-header {
     height: auto;
   }
 
+  .atelier-wide-figure & img {
+    max-width: 100%;
+  }
+
   p {
     margin: 0;
   }
@@ -736,6 +740,13 @@ main:has(> .atelier-landing) > #title-block-header {
 
   .atelier-hero:not(.centred) {
     grid-template-columns: 1.3fr 1fr;
+  }
+
+  // `atelier-chrome.lua` marks a hero whose image is wide, such as a social
+  // card. Its text is only readable at about the full width of the hero, so
+  // the figure goes below the text, as on a small screen.
+  .atelier-hero.atelier-wide-figure {
+    grid-template-columns: 1fr;
   }
 
   .atelier-hero.centred {
