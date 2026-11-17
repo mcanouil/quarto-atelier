@@ -27,8 +27,6 @@ website:
             text: "Workshop mode"
           - href: brand.qmd
             text: "Brand and colours"
-          - href: workshop-example/index.qmd
-            text: "Example workshop"
       - href: landing.qmd
         text: "Landing page"
       - href: examples.qmd
