@@ -198,10 +198,11 @@ local function is_wide(image)
   return width ~= nil and height ~= nil and height > 0 and width / height >= WIDE_RATIO
 end
 
---- Mark a hero whose figure holds a wide image with `atelier-wide-figure`.
---- The stylesheet puts that figure below the text, at the full width of the
---- hero, as the text of a wide image such as a social card is only readable
---- at that size.
+--- Mark a hero whose figure holds a wide image with `atelier-wide-figure`,
+--- and the wide image with `atelier-wide-image`. The stylesheet puts that
+--- figure below the text, and the wide image at the full width of the hero,
+--- as the text of a wide image such as a social card is only readable at
+--- that size. Other images in the figure keep their cap.
 --- @param div table The div
 --- @return table|nil The marked hero, or nil when nothing changes
 local function mark_wide_hero(div)
@@ -209,11 +210,15 @@ local function mark_wide_hero(div)
     return nil
   end
   local wide = false
-  for _, block in ipairs(div.content) do
+  for index, block in ipairs(div.content) do
     if block.t == 'Div' and block.classes:includes('atelier-hero-figure') then
-      block:walk({
+      div.content[index] = block:walk({
         Image = function(image)
-          wide = wide or is_wide(image)
+          if is_wide(image) then
+            wide = true
+            image.classes:insert('atelier-wide-image')
+            return image
+          end
         end,
       })
     end
