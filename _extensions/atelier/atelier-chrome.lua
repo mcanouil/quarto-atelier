@@ -206,7 +206,7 @@ end
 --- @param div table The div
 --- @return table|nil The marked hero, or nil when nothing changes
 local function mark_wide_hero(div)
-  if not div.classes:includes('atelier-hero') then
+  if not quarto.doc.is_format('html') or not div.classes:includes('atelier-hero') then
     return nil
   end
   local wide = false
