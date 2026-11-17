@@ -745,11 +745,8 @@ main:has(> .atelier-landing) > #title-block-header {
   // `atelier-chrome.lua` marks a hero whose image is wide, such as a social
   // card. Its text is only readable at about the full width of the hero, so
   // the figure goes below the text, as on a small screen.
+  .atelier-hero.centred,
   .atelier-hero.atelier-wide-figure {
-    grid-template-columns: 1fr;
-  }
-
-  .atelier-hero.centred {
     grid-template-columns: 1fr;
   }
 
