@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- fix: An embedded extension no longer runs when your project has its own copy of it, so only your copy runs.
+- fix: An embedded extension no longer runs when your project has its own copy of it and names that copy in `filters`, so only your copy runs. (#119)
 
 ## 0.12.0 (2026-11-16)
 
