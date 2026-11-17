@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+#
+# Documentation Demo Build
+# Renders the live demo sites that the gallery links to.
+#
+# @license MIT License
+# @copyright 2026 Mickaël Canouil
+# @author Mickaël Canouil
+#
+# Usage: build-demos.sh <output-dir> [<demo-id>...]
+#
+# Each demo id has a folder in docs/_demos/. Its `source` file names the
+# template (`workshop` or `documentation`) that the demo renders, and every
+# other file is copied over the template: the `_quarto-demo.yml` profile and,
+# for the presets, a `_brand-demo.yml`. A demo is rendered in a temporary copy
+# of the template, so the templates stay untouched.
+#
+# With no ids, the script builds the ids in ATELIER_DEMO_IDS and first removes
+# all of <output-dir>/demos/, so a demo that was removed leaves no stale folder.
+# With ids, it replaces only the folders of those ids.
+# A relative <output-dir> is resolved against docs/.
+#
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
+ROOT_DIR="$(dirname "${DOCS_DIR}")"
+DEMOS_DIR="${DOCS_DIR}/_demos"
+DEFAULT_IDS="workshop-sidebar workshop-navbar docs-navbar docs-sidebar"
+
+if [[ $# -lt 1 ]]; then
+	printf 'Usage: %s <output-dir> [<demo-id>...]\n' "$(basename "$0")" >&2
+	exit 2
+fi
+
+output_dir="$1"
+shift
+[[ "${output_dir}" == /* ]] || output_dir="${DOCS_DIR}/${output_dir}"
+output_dir="${output_dir%/}"
+
+if [[ $# -gt 0 ]]; then
+	ids=("$@")
+else
+	read -r -a ids <<<"${ATELIER_DEMO_IDS:-${DEFAULT_IDS}}"
+	rm -rf "${output_dir}/demos"
+fi
+
+work_dir="$(mktemp -d)"
+trap 'rm -rf "${work_dir}"' EXIT
+
+build_demo() {
+	local id="$1"
+	local demo_dir="${DEMOS_DIR}/${id}"
+	local template site
+
+	if [[ ! -f "${demo_dir}/source" ]]; then
+		printf '[demos] %s failed: %s/source is missing\n' "${id}" "${demo_dir}" >&2
+		return 1
+	fi
+	template="$(tr -d '[:space:]' <"${demo_dir}/source")"
+	if [[ ! -d "${ROOT_DIR}/templates/${template}" ]]; then
+		printf '[demos] %s failed: templates/%s does not exist\n' "${id}" "${template}" >&2
+		return 1
+	fi
+
+	site="${work_dir}/${id}"
+	mkdir -p "${site}/_extensions/local"
+	cp -R "${ROOT_DIR}/templates/${template}/." "${site}"
+	for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
+		[[ -f "${extension_dir}_extension.yml" ]] || continue
+		cp -R "${extension_dir%/}" "${site}/_extensions/local/$(basename "${extension_dir}")"
+	done
+	find "${demo_dir}" -mindepth 1 -maxdepth 1 ! -name source -exec cp -R {} "${site}" \;
+
+	rm -rf "${output_dir}/demos/${id}"
+	mkdir -p "${output_dir}/demos"
+	printf '[demos] Building %s from templates/%s\n' "${id}" "${template}"
+	if ! quarto render "${site}" --profile demo \
+		--output-dir "${output_dir}/demos/${id}" >"${work_dir}/${id}.log" 2>&1; then
+		cat "${work_dir}/${id}.log" >&2
+		printf '[demos] %s failed\n' "${id}" >&2
+		return 1
+	fi
+}
+
+for id in "${ids[@]}"; do
+	build_demo "${id}" || exit 1
+done

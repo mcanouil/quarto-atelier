@@ -1,0 +1,10 @@
+website:
+  site-url: https://m.canouil.dev/quarto-atelier/demos/preset-default/
+  repo-url: https://github.com/mcanouil/quarto-atelier
+  announcement:
+    icon: info-circle
+    dismissable: false
+    type: info
+    position: below-navbar
+    content: "This is a live demo of Atelier. [Back to the gallery](https://m.canouil.dev/quarto-atelier/gallery.html)."
+brand: _brand-demo.yml
