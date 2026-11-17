@@ -28,7 +28,7 @@ anchor-sections: false
 ::: {.atelier-actions}
 
 [Get started](#quick-start){.btn .btn-primary .btn-lg}
-[See the examples](examples.qmd){.btn .btn-outline-primary .btn-lg}
+[See the gallery](gallery.qmd){.btn .btn-outline-primary .btn-lg}
 
 :::
 
@@ -62,6 +62,40 @@ Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto
 ::: {.atelier-hero-figure}
 
 [![The Atelier mark: a page frame with a pinned navbar.](assets/icons/icon-512.png){width="320" height="320"}]{}
+
+:::
+
+:::
+
+::: {.atelier-feature}
+
+::: {.atelier-feature-text}
+
+[Layouts and modes]{.atelier-eyebrow}
+
+## Two modes, two layouts
+
+Atelier has a documentation mode and a workshop mode.
+Each mode works with a navbar layout and with a sidebar-only layout.
+
+Workshop mode adds a module stepper, a timer, and progress dots for a course.
+Select a picture to open a live demo of that combination.
+
+See all the combinations in the [gallery](gallery.qmd).
+
+:::
+
+::: {.atelier-feature-figure}
+
+::: {layout-ncol=2}
+[![](assets/gallery/workshop-sidebar-light.png){fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}](demos/workshop-sidebar/index.html)
+
+[![](assets/gallery/workshop-navbar-light.png){fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}](demos/workshop-navbar/index.html)
+
+[![](assets/gallery/docs-navbar-light.png){fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the light colour scheme."}](demos/docs-navbar/index.html)
+
+[![](assets/gallery/docs-sidebar-light.png){fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the light colour scheme."}](demos/docs-sidebar/index.html)
+:::
 
 :::
 
