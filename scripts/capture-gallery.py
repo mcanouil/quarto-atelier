@@ -40,6 +40,12 @@ DEMOS = {
     "preset-quarto": (DOCS_PAGE, ("light", "dark")),
     "preset-terminal": (DOCS_PAGE, ("dark",)),
 }
+SCHEME_READY = """
+scheme => document.body.classList.contains(`quarto-${scheme}`)
+    && [...document.styleSheets].every(sheet => {
+        try { return sheet.cssRules !== null; } catch { return false; }
+    })
+"""
 BROWSER_VARIABLES = ("CHROME_PATH", "QUARTO_CHROMIUM")
 BROWSER_CANDIDATES = (
     "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
@@ -103,6 +109,7 @@ def capture(output_dir: Path, browser: str) -> None:
                         wait_until="networkidle",
                     )
                     page.evaluate("document.fonts.ready")
+                    page.wait_for_function(SCHEME_READY, arg=scheme)
                     target = OUTPUT / f"{demo}-{scheme}.png"
                     page.screenshot(path=str(target))
                     context.close()
