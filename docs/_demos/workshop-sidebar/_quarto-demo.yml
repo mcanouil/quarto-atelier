@@ -1,6 +1,7 @@
 website:
   site-url: https://m.canouil.dev/quarto-atelier/demos/workshop-sidebar/
   repo-url: https://github.com/mcanouil/quarto-atelier
+  repo-subdir: templates/workshop
   announcement:
     icon: info-circle
     dismissable: false

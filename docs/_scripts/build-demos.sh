@@ -65,16 +65,34 @@ build_demo() {
 	fi
 
 	site="${work_dir}/${id}"
-	mkdir -p "${site}/_extensions/local"
-	cp -R "${ROOT_DIR}/templates/${template}/." "${site}"
+	mkdir -p "${site}/_extensions/local" || {
+		printf '[demos] %s failed: cannot create %s\n' "${id}" "${site}" >&2
+		return 1
+	}
+	cp -R "${ROOT_DIR}/templates/${template}/." "${site}" || {
+		printf '[demos] %s failed: cannot copy templates/%s\n' "${id}" "${template}" >&2
+		return 1
+	}
 	for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
 		[[ -f "${extension_dir}_extension.yml" ]] || continue
-		cp -R "${extension_dir%/}" "${site}/_extensions/local/$(basename "${extension_dir}")"
+		cp -R "${extension_dir%/}" "${site}/_extensions/local/$(basename "${extension_dir}")" || {
+			printf '[demos] %s failed: cannot copy %s\n' "${id}" "${extension_dir}" >&2
+			return 1
+		}
 	done
-	find "${demo_dir}" -mindepth 1 -maxdepth 1 ! -name source -exec cp -R {} "${site}" \;
+	for overlay in "${demo_dir}"/*; do
+		[[ "$(basename "${overlay}")" == source ]] && continue
+		cp -R "${overlay}" "${site}" || {
+			printf '[demos] %s failed: cannot copy %s\n' "${id}" "${overlay}" >&2
+			return 1
+		}
+	done
 
 	rm -rf "${output_dir}/demos/${id}"
-	mkdir -p "${output_dir}/demos"
+	mkdir -p "${output_dir}/demos" || {
+		printf '[demos] %s failed: cannot prepare %s/demos\n' "${id}" "${output_dir}" >&2
+		return 1
+	}
 	printf '[demos] Building %s from templates/%s\n' "${id}" "${template}"
 	if ! quarto render "${site}" --profile demo \
 		--output-dir "${output_dir}/demos/${id}" >"${work_dir}/${id}.log" 2>&1; then
