@@ -96,8 +96,14 @@
     border-left-width: 1ch;
   }
 
-  html div.sourceCode:not(:has(> pre.atelier-terminal)) {
-    border-color: var(--atelier-control-border);
+  // Every code frame takes the control border. A `.terminal` block keeps the
+  // page border.
+  :root {
+    --atelier-code-border: var(--atelier-control-border);
+  }
+
+  html div.sourceCode:has(> pre.atelier-terminal) {
+    --atelier-code-border: var(--atelier-border);
   }
 
   html main a:not(.btn):not(.nav-link) {

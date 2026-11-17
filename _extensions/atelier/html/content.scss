@@ -462,6 +462,8 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
 // The Code Window header holds the file name, with the language pushed to the
 // right by the code-blocks script, and the copy button sits in the same row.
 $atelier-code-header-font-size: 0.78rem;
+$atelier-copy-button-size: 24px;
+$atelier-copy-button-inset: 5px;
 
 html .code-with-filename .code-with-filename-file {
   display: flex;
@@ -473,7 +475,7 @@ html .code-with-filename .code-with-filename-file {
   font-family: var(--bs-font-monospace);
   font-size: $atelier-code-header-font-size;
   color: var(--atelier-muted);
-  border-bottom: 1px solid var(--atelier-border);
+  border-bottom: 1px solid var(--atelier-code-border);
 }
 
 // Code Window gives the file name no width of its own and breaks it at any
@@ -494,7 +496,7 @@ html .code-with-filename .code-with-filename-file pre {
 html .code-with-filename .code-with-filename-file .code-with-filename-lines {
   color: var(--atelier-muted);
   background-color: var(--atelier-surface);
-  border-color: var(--atelier-border);
+  border-color: var(--atelier-code-border);
 }
 
 html .code-with-filename .atelier-code-language {
@@ -515,8 +517,8 @@ html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
   align-items: center;
   justify-content: center;
   opacity: 1;
-  min-width: 24px;
-  min-height: 24px;
+  min-width: $atelier-copy-button-size;
+  min-height: $atelier-copy-button-size;
   padding: 0 0.5rem;
   font-size: 0.72rem;
   border: 1px solid var(--atelier-control-border);
@@ -526,7 +528,13 @@ html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
 // Quarto's right margin on annotated code, which keeps the button clear of the
 // annotation markers, stays. A Code Window puts the button in its header.
 html :not(.code-with-filename) > .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
-  margin-top: 5px;
+  margin-top: $atelier-copy-button-inset;
+}
+
+// Annotated code has no vertical padding, so a block of one line is shorter
+// than the button. The block keeps the same inset below the button as above.
+html :not(.code-with-filename) > .code-copy-outer-scaffold:has(pre.code-annotated) > div.sourceCode {
+  min-height: $atelier-copy-button-size + 2 * $atelier-copy-button-inset;
 }
 
 html .code-with-filename .code-copy-outer-scaffold {
@@ -1247,7 +1255,7 @@ html table.quarto-listing-table a {
     margin-bottom: 1rem;
     padding: $code-block-bg-padding;
     font-size: 0.78rem;
-    border: 1px solid var(--atelier-border);
+    border: 1px solid var(--atelier-code-border);
     border-radius: $border-radius-sm;
     @if $code-block-bg {
       background-color: var(--atelier-surface);

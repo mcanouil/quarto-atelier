@@ -142,6 +142,7 @@ $border-color: null;
   --atelier-surface-strong: #{$atelier-surface-strong};
   --atelier-border: #{$atelier-border};
   --atelier-control-border: #{$atelier-control-border};
+  --atelier-code-border: var(--atelier-border);
   --atelier-muted: #{$atelier-text-muted};
   --atelier-accent-soft: #{$atelier-accent-soft};
   --atelier-accent-ink: #{$atelier-accent-ink};
@@ -766,7 +767,7 @@ html div.sourceCode {
   @if $code-block-bg {
     background-color: var(--atelier-surface);
   }
-  border: 1px solid var(--atelier-border);
+  border: 1px solid var(--atelier-code-border);
   border-radius: $border-radius-sm;
 }
 
@@ -780,7 +781,7 @@ html pre:not(.sourceCode) {
   } @else {
     background-color: transparent;
   }
-  border: 1px solid var(--atelier-border);
+  border: 1px solid var(--atelier-code-border);
   border-radius: $border-radius-sm;
   padding: $code-block-bg-padding;
 }
@@ -890,16 +891,33 @@ html .quarto-dark .code-with-filename .code-with-filename-file {
 // title bar divider uses the same border colour.
 html .code-with-filename {
   margin: 1rem 0;
-  border-color: var(--atelier-border);
+  border-color: var(--atelier-code-border);
   border-radius: $border-radius-sm;
 }
 
 html .code-with-filename .code-with-filename-file {
-  border-bottom-color: var(--atelier-border);
+  border-bottom-color: var(--atelier-code-border);
 }
 
 html .code-with-filename .code-copy-outer-scaffold {
   border-radius: 0 0 $border-radius-sm $border-radius-sm;
+}
+
+// Quarto pads the last child of a titled callout body, and the last child of
+// each `div` in it. In a filename block, that child is the copy scaffold, or
+// the block itself when it ends the callout or a cell, so an empty band shows
+// below the code inside the frame. Remove the padding. A block that ends the
+// callout or a cell keeps the space as a margin, outside the frame.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15382
+// Remove when: the minimum Quarto version includes the fix.
+html .callout.callout-titled .callout-body > .code-with-filename > .code-copy-outer-scaffold:last-child {
+  padding-bottom: 0;
+}
+
+html .callout.callout-titled .callout-body > .code-with-filename:last-child,
+html .callout.callout-titled .callout-body > div > .code-with-filename:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
 }
 
 // A closed collapsible window sets its 8px radius again, on the window and on
