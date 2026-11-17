@@ -163,35 +163,51 @@ local function icon_tags(config)
   return tags
 end
 
---- The page background of the terminal preset, which pins both schemes dark.
+--- The page background of each preset that paints the page, per scheme.
 --- Keep in step with `$body-bg` in `html/presets.scss`.
---- @type string
-local TERMINAL_BACKGROUND = '#101216'
+--- @type table<string, table<string, string>>
+local PRESET_BACKGROUNDS = {
+  terminal = { light = '#101216', dark = '#101216' },
+  quarto = { light = '#eef4fa', dark = '#0f1b2a' },
+}
 
---- Read the `atelier-preset` value of the brand for one colour scheme.
+--- Read the Bootstrap defaults that the brand sets for one colour scheme.
 --- The public `quarto.brand` API gives no access to the brand `defaults`, so
 --- this reads the brand data from Quarto's internal `param('brand')`. A mode
 --- without its own brand uses the light brand, as Quarto does.
 --- @param scheme string The colour scheme, `light` or `dark`
---- @return string|nil The preset, or nil when the brand sets none
-local function brand_preset(scheme)
+--- @return table The `defaults.bootstrap.defaults` table, empty when the brand sets none
+local function brand_bootstrap_defaults(scheme)
   if type(_G.param) ~= 'function' then
-    return nil
+    return {}
   end
   local brand = _G.param('brand')
   local mode = brand and (brand[scheme] or brand.light)
   local defaults = mode and mode.data and mode.data.defaults
-  local bootstrap = defaults and defaults.bootstrap and defaults.bootstrap.defaults
-  local preset = bootstrap and bootstrap['atelier-preset']
-  return str.to_string(preset)
+  return defaults and defaults.bootstrap and defaults.bootstrap.defaults or {}
+end
+
+--- The page background that the brand defaults give for one colour scheme.
+--- A `body-bg` value wins, as it does in Sass. Otherwise a preset that paints
+--- the page gives its own background.
+--- @param scheme string The colour scheme, `light` or `dark`
+--- @return string|nil The colour, or nil when the defaults set none
+local function brand_defaults_background(scheme)
+  local defaults = brand_bootstrap_defaults(scheme)
+  local body_bg = str.to_string(defaults['body-bg'])
+  if body_bg ~= nil then
+    return body_bg
+  end
+  local preset = PRESET_BACKGROUNDS[str.to_string(defaults['atelier-preset']) or '']
+  return preset and preset[scheme]
 end
 
 --- The browser UI tint for one colour scheme.
 --- Falls back to the brand background of that mode, which is the colour Quarto
 --- compiles into `$body-bg` for the matching theme bundle, and so the colour
---- the page is actually painted with. Without a brand background, a preset
---- that paints the page gives its own background. A configured value wins per
---- scheme.
+--- the page is actually painted with. Without a brand background, the brand
+--- `body-bg` default or the background of its preset is used. A configured
+--- value wins per scheme.
 --- @param config table|nil The `extensions.atelier` configuration table
 --- @param scheme string The colour scheme, `light` or `dark`
 --- @return string|nil The colour, or nil when no source supplies one
@@ -207,10 +223,7 @@ local function theme_colour(config, scheme)
       return background
     end
   end
-  if brand_preset(scheme) == 'terminal' then
-    return TERMINAL_BACKGROUND
-  end
-  return nil
+  return brand_defaults_background(scheme)
 end
 
 --- Collect the `theme-color` tags for the page.

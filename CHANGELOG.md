@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- fix: The terminal preset sets the `theme-color` tag of both colour schemes, so the browser bar matches the dark page.
+- fix: The `terminal` and `quarto` presets, and a brand `body-bg` default, now set the `theme-color` tag of each colour scheme, so the browser bar matches the page.
 
 ## 0.12.0 (2026-11-16)
 
