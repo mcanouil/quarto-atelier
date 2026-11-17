@@ -74,6 +74,8 @@ website:
       contents:
         - href: index.qmd
           text: "Home"
+        - href: gallery.qmd
+          text: "Gallery"
         - href: templates.qmd
           text: "Templates"
         - href: workshop.qmd

@@ -17,6 +17,8 @@ website:
     left:
       - href: index.qmd
         text: "Home"
+      - href: gallery.qmd
+        text: "Gallery"
       - href: reference.qmd
         text: "Reference"
       - text: "Guides"
