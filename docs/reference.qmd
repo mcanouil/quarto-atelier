@@ -436,7 +436,7 @@ Set them in the `defaults` layer of a project stylesheet.
 | `$atelier-landing-max-width`     | `1140px`                   | Maximum width of the container.                            |
 | `$atelier-landing-gap`           | `3rem`                     | Space between the two parts of a hero or a feature row.    |
 | `$atelier-hero-title-size`       | `clamp(2.2rem, 5vw, 3.4rem)` | Font size of the hero title.                             |
-| `$atelier-hero-figure-max-width` | `320px`                    | Maximum width of the image in the hero figure.             |
+| `$atelier-hero-figure-max-width` | `320px`                    | Maximum width of the image in the hero figure. A wide image takes the full width of the hero. |
 | `$atelier-hero-gradient-shift`   | `40deg`                    | Hue difference between the first and the last gradient colour. |
 | `$atelier-card-min-width`        | `13rem`                    | Minimum width of a card column.                            |
 

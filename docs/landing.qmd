@@ -102,6 +102,28 @@ Below the `md` breakpoint, the figure goes below the text.
 The image is in an empty span, `[...]{}`, so that Quarto shows it without a caption.
 The text in the square brackets of the image is its alternative text.
 
+A wide image, such as a social card, goes below the text and takes the full width of the hero, so that its text stays readable.
+Atelier finds a wide image from its `width` and `height` attributes, in pixels such as `600` or `600px`: the width is at least 1.5 times the height.
+Without the two attributes, the image stays beside the text.
+
+::: {#hero-wide .atelier-hero}
+
+::: {.atelier-hero-text}
+
+## Project name {.unlisted}
+
+[One sentence that says what the project does.]{.atelier-lead}
+
+:::
+
+::: {.atelier-hero-figure}
+
+[![The social card of Atelier: the project name and a code window with a `_quarto.yml` file.](assets/social/og-image.png){width="600" height="315"}]{}
+
+:::
+
+:::
+
 The examples on this page differ from their Markdown in three ways only.
 This page has its own h1, so the title of each example hero is an h2.
 Atelier styles an h1 or an h2 in a hero as the hero title.
