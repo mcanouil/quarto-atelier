@@ -171,10 +171,13 @@ local PRESET_BACKGROUNDS = {
   quarto = { light = '#eef4fa', dark = '#0f1b2a' },
 }
 
+-- Quarto's Lua `quarto.brand` API gives no access to the brand `defaults`, so
+-- this reads the brand data from Quarto's internal `param('brand')`.
+-- Upstream: https://github.com/quarto-dev/quarto-cli/issues/15383
+-- Remove when: the minimum Quarto version includes the fix.
+
 --- Read the Bootstrap defaults that the brand sets for one colour scheme.
---- The public `quarto.brand` API gives no access to the brand `defaults`, so
---- this reads the brand data from Quarto's internal `param('brand')`. A mode
---- without its own brand uses the light brand, as Quarto does.
+--- A mode without its own brand uses the light brand, as Quarto does.
 --- @param scheme string The colour scheme, `light` or `dark`
 --- @return table The `defaults.bootstrap.defaults` table, empty when the brand sets none
 local function brand_bootstrap_defaults(scheme)
