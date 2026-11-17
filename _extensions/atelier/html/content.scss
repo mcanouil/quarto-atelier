@@ -529,6 +529,13 @@ html :not(.code-with-filename) > .code-copy-outer-scaffold:has(pre.code-annotate
   margin-top: 5px;
 }
 
+// Annotated code has no vertical padding, so a block of one line is shorter
+// than the button. The block keeps the button with a 5px inset below it, as
+// above it.
+html :not(.code-with-filename) > .code-copy-outer-scaffold > div.sourceCode:has(> pre.code-annotated) {
+  min-height: calc(5px + 24px + 5px);
+}
+
 html .code-with-filename .code-copy-outer-scaffold {
   position: relative;
   overflow: visible;

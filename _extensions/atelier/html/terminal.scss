@@ -96,7 +96,14 @@
     border-left-width: 1ch;
   }
 
-  html div.sourceCode:not(:has(> pre.atelier-terminal)) {
+  // Every code frame takes the control border, so that a highlighted block, a
+  // plain `pre`, a Code Window, and the BibTeX block look the same. A
+  // `.terminal` block keeps its own border.
+  html div.sourceCode:not(:has(> pre.atelier-terminal)),
+  html pre:not(.sourceCode),
+  #quarto-appendix.default pre.quarto-appendix-bibtex,
+  html .code-with-filename:not(.atelier-terminal),
+  html .code-with-filename:not(.atelier-terminal) > .code-with-filename-file {
     border-color: var(--atelier-control-border);
   }
 

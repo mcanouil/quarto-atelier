@@ -902,6 +902,15 @@ html .code-with-filename .code-copy-outer-scaffold {
   border-radius: 0 0 $border-radius-sm $border-radius-sm;
 }
 
+// Quarto pads the last child of each `div` in a titled callout. In a filename
+// block, that child is the copy scaffold, so an empty band shows below the
+// code inside the frame. Remove the padding.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15382
+// Remove when: the minimum Quarto version includes the fix.
+html .callout.callout-titled .callout-body > .code-with-filename > .code-copy-outer-scaffold:last-child {
+  padding-bottom: 0;
+}
+
 // A closed collapsible window sets its 8px radius again, on the window and on
 // its title bar, with a more specific selector.
 html .code-with-filename.code-window-collapsible:not([open]),
