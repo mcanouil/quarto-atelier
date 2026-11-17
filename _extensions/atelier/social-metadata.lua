@@ -163,12 +163,10 @@ local function icon_tags(config)
   return tags
 end
 
---- The page background of each preset that sets one, for both schemes.
+--- The page background of the terminal preset, which pins both schemes dark.
 --- Keep in step with `$body-bg` in `html/presets.scss`.
---- @type table<string, string>
-local PRESET_BACKGROUNDS = {
-  terminal = '#101216',
-}
+--- @type string
+local TERMINAL_BACKGROUND = '#101216'
 
 --- Read the `atelier-preset` value of the brand for one colour scheme.
 --- The public `quarto.brand` API gives no access to the brand `defaults`, so
@@ -185,10 +183,7 @@ local function brand_preset(scheme)
   local defaults = mode and mode.data and mode.data.defaults
   local bootstrap = defaults and defaults.bootstrap and defaults.bootstrap.defaults
   local preset = bootstrap and bootstrap['atelier-preset']
-  if preset == nil then
-    return nil
-  end
-  return tostring(preset)
+  return str.to_string(preset)
 end
 
 --- The browser UI tint for one colour scheme.
@@ -212,8 +207,10 @@ local function theme_colour(config, scheme)
       return background
     end
   end
-  local preset = brand_preset(scheme)
-  return preset and PRESET_BACKGROUNDS[preset]
+  if brand_preset(scheme) == 'terminal' then
+    return TERMINAL_BACKGROUND
+  end
+  return nil
 end
 
 --- Collect the `theme-color` tags for the page.
