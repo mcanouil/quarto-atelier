@@ -204,10 +204,11 @@ The [Veil documentation](https://m.canouil.dev/quarto-veil/) lists all of the op
 ### Upgrade from separate copies
 
 You can keep your own copy of one of these extensions, for example to build the documentation of that extension from its source.
-When your project has a copy under `_extensions/`, with any owner such as `_extensions/local/veil/`, the embedded copy does nothing.
+When your project has a copy under `_extensions/`, with any owner such as `_extensions/local/veil/`, the embedded filters of that extension do not run.
 Name your copy in your `filters` list.
-If the list does not name it, neither copy runs.
-The shortcodes of your copy replace the embedded ones.
+If the list does not name it, the filters of neither copy run.
+This applies to filters only.
+The embedded iconify shortcode stays available, and the shortcodes of your copy replace it when your copy is loaded.
 Keep your options under `extensions:`: both copies read them.
 
 ## Page keys

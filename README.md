@@ -61,8 +61,8 @@ Atelier ships with the extensions below, so you don't install them yourself.
 Each one lives in `_extensions/atelier/_extensions/mcanouil/<name>/`, and its `_extension.yml` records the release it came from.
 The [reference page](https://m.canouil.dev/quarto-atelier/reference.html) lists their options and the defaults that Atelier changes.
 
-If your project has its own copy of one of them under `_extensions/`, the embedded copy does nothing, and only your copy runs.
-Name your copy in your `filters` list, because a copy that the list does not name turns off the embedded copy too.
+If your project has its own copy of one of them under `_extensions/`, the embedded filters of that extension do not run, and only your copy runs.
+Name your copy in your `filters` list, because a copy that the list does not name turns off the embedded filters too.
 
 ## Documentation
 
