@@ -7,7 +7,8 @@
 --- @description Writes one JSON block into the head of each HTML page. It
 --- holds the version from `extensions.atelier.version` and the translated
 --- labels: the `language` keys `atelier-<key>`, and the Quarto keys that the
---- scripts need.
+--- scripts need. It also marks a hero whose image is wide, so the stylesheet
+--- can put the image below the text.
 
 --- Load modules
 local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
@@ -173,6 +174,62 @@ local function copy_line_spec(block)
   return block
 end
 
+--- The width-to-height ratio from which a hero image counts as wide.
+--- A social card is about 1.9.
+--- @type number
+local WIDE_RATIO = 1.5
+
+--- Read a size attribute in pixels, such as `600` or `600px`.
+--- @param value string|nil
+--- @return number|nil The size, or nil for a missing or relative size
+local function pixels(value)
+  if value == nil then
+    return nil
+  end
+  return tonumber((value:gsub('px$', '')))
+end
+
+--- Tell whether an image has a wide shape from its `width` and `height`.
+--- @param image table The image
+--- @return boolean
+local function is_wide(image)
+  local width = pixels(image.attributes['width'])
+  local height = pixels(image.attributes['height'])
+  return width ~= nil and height ~= nil and height > 0 and width / height >= WIDE_RATIO
+end
+
+--- Mark a hero whose figure holds a wide image with `atelier-wide-figure`,
+--- and the wide image with `atelier-wide-image`. The stylesheet puts that
+--- figure below the text, and the wide image at the full width of the hero,
+--- as the text of a wide image such as a social card is only readable at
+--- that size. Other images in the figure keep their cap.
+--- @param div table The div
+--- @return table|nil The marked hero, or nil when nothing changes
+local function mark_wide_hero(div)
+  if not quarto.doc.is_format('html') or not div.classes:includes('atelier-hero') then
+    return nil
+  end
+  local wide = false
+  for index, block in ipairs(div.content) do
+    if block.t == 'Div' and block.classes:includes('atelier-hero-figure') then
+      div.content[index] = block:walk({
+        Image = function(image)
+          if is_wide(image) then
+            wide = true
+            image.classes:insert('atelier-wide-image')
+            return image
+          end
+        end,
+      })
+    end
+  end
+  if not wide then
+    return nil
+  end
+  div.classes:insert('atelier-wide-figure')
+  return div
+end
+
 return {
-  { Meta = publish_options, CodeBlock = copy_line_spec },
+  { Meta = publish_options, CodeBlock = copy_line_spec, Div = mark_wide_hero },
 }
