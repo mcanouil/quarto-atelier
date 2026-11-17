@@ -187,6 +187,41 @@ local function brand_bootstrap_defaults(scheme)
   return defaults and defaults.bootstrap and defaults.bootstrap.defaults or {}
 end
 
+--- The relative luminance of a hex colour, as WCAG defines it.
+--- @param colour string A colour such as `#101216` or `#fff`
+--- @return number|nil The luminance, or nil when the colour is not in hex
+local function luminance(colour)
+  local hex = colour:match('^#(%x+)$')
+  if hex ~= nil and #hex == 3 then
+    hex = hex:gsub('.', '%0%0')
+  end
+  if hex == nil or #hex ~= 6 then
+    return nil
+  end
+  local channels = {}
+  for index = 1, 3 do
+    local value = tonumber(hex:sub(index * 2 - 1, index * 2), 16) / 255
+    channels[index] = value <= 0.04045 and value / 12.92 or ((value + 0.055) / 1.055) ^ 2.4
+  end
+  return 0.2126 * channels[1] + 0.7152 * channels[2] + 0.0722 * channels[3]
+end
+
+--- Tell whether the dark bundle keeps a `body-bg` value.
+--- `html/dark.scss` replaces a light-toned value with the Atelier dark page
+--- colour, using the `tone()` test of Quarto: a colour is light when its
+--- contrast with white is under 3.1 and less than its contrast with black.
+--- @param colour string The `body-bg` value
+--- @return boolean
+local function kept_in_dark(colour)
+  local value = luminance(colour)
+  if value == nil then
+    return false
+  end
+  local with_white = 1.05 / (value + 0.05)
+  local with_black = (value + 0.05) / 0.05
+  return not (with_white < 3.1 and with_black > with_white)
+end
+
 --- The page background that the brand defaults give for one colour scheme.
 --- A `body-bg` value wins, as it does in Sass. Otherwise a preset that paints
 --- the page gives its own background.
@@ -195,7 +230,7 @@ end
 local function brand_defaults_background(scheme)
   local defaults = brand_bootstrap_defaults(scheme)
   local body_bg = str.to_string(defaults['body-bg'])
-  if body_bg ~= nil then
+  if body_bg ~= nil and (scheme == 'light' or kept_in_dark(body_bg)) then
     return body_bg
   end
   local preset = PRESET_BACKGROUNDS[str.to_string(defaults['atelier-preset']) or '']
