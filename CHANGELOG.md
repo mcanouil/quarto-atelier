@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- fix: The `terminal` and `quarto` presets, and a brand `body-bg` default, now set the `theme-color` tag of each colour scheme, so the browser bar matches the page.
+- fix: The `theme-color` tag of each colour scheme now matches the background that the page is painted with, including the `terminal` and `quarto` presets, a brand `body-bg` default, and the Atelier dark page.
 
 ## 0.12.0 (2026-11-16)
 

@@ -222,27 +222,46 @@ local function kept_in_dark(colour)
   return not (with_white < 3.1 and with_black > with_white)
 end
 
---- The page background that the brand defaults give for one colour scheme.
---- A `body-bg` value wins, as it does in Sass. Otherwise a preset that paints
---- the page gives its own background.
+--- The page colour of the dark bundle when the brand and the preset give
+--- none, or only a light one. Keep in step with `$_atelier-dark-bg` in
+--- `html/chrome.scss`.
+--- @type string
+local ATELIER_DARK_BACKGROUND = '#1b242e'
+
+--- The presets that pin the page to the dark bundle in both schemes.
+--- @type table<string, boolean>
+local DARK_PINNED_PRESETS = {
+  terminal = true,
+}
+
+--- The page background that the theme bundle of one scheme is painted with.
+--- This follows the order of the Sass layers: the brand background, then the
+--- brand `body-bg` default, then the background of the preset. The dark
+--- bundle replaces a missing or light-toned value with the Atelier dark page
+--- colour, as `html/dark.scss` does.
 --- @param scheme string The colour scheme, `light` or `dark`
---- @return string|nil The colour, or nil when the defaults set none
-local function brand_defaults_background(scheme)
-  local defaults = brand_bootstrap_defaults(scheme)
-  local body_bg = str.to_string(defaults['body-bg'])
-  if body_bg ~= nil and (scheme == 'light' or kept_in_dark(body_bg)) then
-    return body_bg
+--- @return string|nil The colour, or nil when the light bundle has none
+local function painted_background(scheme)
+  local background
+  if quarto.brand.has_mode(scheme) then
+    background = str.to_string(quarto.brand.get_color_css(scheme, BRAND_BACKGROUND_COLOUR))
   end
-  local preset = PRESET_BACKGROUNDS[str.to_string(defaults['atelier-preset']) or '']
-  return preset and preset[scheme]
+  local defaults = brand_bootstrap_defaults(scheme)
+  background = background or str.to_string(defaults['body-bg'])
+  if background == nil then
+    local preset = PRESET_BACKGROUNDS[str.to_string(defaults['atelier-preset']) or '']
+    background = preset and preset[scheme]
+  end
+  if scheme == 'dark' and (background == nil or not kept_in_dark(background)) then
+    return ATELIER_DARK_BACKGROUND
+  end
+  return background
 end
 
 --- The browser UI tint for one colour scheme.
---- Falls back to the brand background of that mode, which is the colour Quarto
---- compiles into `$body-bg` for the matching theme bundle, and so the colour
---- the page is actually painted with. Without a brand background, the brand
---- `body-bg` default or the background of its preset is used. A configured
---- value wins per scheme.
+--- A configured value wins per scheme. Otherwise the tint is the background
+--- that the page of that scheme is painted with. A preset that pins the page
+--- dark paints both schemes with the dark bundle.
 --- @param config table|nil The `extensions.atelier` configuration table
 --- @param scheme string The colour scheme, `light` or `dark`
 --- @return string|nil The colour, or nil when no source supplies one
@@ -252,13 +271,11 @@ local function theme_colour(config, scheme)
   if not str.is_empty(configured) then
     return configured
   end
-  if quarto.brand.has_mode(scheme) then
-    local background = quarto.brand.get_color_css(scheme, BRAND_BACKGROUND_COLOUR)
-    if not str.is_empty(background) then
-      return background
-    end
+  local preset = str.to_string(brand_bootstrap_defaults(scheme)['atelier-preset'])
+  if DARK_PINNED_PRESETS[preset or ''] then
+    return painted_background('dark')
   end
-  return brand_defaults_background(scheme)
+  return painted_background(scheme)
 end
 
 --- Collect the `theme-color` tags for the page.
