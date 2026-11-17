@@ -103,31 +103,38 @@ contributes:
         sidebar-width: 300px
         body-width: 1000px
         margin-width: 300px
-      # The embedded extensions under `_extensions/mcanouil/` are named here,
-      # and Quarto resolves each name to the filters or shortcodes of the
-      # embedded copy. A project resolves the names in its own `filters` list
-      # against its own `_extensions/` only. A project that keeps its own copy
-      # of one of these extensions and names it there runs both copies, and its
-      # own shortcodes replace the embedded ones.
+      # Each embedded extension under `_extensions/mcanouil/` runs through a
+      # wrapper in `bundled/`, at the stage that its own manifest sets. A
+      # wrapper does nothing when the project has its own copy of the same
+      # extension under `_extensions/`, with any owner, so a project that names
+      # its copy in `filters` runs that copy only. Its own shortcodes replace
+      # the embedded ones.
       shortcodes:
         - iconify
       filters:
         - atelier-chrome.lua
         - atelier-workshop.lua
         - social-metadata.lua
-        - iconify
-        - code-window
-        - gitlink
-        - toc-depth
-        - mobile-toc
-        - collapse-output
-        - prism
-        - div-reuse
-        - highlight-text
-        - offset-headings
-        - preview-colour
-        - remember
-        - veil
+        - bundled/iconify.lua
+        - path: bundled/code-window.lua
+          at: pre-quarto
+        - path: bundled/gitlink.lua
+          at: post-quarto
+        - bundled/toc-depth.lua
+        - bundled/mobile-toc.lua
+        - bundled/collapse-output.lua
+        - path: bundled/prism.lua
+          at: pre-ast
+        - path: bundled/div-reuse.lua
+          at: post-quarto
+        - bundled/highlight-text.lua
+        - path: bundled/offset-headings.lua
+          at: pre-ast
+        - path: bundled/preview-colour.lua
+          at: post-quarto
+        - bundled/remember.lua
+        - path: bundled/veil.lua
+          at: pre-quarto
       # Each embedded extension keeps its own defaults, set per site under
       # `extensions:`, with these exceptions. gitlink shows its repository
       # widget, but does not rewrite references in prose. The widget shows only
