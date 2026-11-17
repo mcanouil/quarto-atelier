@@ -55,6 +55,16 @@ BROWSER_CANDIDATES = (
 )
 
 
+class _Server(http.server.ThreadingHTTPServer):
+    """Threading server whose backlog holds a page's burst of stylesheet requests.
+
+    With the default backlog of 5, some requests are dropped, those stylesheets
+    never load, and the page never reaches the colour scheme it was asked for.
+    """
+
+    request_queue_size = 128
+
+
 class _Handler(http.server.SimpleHTTPRequestHandler):
     """Static handler that maps the deployed sub-path to the build folder."""
 
@@ -91,7 +101,7 @@ def build_demos(output_dir: Path) -> None:
 def capture(output_dir: Path, browser: str) -> None:
     """Serve the build folder and write one screenshot per demo and scheme."""
     handler = functools.partial(_Handler, directory=str(output_dir))
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    server = _Server(("127.0.0.1", 0), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     port = server.server_address[1]
     OUTPUT.mkdir(parents=True, exist_ok=True)
