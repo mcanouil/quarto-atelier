@@ -7,10 +7,14 @@ Atelier has two modes and two layouts.
 Each section below shows one combination in the light and the dark colour scheme.
 Each section also gives the YAML that you write in `_quarto.yml` to get it, and a link to a live demo.
 The demos are real sites that you can click through.
+Each block shows only the keys that set the layout and the mode, on top of `project.type: atelier`.
+The template link under each block gives the full configuration.
 
 ## Workshop mode, sidebar only
 
-This layout has no navbar. The sidebar holds the modules of the course, with their durations and your progress.
+This layout has no navbar.
+The sidebar holds the modules of the course, with their durations and your progress.
+Workshop mode also needs its sidebar named in `extensions.atelier.sidebars`, as [Declare the sidebar](workshop.qmd#declare-the-sidebar) describes.
 
 ::: {layout-ncol=2}
 ![Light](assets/gallery/workshop-sidebar-light.png){fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}
@@ -35,7 +39,9 @@ This demo comes from the [workshop template](https://github.com/mcanouil/quarto-
 
 ## Workshop mode, navbar
 
-This layout keeps a navbar above the workshop chrome. The search is a button in the navbar.
+This layout keeps a navbar above the workshop chrome.
+The search is a button in the navbar.
+Workshop mode also needs its sidebar named in `extensions.atelier.sidebars`, as [Declare the sidebar](workshop.qmd#declare-the-sidebar) describes.
 
 ::: {layout-ncol=2}
 ![Light](assets/gallery/workshop-navbar-light.png){fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}
@@ -63,7 +69,8 @@ This demo comes from the [workshop template](https://github.com/mcanouil/quarto-
 
 ## Documentation mode, navbar
 
-This is the default layout. The navbar holds the top-level pages, and a docked sidebar holds the pages of the section.
+This is the default layout.
+The navbar holds the top-level pages, and a docked sidebar holds the pages of the section.
 
 ::: {layout-ncol=2}
 ![Light](assets/gallery/docs-navbar-light.png){fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the light colour scheme."}
@@ -92,7 +99,8 @@ This demo comes from the [documentation template](https://github.com/mcanouil/qu
 
 ## Documentation mode, sidebar only
 
-This layout has no navbar. The docked sidebar carries the navigation and the search, like a book.
+This layout has no navbar.
+The docked sidebar carries the navigation and the search, like a book.
 
 ::: {layout-ncol=2}
 ![Light](assets/gallery/docs-sidebar-light.png){fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the light colour scheme."}
@@ -106,9 +114,6 @@ website:
   search:
     location: sidebar
     type: textbox
-  sidebar:
-    style: docked
-    search: true
 ```
 
 [Open the live demo](demos/docs-sidebar/index.html){.btn .btn-primary}
@@ -124,6 +129,12 @@ The presets have no live demo.
 
 ### The default preset
 
+::: {layout-ncol=2}
+![Light](assets/gallery/preset-default-light.png){fig-alt="The default preset in the light colour scheme: a pale page with a navbar, a sidebar, a table of contents, and a code block."}
+
+![Dark](assets/gallery/preset-default-dark.png){fig-alt="The default preset in the dark colour scheme: a dark page with a navbar, a sidebar, a table of contents, and a code block."}
+:::
+
 ```{.yaml filename="_brand.yml"}
 defaults:
   bootstrap:
@@ -131,13 +142,13 @@ defaults:
       atelier-preset: default
 ```
 
-::: {layout-ncol=2}
-![Light](assets/gallery/preset-default-light.png){fig-alt="The default preset in the light colour scheme: a pale page with a navbar, a sidebar, a table of contents, and a code block."}
-
-![Dark](assets/gallery/preset-default-dark.png){fig-alt="The default preset in the dark colour scheme: a dark page with a navbar, a sidebar, a table of contents, and a code block."}
-:::
-
 ### The quarto preset
+
+::: {layout-ncol=2}
+![Light](assets/gallery/preset-quarto-light.png){fig-alt="The quarto preset in the light colour scheme: a white page with a navbar, a sidebar, and a code block."}
+
+![Dark](assets/gallery/preset-quarto-dark.png){fig-alt="The quarto preset in the dark colour scheme: a dark page with a navbar, a sidebar, and a code block."}
+:::
 
 ```{.yaml filename="_brand.yml"}
 defaults:
@@ -146,15 +157,11 @@ defaults:
       atelier-preset: quarto
 ```
 
-::: {layout-ncol=2}
-![Light](assets/gallery/preset-quarto-light.png){fig-alt="The quarto preset in the light colour scheme: a white page with a navbar, a sidebar, and a code block."}
-
-![Dark](assets/gallery/preset-quarto-dark.png){fig-alt="The quarto preset in the dark colour scheme: a dark page with a navbar, a sidebar, and a code block."}
-:::
-
 ### The terminal preset
 
 The terminal preset has a dark colour scheme only.
+
+![Dark](assets/gallery/preset-terminal-dark.png){fig-alt="The terminal preset: a near-black page with green accents, a prompt and a cursor in the title, and monospace text."}
 
 ```{.yaml filename="_brand.yml"}
 defaults:
@@ -162,5 +169,3 @@ defaults:
     defaults:
       atelier-preset: terminal
 ```
-
-![Dark](assets/gallery/preset-terminal-dark.png){fig-alt="The terminal preset: a near-black page with green accents, a prompt and a cursor in the title, and monospace text."}
