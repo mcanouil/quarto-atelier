@@ -115,24 +115,24 @@ contributes:
         - atelier-chrome.lua
         - atelier-workshop.lua
         - social-metadata.lua
-        - path: bundled/iconify.lua
+        - bundled/iconify.lua
         - path: bundled/code-window.lua
           at: pre-quarto
         - path: bundled/gitlink.lua
           at: post-quarto
-        - path: bundled/toc-depth.lua
-        - path: bundled/mobile-toc.lua
-        - path: bundled/collapse-output.lua
+        - bundled/toc-depth.lua
+        - bundled/mobile-toc.lua
+        - bundled/collapse-output.lua
         - path: bundled/prism.lua
           at: pre-ast
         - path: bundled/div-reuse.lua
           at: post-quarto
-        - path: bundled/highlight-text.lua
+        - bundled/highlight-text.lua
         - path: bundled/offset-headings.lua
           at: pre-ast
         - path: bundled/preview-colour.lua
           at: post-quarto
-        - path: bundled/remember.lua
+        - bundled/remember.lua
         - path: bundled/veil.lua
           at: pre-quarto
       # Each embedded extension keeps its own defaults, set per site under
