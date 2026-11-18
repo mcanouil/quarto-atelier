@@ -58,6 +58,7 @@ else
 	rm -rf "${output_dir}/demos"
 fi
 
+# The same pattern as the version read in pre-render.sh.
 atelier_version=""
 if [[ -f "${MANIFEST}" ]]; then
 	atelier_version="$(sed -n \
@@ -68,6 +69,12 @@ if [[ -z "${atelier_version}" ]]; then
 	printf '[demos] failed: no version in %s\n' "${MANIFEST}" >&2
 	exit 1
 fi
+
+# The gitlink widget item, as a YAML list item. Each bar indents it.
+WIDGET_ITEM='- href: "#gitlink-widget"
+  text: "GitHub"
+  icon: github'
+WIDGET_ITEM_IN_BAR="      ${WIDGET_ITEM//$'\n'/$'\n'      }"
 
 work_dir="$(mktemp -d)"
 trap 'rm -rf "${work_dir}"' EXIT
@@ -112,30 +119,27 @@ build_demo() {
 	# The widget shows only where a navbar item or a sidebar tool links to
 	# #gitlink-widget, so the item goes in the bar that the demo has. The layout
 	# profile decides before the template.
-	local navbar=true layout_file="${site}/_quarto-layout.yml" widget
-	if [[ -f "${layout_file}" ]] && grep -q '^[[:space:]]*navbar:' "${layout_file}"; then
-		grep -q '^[[:space:]]*navbar:[[:space:]]*false' "${layout_file}" && navbar=false
-	elif grep -q '^[[:space:]]*navbar:[[:space:]]*false' "${site}/_quarto.yml"; then
-		navbar=false
+	local navbar=true navbar_source="${site}/_quarto.yml" widget
+	if [[ -f "${site}/_quarto-layout.yml" ]] &&
+		grep -q '^[[:space:]]*navbar:' "${site}/_quarto-layout.yml"; then
+		navbar_source="${site}/_quarto-layout.yml"
 	fi
+	grep -q '^[[:space:]]*navbar:[[:space:]]*false' "${navbar_source}" && navbar=false
 	if [[ "${navbar}" == true ]]; then
 		widget="  navbar:
     right:
-      - href: \"#gitlink-widget\"
-        text: \"GitHub\"
-        icon: github"
+${WIDGET_ITEM_IN_BAR}"
 	elif [[ -f "${site}/_sidebars.yml" ]]; then
 		# Quarto appends a list from a profile instead of merging it by id, so
 		# the tool goes into the copy of _sidebars.yml, under the first id.
 		widget=""
-		awk '
+		WIDGET_ITEM="${WIDGET_ITEM}" awk '
 			!done && /^[[:space:]]*id:/ {
 				print
 				indent = substr($0, 1, match($0, /[^[:space:]]/) - 1)
 				print indent "tools:"
-				print indent "  - href: \"#gitlink-widget\""
-				print indent "    text: \"GitHub\""
-				print indent "    icon: github"
+				n = split(ENVIRON["WIDGET_ITEM"], lines, "\n")
+				for (i = 1; i <= n; i++) print indent "  " lines[i]
 				done = 1
 				next
 			}
@@ -149,9 +153,7 @@ build_demo() {
 	else
 		widget="  sidebar:
     tools:
-      - href: \"#gitlink-widget\"
-        text: \"GitHub\"
-        icon: github"
+${WIDGET_ITEM_IN_BAR}"
 	fi
 
 	cat >"${site}/_quarto-demo.yml" <<EOF || {
