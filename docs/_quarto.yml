@@ -68,7 +68,6 @@ website:
       style: docked
       search: true
       pinned: true
-      align: center
       collapse-level: 2
       tools:
         - href: "#gitlink-widget"

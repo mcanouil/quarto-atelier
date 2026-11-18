@@ -1142,17 +1142,13 @@ body.docked {
   // selector when its widget is one of the tools.
   .sidebar-title .sidebar-tools-main {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     margin-top: 0.5rem;
   }
 
   // `sidebar.align` reaches the header as a text class, which a flex row does
-  // not follow. Bootstrap has no `text-left`, so the rule above covers the
-  // left-aligned case on its own.
-  .sidebar-header.text-center .sidebar-title .sidebar-tools-main {
-    justify-content: center;
-  }
-
+  // not follow. The header is centred unless `align` is `right`, as in
+  // `html/navigation.scss`.
   .sidebar-header.text-end .sidebar-title .sidebar-tools-main {
     justify-content: flex-end;
   }
