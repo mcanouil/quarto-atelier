@@ -248,10 +248,14 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
   // padding instead, so the tools centre on the column.
   padding-inline: 0;
 
+  // Quarto gives the header `text-left` both when `sidebar.align` is `left`
+  // and when it is not set, so the two cannot be told apart. The header is
+  // centred unless `align` is `right`, which Bootstrap's `text-end` applies.
   .sidebar-header {
     display: grid;
     gap: 0.75rem;
     margin: 0;
+    text-align: center;
     padding: 1rem 0.9rem 0.8rem;
     border-bottom: 1px solid var(--atelier-sidebar-border);
   }
@@ -272,13 +276,6 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
       background: var(--atelier-sidebar-accent-soft);
       color: var(--atelier-sidebar-accent);
     }
-  }
-
-  // Quarto gives the header `text-left` both when `sidebar.align` is `left`
-  // and when it is not set, so the two cannot be told apart. The header is
-  // centred unless `align` is `right`.
-  .sidebar-header.text-left {
-    text-align: center;
   }
 
   .sidebar-header.text-end .atelier-version {
@@ -320,6 +317,13 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     .gitlink-widget {
       order: 0;
     }
+  }
+
+  // `html/scripts/chrome.html` moves the tools out of the header, after the
+  // search field, so the row follows the header class as a later sibling.
+  .sidebar-header.text-end .sidebar-tools-main,
+  .sidebar-header.text-end ~ .sidebar-tools-main {
+    justify-content: flex-end;
   }
 
   .sidebar-menu-container {
