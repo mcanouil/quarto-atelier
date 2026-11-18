@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: The navbar now stays until the page scrolls past it, so it no longer leaves an empty band above the page. (#128)
+
 ## 0.13.0 (2026-11-18)
 
 - fix: The embedded filters of an extension no longer run when your project has its own copy of it and names that copy in `filters`, so only your copy runs. (#119)
