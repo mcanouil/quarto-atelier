@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.13.0 (2026-11-18)
+
 - fix: The embedded filters of an extension no longer run when your project has its own copy of it and names that copy in `filters`, so only your copy runs. (#119)
 - fix: A hero image that is at least 1.5 times as wide as it is high goes below the text, at the full width of the hero, so the text of a social card stays readable. (#120)
 - fix: The `theme-color` tag of each colour scheme now matches the background that the page is painted with, including the `terminal` and `quarto` presets, a brand `body-bg` default, and the Atelier dark page. (#121)
