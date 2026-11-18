@@ -129,6 +129,8 @@ if [[ -n "${VERSION}" ]]; then
 		printf '    version: "%s"\n' "${VERSION}"
 	} >"${DOCS_DIR}/_atelier-version.yml"
 	printf '[pre-render] _extension.yml -> _atelier-version.yml (%s)\n' "${VERSION}"
+else
+	rm -f "${DOCS_DIR}/_atelier-version.yml"
 fi
 
 if [[ ! -f "${ROOT_DIR}/CHANGELOG.md" ]]; then

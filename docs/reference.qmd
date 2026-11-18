@@ -67,6 +67,16 @@ To read the version from `CITATION.cff`:
      - _atelier-version.yml
    ```
 
+   If `_quarto.yml` already has a `metadata-files` list, add `_atelier-version.yml` to this list.
+   Do not add a second `metadata-files` key.
+   The workshop template, for example, already lists `_sidebars.yml`:
+
+   ```{.yaml filename="_quarto.yml"}
+   metadata-files:
+     - _sidebars.yml
+     - _atelier-version.yml
+   ```
+
 2. Write the `pre-render` script, and make it executable with `chmod +x _scripts/pre-render.sh`.
    Quarto runs the script in the project directory.
    The script reads `CITATION.cff` from this directory, or from the directory above it when the site is in a subdirectory such as `docs/`:
