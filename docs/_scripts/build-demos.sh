@@ -26,6 +26,11 @@
 # With ids, it replaces only the folders of those ids.
 # A relative <output-dir> is resolved against docs/.
 #
+# Each demo shows the Atelier version in its version pill, in place of the
+# placeholder version of the template, and the gitlink repository widget. The
+# version is read from the manifest of the extension; set ATELIER_MANIFEST to
+# read another manifest, as the tests do.
+#
 
 set -euo pipefail
 
@@ -34,6 +39,7 @@ DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 ROOT_DIR="$(dirname "${DOCS_DIR}")"
 DEMOS_DIR="${DOCS_DIR}/_demos"
 DEFAULT_IDS="workshop-sidebar workshop-navbar docs-navbar docs-sidebar"
+MANIFEST="${ATELIER_MANIFEST:-${ROOT_DIR}/_extensions/atelier/_extension.yml}"
 
 if [[ $# -lt 1 ]]; then
 	printf 'Usage: %s <output-dir> [<demo-id>...]\n' "$(basename "$0")" >&2
@@ -51,6 +57,24 @@ else
 	read -r -a ids <<<"${ATELIER_DEMO_IDS:-${DEFAULT_IDS}}"
 	rm -rf "${output_dir}/demos"
 fi
+
+# The same pattern as the version read in pre-render.sh.
+atelier_version=""
+if [[ -f "${MANIFEST}" ]]; then
+	atelier_version="$(sed -n \
+		's/^version:[[:space:]]*["'\'']\{0,1\}\([^"'\''[:space:]]*\).*/\1/p' \
+		"${MANIFEST}" | head -n 1)"
+fi
+if [[ -z "${atelier_version}" ]]; then
+	printf '[demos] failed: no version in %s\n' "${MANIFEST}" >&2
+	exit 1
+fi
+
+# The gitlink widget item, as a YAML list item. Each bar indents it.
+WIDGET_ITEM='- href: "#gitlink-widget"
+  text: "GitHub"
+  icon: github'
+WIDGET_ITEM_IN_BAR="      ${WIDGET_ITEM//$'\n'/$'\n'      }"
 
 work_dir="$(mktemp -d)"
 trap 'rm -rf "${work_dir}"' EXIT
@@ -92,17 +116,61 @@ build_demo() {
 		}
 	done
 
+	# The widget shows only where a navbar item or a sidebar tool links to
+	# #gitlink-widget, so the item goes in the bar that the demo has. The layout
+	# profile decides before the template.
+	local navbar=true navbar_source="${site}/_quarto.yml" widget
+	if [[ -f "${site}/_quarto-layout.yml" ]] &&
+		grep -q '^[[:space:]]*navbar:' "${site}/_quarto-layout.yml"; then
+		navbar_source="${site}/_quarto-layout.yml"
+	fi
+	grep -q '^[[:space:]]*navbar:[[:space:]]*false' "${navbar_source}" && navbar=false
+	if [[ "${navbar}" == true ]]; then
+		widget="  navbar:
+    right:
+${WIDGET_ITEM_IN_BAR}"
+	elif [[ -f "${site}/_sidebars.yml" ]]; then
+		# Quarto appends a list from a profile instead of merging it by id, so
+		# the tool goes into the copy of _sidebars.yml, under the first id.
+		widget=""
+		WIDGET_ITEM="${WIDGET_ITEM}" awk '
+			!done && /^[[:space:]]*id:/ {
+				print
+				indent = substr($0, 1, match($0, /[^[:space:]]/) - 1)
+				print indent "tools:"
+				n = split(ENVIRON["WIDGET_ITEM"], lines, "\n")
+				for (i = 1; i <= n; i++) print indent "  " lines[i]
+				done = 1
+				next
+			}
+			{ print }
+			END { exit !done }
+		' "${site}/_sidebars.yml" >"${site}/_sidebars.yml.new" || {
+			printf '[demos] %s failed: no sidebar id in _sidebars.yml\n' "${id}" >&2
+			return 1
+		}
+		mv "${site}/_sidebars.yml.new" "${site}/_sidebars.yml"
+	else
+		widget="  sidebar:
+    tools:
+${WIDGET_ITEM_IN_BAR}"
+	fi
+
 	cat >"${site}/_quarto-demo.yml" <<EOF || {
 website:
   site-url: https://m.canouil.dev/quarto-atelier/demos/${id}/
   repo-url: https://github.com/mcanouil/quarto-atelier
   repo-subdir: templates/${template}
-  announcement:
+${widget:+${widget}
+}  announcement:
     icon: info-circle
     dismissable: false
     type: info
     position: below-navbar
     content: "This is a live demo of Atelier. [Back to the gallery](https://m.canouil.dev/quarto-atelier/gallery.html)."
+extensions:
+  atelier:
+    version: "${atelier_version}"
 EOF
 		printf '[demos] %s failed: cannot write the demo profile\n' "${id}" >&2
 		return 1

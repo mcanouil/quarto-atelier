@@ -42,6 +42,88 @@ extensions:
 
 The anchor is needed because Quarto keeps the `website` block out of the metadata it hands to Lua filters.
 
+### Read the version from a project file
+
+The usual way to show a version is to set `version` in `_quarto.yml` by hand.
+With this method, you must change the value at each release.
+If your release already changes a file that holds the version, the pill can read the version from that file.
+Examples of such files are `CITATION.cff`, `_extension.yml`, `DESCRIPTION`, and `pyproject.toml`.
+
+A `{{{< var >}}}` shortcode cannot set the pill, because the pill reads `extensions.atelier.version` from the metadata of the site.
+Thus, a `pre-render` script writes the version to a metadata file, and `metadata-files` reads this file.
+Quarto reads the project configuration again after the `pre-render` script, so the new value has an effect on the same render.
+
+To read the version from `CITATION.cff`:
+
+1. Add the scripts and the metadata file to `_quarto.yml`:
+
+   ```{.yaml filename="_quarto.yml"}
+   project:
+     type: atelier
+     pre-render: ./_scripts/pre-render.sh
+     post-render: ./_scripts/post-render.sh
+
+   metadata-files:
+     - _atelier-version.yml
+   ```
+
+   If `_quarto.yml` already has a `metadata-files` list, add `_atelier-version.yml` to this list.
+   Do not add a second `metadata-files` key.
+   The workshop template, for example, already lists `_sidebars.yml`:
+
+   ```{.yaml filename="_quarto.yml"}
+   metadata-files:
+     - _sidebars.yml
+     - _atelier-version.yml
+   ```
+
+2. Write the `pre-render` script, and make it executable with `chmod +x _scripts/pre-render.sh`.
+   Quarto runs the script in the project directory.
+   The script reads `CITATION.cff` from this directory, or from the directory above it when the site is in a subdirectory such as `docs/`:
+
+   ```{.bash filename="_scripts/pre-render.sh"}
+   #!/usr/bin/env bash
+   set -euo pipefail
+
+   citation=""
+   for candidate in CITATION.cff ../CITATION.cff; do
+     if [[ -f "${candidate}" ]]; then
+       citation="${candidate}"
+       break
+     fi
+   done
+   if [[ -z "${citation}" ]]; then
+     printf 'No CITATION.cff in the project directory or in its parent\n' >&2
+     exit 1
+   fi
+
+   version="$(sed -n "s/^version:[[:space:]]*[\"']\{0,1\}\([^\"'[:space:]]*\).*/\1/p" "${citation}" | head -n 1)"
+   if [[ -z "${version}" ]]; then
+     printf 'No version in %s\n' "${citation}" >&2
+     exit 1
+   fi
+
+   {
+     printf 'extensions:\n'
+     printf '  atelier:\n'
+     printf '    version: "%s"\n' "${version}"
+   } >_atelier-version.yml
+   ```
+
+3. Write the `post-render` script, which removes the file, and make it executable:
+
+   ```{.bash filename="_scripts/post-render.sh"}
+   #!/usr/bin/env bash
+   set -euo pipefail
+
+   rm -f _atelier-version.yml
+   ```
+
+4. Add `_atelier-version.yml` to `.gitignore`.
+
+Quarto skips a file in `metadata-files` that does not exist.
+Thus, if `_atelier-version.yml` is not there, the render does not fail, and the pages have no pill.
+
 ## Website defaults
 
 The project type sets these under `website`, and any of them can be overridden in your own `_quarto.yml`.
