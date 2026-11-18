@@ -10,6 +10,7 @@
 - fix: Keep the copy button inside the frame of an annotated code block of one line. (#122)
 - fix: Remove the empty band below the code of a `filename` block in a titled callout. (#122)
 - docs: Add a gallery page with screenshots and live demo sites of each layout and mode, and replace the example workshop pages with the workshop demo. (#123)
+- docs: Open the screenshots of the documentation site in a lightbox, with the light and dark screenshot of each layout and preset in one group. (#124)
 
 ## 0.12.0 (2026-11-16)
 

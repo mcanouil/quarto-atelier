@@ -54,7 +54,7 @@ It takes its colours and fonts from your `_brand.yml`, and it has a light and a 
 
 | Light | Dark |
 | --- | --- |
-| ![The default preset in the light colour scheme: a pale page with a navbar, a sidebar, a table of contents, and a code block](assets/gallery/preset-default-light.png) | ![The default preset in the dark colour scheme: a dark page with a navbar, a sidebar, a table of contents, and a code block](assets/gallery/preset-default-dark.png) |
+| ![The default preset in the light colour scheme: a pale page with a navbar, a sidebar, a table of contents, and a code block](assets/gallery/preset-default-light.png){.lightbox group="preset-default"} | ![The default preset in the dark colour scheme: a dark page with a navbar, a sidebar, a table of contents, and a code block](assets/gallery/preset-default-dark.png){.lightbox group="preset-default"} |
 
 : The default preset. {tbl-colwidths="[50,50]"}
 
@@ -76,7 +76,7 @@ It has a light and a dark colour scheme, and it sets only colours and two typefa
 
 | Light | Dark |
 | --- | --- |
-| ![The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a dark code block](assets/gallery/preset-quarto-light.png) | ![The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links](assets/gallery/preset-quarto-dark.png) |
+| ![The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a dark code block](assets/gallery/preset-quarto-light.png){.lightbox group="preset-quarto"} | ![The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links](assets/gallery/preset-quarto-dark.png){.lightbox group="preset-quarto"} |
 
 : The quarto preset. {tbl-colwidths="[50,50]"}
 

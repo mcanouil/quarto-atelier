@@ -64,7 +64,7 @@ Below the `md` breakpoint, the figure goes below the text.
 
 ::: {.atelier-hero-figure}
 
-[![The project logo.](assets/icons/icon-512.png){width="320" height="320"}]{}
+[![The project logo.](assets/icons/icon-512.png){.nolightbox width="320" height="320"}]{}
 
 :::
 
@@ -118,7 +118,7 @@ Without the two attributes, the image stays beside the text.
 
 ::: {.atelier-hero-figure}
 
-[![The social card of Atelier: the project name and a code window with a `_quarto.yml` file.](assets/social/og-image.png){width="600" height="315"}]{}
+[![The social card of Atelier: the project name and a code window with a `_quarto.yml` file.](assets/social/og-image.png){.nolightbox width="600" height="315"}]{}
 
 :::
 
@@ -290,7 +290,7 @@ The gradient does not move.
 
 ::: {.atelier-hero-figure}
 
-[![The project logo.](assets/icons/icon-512.png){width="320" height="320"}]{}
+[![The project logo.](assets/icons/icon-512.png){.nolightbox width="320" height="320"}]{}
 
 :::
 
@@ -389,7 +389,7 @@ One or two sentences that tell the reader what this feature does for them.
 
 ::: {.atelier-feature-figure}
 
-[![A screenshot of the feature.](assets/icons/icon-512.png){width="240" height="240"}]{}
+[![A screenshot of the feature.](assets/icons/icon-512.png){.nolightbox width="240" height="240"}]{}
 
 :::
 
