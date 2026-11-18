@@ -18,8 +18,11 @@
 # profiles. A demo is rendered in a temporary copy of the template, so the
 # templates stay untouched.
 #
-# With no ids, the script builds the ids in ATELIER_DEMO_IDS and first removes
-# all of <output-dir>/demos/, so a demo that was removed leaves no stale folder.
+# With no ids, the script builds the ids in ATELIER_DEMO_IDS when that variable
+# is set, and otherwise the ids in DEFAULT_IDS: workshop-sidebar,
+# workshop-navbar, docs-navbar, and docs-sidebar. The preset demos are built
+# only when you name them. The script first removes all of <output-dir>/demos/,
+# so a demo that was removed leaves no stale folder.
 # With ids, it replaces only the folders of those ids.
 # A relative <output-dir> is resolved against docs/.
 #

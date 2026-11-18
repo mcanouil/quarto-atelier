@@ -23,6 +23,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from playwright.sync_api import Page, Response, sync_playwright
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCRIPT = ROOT / "docs" / "_scripts" / "build-demos.sh"
@@ -130,17 +131,21 @@ def capture(output_dir: Path, browser: str) -> None:
                     )
                     page = context.new_page()
                     failures = watch_failures(page, origin)
-                    page.goto(
-                        f"{origin}{PREFIX}/demos/{demo}/{page_path}",
-                        wait_until="networkidle",
-                    )
-                    page.evaluate("document.fonts.ready")
-                    page.wait_for_function(SCHEME_READY, arg=scheme)
+                    url = f"{origin}{PREFIX}/demos/{demo}/{page_path}"
+                    timeout: PlaywrightTimeoutError | None = None
+                    try:
+                        page.goto(url, wait_until="networkidle")
+                        page.evaluate("document.fonts.ready")
+                        page.wait_for_function(SCHEME_READY, arg=scheme)
+                    except PlaywrightTimeoutError as error:
+                        if not failures:
+                            raise
+                        timeout = error
                     if failures:
                         raise RuntimeError(
                             f"Demo {demo} ({scheme}) failed to load: "
                             + ", ".join(failures)
-                        )
+                        ) from timeout
                     target = OUTPUT / f"{demo}-{scheme}.png"
                     page.screenshot(path=str(target))
                     context.close()
