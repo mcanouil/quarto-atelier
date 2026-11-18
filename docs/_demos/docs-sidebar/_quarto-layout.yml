@@ -1,0 +1,5 @@
+website:
+  navbar: false
+  search:
+    location: sidebar
+    type: textbox

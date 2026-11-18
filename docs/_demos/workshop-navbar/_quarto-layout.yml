@@ -1,0 +1,8 @@
+website:
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Home"
+  search:
+    location: navbar
+    type: overlay

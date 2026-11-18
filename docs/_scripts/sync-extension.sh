@@ -28,7 +28,10 @@ ROOT_DIR="$(dirname "${DOCS_DIR}")"
 # rather than installed from anywhere, and saying so in the path keeps it
 # distinct from the vendored dependencies. It also avoids a collision when the
 # extension is named after its owner.
-TARGET_DIR="${DOCS_DIR}/_extensions/local"
+# An optional first argument names another target folder.
+TARGET_DIR="${1:-${DOCS_DIR}/_extensions/local}"
+TARGET_LABEL="docs/_extensions/local"
+[[ $# -eq 0 ]] || TARGET_LABEL="${TARGET_DIR}"
 
 for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
 	[[ -f "${extension_dir}_extension.yml" ]] || continue
@@ -39,6 +42,6 @@ for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
 	rm -rf "${target}"
 	mkdir -p "${TARGET_DIR}"
 	cp -R "${extension_dir%/}" "${target}"
-	printf '[sync] _extensions/%s -> docs/_extensions/local/%s\n' \
-		"${extension_name}" "${extension_name}"
+	printf '[sync] _extensions/%s -> %s/%s\n' \
+		"${extension_name}" "${TARGET_LABEL}" "${extension_name}"
 done

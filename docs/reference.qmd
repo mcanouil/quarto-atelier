@@ -75,15 +75,7 @@ This site sets `navbar: false` and gives the docked sidebar the navigation and t
 The layout comes from `website.navbar`, and the mode from `extensions.atelier.mode`.
 The table in [The workshop chrome](workshop.qmd#the-workshop-chrome) shows what each layout gives each mode.
 
-::: {layout-ncol=2}
-[![](assets/gallery/workshop-sidebar-light.png){fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}](demos/workshop-sidebar/index.html)
-
-[![](assets/gallery/workshop-navbar-light.png){fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}](demos/workshop-navbar/index.html)
-
-[![](assets/gallery/docs-navbar-light.png){fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the light colour scheme."}](demos/docs-navbar/index.html)
-
-[![](assets/gallery/docs-sidebar-light.png){fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the light colour scheme."}](demos/docs-sidebar/index.html)
-:::
+{{< include _layouts-and-modes-grid.qmd >}}
 
 The [gallery](gallery.qmd) shows each combination in both colour schemes, with the YAML for it.
 Select a picture to open a live demo.

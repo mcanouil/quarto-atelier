@@ -11,9 +11,12 @@
 #
 # Each demo id has a folder in docs/_demos/. Its `source` file names the
 # template (`workshop` or `documentation`) that the demo renders, and every
-# other file is copied over the template: the `_quarto-demo.yml` profile and,
-# for the presets, a `_brand-demo.yml`. A demo is rendered in a temporary copy
-# of the template, so the templates stay untouched.
+# other file is copied over the template: an optional `_quarto-layout.yml`
+# profile with the keys that are unique to the demo and, for the presets, a
+# `_brand-demo.yml`. The keys that every demo shares are written into a
+# generated `_quarto-demo.yml` profile, and the site renders with both
+# profiles. A demo is rendered in a temporary copy of the template, so the
+# templates stay untouched.
 #
 # With no ids, the script builds the ids in ATELIER_DEMO_IDS and first removes
 # all of <output-dir>/demos/, so a demo that was removed leaves no stale folder.
@@ -52,7 +55,7 @@ trap 'rm -rf "${work_dir}"' EXIT
 build_demo() {
 	local id="$1"
 	local demo_dir="${DEMOS_DIR}/${id}"
-	local template site
+	local template site profiles
 
 	if [[ ! -f "${demo_dir}/source" ]]; then
 		printf '[demos] %s failed: %s/source is missing\n' "${id}" "${demo_dir}" >&2
@@ -73,13 +76,10 @@ build_demo() {
 		printf '[demos] %s failed: cannot copy templates/%s\n' "${id}" "${template}" >&2
 		return 1
 	}
-	for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
-		[[ -f "${extension_dir}_extension.yml" ]] || continue
-		cp -R "${extension_dir%/}" "${site}/_extensions/local/$(basename "${extension_dir}")" || {
-			printf '[demos] %s failed: cannot copy %s\n' "${id}" "${extension_dir}" >&2
-			return 1
-		}
-	done
+	"${SCRIPT_DIR}/sync-extension.sh" "${site}/_extensions/local" >/dev/null || {
+		printf '[demos] %s failed: cannot copy the extension\n' "${id}" >&2
+		return 1
+	}
 	for overlay in "${demo_dir}"/*; do
 		[[ "$(basename "${overlay}")" == source ]] && continue
 		cp -R "${overlay}" "${site}" || {
@@ -88,13 +88,31 @@ build_demo() {
 		}
 	done
 
+	cat >"${site}/_quarto-demo.yml" <<EOF || {
+website:
+  site-url: https://m.canouil.dev/quarto-atelier/demos/${id}/
+  repo-url: https://github.com/mcanouil/quarto-atelier
+  repo-subdir: templates/${template}
+  announcement:
+    icon: info-circle
+    dismissable: false
+    type: info
+    position: below-navbar
+    content: "This is a live demo of Atelier. [Back to the gallery](https://m.canouil.dev/quarto-atelier/gallery.html)."
+EOF
+		printf '[demos] %s failed: cannot write the demo profile\n' "${id}" >&2
+		return 1
+	}
+	profiles="demo"
+	[[ -f "${site}/_quarto-layout.yml" ]] && profiles="demo,layout"
+
 	rm -rf "${output_dir}/demos/${id}"
 	mkdir -p "${output_dir}/demos" || {
 		printf '[demos] %s failed: cannot prepare %s/demos\n' "${id}" "${output_dir}" >&2
 		return 1
 	}
 	printf '[demos] Building %s from templates/%s\n' "${id}" "${template}"
-	if ! quarto render "${site}" --profile demo \
+	if ! quarto render "${site}" --profile "${profiles}" \
 		--output-dir "${output_dir}/demos/${id}" >"${work_dir}/${id}.log" 2>&1; then
 		cat "${work_dir}/${id}.log" >&2
 		printf '[demos] %s failed\n' "${id}" >&2

@@ -22,7 +22,7 @@ import threading
 from collections.abc import Sequence
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import Page, Response, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCRIPT = ROOT / "docs" / "_scripts" / "build-demos.sh"
@@ -31,21 +31,18 @@ PREFIX = "/quarto-atelier"
 VIEWPORT = {"width": 1440, "height": 900}
 WORKSHOP_PAGE = "workshop/first-site/index.html"
 DOCS_PAGE = "get-started.html"
+SCHEMES = ("light", "dark")
+DARK_ONLY = {"preset-terminal"}
 DEMOS = {
-    "workshop-sidebar": (WORKSHOP_PAGE, ("light", "dark")),
-    "workshop-navbar": (WORKSHOP_PAGE, ("light", "dark")),
-    "docs-navbar": (DOCS_PAGE, ("light", "dark")),
-    "docs-sidebar": (DOCS_PAGE, ("light", "dark")),
-    "preset-default": (DOCS_PAGE, ("light", "dark")),
-    "preset-quarto": (DOCS_PAGE, ("light", "dark")),
-    "preset-terminal": (DOCS_PAGE, ("dark",)),
+    "workshop-sidebar": WORKSHOP_PAGE,
+    "workshop-navbar": WORKSHOP_PAGE,
+    "docs-navbar": DOCS_PAGE,
+    "docs-sidebar": DOCS_PAGE,
+    "preset-default": DOCS_PAGE,
+    "preset-quarto": DOCS_PAGE,
+    "preset-terminal": DOCS_PAGE,
 }
-SCHEME_READY = """
-scheme => document.body.classList.contains(`quarto-${scheme}`)
-    && [...document.styleSheets].every(sheet => {
-        try { return sheet.cssRules !== null; } catch { return false; }
-    })
-"""
+SCHEME_READY = "scheme => document.body.classList.contains(`quarto-${scheme}`)"
 BROWSER_VARIABLES = ("CHROME_PATH", "QUARTO_CHROMIUM")
 BROWSER_CANDIDATES = (
     "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
@@ -98,35 +95,59 @@ def build_demos(output_dir: Path) -> None:
     subprocess.run([str(BUILD_SCRIPT), str(output_dir), *DEMOS], check=True)
 
 
+def watch_failures(page: Page, origin: str) -> list[str]:
+    """Collect the failed requests and the same-origin error responses of a page."""
+    failures: list[str] = []
+
+    def on_response(response: Response) -> None:
+        if response.status >= 400 and response.url.startswith(origin):
+            failures.append(f"{response.url} (HTTP {response.status})")
+
+    page.on(
+        "requestfailed",
+        lambda request: failures.append(f"{request.url} ({request.failure})"),
+    )
+    page.on("response", on_response)
+    return failures
+
+
 def capture(output_dir: Path, browser: str) -> None:
     """Serve the build folder and write one screenshot per demo and scheme."""
     handler = functools.partial(_Handler, directory=str(output_dir))
     server = _Server(("127.0.0.1", 0), handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     port = server.server_address[1]
+    origin = f"http://127.0.0.1:{port}"
     OUTPUT.mkdir(parents=True, exist_ok=True)
     try:
         with sync_playwright() as playwright:
             chromium = playwright.chromium.launch(executable_path=browser)
-            for demo, (page_path, schemes) in DEMOS.items():
+            for demo, page_path in DEMOS.items():
+                schemes = ("dark",) if demo in DARK_ONLY else SCHEMES
                 for scheme in schemes:
                     context = chromium.new_context(
                         viewport=VIEWPORT, color_scheme=scheme
                     )
                     page = context.new_page()
+                    failures = watch_failures(page, origin)
                     page.goto(
-                        f"http://127.0.0.1:{port}{PREFIX}/demos/{demo}/{page_path}",
+                        f"{origin}{PREFIX}/demos/{demo}/{page_path}",
                         wait_until="networkidle",
                     )
                     page.evaluate("document.fonts.ready")
                     page.wait_for_function(SCHEME_READY, arg=scheme)
+                    if failures:
+                        raise RuntimeError(
+                            f"Demo {demo} ({scheme}) failed to load: "
+                            + ", ".join(failures)
+                        )
                     target = OUTPUT / f"{demo}-{scheme}.png"
                     page.screenshot(path=str(target))
                     context.close()
                     print(f"[gallery] {target.relative_to(ROOT)}")
-            chromium.close()
     finally:
         server.shutdown()
+        server.server_close()
 
 
 def main(argv: Sequence[str] | None = None) -> int:
