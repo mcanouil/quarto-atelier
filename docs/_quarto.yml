@@ -120,6 +120,9 @@ website:
 # without a second stylesheet layered over it.
 brand: _brand.yml
 
+# Screenshots enlarge on click. Decorative images opt out with `.nolightbox`.
+lightbox: auto
+
 # There is no `filters` list: atelier runs the code-window and gitlink filters
 # from its embedded copies. The options below set them up for this site.
 extensions:

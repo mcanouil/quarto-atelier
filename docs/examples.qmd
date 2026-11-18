@@ -8,7 +8,6 @@ author:
 categories: [Atelier, Accessibility]
 license: "CC BY"
 citation: true
-lightbox: true
 ---
 
 Set `project.type: atelier` in your `_quarto.yml`, provide a `_brand.yml`, then author pages as usual.
@@ -217,7 +216,7 @@ Atelier keeps their text readable in both schemes, and names the author email li
 <!-- The alt text below describes the same card as the `og-alt` anchor in `_quarto.yml`.
      Regenerating the card, as `assets/social/README.md` describes, updates both. -->
 
-![](assets/social/og-image.png){.embed-art loading="lazy" title="The site's social card, framed" fig-alt="The quarto-atelier social card: the extension name and the &quot;project&quot; badge over the line &quot;Accessible, brand-driven documentation sites, ready out of the box&quot;, beside a dark code window showing _quarto.yml."}
+![](assets/social/og-image.png){.embed-art .nolightbox loading="lazy" title="The site's social card, framed" fig-alt="The quarto-atelier social card: the extension name and the &quot;project&quot; badge over the line &quot;Accessible, brand-driven documentation sites, ready out of the box&quot;, beside a dark code window showing _quarto.yml."}
 
 The card here is the site's own social card, framed at its own dimensions: the frame carries no shape of its own, so the padding is the same on all four sides whatever it holds.
 Give an `<embed>` a `width` and a `height` to size it, and override the `--atelier-embed-art-*` properties in a project stylesheet to change the fallback or the tilt.
@@ -293,7 +292,7 @@ Secondary text and a folded code block are included to check that they stay read
 A margin note in secondary text.
 :::
 
-![The extension icon, with a caption in secondary text.](assets/icons/icon.svg){width=64 fig-alt="The Atelier extension icon."}
+![The extension icon, with a caption in secondary text.](assets/icons/icon.svg){.nolightbox width=64 fig-alt="The Atelier extension icon."}
 
 ```{.python .code-fold}
 print("A folded code block")

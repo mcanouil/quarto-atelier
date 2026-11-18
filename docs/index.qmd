@@ -61,7 +61,7 @@ Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto
 
 ::: {.atelier-hero-figure}
 
-[![The Atelier mark: a page frame with a pinned navbar.](assets/icons/icon-512.png){width="320" height="320"}]{}
+[![The Atelier mark: a page frame with a pinned navbar.](assets/icons/icon-512.png){.nolightbox width="320" height="320"}]{}
 
 :::
 
@@ -116,7 +116,7 @@ The project type sets `format: atelier-html`, and contributes the theme, the bun
 
 ::: {.atelier-feature-figure}
 
-[![The quarto-atelier social card: the extension name and the "project" badge over the line "Accessible, brand-driven documentation sites, ready out of the box", beside a dark code window showing `_quarto.yml`.](assets/social/og-image.png){width="1200" height="630"}]{}
+[![The quarto-atelier social card: the extension name and the "project" badge over the line "Accessible, brand-driven documentation sites, ready out of the box", beside a dark code window showing `_quarto.yml`.](assets/social/og-image.png){.nolightbox width="1200" height="630"}]{}
 
 :::
 
