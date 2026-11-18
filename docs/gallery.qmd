@@ -17,9 +17,9 @@ The sidebar holds the modules of the course, with their durations and your progr
 Workshop mode also needs its sidebar named in `extensions.atelier.sidebars`, as [Declare the sidebar](workshop.qmd#declare-the-sidebar) describes.
 
 ::: {layout-ncol=2}
-![Light](assets/gallery/workshop-sidebar-light.png){width="1440" height="900" fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}
+![Light](assets/gallery/workshop-sidebar-light.png){group="workshop-sidebar" width="1440" height="900" fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}
 
-![Dark](assets/gallery/workshop-sidebar-dark.png){width="1440" height="900" fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the dark colour scheme."}
+![Dark](assets/gallery/workshop-sidebar-dark.png){group="workshop-sidebar" width="1440" height="900" fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the dark colour scheme."}
 :::
 
 ```{.yaml filename="_quarto.yml"}
@@ -46,9 +46,9 @@ The search is a button in the navbar.
 Workshop mode also needs its sidebar named in `extensions.atelier.sidebars`, as [Declare the sidebar](workshop.qmd#declare-the-sidebar) describes.
 
 ::: {layout-ncol=2}
-![Light](assets/gallery/workshop-navbar-light.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}
+![Light](assets/gallery/workshop-navbar-light.png){group="workshop-navbar" width="1440" height="900" loading="lazy" fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}
 
-![Dark](assets/gallery/workshop-navbar-dark.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the dark colour scheme."}
+![Dark](assets/gallery/workshop-navbar-dark.png){group="workshop-navbar" width="1440" height="900" loading="lazy" fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the dark colour scheme."}
 :::
 
 ```{.yaml filename="_quarto.yml"}
@@ -77,9 +77,9 @@ This is the default layout.
 The navbar holds the top-level pages, and a docked sidebar holds the pages of the section.
 
 ::: {layout-ncol=2}
-![Light](assets/gallery/docs-navbar-light.png){width="1440" height="900" loading="lazy" fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the light colour scheme."}
+![Light](assets/gallery/docs-navbar-light.png){group="docs-navbar" width="1440" height="900" loading="lazy" fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the light colour scheme."}
 
-![Dark](assets/gallery/docs-navbar-dark.png){width="1440" height="900" loading="lazy" fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the dark colour scheme."}
+![Dark](assets/gallery/docs-navbar-dark.png){group="docs-navbar" width="1440" height="900" loading="lazy" fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the dark colour scheme."}
 :::
 
 ```{.yaml filename="_quarto.yml"}
@@ -107,9 +107,9 @@ This layout has no navbar.
 The docked sidebar carries the navigation and the search, like a book.
 
 ::: {layout-ncol=2}
-![Light](assets/gallery/docs-sidebar-light.png){width="1440" height="900" loading="lazy" fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the light colour scheme."}
+![Light](assets/gallery/docs-sidebar-light.png){group="docs-sidebar" width="1440" height="900" loading="lazy" fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the light colour scheme."}
 
-![Dark](assets/gallery/docs-sidebar-dark.png){width="1440" height="900" loading="lazy" fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the dark colour scheme."}
+![Dark](assets/gallery/docs-sidebar-dark.png){group="docs-sidebar" width="1440" height="900" loading="lazy" fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the dark colour scheme."}
 :::
 
 ```{.yaml filename="_quarto.yml"}
@@ -136,9 +136,9 @@ The presets have no live demo.
 ### The default preset
 
 ::: {layout-ncol=2}
-![Light](assets/gallery/preset-default-light.png){width="1440" height="900" loading="lazy" fig-alt="The default preset in the light colour scheme: a pale page with a navbar, a sidebar, a table of contents, and a code block."}
+![Light](assets/gallery/preset-default-light.png){group="preset-default" width="1440" height="900" loading="lazy" fig-alt="The default preset in the light colour scheme: a pale page with a navbar, a sidebar, a table of contents, and a code block."}
 
-![Dark](assets/gallery/preset-default-dark.png){width="1440" height="900" loading="lazy" fig-alt="The default preset in the dark colour scheme: a dark slate page with a grey navbar and sidebar, a table of contents, and a code block with cyan highlights."}
+![Dark](assets/gallery/preset-default-dark.png){group="preset-default" width="1440" height="900" loading="lazy" fig-alt="The default preset in the dark colour scheme: a dark slate page with a grey navbar and sidebar, a table of contents, and a code block with cyan highlights."}
 :::
 
 ```{.yaml filename="_brand.yml"}
@@ -151,9 +151,9 @@ defaults:
 ### The quarto preset
 
 ::: {layout-ncol=2}
-![Light](assets/gallery/preset-quarto-light.png){width="1440" height="900" loading="lazy" fig-alt="The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a dark code block."}
+![Light](assets/gallery/preset-quarto-light.png){group="preset-quarto" width="1440" height="900" loading="lazy" fig-alt="The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a dark code block."}
 
-![Dark](assets/gallery/preset-quarto-dark.png){width="1440" height="900" loading="lazy" fig-alt="The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links."}
+![Dark](assets/gallery/preset-quarto-dark.png){group="preset-quarto" width="1440" height="900" loading="lazy" fig-alt="The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links."}
 :::
 
 ```{.yaml filename="_brand.yml"}
