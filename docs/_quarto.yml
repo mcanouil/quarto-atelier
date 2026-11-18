@@ -24,6 +24,12 @@ project:
     - assets/icons/*.png
     - assets/social/og-image.png
 
+# Written by _scripts/pre-render.sh from the extension manifest, so the version
+# pill shows the release that rendered the site. Quarto skips a file that is not
+# there, so a render without pre-render still succeeds.
+metadata-files:
+  - _atelier-version.yml
+
 website:
   title: "Atelier"
   description: "An accessible, brand-driven documentation-website project type for Quarto."
