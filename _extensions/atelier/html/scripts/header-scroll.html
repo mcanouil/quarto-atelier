@@ -6,31 +6,30 @@
 	 */
 	// Quarto starts Headroom with no offset, so the fixed header unpins after
 	// 5 px of scroll and slides away. The body keeps its top padding, which
-	// leaves an empty band as tall as the header above the page. While the
-	// page is less than one header height from the top, this script moves the
-	// unpinned header up by the scroll distance, so it leaves with the page.
-	// Upstream: none filed.
-	// Remove when: Quarto unpins the header only after the page scrolls past it.
-	document.addEventListener("DOMContentLoaded", function () {
-		var header = document.querySelector("#quarto-header.headroom");
-		if (!header) return;
-
-		function follow() {
-			var y = window.scrollY;
-			if (header.classList.contains("headroom--unpinned") && y < header.offsetHeight) {
-				header.style.transition = "none";
-				header.style.transform = "translateY(" + -y + "px)";
-			} else {
-				header.style.removeProperty("transition");
-				header.style.removeProperty("transform");
+	// leaves an empty band as tall as the header above the page. Wrap Headroom
+	// to give it the header height as its offset, so that the header unpins
+	// only after the page scrolls past it. Headroom reads the offset object on
+	// each scroll, so the wrapper updates it when the header changes height.
+	// This runs before Quarto makes the header Headroom, on DOMContentLoaded.
+	// Upstream: https://github.com/quarto-dev/quarto-cli/pull/15397
+	// Remove when: the minimum Quarto version includes the fix.
+	(function () {
+		var QuartoHeadroom = window.Headroom;
+		if (typeof QuartoHeadroom !== "function") return;
+		var OffsetHeadroom = function (elem, options) {
+			var headroom = new QuartoHeadroom(
+				elem,
+				Object.assign({}, options, { offset: elem.offsetHeight })
+			);
+			if (window.ResizeObserver) {
+				new ResizeObserver(function () {
+					headroom.offset.up = headroom.offset.down = elem.offsetHeight;
+				}).observe(elem);
 			}
-		}
-
-		window.addEventListener("scroll", follow, { passive: true });
-		new MutationObserver(follow).observe(header, {
-			attributes: true,
-			attributeFilter: ["class"],
-		});
-		follow();
-	});
+			return headroom;
+		};
+		Object.assign(OffsetHeadroom, QuartoHeadroom);
+		OffsetHeadroom.prototype = QuartoHeadroom.prototype;
+		window.Headroom = OffsetHeadroom;
+	})();
 </script>
