@@ -3,7 +3,7 @@
 ## Unreleased
 
 - feat: Show the version as a pill in the sidebar of a site with no navbar, as in the navbar, and centre the title and the version at the top of the sidebar.
-  Set `sidebar.align: right` to align them to the right.
+  Set `sidebar.align: right` to align them to the right. (#129)
 
 ## 0.13.0 (2026-11-18)
 
