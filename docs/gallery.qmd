@@ -31,6 +31,8 @@ website:
   search:
     location: sidebar
     type: textbox
+  sidebar:
+    style: docked
 ```
 
 [Open the live demo](demos/workshop-sidebar/index.html){.btn .btn-primary}
@@ -61,6 +63,8 @@ website:
   search:
     location: navbar
     type: overlay
+  sidebar:
+    style: docked
 ```
 
 [Open the live demo](demos/workshop-navbar/index.html){.btn .btn-primary}
@@ -114,6 +118,8 @@ website:
   search:
     location: sidebar
     type: textbox
+  sidebar:
+    style: docked
 ```
 
 [Open the live demo](demos/docs-sidebar/index.html){.btn .btn-primary}
