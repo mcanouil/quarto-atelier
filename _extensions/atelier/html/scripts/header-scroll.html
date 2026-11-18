@@ -1,0 +1,36 @@
+<script id="header-scroll" type="text/javascript">
+	/**
+	 * @license MIT
+	 * @copyright 2026 Mickaël Canouil
+	 * @author Mickaël Canouil
+	 */
+	// Quarto starts Headroom with no offset, so the fixed header unpins after
+	// 5 px of scroll and slides away. The body keeps its top padding, which
+	// leaves an empty band as tall as the header above the page. While the
+	// page is less than one header height from the top, this script moves the
+	// unpinned header up by the scroll distance, so it leaves with the page.
+	// Upstream: none filed.
+	// Remove when: Quarto unpins the header only after the page scrolls past it.
+	document.addEventListener("DOMContentLoaded", function () {
+		var header = document.querySelector("#quarto-header.headroom");
+		if (!header) return;
+
+		function follow() {
+			var y = window.scrollY;
+			if (header.classList.contains("headroom--unpinned") && y < header.offsetHeight) {
+				header.style.transition = "none";
+				header.style.transform = "translateY(" + -y + "px)";
+			} else {
+				header.style.removeProperty("transition");
+				header.style.removeProperty("transform");
+			}
+		}
+
+		window.addEventListener("scroll", follow, { passive: true });
+		new MutationObserver(follow).observe(header, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+		follow();
+	});
+</script>
