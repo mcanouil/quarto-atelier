@@ -11,6 +11,8 @@
 - fix: Remove the empty band below the code of a `filename` block in a titled callout. (#122)
 - docs: Add a gallery page with screenshots and live demo sites of each layout and mode, and replace the example workshop pages with the workshop demo. (#123)
 - docs: Open the screenshots of the documentation site in a lightbox, with the light and dark screenshot of each layout and preset in one group. (#124)
+- fix: A render now warns when your project has its own copy of iconify that `filters` does not name, because the shortcode of your copy then runs with the embedded filter.
+  Name your copy in `filters`.
 
 ## 0.12.0 (2026-11-16)
 

@@ -107,8 +107,9 @@ contributes:
       # wrapper in `bundled/`, at the stage that its own manifest sets. A
       # wrapper does nothing when the project has its own copy of the same
       # extension under `_extensions/`, with any owner, so a project that names
-      # its copy in `filters` runs that copy only. Its own shortcodes replace
-      # the embedded ones.
+      # its copy in `filters` runs that copy only. Quarto always loads the
+      # shortcodes of a copy, so they replace the embedded ones; name the copy
+      # in `filters` too, or the render warns.
       shortcodes:
         - iconify
       filters:
