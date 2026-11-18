@@ -119,9 +119,9 @@ The workshop chrome shows the same course in each layout.
 The layout changes where the bar is.
 
 ::: {layout-ncol=2}
-[![](assets/gallery/workshop-sidebar-light.png){fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}](demos/workshop-sidebar/index.html)
+[![Workshop, sidebar only](assets/gallery/workshop-sidebar-light.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}](demos/workshop-sidebar/index.html)
 
-[![](assets/gallery/workshop-navbar-light.png){fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}](demos/workshop-navbar/index.html)
+[![Workshop, navbar](assets/gallery/workshop-navbar-light.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}](demos/workshop-navbar/index.html)
 :::
 
 Select a picture to open the live demo of the sidebar-only layout or the navbar layout.

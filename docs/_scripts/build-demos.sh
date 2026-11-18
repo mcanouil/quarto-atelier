@@ -85,6 +85,7 @@ build_demo() {
 	}
 	for overlay in "${demo_dir}"/*; do
 		[[ "$(basename "${overlay}")" == source ]] && continue
+		rm -rf "${site:?}/$(basename "${overlay}")"
 		cp -R "${overlay}" "${site}" || {
 			printf '[demos] %s failed: cannot copy %s\n' "${id}" "${overlay}" >&2
 			return 1
