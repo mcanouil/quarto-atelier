@@ -67,15 +67,29 @@ To read the version from `CITATION.cff`:
      - _atelier-version.yml
    ```
 
-2. Write the `pre-render` script, and make it executable with `chmod +x _scripts/pre-render.sh`:
+2. Write the `pre-render` script, and make it executable with `chmod +x _scripts/pre-render.sh`.
+   Quarto runs the script in the project directory.
+   The script reads `CITATION.cff` from this directory, or from the directory above it when the site is in a subdirectory such as `docs/`:
 
    ```{.bash filename="_scripts/pre-render.sh"}
    #!/usr/bin/env bash
    set -euo pipefail
 
-   version="$(sed -n 's/^version:[[:space:]]*"\{0,1\}\([^"[:space:]]*\).*/\1/p' CITATION.cff | head -n 1)"
+   citation=""
+   for candidate in CITATION.cff ../CITATION.cff; do
+     if [[ -f "${candidate}" ]]; then
+       citation="${candidate}"
+       break
+     fi
+   done
+   if [[ -z "${citation}" ]]; then
+     printf 'No CITATION.cff in the project directory or in its parent\n' >&2
+     exit 1
+   fi
+
+   version="$(sed -n "s/^version:[[:space:]]*[\"']\{0,1\}\([^\"'[:space:]]*\).*/\1/p" "${citation}" | head -n 1)"
    if [[ -z "${version}" ]]; then
-     printf 'No version in CITATION.cff\n' >&2
+     printf 'No version in %s\n' "${citation}" >&2
      exit 1
    fi
 
