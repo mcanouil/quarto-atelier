@@ -28,7 +28,7 @@ anchor-sections: false
 ::: {.atelier-actions}
 
 [Get started](#quick-start){.btn .btn-primary .btn-lg}
-[See the examples](examples.qmd){.btn .btn-outline-primary .btn-lg}
+[See the gallery](gallery.qmd){.btn .btn-outline-primary .btn-lg}
 
 :::
 
@@ -62,6 +62,32 @@ Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto
 ::: {.atelier-hero-figure}
 
 [![The Atelier mark: a page frame with a pinned navbar.](assets/icons/icon-512.png){width="320" height="320"}]{}
+
+:::
+
+:::
+
+::: {.atelier-feature}
+
+::: {.atelier-feature-text}
+
+[Layouts and modes]{.atelier-eyebrow}
+
+## Two modes, two layouts
+
+Atelier has a documentation mode and a workshop mode.
+Each mode works with a navbar layout and with a sidebar-only layout.
+
+Workshop mode adds a module stepper, a timer, and progress dots for a course.
+Select a picture to open a live demo of that combination.
+
+See all the combinations in the [gallery](gallery.qmd).
+
+:::
+
+::: {.atelier-feature-figure}
+
+{{< include _layouts-and-modes-grid.qmd >}}
 
 :::
 

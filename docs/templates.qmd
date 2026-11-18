@@ -15,6 +15,10 @@ Each template sets the mode and the layout together, and holds sample pages that
 
 : The starter templates. {.striped .hover tbl-colwidths="[18,18,40,24]"}
 
+Each template has a live demo.
+Open the [documentation demo](demos/docs-navbar/index.html) or the [workshop demo](demos/workshop-sidebar/index.html) to see a rendered site before you install a template.
+The [gallery](gallery.qmd) shows both templates in each layout.
+
 Each mode works with each layout.
 The table below shows what the page shows in each combination.
 

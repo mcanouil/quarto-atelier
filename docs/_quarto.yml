@@ -48,10 +48,8 @@ website:
     location: sidebar
     type: textbox
   # Book-like layout: a docked sidebar carries the navigation and the search,
-  # and there is no navbar. The site has two sidebars. The `docs` sidebar holds
-  # the documentation pages. The `workshop` sidebar holds the example workshop;
-  # its alias is in `extensions.atelier.sidebars` below. The anchors and the
-  # alias stay in this file. The gitlink widget replaces the sidebar tool
+  # and there is no navbar. The `docs` sidebar holds the documentation pages.
+  # Its anchor and its alias stay in this file. The gitlink widget replaces the sidebar tool
   # pointing at #gitlink-widget, and atelier themes the docked sidebar from the
   # same tokens as the navbar it replaces. Render `--profile navbar` for the
   # layout with the navbar instead; see _quarto-navbar.yml.
@@ -76,6 +74,8 @@ website:
       contents:
         - href: index.qmd
           text: "Home"
+        - href: gallery.qmd
+          text: "Gallery"
         - href: templates.qmd
           text: "Templates"
         - href: workshop.qmd
@@ -100,25 +100,6 @@ website:
         - text: "---"
         - href: changelog.qmd
           text: "Changelog"
-    - &workshop
-      id: workshop
-      title: "Example workshop"
-      style: docked
-      search: true
-      pinned: true
-      align: center
-      tools:
-        - href: "#gitlink-widget"
-          text: "GitHub"
-          icon: github
-      contents:
-        - section: "Getting started"
-          contents:
-            - workshop-example/index.qmd
-            - workshop-example/setup.qmd
-        - section: "Practice"
-          contents:
-            - workshop-example/practice.qmd
   announcement:
     icon: info-circle
     dismissable: true
@@ -153,7 +134,6 @@ extensions:
     manifest: site.webmanifest
     sidebars:
       - *docs
-      - *workshop
   gitlink:
     # Widget only, as atelier sets it: the platform and repository come from
     # `website.repo-url`, and in-text reference rewriting stays off so prose is

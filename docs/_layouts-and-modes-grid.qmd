@@ -1,0 +1,9 @@
+::: {layout-ncol=2}
+[![Workshop, sidebar only](assets/gallery/workshop-sidebar-light.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}](demos/workshop-sidebar/index.html)
+
+[![Workshop, navbar](assets/gallery/workshop-navbar-light.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}](demos/workshop-navbar/index.html)
+
+[![Documentation, navbar](assets/gallery/docs-navbar-light.png){width="1440" height="900" loading="lazy" fig-alt="A documentation page with a navbar of top-level links, a docked sidebar of pages, the page content, and a table of contents on the right, in the light colour scheme."}](demos/docs-navbar/index.html)
+
+[![Documentation, sidebar only](assets/gallery/docs-sidebar-light.png){width="1440" height="900" loading="lazy" fig-alt="A documentation page with no navbar, a docked sidebar with a search field and grouped pages, the page content, and a table of contents on the right, in the light colour scheme."}](demos/docs-sidebar/index.html)
+:::

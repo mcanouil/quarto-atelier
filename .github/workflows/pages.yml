@@ -13,6 +13,7 @@ on:
     paths:
       - "docs/**"
       - "_extensions/**"
+      - "templates/**"
       - "CHANGELOG.md"
       - ".github/workflows/pages.yml"
   workflow_dispatch:

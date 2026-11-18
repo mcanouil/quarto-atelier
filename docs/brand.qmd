@@ -54,7 +54,7 @@ It takes its colours and fonts from your `_brand.yml`, and it has a light and a 
 
 | Light | Dark |
 | --- | --- |
-| ![The default preset in the light colour scheme: a pale page with a navbar, a sidebar, and a code block](assets/presets/preset-default-light.png) | ![The default preset in the dark colour scheme: a dark page with a navbar, a sidebar, and a code block](assets/presets/preset-default-dark.png) |
+| ![The default preset in the light colour scheme: a pale page with a navbar, a sidebar, a table of contents, and a code block](assets/gallery/preset-default-light.png) | ![The default preset in the dark colour scheme: a dark page with a navbar, a sidebar, a table of contents, and a code block](assets/gallery/preset-default-dark.png) |
 
 : The default preset. {tbl-colwidths="[50,50]"}
 
@@ -76,7 +76,7 @@ It has a light and a dark colour scheme, and it sets only colours and two typefa
 
 | Light | Dark |
 | --- | --- |
-| ![The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a code block](assets/presets/preset-quarto-light.png) | ![The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links](assets/presets/preset-quarto-dark.png) |
+| ![The quarto preset in the light colour scheme: a pale blue page under a filled blue navbar and sidebar, with a dark code block](assets/gallery/preset-quarto-light.png) | ![The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links](assets/gallery/preset-quarto-dark.png) |
 
 : The quarto preset. {tbl-colwidths="[50,50]"}
 
@@ -97,7 +97,7 @@ The preset stays dark, and the reader cannot change it.
   Code blocks have a solid border.
 - Links have a dotted underline.
 
-![The terminal preset: a near-black page with green accents, a prompt in the title, and monospace text](assets/presets/preset-terminal-dark.png)
+![The terminal preset in the dark colour scheme.](assets/gallery/preset-terminal-dark.png){fig-alt="The terminal preset: a near-black page with green accents, a prompt and a cursor in the title, and monospace text"}
 
 To turn the decoration off, set `atelier-terminal-decoration` to `false`.
 This setting has no effect on the other presets.

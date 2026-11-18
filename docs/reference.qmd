@@ -75,6 +75,11 @@ This site sets `navbar: false` and gives the docked sidebar the navigation and t
 The layout comes from `website.navbar`, and the mode from `extensions.atelier.mode`.
 The table in [The workshop chrome](workshop.qmd#the-workshop-chrome) shows what each layout gives each mode.
 
+{{< include _layouts-and-modes-grid.qmd >}}
+
+The [gallery](gallery.qmd) shows each combination in both colour schemes, with the YAML for it.
+Select a picture to open a live demo.
+
 ## Format defaults
 
 The project type sets `format: atelier-html`.

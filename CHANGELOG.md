@@ -9,6 +9,7 @@
   A Code Window, a plain `pre`, and the BibTeX block now use the control border like a highlighted block. (#122)
 - fix: Keep the copy button inside the frame of an annotated code block of one line. (#122)
 - fix: Remove the empty band below the code of a `filename` block in a titled callout. (#122)
+- docs: Add a gallery page with screenshots and live demo sites of each layout and mode, and replace the example workshop pages with the workshop demo. (#123)
 
 ## 0.12.0 (2026-11-16)
 

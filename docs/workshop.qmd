@@ -7,7 +7,7 @@ Workshop mode turns one sidebar of a site into a course.
 Each top-level item of that sidebar is a module.
 The pages in workshop mode get the workshop chrome.
 
-The [example workshop](workshop-example/index.qmd) of this site uses each part that this page describes.
+The [live demo workshop](demos/workshop-sidebar/index.html) uses each part that this page describes.
 The [workshop template](templates.qmd) gives you a workshop site to start from.
 Workshop mode needs Quarto 1.12.1 or later.
 
@@ -25,7 +25,14 @@ extensions:
 ```
 
 The `_metadata.yml` of a folder and the front matter of a page can also set the option.
-This site uses a folder `_metadata.yml` to show its [example workshop](workshop-example/index.qmd) inside the documentation.
+A folder `_metadata.yml` can turn on workshop mode for the pages of one folder, in a site that is otherwise documentation.
+This is an example of such a file:
+
+```{.yaml filename="workshop/_metadata.yml"}
+extensions:
+  atelier:
+    mode: workshop
+```
 
 A page in workshop mode that no sidebar of `extensions.atelier.sidebars` lists, such as `404.qmd`, shows no workshop chrome.
 
@@ -70,7 +77,7 @@ metadata-files:
 
 The `extensions.atelier` options of `_sidebars.yml` merge with the options of `_quarto.yml`.
 A site with more than one sidebar lists each one in `extensions.atelier.sidebars`.
-This site lists its `docs` sidebar and its `workshop` sidebar.
+This site lists only its `docs` sidebar.
 
 The `id` of the sidebar is part of the key that stores the progress of the reader.
 If you change the `id`, each reader starts again with no progress.
@@ -110,6 +117,14 @@ A page with no duration adds nothing to the sums, and it shows no timer.
 
 The workshop chrome shows the same course in each layout.
 The layout changes where the bar is.
+
+::: {layout-ncol=2}
+[![Workshop, sidebar only](assets/gallery/workshop-sidebar-light.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a sidebar of numbered modules and durations, a timer and Previous and Next buttons in a top bar, and a table of contents on the right, in the light colour scheme."}](demos/workshop-sidebar/index.html)
+
+[![Workshop, navbar](assets/gallery/workshop-navbar-light.png){width="1440" height="900" loading="lazy" fig-alt="A workshop page with a navbar and a search button on top, then the module sidebar, the timer bar, and the page content, in the light colour scheme."}](demos/workshop-navbar/index.html)
+:::
+
+Select a picture to open the live demo of the sidebar-only layout or the navbar layout.
 
 | Part              | Sidebar-only layout                                     | Navbar layout                                     |
 | ----------------- | ------------------------------------------------------- | ------------------------------------------------- |
@@ -170,7 +185,7 @@ The default title is "By the end of this module, you can".
 
 The `title` and `duration` attributes are optional.
 With no `duration` attribute, the block shows the duration of the page.
-The [Set up](workshop-example/setup.qmd#goals) page of the example shows this block.
+The [Set up](demos/workshop-sidebar/workshop/setup/index.html#goals) page of the demo shows this block.
 
 ### Exercise
 
@@ -186,7 +201,7 @@ Give the file a title and one paragraph of text.
 :::
 ```
 
-The [Practice](workshop-example/practice.qmd#the-task) page of the example shows this block.
+The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows this block.
 
 ### Solution
 
@@ -207,7 +222,7 @@ Write this in `notes.qmd`.
 Give a solution no `id`.
 A solution with an `id` that starts with `sol-` stays a Quarto cross-reference target, and Atelier does not change it.
 Quarto stops the render on a solution with an `id` that has a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
-The [Practice](workshop-example/practice.qmd#the-task) page of the example shows a solution after the exercise.
+The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows a solution after the exercise.
 
 ### Terminal
 
@@ -237,7 +252,7 @@ For this reason, the copy button copies the commands without the prompt, and scr
 The header shows "Terminal", unless the block has a `filename`.
 The block needs a language class, such as `bash`.
 If it has no language class, Atelier logs a warning and shows the block as a normal code block.
-The [Set up](workshop-example/setup.qmd#check-the-version) page of the example shows a terminal block.
+The [Set up](demos/workshop-sidebar/workshop/setup/index.html#check-your-set-up) page of the demo shows a terminal block.
 
 ## Title block labels
 
@@ -254,7 +269,7 @@ language:
 
 To change one label on one page, set `author-title`, `published-title`, or `modified-title` in the front matter of the page.
 
-The [Practice](workshop-example/practice.qmd) page of the example shows the "Instructors" label.
+The [Your first site](demos/workshop-sidebar/workshop/first-site/index.html) page of the demo shows the "Instructors" label.
 The [Reference](reference.qmd#language-keys) lists the `language` keys of Atelier, which change the text of the workshop chrome.
 
 ## Progress
@@ -262,7 +277,7 @@ The [Reference](reference.qmd#language-keys) lists the `language` keys of Atelie
 The browser keeps the progress of the reader in `localStorage`.
 The progress holds the pages that the reader opened, the headings that the reader read, and the objectives that the reader ticked.
 The key is `atelier:<site path>:<sidebar id>`.
-On this site, the key of the example workshop is `atelier:/quarto-atelier/:workshop`.
+In the live demo, the key is `atelier:/quarto-atelier/demos/workshop-sidebar/:workshop`.
 
 Atelier has no control to reset the progress.
 To start again, the reader removes the site data in the browser settings.
