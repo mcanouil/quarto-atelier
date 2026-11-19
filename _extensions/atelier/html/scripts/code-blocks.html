@@ -91,8 +91,16 @@
 				var language = code && Array.prototype.find.call(code.classList, function (name) {
 					return name !== "sourceCode";
 				});
-				if (!language) {
+				// Quarto gives the class `default` to code that it does not highlight.
+				if (!language || language === "default") {
 					return;
+				}
+				// With auto-filename, Code Window names the window after its language.
+				// The language label replaces that name, so the header shows it once.
+				var name = header.querySelector(":scope > pre");
+				if (codeWindow.classList.contains("code-window-auto") && name &&
+					name.textContent.trim().toLowerCase() === language.toLowerCase()) {
+					name.hidden = true;
 				}
 				var label = document.createElement("span");
 				label.className = "atelier-code-language";
