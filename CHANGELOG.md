@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.14.0 (2026-11-19)
+
 - feat: Show the version as a pill in the sidebar header of a site with no navbar, with the title, the version and the search field centred.
   Set `sidebar.alignment: right` to align them to the right. (#129)
 - fix: The navbar no longer leaves an empty band above the page when it hides on scroll. (#128)
