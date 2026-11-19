@@ -4,6 +4,7 @@
 
 - feat: Show every code block in a code window, with its language once in the title bar.
   Set `extensions.code-window.auto-filename: false` to frame only blocks with a `filename`. (#131)
+- fix: A code window no longer shows `default` as the language of code that Quarto does not highlight. (#131)
 
 ## 0.14.0 (2026-11-19)
 
