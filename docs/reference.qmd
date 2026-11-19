@@ -257,7 +257,7 @@ extensions:
 ```
 
 Code Window shows each code block in a window.
-A block with a `filename` shows the name and the language in its title bar.
+A block with a `filename` shows the name in its title bar, and its language if Quarto highlights it.
 A block with no `filename` shows only the language.
 A block with a class that is not a language, such as `text`, shows that class.
 A block with no class shows no label.
