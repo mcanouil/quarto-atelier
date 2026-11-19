@@ -118,16 +118,14 @@
 			}
 		}
 
-		// The version pill follows the brand in the navbar and the title link in
-		// the sidebar. Without a version, neither is added. A navbar with a logo
-		// has two brand links in one container, so the pill goes once after the
-		// container's last child.
+		// The version pill follows the title link in the sidebar. Without a
+		// version, no pill is added. page-load.html adds the pill of the navbar.
 		if (options.version) {
-			document.querySelectorAll(".navbar-brand-container > :last-child, .sidebar-title > a").forEach(function (brand) {
+			document.querySelectorAll(".sidebar-title > a").forEach(function (title) {
 				var pill = document.createElement("span");
 				pill.className = "atelier-version";
 				pill.textContent = options.version;
-				brand.after(pill);
+				title.after(pill);
 			});
 		}
 
