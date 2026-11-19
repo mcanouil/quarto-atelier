@@ -259,7 +259,8 @@ extensions:
 Code Window shows each code block in a window.
 A block with a `filename` shows the name and the language in its title bar.
 A block with no `filename` shows only the language.
-A block with no language shows no label.
+A block with a class that is not a language, such as `text`, shows that class.
+A block with no class shows no label.
 To show a window only for a block that has a `filename`, set:
 
 ```yaml
