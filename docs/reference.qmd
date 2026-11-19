@@ -401,6 +401,7 @@ language:
 | `atelier-home`                   | `Home`                               | `Accueil`                                   |
 | `atelier-logo-link`              | `{site} — home`                      | `{site} — accueil`                          |
 | `atelier-footnote-back`          | `Back to note {n} in the text`       | `Retour à la note {n} dans le texte`        |
+| `atelier-code-window`            | `Code`                               | `Code`                                      |
 
 : The `language` keys of Atelier and their text in English and in French. {.striped .hover tbl-colwidths="[34,33,33]"}
 

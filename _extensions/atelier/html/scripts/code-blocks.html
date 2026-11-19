@@ -5,6 +5,8 @@
 -->
 <script id="atelier-code-blocks" type="text/javascript">
 	(function () {
+		var labels = (window.atelierOptions || {}).labels || {};
+
 		// Quarto documents line highlighting for Reveal.js only, so the filter
 		// copies the line spec of `code-window-lines` or `code-line-numbers` to
 		// `data-atelier-highlight`.
@@ -99,12 +101,16 @@
 				// With auto-filename, Code Window names the window after its language,
 				// or `default` when it has none. The language label replaces that
 				// name, so the header shows the language once, or no name at all.
-				if (codeWindow.classList.contains("code-window-auto")) {
-					var windowName = header.querySelector(":scope > pre");
-					var shownName = windowName && windowName.textContent.trim().toLowerCase();
-					if (shownName === "default" || (language && shownName === language.toLowerCase())) {
-						windowName.hidden = true;
-					}
+				var windowName = codeWindow.classList.contains("code-window-auto") &&
+					header.querySelector(":scope > pre");
+				var shownName = windowName && windowName.textContent.trim().toLowerCase();
+				var unnamed = shownName === "default";
+				if (unnamed || (language && shownName === language.toLowerCase())) {
+					windowName.hidden = true;
+				}
+				// A collapsible window toggles from its header, which needs a name.
+				if (unnamed && header.tagName === "SUMMARY" && labels["code-window"]) {
+					header.setAttribute("aria-label", labels["code-window"]);
 				}
 				if (!language) {
 					return;
