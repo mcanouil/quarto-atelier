@@ -91,16 +91,23 @@
 				var language = code && Array.prototype.find.call(code.classList, function (name) {
 					return name !== "sourceCode";
 				});
-				// Quarto gives the class `default` to code that it does not highlight.
-				if (!language || language === "default") {
-					return;
+				// Code that is not highlighted has the class `default`, which is not
+				// a language.
+				if (language === "default") {
+					language = null;
 				}
-				// With auto-filename, Code Window names the window after its language.
-				// The language label replaces that name, so the header shows it once.
-				var name = header.querySelector(":scope > pre");
-				if (codeWindow.classList.contains("code-window-auto") && name &&
-					name.textContent.trim().toLowerCase() === language.toLowerCase()) {
-					name.hidden = true;
+				// With auto-filename, Code Window names the window after its language,
+				// or `default` when it has none. The language label replaces that
+				// name, so the header shows the language once, or no name at all.
+				if (codeWindow.classList.contains("code-window-auto")) {
+					var windowName = header.querySelector(":scope > pre");
+					var shownName = windowName && windowName.textContent.trim().toLowerCase();
+					if (shownName === "default" || (language && shownName === language.toLowerCase())) {
+						windowName.hidden = true;
+					}
+				}
+				if (!language) {
+					return;
 				}
 				var label = document.createElement("span");
 				label.className = "atelier-code-language";

@@ -256,9 +256,10 @@ extensions:
     enabled: true
 ```
 
-Code Window shows each block that has a language in a window.
+Code Window shows each code block in a window.
 A block with a `filename` shows the name and the language in its title bar.
 A block with no `filename` shows only the language.
+A block with no language shows no label.
 To show a window only for a block that has a `filename`, set:
 
 ```yaml
