@@ -3,7 +3,7 @@
 ## Unreleased
 
 - feat: Show every code block that has a language in a code window, with the language once in its title bar.
-  Set `extensions.code-window.auto-filename: false` to frame only blocks with a `filename`.
+  Set `extensions.code-window.auto-filename: false` to frame only blocks with a `filename`. (#131)
 
 ## 0.14.0 (2026-11-19)
 
