@@ -230,7 +230,7 @@ They also draw the dismiss control of the announcement bar so that the keyboard 
 | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------- |
 | [iconify](https://github.com/mcanouil/quarto-iconify)                 | Adds the `{{{< iconify >}}}` shortcode, for icons from the Iconify sets.                             | `extensions.iconify`         |
 | [gitlink](https://github.com/mcanouil/quarto-gitlink)                 | Shows a repository widget in place of a navbar item or sidebar tool with the href `#gitlink-widget`. | `extensions.gitlink`         |
-| [code-window](https://github.com/mcanouil/quarto-code-window)         | Shows a code block that has a `filename` in a window frame with a title bar.                         | `extensions.code-window`     |
+| [code-window](https://github.com/mcanouil/quarto-code-window)         | Shows a code block in a window frame with a title bar.                                               | `extensions.code-window`     |
 | [toc-depth](https://github.com/mcanouil/quarto-toc-depth)             | Sets the table of contents depth below a heading, with the `toc-depth` attribute.                    | `extensions.toc-depth`       |
 | [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc)           | Shows the table of contents in a bottom sheet on narrow screens, opened from a pill.                 | none                         |
 | [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option.                         | `extensions.collapse-output` |
@@ -245,18 +245,26 @@ They also draw the dismiss control of the announcement bar so that the keyboard 
 : Extensions that Atelier contains. {.striped .hover tbl-colwidths="[22,56,22]"}
 
 Each extension keeps its own defaults, and its repository lists its options.
-Atelier changes three defaults.
+Atelier changes two defaults.
 gitlink shows only its widget, and does not change the references in your text.
-Code Window shows a window only for a block that has a `filename`, and does not make a label from the language of the other blocks.
 remember does not offer to resume on the home page (`index.qmd`) or the 404 page (`404.qmd`).
-To turn reference rewriting on, or to give every block a window, set:
+To turn reference rewriting on, set:
 
 ```yaml
 extensions:
   gitlink:
     enabled: true
+```
+
+Code Window shows each block that has a language in a window.
+A block with a `filename` shows the name and the language in its title bar.
+A block with no `filename` shows only the language.
+To show a window only for a block that has a `filename`, set:
+
+```yaml
+extensions:
   code-window:
-    auto-filename: true
+    auto-filename: false
 ```
 
 Quarto adds a `page-exclude` list of your site to the list of Atelier.
