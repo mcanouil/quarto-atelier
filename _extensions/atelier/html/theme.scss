@@ -1133,30 +1133,6 @@ body.docked {
     color: var(--atelier-sidebar-accent);
   }
 
-  // Quarto renders the sidebar tools inside `.sidebar-title` whenever the
-  // sidebar has a title and the project has no navbar, as an inline-flex
-  // pulled up 6px, which lands the colour-scheme toggle on the title's line.
-  // A block-level flex row breaks it onto its own line, which the document
-  // order then places above the search field. Nothing here is forced: the
-  // gitlink extension stacks the same container into a column from an id
-  // selector when its widget is one of the tools.
-  .sidebar-title .sidebar-tools-main {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 0.5rem;
-  }
-
-  // `sidebar.align` reaches the header as a text class, which a flex row does
-  // not follow. Bootstrap has no `text-left`, so the rule above covers the
-  // left-aligned case on its own.
-  .sidebar-header.text-center .sidebar-title .sidebar-tools-main {
-    justify-content: center;
-  }
-
-  .sidebar-header.text-end .sidebar-title .sidebar-tools-main {
-    justify-content: flex-end;
-  }
-
   // Quarto dims the sidebar tools to 0.7, which on the dark column drops the
   // colour-scheme toggle and the repo links below the contrast floor.
   .sidebar-navigation .quarto-navigation-tool {

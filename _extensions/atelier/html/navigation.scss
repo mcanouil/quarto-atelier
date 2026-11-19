@@ -248,10 +248,14 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
   // padding instead, so the tools centre on the column.
   padding-inline: 0;
 
+  // Quarto gives the header `text-left` both when `sidebar.alignment` is `left`
+  // and when it is not set, so the two cannot be told apart. The header is
+  // centred unless `alignment` is `right`, which Bootstrap's `text-end` applies.
   .sidebar-header {
     display: grid;
     gap: 0.75rem;
     margin: 0;
+    text-align: center;
     padding: 1rem 0.9rem 0.8rem;
     border-bottom: 1px solid var(--atelier-sidebar-border);
   }
@@ -263,15 +267,26 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
       font-weight: 650;
     }
 
-    // The version is a plain line under the title, not the navbar pill.
+    // The version is the navbar pill on the sidebar tokens, on its own line
+    // under the title.
     .atelier-version {
-      display: block;
-      margin: 0.2rem 0 0;
-      padding: 0;
-      background: none;
-      color: var(--atelier-sidebar-muted);
-      font-size: 0.72rem;
+      display: flex;
+      width: fit-content;
+      margin: 0.4rem auto 0;
+      background: var(--atelier-sidebar-accent-soft);
+      color: var(--atelier-sidebar-accent);
     }
+  }
+
+  .sidebar-header.text-end .atelier-version {
+    margin-inline: auto 0;
+  }
+
+  // Quarto pads every child of the sidebar 1em on the right. The wrapper of the
+  // search field is the one child without its own padding here, so it drops
+  // that padding, and the field centres on the column.
+  > :has(> .sidebar-search) {
+    padding-inline: 0;
   }
 
   .sidebar-search {
@@ -309,6 +324,19 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     .gitlink-widget {
       order: 0;
     }
+  }
+
+  // Without a search field the tools stay in the header, which already has
+  // the side padding.
+  .sidebar-header .sidebar-tools-main {
+    padding-inline: 0;
+  }
+
+  // `html/scripts/chrome.html` moves the tools out of the header, after the
+  // search field, so the row follows the header class as a later sibling.
+  .sidebar-header.text-end .sidebar-tools-main,
+  .sidebar-header.text-end ~ .sidebar-tools-main {
+    justify-content: flex-end;
   }
 
   .sidebar-menu-container {

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- feat: Show the version as a pill in the sidebar of a site with no navbar, and centre the title, the version and the search field at the top of the sidebar.
+  Set `sidebar.alignment: right` to align them to the right. (#129)
+
 ## 0.13.0 (2026-11-18)
 
 - fix: The embedded filters of an extension no longer run when your project has its own copy of it and names that copy in `filters`, so only your copy runs. (#119)
