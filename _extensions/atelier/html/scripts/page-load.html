@@ -8,45 +8,52 @@
 	// written it, before the browser paints the page. A mutation observer
 	// callback runs before the next paint, so each change is in the first paint.
 	// A change that comes later makes the header taller, and the content moves.
+	// A page with no #quarto-content gets the same changes on DOMContentLoaded.
 	(function () {
-		if (!window.MutationObserver) return;
+		function pageOf(path) {
+			return path.replace(/index\.html$/, "");
+		}
 
 		// Quarto marks the first navbar link whose page is also in the sidebar.
 		// With one sidebar that holds every page, that link is "Home" on every
-		// page. A link to the current page is a better mark, so the mark moves
-		// to that link. A page that no navbar link opens keeps the mark of Quarto.
+		// page. The mark moves to the link of the current page, with
+		// aria-current="page". A page that no navbar link opens keeps the mark
+		// of Quarto, with aria-current="true", because that tab is a section and
+		// not the page. The sidebar link is handled in a11y-fixes.html.
 		// Upstream: none filed (WCAG 2.4.8)
-		// Remove when: Quarto marks the navbar link of the current page first.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190 (aria-current)
+		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
+		// Remove when: the minimum Quarto version includes both fixes.
 		function markCurrentTab() {
-			var here = location.pathname.replace(/index\.html$/, "");
-			var links = document.querySelectorAll(".navbar .nav-link[href]");
-			var current = Array.prototype.find.call(links, function (link) {
-				var target = new URL(link.href, location.href);
-				return (
-					target.origin === location.origin &&
-					target.hash === "" &&
-					target.pathname.replace(/index\.html$/, "") === here
-				);
+			var here = pageOf(location.pathname);
+			var links = Array.prototype.slice.call(document.querySelectorAll(".navbar .nav-link[href]"));
+			var current = links.find(function (link) {
+				return link.origin === location.origin && link.hash === "" && pageOf(link.pathname) === here;
 			});
-			if (!current || current.classList.contains("active")) return;
 			links.forEach(function (link) {
-				if (!link.classList.contains("active")) return;
-				link.classList.remove("active");
-				link.removeAttribute("aria-current");
+				if (current && link !== current) {
+					link.classList.remove("active");
+					link.removeAttribute("aria-current");
+				} else if (link.classList.contains("active")) {
+					link.setAttribute("aria-current", current ? "page" : "true");
+				}
 			});
-			current.classList.add("active");
-			current.setAttribute("aria-current", "page");
+			if (current) {
+				current.classList.add("active");
+				current.setAttribute("aria-current", "page");
+			}
 		}
 
 		// The version pill follows the brand in the navbar. A navbar with a logo
 		// has two brand links in one container, so the pill goes once after the
-		// last child of the container. chrome.html adds the pill of the sidebar.
-		function addVersionPill(options) {
+		// last child of the container. chrome.html adds the pill of the sidebar,
+		// because the parser has not written the sidebar when this script runs.
+		function addVersionPill(version) {
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
-			if (!options.version || !brand) return;
+			if (!version || !brand) return;
 			var pill = document.createElement("span");
 			pill.className = "atelier-version";
-			pill.textContent = options.version;
+			pill.textContent = version;
 			brand.after(pill);
 		}
 
@@ -74,23 +81,25 @@
 		// is 64px, which is less than the two rows of the Atelier header. Thus
 		// the content moves down after the first paint. This function sets the
 		// bar and the padding first, with the values that Quarto gives them later.
-		// If the browser blocks the storage, the bar stays as Quarto leaves it.
 		// Upstream: none filed
 		// Remove when: Quarto shows the bar and sets the padding before the first paint.
-		function settleHeader() {
-			var bar = document.getElementById("quarto-announcement");
-			if (bar && bar.classList.contains("hidden")) {
-				try {
-					var key = "quarto-announce-" + bar.getAttribute("data-announcement-id");
-					if (window.localStorage.getItem(key)) {
-						bar.remove();
-					} else {
-						bar.classList.remove("hidden");
-					}
-				} catch (error) {
-					// Blocked storage: Quarto keeps the bar hidden, so the bar stays hidden here too.
-				}
+		function showAnnouncement(bar) {
+			var dismissed;
+			try {
+				dismissed = window.localStorage.getItem("quarto-announce-" + bar.getAttribute("data-announcement-id"));
+			} catch (error) {
+				// Blocked storage: Quarto then keeps the bar hidden, so the bar stays hidden here too.
+				return;
 			}
+			if (dismissed) {
+				bar.remove();
+			} else {
+				bar.classList.remove("hidden");
+			}
+		}
+
+		function settleHeader(bar) {
+			if (bar && bar.classList.contains("hidden")) showAnnouncement(bar);
 			var header = document.querySelector("header.fixed-top");
 			if (header) document.body.style.paddingTop = header.clientHeight + "px";
 		}
@@ -104,19 +113,24 @@
 			}
 		}
 
-		var observer = new MutationObserver(function () {
-			if (!document.getElementById("quarto-content")) return;
+		var done = false;
+		function run() {
+			done = true;
 			observer.disconnect();
 			var options = readOptions();
 			var bar = document.getElementById("quarto-announcement");
 			markCurrentTab();
-			addVersionPill(options);
+			addVersionPill(options.version);
 			if (bar) labelAnnouncement(bar, options.labels || {});
-			settleHeader();
+			settleHeader(bar);
+		}
+
+		var observer = new MutationObserver(function () {
+			if (document.getElementById("quarto-content")) run();
 		});
 		observer.observe(document, { childList: true, subtree: true });
 		document.addEventListener("DOMContentLoaded", function () {
-			observer.disconnect();
-		});
+			if (!done) run();
+		}, { once: true });
 	})();
 </script>
