@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: The page content no longer jumps down when the reading bar or the workshop bar appears on a site without a navbar.
+
 ## 0.15.1 (2026-11-20)
 
 - fix: The navbar now marks the tab of the page you're on, instead of "Home" on every page of a site with one sidebar. (#133)
