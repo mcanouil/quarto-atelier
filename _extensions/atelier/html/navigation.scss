@@ -276,6 +276,8 @@ body.docked .sidebar-navigation {
 // Without a navbar the sidebar carries the brand, the search field, the
 // tools, and the menu. The tools are moved below the field in
 // `html/scripts/chrome.html`.
+$sidebar-search-height: 32px;
+
 body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
   // Quarto pads the column on one side only. Each block takes its own side
   // padding instead, so the tools centre on the column.
@@ -326,8 +328,15 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     margin: 0;
     padding-inline: 0.9rem;
 
+    // Quarto fills the sidebar search box only after the first paint, so the box grows from 0 to its height and moves the sidebar. This rule gives the empty box its final height.
+    // Upstream: none filed yet
+    // Remove when: Quarto gives the search box its height in the served markup.
+    #quarto-search:empty {
+      min-height: $sidebar-search-height;
+    }
+
     .aa-Form {
-      min-height: 32px;
+      min-height: $sidebar-search-height;
       border-radius: $border-radius-sm;
     }
   }
