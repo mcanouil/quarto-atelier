@@ -27,8 +27,16 @@
 		function markCurrentTab() {
 			var here = pageOf(location.pathname);
 			var links = Array.prototype.slice.call(document.querySelectorAll(".navbar .nav-link[href]"));
+			// The toggle of a navbar menu has href="#", which opens no page.
 			var current = links.find(function (link) {
-				return link.origin === location.origin && link.hash === "" && pageOf(link.pathname) === here;
+				var href = link.getAttribute("href");
+				return (
+					href !== "" &&
+					href.charAt(0) !== "#" &&
+					link.origin === location.origin &&
+					link.hash === "" &&
+					pageOf(link.pathname) === here
+				);
 			});
 			links.forEach(function (link) {
 				if (current && link !== current) {
