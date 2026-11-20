@@ -65,8 +65,8 @@
 
 		// The version pill follows the brand in the navbar. A navbar with a logo
 		// has two brand links in one container, so the pill goes once after the
-		// last child of the container. chrome.html adds the pill of the sidebar,
-		// because the parser has not written the sidebar when this script runs.
+		// last child of the container. sidebar-header.html adds the pill of the
+		// sidebar, because the parser has not written the sidebar when this script runs.
 		function addVersionPill(version) {
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
 			if (!version || !brand) return;

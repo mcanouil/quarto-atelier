@@ -275,7 +275,7 @@ body.docked .sidebar-navigation {
 // ===========================================================================
 // Without a navbar the sidebar carries the brand, the search field, the
 // tools, and the menu. The tools are moved below the field in
-// `html/scripts/chrome.html`.
+// `html/scripts/sidebar-header.html`.
 $sidebar-search-height: 32px;
 
 body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
@@ -374,7 +374,7 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     padding-inline: 0;
   }
 
-  // `html/scripts/chrome.html` moves the tools out of the header, after the
+  // `html/scripts/sidebar-header.html` moves the tools out of the header, after the
   // search field, so the row follows the header class as a later sibling.
   .sidebar-header.text-end .sidebar-tools-main,
   .sidebar-header.text-end ~ .sidebar-tools-main {
