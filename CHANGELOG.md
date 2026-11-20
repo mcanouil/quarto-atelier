@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- fix: The page content no longer jumps down when the reading bar or the workshop bar appears on a site without a navbar.
+- fix: The page content no longer jumps down when the reading bar or the workshop bar appears on a site without a navbar. (#135)
 
 ## 0.15.1 (2026-11-20)
 
