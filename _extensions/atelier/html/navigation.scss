@@ -328,15 +328,7 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     margin: 0;
     padding-inline: 0.9rem;
 
-    // Quarto fills the sidebar search box only after the first paint, so the box grows from 0 to its height and moves the sidebar. This rule gives the empty box its final height.
-    // Upstream: none filed yet
-    // Remove when: Quarto gives the search box its height in the served markup.
-    #quarto-search:empty {
-      min-height: $sidebar-search-height;
-    }
-
     .aa-Form {
-      min-height: $sidebar-search-height;
       border-radius: $border-radius-sm;
     }
   }
@@ -393,6 +385,18 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     font-size: 0.72rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+}
+
+// Quarto fills the sidebar search box only after the first paint, so the box
+// grows from 0 to its height and moves the sidebar. This rule gives the empty
+// box and the filled box the same height, with or without a navbar.
+// Upstream: none filed yet
+// Remove when: Quarto gives the search box its height in the served markup.
+body.docked .sidebar-navigation .sidebar-search {
+  #quarto-search:empty,
+  .aa-Form {
+    min-height: $sidebar-search-height;
   }
 }
 
