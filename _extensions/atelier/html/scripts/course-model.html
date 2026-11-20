@@ -10,177 +10,199 @@
 		// workshop data block and Quarto's own sidebar. A page without a sidebar menu
 		// gets null. A workshop page that no sidebar of extensions.atelier.sidebars
 		// lists also gets null, so it keeps the plain sidebar.
+		// This script is in the head. It builds the course on the "sidebar" stage of
+		// page-load.html, before the first paint, so the scripts that change the side
+		// columns can read it. The page navigation is not parsed yet at that stage,
+		// thus "previous" and "next" read it each time a script asks for them.
 		window.atelierCourse = null;
-		var menu = document.querySelector("#quarto-sidebar .sidebar-menu-container");
-		if (!menu) return;
-
-		var data = {};
-		try {
-			data = JSON.parse(document.getElementById("atelier-workshop")?.textContent || "{}");
-		} catch (error) {
-			console.warn("Atelier: the workshop data block is not valid JSON.", error);
+		if (!window.atelierStages) {
+			console.warn("Atelier: the course model needs page-load.html, which is not in the head.");
+			return;
 		}
-		var labels = data.labels || {};
-		var workshop = data.mode === "workshop";
-		if (workshop && data.listed !== true) return;
-		var durations = data.durations || {};
+		window.atelierStages.on("sidebar", buildCourse);
 
-		// The site root path is the page path with the offset applied. A folder
-		// URL gets "index.html", so it matches the sidebar link to that page.
-		var root = new URL(data.offset || "./", location.href).pathname;
-		function toHref(url) {
-			var path = url.pathname;
-			if (path.slice(-1) === "/") path += "index.html";
-			return path.indexOf(root) === 0 ? path.slice(root.length) : path;
-		}
+		function buildCourse() {
+			var menu = document.querySelector("#quarto-sidebar .sidebar-menu-container");
+			if (!menu) return;
 
-		function hrefOf(raw) {
-			return toHref(new URL(raw, location.href));
-		}
+			var data = {};
+			try {
+				data = JSON.parse(document.getElementById("atelier-workshop")?.textContent || "{}");
+			} catch (error) {
+				console.warn("Atelier: the workshop data block is not valid JSON.", error);
+			}
+			var labels = data.labels || {};
+			var workshop = data.mode === "workshop";
+			if (workshop && data.listed !== true) return;
+			var durations = data.durations || {};
 
-		// A page of the course is a link to this site, below the site root.
-		function isPage(url) {
-			return url.origin === location.origin && url.pathname.indexOf(root) === 0;
-		}
+			// The site root path is the page path with the offset applied. A folder
+			// URL gets "index.html", so it matches the sidebar link to that page.
+			var root = new URL(data.offset || "./", location.href).pathname;
+			function toHref(url) {
+				var path = url.pathname;
+				if (path.slice(-1) === "/") path += "index.html";
+				return path.indexOf(root) === 0 ? path.slice(root.length) : path;
+			}
 
-		function label(key, values) {
-			return String(labels[key] || "").replace(/\{(\w+)\}/g, function (match, name) {
-				return values && name in values ? values[name] : match;
-			});
-		}
+			function hrefOf(raw) {
+				return toHref(new URL(raw, location.href));
+			}
 
-		function format(minutes) {
-			var hours = Math.floor(minutes / 60);
-			var rest = minutes % 60;
-			var key = "duration-minutes";
-			if (hours > 0 && rest > 0) key = "duration-hours-minutes";
-			else if (hours > 0) key = "duration-hours";
-			// No-break spaces keep a duration on one line.
-			return label(key, { h: hours, m: rest }).replace(/ /g, "\u00a0");
-		}
+			// A page of the course is a link to this site, below the site root.
+			function isPage(url) {
+				return url.origin === location.origin && url.pathname.indexOf(root) === 0;
+			}
 
-		function sum(values) {
-			var known = values.filter(function (value) {
-				return value !== null;
-			});
-			return known.length ? known.reduce(function (a, b) { return a + b; }, 0) : null;
-		}
-
-		function textOf(element) {
-			return (element?.textContent || "").replace(/\s+/g, " ").trim();
-		}
-
-		var pages = [];
-		var modules = [];
-		var moduleItems = [];
-		var indexByHref = {};
-
-		function pageIndex(link, href) {
-			if (!(href in indexByHref)) {
-				var minutes = durations[href];
-				indexByHref[href] = pages.length;
-				pages.push({
-					href: href,
-					title: textOf(link.querySelector(".menu-text") || link),
-					minutes: typeof minutes === "number" ? minutes : null,
-					module: modules.length,
+			function label(key, values) {
+				return String(labels[key] || "").replace(/\{(\w+)\}/g, function (match, name) {
+					return values && name in values ? values[name] : match;
 				});
 			}
-			return indexByHref[href];
-		}
 
-		var items = menu.querySelector("ul")?.children || [];
-		Array.prototype.forEach.call(items, function (item) {
-			var indices = [];
-			item.querySelectorAll("a.sidebar-link[href]").forEach(function (link) {
-				var raw = link.getAttribute("href");
-				if (raw === "#") return;
-				var url = new URL(raw, location.href);
-				if (!isPage(url)) return;
-				var index = pageIndex(link, toHref(url));
-				if (indices.indexOf(index) === -1) indices.push(index);
-			});
-			if (!indices.length) return;
-			moduleItems.push(item);
-			modules.push({
-				title: textOf(item.querySelector(".sidebar-item-container .menu-text")),
-				pages: indices,
-				minutes: sum(indices.map(function (index) { return pages[index].minutes; })),
-			});
-		});
-
-		var here = hrefOf(location.href);
-		var current = Object.prototype.hasOwnProperty.call(indexByHref, here) ? indexByHref[here] : -1;
-
-		function neighbour(selector) {
-			var link = document.querySelector(selector);
-			if (!link) return null;
-			return { href: hrefOf(link.getAttribute("href")), title: textOf(link.querySelector(".nav-page-text") || link) };
-		}
-
-		var course = {
-			mode: workshop ? "workshop" : "documentation",
-			labels: labels,
-			duration: typeof data.duration === "number" ? data.duration : null,
-			pages: pages,
-			modules: modules,
-			// The top-level sidebar items of the modules, in the order of modules.
-			moduleItems: moduleItems,
-			current: current,
-			currentModule: current === -1 ? -1 : pages[current].module,
-			previous: neighbour(".page-navigation .nav-page-previous a"),
-			next: neighbour(".page-navigation .nav-page-next a"),
-			totalMinutes: sum(pages.map(function (page) { return page.minutes; })),
-			format: format,
-			label: label,
-		};
-
-		if (workshop) {
-			course.storageKey = data.sidebar ? "atelier:" + root + ":" + data.sidebar : null;
-			course.progress = { visited: [], read: {}, objectives: {} };
-			var warned = false;
-			function warn(error) {
-				if (warned) return;
-				warned = true;
-				console.warn("Atelier: the workshop progress cannot be stored in this browser.", error);
+			function format(minutes) {
+				var hours = Math.floor(minutes / 60);
+				var rest = minutes % 60;
+				var key = "duration-minutes";
+				if (hours > 0 && rest > 0) key = "duration-hours-minutes";
+				else if (hours > 0) key = "duration-hours";
+				// No-break spaces keep a duration on one line.
+				return label(key, { h: hours, m: rest }).replace(/ /g, "\u00a0");
 			}
 
-			course.save = function () {
-				if (!course.storageKey) return;
-				try {
-					localStorage.setItem(course.storageKey, JSON.stringify(course.progress));
-				} catch (error) {
-					warn(error);
+			function sum(values) {
+				var known = values.filter(function (value) {
+					return value !== null;
+				});
+				return known.length ? known.reduce(function (a, b) { return a + b; }, 0) : null;
+			}
+
+			function textOf(element) {
+				return (element?.textContent || "").replace(/\s+/g, " ").trim();
+			}
+
+			var pages = [];
+			var modules = [];
+			var moduleItems = [];
+			var indexByHref = {};
+
+			function pageIndex(link, href) {
+				if (!(href in indexByHref)) {
+					var minutes = durations[href];
+					indexByHref[href] = pages.length;
+					pages.push({
+						href: href,
+						title: textOf(link.querySelector(".menu-text") || link),
+						minutes: typeof minutes === "number" ? minutes : null,
+						module: modules.length,
+					});
 				}
-			};
+				return indexByHref[href];
+			}
 
-			course.isComplete = function (moduleIndex) {
-				var module = modules[moduleIndex];
-				return Boolean(module) && module.pages.every(function (index) {
-					return course.progress.visited.indexOf(pages[index].href) !== -1;
+			var items = menu.querySelector("ul")?.children || [];
+			Array.prototype.forEach.call(items, function (item) {
+				var indices = [];
+				item.querySelectorAll("a.sidebar-link[href]").forEach(function (link) {
+					var raw = link.getAttribute("href");
+					if (raw === "#") return;
+					var url = new URL(raw, location.href);
+					if (!isPage(url)) return;
+					var index = pageIndex(link, toHref(url));
+					if (indices.indexOf(index) === -1) indices.push(index);
 				});
-			};
+				if (!indices.length) return;
+				moduleItems.push(item);
+				modules.push({
+					title: textOf(item.querySelector(".sidebar-item-container .menu-text")),
+					pages: indices,
+					minutes: sum(indices.map(function (index) { return pages[index].minutes; })),
+				});
+			});
 
-			if (course.storageKey) {
-				try {
-					var stored = JSON.parse(localStorage.getItem(course.storageKey) || "null");
-					if (stored && typeof stored === "object") {
-						course.progress = {
-							visited: Array.isArray(stored.visited) ? stored.visited : [],
-							read: stored.read && typeof stored.read === "object" ? stored.read : {},
-							objectives: stored.objectives && typeof stored.objectives === "object" ? stored.objectives : {},
-						};
+			var here = hrefOf(location.href);
+			var current = Object.prototype.hasOwnProperty.call(indexByHref, here) ? indexByHref[here] : -1;
+
+			function neighbour(selector) {
+				var link = document.querySelector(selector);
+				if (!link) return null;
+				return { href: hrefOf(link.getAttribute("href")), title: textOf(link.querySelector(".nav-page-text") || link) };
+			}
+
+			var course = {
+				mode: workshop ? "workshop" : "documentation",
+				labels: labels,
+				duration: typeof data.duration === "number" ? data.duration : null,
+				pages: pages,
+				modules: modules,
+				// The top-level sidebar items of the modules, in the order of modules.
+				moduleItems: moduleItems,
+				current: current,
+				currentModule: current === -1 ? -1 : pages[current].module,
+				totalMinutes: sum(pages.map(function (page) { return page.minutes; })),
+				format: format,
+				label: label,
+			};
+			Object.defineProperty(course, "previous", {
+				enumerable: true,
+				get: function () {
+					return neighbour(".page-navigation .nav-page-previous a");
+				},
+			});
+			Object.defineProperty(course, "next", {
+				enumerable: true,
+				get: function () {
+					return neighbour(".page-navigation .nav-page-next a");
+				},
+			});
+
+			if (workshop) {
+				course.storageKey = data.sidebar ? "atelier:" + root + ":" + data.sidebar : null;
+				course.progress = { visited: [], read: {}, objectives: {} };
+				var warned = false;
+				function warn(error) {
+					if (warned) return;
+					warned = true;
+					console.warn("Atelier: the workshop progress cannot be stored in this browser.", error);
+				}
+
+				course.save = function () {
+					if (!course.storageKey) return;
+					try {
+						localStorage.setItem(course.storageKey, JSON.stringify(course.progress));
+					} catch (error) {
+						warn(error);
 					}
-				} catch (error) {
-					warn(error);
+				};
+
+				course.isComplete = function (moduleIndex) {
+					var module = modules[moduleIndex];
+					return Boolean(module) && module.pages.every(function (index) {
+						return course.progress.visited.indexOf(pages[index].href) !== -1;
+					});
+				};
+
+				if (course.storageKey) {
+					try {
+						var stored = JSON.parse(localStorage.getItem(course.storageKey) || "null");
+						if (stored && typeof stored === "object") {
+							course.progress = {
+								visited: Array.isArray(stored.visited) ? stored.visited : [],
+								read: stored.read && typeof stored.read === "object" ? stored.read : {},
+								objectives: stored.objectives && typeof stored.objectives === "object" ? stored.objectives : {},
+							};
+						}
+					} catch (error) {
+						warn(error);
+					}
+				}
+				if (current !== -1 && course.progress.visited.indexOf(here) === -1) {
+					course.progress.visited.push(here);
+					course.save();
 				}
 			}
-			if (current !== -1 && course.progress.visited.indexOf(here) === -1) {
-				course.progress.visited.push(here);
-				course.save();
-			}
-		}
 
-		window.atelierCourse = course;
+			window.atelierCourse = course;
+		}
 	})();
 </script>

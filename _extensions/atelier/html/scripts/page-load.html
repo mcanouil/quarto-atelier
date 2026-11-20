@@ -4,11 +4,22 @@
 	 * @copyright 2026 Mickaël Canouil
 	 * @author Mickaël Canouil
 	 */
-	// This script is in the head. It changes the header once the parser has
-	// written it, before the browser paints the page. A mutation observer
+	// This script is in the head. It changes the page once the parser has
+	// written each part, before the browser paints the page. A mutation observer
 	// callback runs before the next paint, so each change is in the first paint.
-	// A change that comes later makes the header taller, and the content moves.
-	// A page with no #quarto-content gets the same changes on DOMContentLoaded.
+	// A change that comes later moves the content.
+	// The changes run in four stages, in this order:
+	// - "header" when #quarto-content exists, so the header is complete.
+	// - "sidebar" when #quarto-margin-sidebar or #quarto-document-content
+	//   exists, so the sidebar is complete.
+	// - "toc" when #quarto-document-content exists, so the table of contents
+	//   is complete.
+	// - "title" when the title block has a next element, or the main content
+	//   has more than one child, so the title block is complete.
+	// Other scripts in the head add their changes to a stage with
+	// window.atelierStages.on(name, fn). A stage that the parser does not
+	// reach runs on DOMContentLoaded. A function added after its stage ran
+	// runs at once.
 	(function () {
 		function pageOf(path) {
 			return path.replace(/index\.html$/, "");
@@ -135,10 +146,7 @@
 			}
 		}
 
-		var done = false;
-		function run() {
-			done = true;
-			observer.disconnect();
+		function settlePage() {
 			var options = readOptions();
 			var bar = document.getElementById("quarto-announcement");
 			markCurrentTab();
@@ -148,12 +156,94 @@
 			settleHeader(bar);
 		}
 
+		var stages = [
+			{
+				name: "header",
+				ready: function () {
+					return document.getElementById("quarto-content");
+				},
+			},
+			{
+				name: "sidebar",
+				ready: function () {
+					return document.querySelector("#quarto-margin-sidebar, #quarto-document-content");
+				},
+			},
+			{
+				name: "toc",
+				ready: function () {
+					return document.getElementById("quarto-document-content");
+				},
+			},
+			{
+				name: "title",
+				ready: function () {
+					var title = document.getElementById("title-block-header");
+					var main = document.getElementById("quarto-document-content");
+					return (title && title.nextElementSibling) || (main && main.children.length > 1);
+				},
+			},
+		];
+		stages.forEach(function (stage) {
+			stage.done = false;
+			stage.tasks = [];
+		});
+
+		function stageOf(name) {
+			return stages.find(function (stage) {
+				return stage.name === name;
+			});
+		}
+
+		// A failed task warns and does not stop the other tasks of the page.
+		function runTask(stage, fn) {
+			try {
+				fn();
+			} catch (error) {
+				console.warn("Atelier: a task of the \"" + stage.name + "\" page load stage failed.", error);
+			}
+		}
+
+		function runStage(stage) {
+			stage.done = true;
+			var tasks = stage.tasks;
+			stage.tasks = [];
+			tasks.forEach(function (fn) {
+				runTask(stage, fn);
+			});
+		}
+
+		// A stage runs only after the stages before it.
+		function advance(force) {
+			for (var i = 0; i < stages.length; i++) {
+				var stage = stages[i];
+				if (stage.done) continue;
+				if (!force && !stage.ready()) return;
+				runStage(stage);
+			}
+			observer.disconnect();
+		}
+
+		window.atelierStages = {
+			on: function (name, fn) {
+				var stage = stageOf(name);
+				if (!stage || typeof fn !== "function") {
+					console.warn("Atelier: window.atelierStages.on needs a stage (header, sidebar, toc or title) and a function.", name);
+					return;
+				}
+				if (stage.done) runTask(stage, fn);
+				else stage.tasks.push(fn);
+			},
+		};
+
+		stageOf("header").tasks.push(settlePage);
+
 		var observer = new MutationObserver(function () {
-			if (document.getElementById("quarto-content")) run();
+			advance(false);
 		});
 		observer.observe(document, { childList: true, subtree: true });
 		document.addEventListener("DOMContentLoaded", function () {
-			if (!done) run();
+			advance(true);
 		}, { once: true });
 	})();
 </script>
