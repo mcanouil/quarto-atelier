@@ -12,18 +12,10 @@
 			return;
 		}
 
-		function readVersion() {
-			try {
-				return JSON.parse(document.getElementById("atelier-options")?.textContent || "{}").version;
-			} catch (error) {
-				return undefined;
-			}
-		}
-
 		window.atelierStages.on("sidebar", function () {
 			// The version pill follows the title link in the sidebar. Without a
 			// version, no pill is added. page-load.html adds the pill of the navbar.
-			var version = readVersion();
+			var version = window.atelierStages.options().version;
 			if (version) {
 				document.querySelectorAll(".sidebar-title > a").forEach(function (title) {
 					var pill = document.createElement("span");

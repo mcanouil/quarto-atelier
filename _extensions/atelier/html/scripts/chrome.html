@@ -7,13 +7,11 @@
 	(function () {
 		// The other Atelier scripts that run after the body read the options from
 		// here. Of those scripts, this script runs first. page-load.html, in the
-		// head, reads the block on its own.
-		var options = {};
-		try {
-			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
-		} catch (error) {
-			console.warn("Atelier: the options block is not valid JSON.", error);
+		// head, reads the block.
+		if (!window.atelierStages) {
+			console.warn("Atelier: the page options need page-load.html, which is not in the head.");
 		}
+		var options = window.atelierStages ? window.atelierStages.options() : {};
 		window.atelierOptions = options;
 		var labels = options.labels || {};
 

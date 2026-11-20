@@ -137,13 +137,21 @@
 			navbar.after(frame);
 		}
 
-		// chrome.html reads the options again, and warns when the block is not valid JSON.
+		// The options block comes after the head scripts, so it is read on the
+		// first call after the parser has written it. Each later call gives the
+		// same object. The other Atelier scripts read the options from here.
+		var parsedOptions = null;
 		function readOptions() {
+			if (parsedOptions) return parsedOptions;
+			var block = document.getElementById("atelier-options");
+			if (!block) return {};
 			try {
-				return JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+				parsedOptions = JSON.parse(block.textContent || "{}");
 			} catch (error) {
-				return {};
+				console.warn("Atelier: the options block is not valid JSON.", error);
+				parsedOptions = {};
 			}
+			return parsedOptions;
 		}
 
 		function settlePage() {
@@ -228,6 +236,7 @@
 		}
 
 		window.atelierStages = {
+			options: readOptions,
 			on: function (name, fn) {
 				var stage = stageOf(name);
 				if (!stage || typeof fn !== "function") {
