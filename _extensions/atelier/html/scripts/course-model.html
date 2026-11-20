@@ -15,10 +15,6 @@
 		// columns can read it. The page navigation is not parsed yet at that stage,
 		// thus "previous" and "next" read it each time a script asks for them.
 		window.atelierCourse = null;
-		if (!window.atelierStages) {
-			console.warn("Atelier: the course model needs page-load.html, which is not in the head.");
-			return;
-		}
 		window.atelierStages.on("sidebar", buildCourse);
 
 		function buildCourse() {
@@ -123,10 +119,15 @@
 			var here = hrefOf(location.href);
 			var current = Object.prototype.hasOwnProperty.call(indexByHref, here) ? indexByHref[here] : -1;
 
-			function neighbour(selector) {
-				var link = document.querySelector(selector);
-				if (!link) return null;
-				return { href: hrefOf(link.getAttribute("href")), title: textOf(link.querySelector(".nav-page-text") || link) };
+			function neighbour(kind) {
+				return {
+					enumerable: true,
+					get: function () {
+						var link = document.querySelector(".page-navigation .nav-page-" + kind + " a");
+						if (!link) return null;
+						return { href: hrefOf(link.getAttribute("href")), title: textOf(link.querySelector(".nav-page-text") || link) };
+					},
+				};
 			}
 
 			var course = {
@@ -143,18 +144,7 @@
 				format: format,
 				label: label,
 			};
-			Object.defineProperty(course, "previous", {
-				enumerable: true,
-				get: function () {
-					return neighbour(".page-navigation .nav-page-previous a");
-				},
-			});
-			Object.defineProperty(course, "next", {
-				enumerable: true,
-				get: function () {
-					return neighbour(".page-navigation .nav-page-next a");
-				},
-			});
+			Object.defineProperties(course, { previous: neighbour("previous"), next: neighbour("next") });
 
 			if (workshop) {
 				course.storageKey = data.sidebar ? "atelier:" + root + ":" + data.sidebar : null;

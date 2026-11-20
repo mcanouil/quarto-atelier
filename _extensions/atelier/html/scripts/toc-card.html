@@ -39,23 +39,24 @@
 			}
 			return text.join("").split(/\s+/).filter(Boolean).length;
 		}
-		if (readingTime && toc.querySelector(".atelier-toc-reading-time")) {
+		// toc-early.html adds the reading time only when it has a label.
+		var readingSlot = toc.querySelector(".atelier-toc-reading-time");
+		if (readingSlot) {
 			// When content spans into the margin, Quarto clones the table of
-			// contents into a toggle, so an update writes to each copy. The
-			// first text makes the meta row visible to assistive technology,
-			// and fades it in.
+			// contents into a toggle, so an update writes to each copy.
 			var updateReadingTime = function () {
 				var text = readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
 				document.querySelectorAll(".atelier-toc-reading-time").forEach(function (copy) {
 					copy.textContent = text;
-					var meta = copy.closest(".atelier-toc-meta");
-					if (meta && meta.hasAttribute("aria-hidden")) {
-						meta.removeAttribute("aria-hidden");
-						meta.classList.add("atelier-filled");
-					}
 				});
 			};
 			updateReadingTime();
+			// The first text makes the meta row visible to assistive technology,
+			// and fades it in. Quarto makes the clone later, on DOMContentLoaded,
+			// so the clone copies the row as it is now.
+			var meta = readingSlot.closest(".atelier-toc-meta");
+			meta.removeAttribute("aria-hidden");
+			meta.classList.add("atelier-filled");
 			// Veil starts on DOMContentLoaded, after this script runs. It sends
 			// veil:ready once it has applied the start state, and veil:change
 			// after each later change.

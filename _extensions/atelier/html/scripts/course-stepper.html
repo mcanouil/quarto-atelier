@@ -14,17 +14,7 @@
 		// This script is in the head. It runs on the "sidebar" stage of
 		// page-load.html, after course-model.html built the course, so the
 		// stepper is in the first paint.
-		if (!window.atelierStages) {
-			console.warn("Atelier: the course stepper needs page-load.html, which is not in the head.");
-			return;
-		}
-
-		function element(tag, className, text) {
-			var node = document.createElement(tag);
-			if (className) node.className = className;
-			if (text) node.textContent = text;
-			return node;
-		}
+		var element = window.atelierStages.element;
 
 		window.atelierStages.on("sidebar", function () {
 			var course = window.atelierCourse;

@@ -28,12 +28,7 @@
 		var page = course.pages[course.current];
 		var module = course.modules[course.currentModule];
 
-		function element(tag, className, text) {
-			var node = document.createElement(tag);
-			if (className) node.className = className;
-			if (text) node.textContent = text;
-			return node;
-		}
+		var element = window.atelierStages.element;
 		// An empty label sets no attribute, so a control never gets an empty name.
 		function setLabel(node, name, text) {
 			if (text) node.setAttribute(name, text);

@@ -19,7 +19,9 @@
 	// Other scripts in the head add their changes to a stage with
 	// window.atelierStages.on(name, fn). A stage that the parser does not
 	// reach runs on DOMContentLoaded. A function added after its stage ran
-	// runs at once.
+	// runs at once. window.atelierStages also gives the options and the small
+	// builders that the Atelier scripts share: element, afterTitle and
+	// versionPill.
 	(function () {
 		function pageOf(path) {
 			return path.replace(/index\.html$/, "");
@@ -63,6 +65,28 @@
 			}
 		}
 
+		function element(tag, className, text) {
+			var node = document.createElement(tag);
+			if (className) node.className = className;
+			if (text) node.textContent = text;
+			return node;
+		}
+
+		// A row of the table of contents goes after its title, or first when the
+		// table of contents has no title.
+		function afterTitle(toc, node) {
+			var title = toc.querySelector("#toc-title");
+			if (title) {
+				title.after(node);
+			} else {
+				toc.prepend(node);
+			}
+		}
+
+		function versionPill(version) {
+			return element("span", "atelier-version", version);
+		}
+
 		// The version pill follows the brand in the navbar. A navbar with a logo
 		// has two brand links in one container, so the pill goes once after the
 		// last child of the container. sidebar-header.html adds the pill of the
@@ -71,10 +95,7 @@
 		function addVersionPill(version) {
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
 			if (!version || !brand) return;
-			var pill = document.createElement("span");
-			pill.className = "atelier-version";
-			pill.textContent = version;
-			brand.after(pill);
+			brand.after(versionPill(version));
 		}
 
 		// The label of the announcement names its type. The theme colours map
@@ -85,8 +106,7 @@
 			});
 			var type = (typeClass || "").slice(6);
 			var key = "announcement-" + (["info", "warning", "danger", "success"].includes(type) ? type : "notice");
-			var label = document.createElement("span");
-			label.className = "atelier-announcement-label";
+			var label = element("span", "atelier-announcement-label");
 			var icon = bar.querySelector(".quarto-announcement-icon");
 			if (icon) {
 				icon.setAttribute("aria-hidden", "true");
@@ -132,8 +152,7 @@
 			var root = document.documentElement.classList;
 			var navbar = document.querySelector("#quarto-header > nav.navbar");
 			if (!navbar || !root.contains("atelier-workshop") || root.contains("atelier-workshop-unlisted")) return;
-			var frame = document.createElement("div");
-			frame.className = "atelier-bar-frame";
+			var frame = element("div", "atelier-bar-frame");
 			frame.setAttribute("aria-hidden", "true");
 			navbar.after(frame);
 		}
@@ -165,97 +184,82 @@
 			settleHeader(bar);
 		}
 
-		var stages = [
-			{
-				name: "header",
-				ready: function () {
-					return document.getElementById("quarto-content");
-				},
-			},
-			{
-				name: "sidebar",
-				ready: function () {
-					return document.querySelector("#quarto-margin-sidebar, #quarto-document-content");
-				},
-			},
-			{
-				name: "toc",
-				ready: function () {
-					return document.getElementById("quarto-document-content");
-				},
-			},
-			{
-				name: "title",
-				ready: function () {
-					var title = document.getElementById("title-block-header");
-					var main = document.getElementById("quarto-document-content");
-					return (title && title.nextElementSibling) || (main && main.children.length > 1);
-				},
-			},
-		];
-		stages.forEach(function (stage) {
-			stage.done = false;
-			stage.tasks = [];
-		});
-
-		function stageOf(name) {
-			return stages.find(function (stage) {
-				return stage.name === name;
-			});
+		// An element that a ready check finds stays the same, so it is kept.
+		var found = {};
+		function byId(id) {
+			if (!found[id]) found[id] = document.getElementById(id);
+			return found[id];
 		}
 
+		var order = ["header", "sidebar", "toc", "title"];
+		var ready = {
+			header: function () {
+				return byId("quarto-content");
+			},
+			sidebar: function () {
+				return byId("quarto-margin-sidebar") || byId("quarto-document-content");
+			},
+			toc: function () {
+				return byId("quarto-document-content");
+			},
+			title: function () {
+				var title = byId("title-block-header");
+				var main = byId("quarto-document-content");
+				return (title && title.nextElementSibling) || (main && main.children.length > 1);
+			},
+		};
+		var tasks = { header: [settlePage], sidebar: [], toc: [], title: [] };
+		// The stages before this index have run.
+		var next = 0;
+
 		// A failed task warns and does not stop the other tasks of the page.
-		function runTask(stage, fn) {
+		function runTask(name, fn) {
 			try {
 				fn();
 			} catch (error) {
-				console.warn("Atelier: a task of the \"" + stage.name + "\" page load stage failed.", error);
+				console.warn("Atelier: a task of the \"" + name + "\" page load stage failed.", error);
 			}
-		}
-
-		function runStage(stage) {
-			stage.done = true;
-			var tasks = stage.tasks;
-			stage.tasks = [];
-			tasks.forEach(function (fn) {
-				runTask(stage, fn);
-			});
 		}
 
 		// A stage runs only after the stages before it.
 		function advance(force) {
-			for (var i = 0; i < stages.length; i++) {
-				var stage = stages[i];
-				if (stage.done) continue;
-				if (!force && !stage.ready()) return;
-				if (force && stage.name === "sidebar" && document.getElementById("quarto-sidebar")) {
-					console.warn("Atelier: the side columns were set up on DOMContentLoaded, after the first paint. The scripts after the body may have read window.atelierCourse as null.");
-				}
-				runStage(stage);
+			while (next < order.length) {
+				var name = order[next];
+				if (!force && !ready[name]()) return;
+				next += 1;
+				var list = tasks[name];
+				tasks[name] = [];
+				list.forEach(function (fn) {
+					runTask(name, fn);
+				});
 			}
 			observer.disconnect();
 		}
 
 		window.atelierStages = {
 			options: readOptions,
+			element: element,
+			afterTitle: afterTitle,
+			versionPill: versionPill,
 			on: function (name, fn) {
-				var stage = stageOf(name);
-				if (!stage || typeof fn !== "function") {
-					console.warn("Atelier: window.atelierStages.on needs a stage (header, sidebar, toc or title) and a function.", name);
+				var index = order.indexOf(name);
+				if (index === -1) {
+					console.warn("Atelier: window.atelierStages.on needs a stage: header, sidebar, toc or title.", name);
 					return;
 				}
-				if (stage.done) runTask(stage, fn);
-				else stage.tasks.push(fn);
+				if (index < next) runTask(name, fn);
+				else tasks[name].push(fn);
 			},
 		};
-
-		stageOf("header").tasks.push(settlePage);
 
 		var observer = new MutationObserver(function () {
 			advance(false);
 		});
 		observer.observe(document, { childList: true, subtree: true });
 		document.addEventListener("DOMContentLoaded", function () {
+			if (next <= order.indexOf("sidebar") && document.getElementById("quarto-sidebar")) {
+				console.warn("Atelier: the side columns were set up on DOMContentLoaded, after the first paint. The scripts after the body may have read window.atelierCourse as null.");
+			}
 			advance(true);
 		}, { once: true });
 	})();

@@ -10,12 +10,7 @@
 		var course = window.atelierCourse;
 		if (!course || course.mode !== "workshop") return;
 
-		function element(tag, className, text) {
-			var node = document.createElement(tag);
-			if (className) node.className = className;
-			if (text) node.textContent = text;
-			return node;
-		}
+		var element = window.atelierStages.element;
 
 		// =====================================================================
 		// T3 PROGRESS DOTS
@@ -48,8 +43,10 @@
 				var heading = document.getElementById(id);
 				if (heading) headings.push({ href: target, node: heading });
 			});
-			// html/scripts/toc-early.html adds the class and the line in the head.
-			// With no heading to track, the table of contents goes back to the card.
+			// html/scripts/toc-early.html adds the class and the line in the head,
+			// from the links of the table of contents only. When no link has its
+			// heading on the page, nothing is tracked, and the table of contents
+			// goes back to the card.
 			if (!headings.length) {
 				toc.classList.remove("atelier-toc-dots");
 				toc.querySelectorAll(".atelier-toc-progress").forEach(function (line) {
@@ -69,26 +66,19 @@
 			// html/scripts/toc-early.html adds the class and the line in the head,
 			// so a clone that Quarto makes on DOMContentLoaded has them. A clone
 			// made in another way can lack them, so render() calls this on every
-			// root. It adds only what is missing. It returns the ring and the text
-			// node of the line, or null outside a module.
+			// root, and a root without the line gets a copy of the line of the
+			// margin. It returns the ring and the text node of the line, or null
+			// outside a module.
+			var originalLine = toc.querySelector(".atelier-toc-progress");
 			function prepare(root) {
 				root.classList.add("atelier-toc-dots");
-				if (!inModule) return null;
-				var existing = root.querySelector(".atelier-toc-progress");
-				if (existing) return { ring: existing.querySelector(".atelier-ring"), text: existing.lastChild };
-				var progress = element("p", "atelier-toc-progress");
-				var ring = element("span", "atelier-ring");
-				ring.setAttribute("aria-hidden", "true");
-				progress.appendChild(ring);
-				var text = document.createTextNode("");
-				progress.appendChild(text);
-				var title = root.querySelector("#toc-title");
-				if (title) {
-					title.after(progress);
-				} else {
-					root.prepend(progress);
+				if (!inModule || !originalLine) return null;
+				var line = root.querySelector(".atelier-toc-progress");
+				if (!line) {
+					line = originalLine.cloneNode(true);
+					window.atelierStages.afterTitle(root, line);
 				}
-				return { ring: ring, text: text };
+				return { ring: line.querySelector(".atelier-ring"), text: line.lastChild };
 			}
 
 			function render() {

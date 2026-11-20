@@ -177,12 +177,6 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
   );
 }
 
-@keyframes atelier-bar-fade {
-  from {
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   :is(#quarto-content, #quarto-header) > .atelier-bar :is(.atelier-bar-row, .atelier-bar-progress > span) {
     animation: atelier-bar-fade 150ms ease-out;
