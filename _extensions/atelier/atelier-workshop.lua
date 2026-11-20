@@ -8,7 +8,9 @@
 --- holds the mode from `extensions.atelier.mode`, the project offset, the
 --- translated labels, and, in workshop mode, the page duration, the sidebar
 --- that lists the page, and the durations of every page in that sidebar.
---- A workshop page also gets the `atelier-workshop` class on `<html>`.
+--- A workshop page also gets the `atelier-workshop` class on `<html>`, and
+--- a workshop page that no listed sidebar holds also gets
+--- `atelier-workshop-unlisted`.
 
 --- Load modules
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
@@ -568,9 +570,11 @@ local function publish_workshop(meta)
         data.durations = durations
       end
     end
+    -- An unlisted page gets no workshop bar, so its CSS must not reserve the bar row.
+    local classes = data.listed and '"atelier-workshop"' or '"atelier-workshop", "atelier-workshop-unlisted"'
     quarto.doc.include_text(
       'in-header',
-      '<script>document.documentElement.classList.add("atelier-workshop");</script>'
+      '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
     )
     apply_title_labels(meta, state.labels)
     changed = meta
