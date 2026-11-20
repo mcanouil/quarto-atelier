@@ -17,7 +17,8 @@
 $_atelier-bar-row-height: 50px;
 $_atelier-bar-track-height: 5px;
 $_atelier-bar-border-width: 1px;
-$_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_atelier-bar-track-height + $_atelier-bar-border-width});
+$_atelier-bar-one-line-height: $_atelier-bar-row-height + $_atelier-bar-track-height + $_atelier-bar-border-width;
+$_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-one-line-height});
 
 // The script inserts the bar after the first paint. The served page already
 // tells that it will come: a page with no navbar (no `nav-fixed` on `body`
@@ -27,7 +28,8 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
 // from the first paint.
 $_atelier-bar-navbar: "#quarto-header > nav.navbar";
 $_atelier-bar-current: "#quarto-sidebar .sidebar-link.active";
-$_atelier-bar-content: "#quarto-content:has(> .atelier-bar), html:not(.atelier-workshop-unlisted) > body:not(.nav-fixed, :has(#{$_atelier-bar-navbar})) #quarto-content:has(#{$_atelier-bar-current})";
+$_atelier-bar-expected: "html:not(.atelier-workshop-unlisted) > body:not(.nav-fixed, :has(#{$_atelier-bar-navbar})) #quarto-content:has(#{$_atelier-bar-current})";
+$_atelier-bar-content: "#quarto-content:has(> .atelier-bar), #{$_atelier-bar-expected}";
 // `:has()` does not nest, so the root puts the navbar test on `html`.
 $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier-workshop-unlisted, :has(#{$_atelier-bar-navbar})):has(> body:not(.nav-fixed) #{$_atelier-bar-current})";
 
@@ -59,7 +61,9 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
 
 #{$_atelier-bar-content} {
   grid-template-rows:
-    [bar-top] minmax(#{$_atelier-bar-height}, auto)
+    // The floor is the one-line height. The measured height would only grow,
+    // because the bar stretches to the row it measures.
+    [bar-top] minmax(#{$_atelier-bar-one-line-height}, auto)
     [content-top] minmax(max-content, 1fr)
     [content-bottom] minmax(60px, max-content)
     [page-bottom];
