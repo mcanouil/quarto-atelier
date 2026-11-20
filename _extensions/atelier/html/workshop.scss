@@ -152,8 +152,7 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
 
 // Until the script inserts the bar, its row shows the frame of the bar: the
 // background, the empty progress track, and the bottom border. The text, the
-// links, and the progress fill then fade in, so only they change. The same
-// holds for the module row under a navbar.
+// links, and the progress fill then fade in, so only they change.
 #{$_atelier-bar-expected}:not(:has(> .atelier-bar))::before {
   content: "";
   grid-column: screen-start / screen-end;
@@ -166,13 +165,9 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
   );
 }
 
-// With a navbar, the module row of a workshop page goes under the navbar. The
-// head script marks the page before the header is parsed, so the header has
-// the frame of the row when `page-load.html` measures it.
-html.atelier-workshop:not(.atelier-workshop-unlisted) #quarto-header:has(> nav.navbar):not(:has(> .atelier-bar))::after {
-  content: "";
-  display: block;
-  box-sizing: border-box;
+// `page-load.html` puts this frame of the module row under the navbar before
+// the first paint, and `reading-bar.html` swaps it for the row.
+#quarto-header > .atelier-bar-frame {
   height: $_atelier-bar-one-line-height;
   border-bottom: $_atelier-bar-border-width solid var(--atelier-workshop-bar-border);
   background: linear-gradient(
