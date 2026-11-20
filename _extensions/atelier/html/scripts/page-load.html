@@ -20,7 +20,7 @@
 		// aria-current="page". A page that no navbar link opens keeps the mark
 		// of Quarto, with aria-current="true", because that tab is a section and
 		// not the page. The sidebar link is handled in a11y-fixes.html.
-		// Upstream: none filed (WCAG 2.4.8)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15392 (mark)
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190 (aria-current)
 		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
 		// Remove when: the minimum Quarto version includes both fixes.
@@ -89,8 +89,8 @@
 		// is 64px, which is less than the two rows of the Atelier header. Thus
 		// the content moves down after the first paint. This function sets the
 		// bar and the padding first, with the values that Quarto gives them later.
-		// Upstream: none filed
-		// Remove when: Quarto shows the bar and sets the padding before the first paint.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15405
+		// Remove when: the minimum Quarto version includes the fix.
 		function showAnnouncement(bar) {
 			var dismissed;
 			try {
