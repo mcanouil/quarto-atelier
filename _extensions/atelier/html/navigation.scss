@@ -543,7 +543,7 @@ body.floating .sidebar.sidebar-navigation {
   // has its own line, so the late reading time cannot push the date to a new
   // line, and its empty line keeps the height of one line. The entries then do
   // not move when the text comes. The text fades in with the keyframes of
-  // `html/workshop.scss`.
+  // `html/theme.scss`.
   .atelier-toc-meta {
     display: flex;
     flex-direction: column;
