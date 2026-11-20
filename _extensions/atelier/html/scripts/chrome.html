@@ -7,13 +7,11 @@
 	(function () {
 		// The other Atelier scripts that run after the body read the options from
 		// here. Of those scripts, this script runs first. page-load.html, in the
-		// head, reads the block on its own.
-		var options = {};
-		try {
-			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
-		} catch (error) {
-			console.warn("Atelier: the options block is not valid JSON.", error);
+		// head, reads the block.
+		if (!window.atelierStages) {
+			console.warn("Atelier: the page options need page-load.html, which is not in the head.");
 		}
+		var options = window.atelierStages ? window.atelierStages.options() : {};
 		window.atelierOptions = options;
 		var labels = options.labels || {};
 
@@ -119,17 +117,6 @@
 			}
 		}
 
-		// The version pill follows the title link in the sidebar. Without a
-		// version, no pill is added. page-load.html adds the pill of the navbar.
-		if (options.version) {
-			document.querySelectorAll(".sidebar-title > a").forEach(function (title) {
-				var pill = document.createElement("span");
-				pill.className = "atelier-version";
-				pill.textContent = options.version;
-				title.after(pill);
-			});
-		}
-
 		// Quarto marks the current page in the breadcrumbs by class only, so the
 		// last crumb, a link or a span, gets aria-current when it has none.
 		// Upstream: none filed (WCAG 4.1.2)
@@ -157,15 +144,6 @@
 			first.textContent = first.textContent.slice(match[1].length);
 			caption.insertBefore(label, first);
 		});
-
-		// With a search field in the sidebar header, the tools follow the field
-		// instead of sitting under the title. The field sits in a wrapper, so the
-		// tools become the wrapper's next sibling.
-		var sidebarSearch = document.querySelector("#quarto-sidebar .sidebar-search");
-		var sidebarTools = document.querySelector("#quarto-sidebar .sidebar-tools-main");
-		if (sidebarSearch && sidebarTools && sidebarSearch.parentElement) {
-			sidebarSearch.parentElement.after(sidebarTools);
-		}
 
 		// The search button keeps Quarto's own accessible name. The label and the
 		// shortcut are decoration for sighted users, so both are hidden from

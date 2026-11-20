@@ -275,7 +275,9 @@ body.docked .sidebar-navigation {
 // ===========================================================================
 // Without a navbar the sidebar carries the brand, the search field, the
 // tools, and the menu. The tools are moved below the field in
-// `html/scripts/chrome.html`.
+// `html/scripts/sidebar-header.html`.
+$sidebar-search-height: 32px;
+
 body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
   // Quarto pads the column on one side only. Each block takes its own side
   // padding instead, so the tools centre on the column.
@@ -327,7 +329,6 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     padding-inline: 0.9rem;
 
     .aa-Form {
-      min-height: 32px;
       border-radius: $border-radius-sm;
     }
   }
@@ -365,8 +366,8 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     padding-inline: 0;
   }
 
-  // `html/scripts/chrome.html` moves the tools out of the header, after the
-  // search field, so the row follows the header class as a later sibling.
+  // `html/scripts/sidebar-header.html` moves the tools out of the header, after
+  // the search field, so the row follows the header class as a later sibling.
   .sidebar-header.text-end .sidebar-tools-main,
   .sidebar-header.text-end ~ .sidebar-tools-main {
     justify-content: flex-end;
@@ -384,6 +385,24 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     font-size: 0.72rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+  }
+}
+
+// Quarto fills the sidebar search box only after the first paint, so the box
+// grows from 0 to its height and moves the sidebar. This rule gives the empty
+// box and the filled box the same height, with or without a navbar. With the
+// overlay type, the button gets the same height, because it is shorter than
+// the textbox.
+// Upstream: none filed (no WCAG criterion; layout shift on load)
+// Remove when: Quarto gives the search box its height in the served markup.
+body.docked .sidebar-navigation .sidebar-search {
+  #quarto-search:empty,
+  .aa-Form {
+    min-height: $sidebar-search-height;
+  }
+
+  .aa-DetachedSearchButton {
+    min-height: $sidebar-search-height;
   }
 }
 
@@ -422,6 +441,14 @@ body.floating .sidebar.sidebar-navigation {
     border-top-color: var(--atelier-sidebar-border);
     opacity: 1;
   }
+}
+
+// Until the icon font loads, the sidebar chevron is a fallback glyph of
+// another width, so the chevron moves sideways when the font comes. The box
+// keeps the width of the icon glyph, which is one em, from the first paint.
+#quarto-sidebar .sidebar-item-toggle > .bi {
+  box-sizing: content-box;
+  width: 1em;
 }
 
 // The narrow-screen toggle sits in the secondary nav bar. It is a 32 px icon
@@ -514,13 +541,29 @@ body.floating .sidebar.sidebar-navigation {
     text-transform: uppercase;
   }
 
+  // `html/scripts/toc-early.html` adds the meta row before the first paint,
+  // and `html/scripts/toc-card.html` writes the reading time later. Each item
+  // has its own line, so the late reading time cannot push the date to a new
+  // line, and its empty line keeps the height of one line. The entries then do
+  // not move when the text comes. The text fades in with the keyframes of
+  // `html/workshop.scss`.
   .atelier-toc-meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
+    flex-direction: column;
+    gap: 0.15rem;
     margin-bottom: 0.7rem;
     color: var(--atelier-toc-muted);
     font-size: 0.78rem;
+  }
+
+  .atelier-toc-reading-time {
+    min-height: 1lh;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .atelier-toc-meta.atelier-filled > .atelier-toc-reading-time {
+      animation: atelier-bar-fade 150ms ease-out;
+    }
   }
 
   ul {

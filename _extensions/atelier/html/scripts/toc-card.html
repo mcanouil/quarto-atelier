@@ -8,21 +8,21 @@
 		var toc = document.querySelector("#quarto-margin-sidebar #TOC");
 		if (!toc) return;
 
-		// In workshop mode, html/scripts/course.html draws the progress dots in
-		// place of this card.
+		// In workshop mode, the table of contents shows progress dots in place of
+		// this card. html/scripts/toc-early.html adds them, and
+		// html/scripts/course.html updates them.
 		if (window.atelierCourse && window.atelierCourse.mode === "workshop") return;
 
+		// html/scripts/toc-early.html adds the rows of the card in the head. This
+		// script fills the reading time, and handles the copy-link button.
 		var labels = (window.atelierOptions || {}).labels || {};
 		var readingTime = labels["toc-reading-time"];
-		var updated = labels["toc-updated"];
 		var copyLabel = labels["toc-copy-link"];
 		var copiedLabel = labels["toc-link-copied"];
 
-		// The meta row sits between the title and the entries. Reading time
-		// counts 200 words a minute, at least one minute, of the content that
-		// shows: the veil extension hides content with the hidden attribute.
-		var meta = document.createElement("div");
-		meta.className = "atelier-toc-meta";
+		// Reading time counts 200 words a minute, at least one minute, of the
+		// content that shows: the veil extension hides content with the hidden
+		// attribute.
 		var content = document.getElementById("quarto-document-content");
 		function countWords() {
 			if (!content) return 0;
@@ -39,21 +39,23 @@
 			}
 			return text.join("").split(/\s+/).filter(Boolean).length;
 		}
-		if (readingTime) {
-			var time = document.createElement("span");
-			time.className = "atelier-toc-reading-time";
-			var readingText = function () {
-				return readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
-			};
-			time.textContent = readingText();
-			// Quarto clones the card for narrow screens after this script runs,
-			// so an update writes to each copy.
+		if (readingTime && toc.querySelector(".atelier-toc-reading-time")) {
+			// When content spans into the margin, Quarto clones the table of
+			// contents into a toggle, so an update writes to each copy. The
+			// first text makes the meta row visible to assistive technology,
+			// and fades it in.
 			var updateReadingTime = function () {
-				var text = readingText();
+				var text = readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
 				document.querySelectorAll(".atelier-toc-reading-time").forEach(function (copy) {
 					copy.textContent = text;
+					var meta = copy.closest(".atelier-toc-meta");
+					if (meta && meta.hasAttribute("aria-hidden")) {
+						meta.removeAttribute("aria-hidden");
+						meta.classList.add("atelier-filled");
+					}
 				});
 			};
+			updateReadingTime();
 			// Veil starts on DOMContentLoaded, after this script runs. It sends
 			// veil:ready once it has applied the start state, and veil:change
 			// after each later change.
@@ -61,52 +63,11 @@
 				document.addEventListener("veil:ready", updateReadingTime);
 				document.addEventListener("veil:change", updateReadingTime);
 			}
-			meta.appendChild(time);
-		}
-		var modified = document.querySelector(".quarto-title-meta .date-modified");
-		var modifiedDate = modified && modified.textContent.trim();
-		if (updated && modifiedDate) {
-			var stamp = document.createElement("span");
-			stamp.className = "atelier-toc-updated";
-			stamp.textContent = updated.replace("{date}", modifiedDate);
-			meta.appendChild(stamp);
-		}
-		var title = toc.querySelector("#toc-title");
-		if (title) {
-			title.after(meta);
-		} else {
-			toc.prepend(meta);
 		}
 
-		// Quarto writes the actions list only when the site has actions.
-		var actions = toc.querySelector(".toc-actions");
-		if (!actions) {
-			actions = document.createElement("div");
-			actions.className = "toc-actions";
-			toc.appendChild(actions);
-		}
-		var list = actions.querySelector("ul");
-		if (!list) {
-			list = document.createElement("ul");
-			actions.appendChild(list);
-		}
-		var button = document.createElement("button");
-		button.type = "button";
-		button.className = "toc-action atelier-copy-link";
-		button.innerHTML = '<i class="bi bi-link-45deg" aria-hidden="true"></i>';
-		button.appendChild(document.createTextNode(copyLabel || ""));
-		var item = document.createElement("li");
-		item.appendChild(button);
-		list.appendChild(item);
-
-		var status = document.createElement("span");
-		status.className = "visually-hidden";
-		status.setAttribute("aria-live", "polite");
-		toc.appendChild(status);
-
-		// Quarto clones the margin table of contents into a toggle on narrow
-		// pages, and a clone has no listeners. Delegate from the document so
-		// that the original and the clone both work.
+		// When content spans into the margin, Quarto clones the table of
+		// contents into a toggle, and a clone has no listeners. Delegate from
+		// the document so that the original and the clone both work.
 		var timers = new WeakMap();
 		document.addEventListener("click", function (event) {
 			var target = event.target;
