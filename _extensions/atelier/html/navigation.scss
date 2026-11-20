@@ -166,6 +166,40 @@ body .gitlink-widget:not(.gitlink-widget-sidebar) .gitlink-widget-dropdown {
   box-shadow: 0 12px 30px -16px var(--atelier-shadow);
 }
 
+// On a phone, the top row of the navbar wraps when it is full. The widget and
+// the search button are added after the first paint, so each one keeps a
+// width that is known before the paint: otherwise the row can wrap late and
+// move the page down. The pill drops its counts, whose width depends on the
+// numbers; the menu items keep the counts, with their own screen-reader text.
+// The placeholder link that the widget replaces gets the width of the pill.
+@include media-breakpoint-down(sm) {
+  .navbar {
+    --atelier-gitlink-pill-width: 4rem;
+
+    .gitlink-widget-stats {
+      display: none;
+    }
+
+    .gitlink-widget-trigger,
+    .quarto-navbar-tools .quarto-navigation-tool[href$="#gitlink-widget"] {
+      width: var(--atelier-gitlink-pill-width);
+      justify-content: center;
+    }
+
+    #quarto-search:empty {
+      min-width: var(--atelier-navbar-control-size);
+      min-height: var(--atelier-navbar-control-size);
+    }
+
+    // Quarto's wrapper is a block around an inline button, so its line box
+    // adds the space below the baseline and the mounted search is taller than
+    // the other controls.
+    #quarto-search .aa-Autocomplete {
+      display: flex;
+    }
+  }
+}
+
 // ===========================================================================
 // SIDEBAR MENU
 // ===========================================================================
