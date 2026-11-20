@@ -395,7 +395,7 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
 // the textbox.
 // Upstream: none filed (no WCAG criterion; layout shift on load)
 // Remove when: Quarto gives the search box its height in the served markup.
-body.docked .sidebar-navigation .sidebar-search {
+body:is(.docked, .floating) .sidebar-navigation .sidebar-search {
   #quarto-search:empty,
   .aa-Form,
   .aa-DetachedSearchButton {
