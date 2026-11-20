@@ -11,14 +11,20 @@
 		// module, the module position, and a session timer when the page has a
 		// duration. With a navbar, only workshop mode has the bar: it is the module
 		// row under the navbar, inside the header, so it stays with the navbar.
-		if (!window.atelierCourse || window.atelierCourse.current < 0) return;
+		// page-load.html puts a frame of the module row under the navbar. The
+		// row takes its place, and a page that gets no row loses the frame.
+		var frame = document.querySelector("#quarto-header > .atelier-bar-frame");
+		function noBar() {
+			if (frame) frame.remove();
+		}
+		if (!window.atelierCourse || window.atelierCourse.current < 0) return noBar();
 		var content = document.getElementById("quarto-content");
-		if (!content) return;
+		if (!content) return noBar();
 
 		var course = window.atelierCourse;
 		var workshop = course.mode === "workshop";
 		var navbar = document.querySelector("#quarto-header > nav.navbar");
-		if (navbar && !workshop) return;
+		if (navbar && !workshop) return noBar();
 		var page = course.pages[course.current];
 		var module = course.modules[course.currentModule];
 
@@ -50,7 +56,7 @@
 		var active = document.querySelector("#quarto-sidebar .sidebar-link.active");
 		var inSection = Boolean(active && active.closest(".sidebar-item-section"));
 		if (module && module.title && module.title !== page.title && (workshop || inSection)) {
-			crumb.appendChild(document.createTextNode(module.title + " / "));
+			crumb.appendChild(element("span", "atelier-bar-module", module.title + " / "));
 		}
 		crumb.appendChild(element("b", "", page.title));
 		row.appendChild(crumb);
@@ -67,7 +73,7 @@
 			link.href = quartoLink.href;
 			var label = course.label(kind);
 			if (!label) setLabel(link, "aria-label", quartoLink.textContent.trim());
-			var text = document.createTextNode(label);
+			var text = element("span", "atelier-bar-label", label);
 			if (kind === "previous") {
 				link.appendChild(icon(iconName));
 				link.appendChild(text);
@@ -100,7 +106,8 @@
 		// sets the page offset, so the row needs no measurement of its own.
 		if (navbar) {
 			bar.classList.add("atelier-bar-module-row");
-			navbar.after(bar);
+			if (frame) frame.replaceWith(bar);
+			else navbar.after(bar);
 		} else {
 			content.insertBefore(bar, content.firstChild);
 			// The table of contents and the scroll padding sit below the bar. The

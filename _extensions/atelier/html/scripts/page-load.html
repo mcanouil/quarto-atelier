@@ -112,6 +112,20 @@
 			if (header) document.body.style.paddingTop = header.clientHeight + "px";
 		}
 
+		// On a workshop page with a navbar, reading-bar.html puts the module row
+		// right after the navbar. The frame of the row goes there first, so the
+		// header has its final height and order before the first paint, and the
+		// script swaps the frame for the row.
+		function addModuleRowFrame() {
+			var root = document.documentElement.classList;
+			var navbar = document.querySelector("#quarto-header > nav.navbar");
+			if (!navbar || !root.contains("atelier-workshop") || root.contains("atelier-workshop-unlisted")) return;
+			var frame = document.createElement("div");
+			frame.className = "atelier-bar-frame";
+			frame.setAttribute("aria-hidden", "true");
+			navbar.after(frame);
+		}
+
 		// chrome.html reads the options again, and warns when the block is not valid JSON.
 		function readOptions() {
 			try {
@@ -129,6 +143,7 @@
 			var bar = document.getElementById("quarto-announcement");
 			markCurrentTab();
 			addVersionPill(options.version);
+			addModuleRowFrame();
 			if (bar) labelAnnouncement(bar, options.labels || {});
 			settleHeader(bar);
 		}

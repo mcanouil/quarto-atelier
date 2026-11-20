@@ -17,7 +17,21 @@
 $_atelier-bar-row-height: 50px;
 $_atelier-bar-track-height: 5px;
 $_atelier-bar-border-width: 1px;
-$_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_atelier-bar-track-height + $_atelier-bar-border-width});
+$_atelier-bar-one-line-height: $_atelier-bar-row-height + $_atelier-bar-track-height + $_atelier-bar-border-width;
+$_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-one-line-height});
+
+// The script inserts the bar after the first paint. The served page already
+// tells that it will come: a page with no navbar (no `nav-fixed` on `body`
+// and no `nav.navbar` in the header) and with the current page in the
+// sidebar gets the bar, unless it is a workshop page that no listed sidebar
+// holds. The layout around the bar uses both selectors, so the row is there
+// from the first paint.
+$_atelier-bar-navbar: "#quarto-header > nav.navbar";
+$_atelier-bar-current: "#quarto-sidebar .sidebar-link.active";
+$_atelier-bar-expected: "html:not(.atelier-workshop-unlisted) > body:not(.nav-fixed, :has(#{$_atelier-bar-navbar})) #quarto-content:has(#{$_atelier-bar-current})";
+$_atelier-bar-content: "#quarto-content:has(> .atelier-bar), #{$_atelier-bar-expected}";
+// `:has()` does not nest, so the root puts the navbar test on `html`.
+$_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier-workshop-unlisted, :has(#{$_atelier-bar-navbar})):has(> body:not(.nav-fixed) #{$_atelier-bar-current})";
 
 .atelier-bar {
   grid-column: screen-start / screen-end;
@@ -45,9 +59,11 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
   padding-inline: 0;
 }
 
-#quarto-content:has(> .atelier-bar) {
+#{$_atelier-bar-content} {
   grid-template-rows:
-    [bar-top] auto
+    // The floor is the one-line height. The measured height would only grow,
+    // because the bar stretches to the row it measures.
+    [bar-top] minmax(#{$_atelier-bar-one-line-height}, auto)
     [content-top] minmax(max-content, 1fr)
     [content-bottom] minmax(60px, max-content)
     [page-bottom];
@@ -134,6 +150,45 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
   font-variant-numeric: tabular-nums;
 }
 
+// Until the script inserts the bar, its row shows the frame of the bar: the
+// background, the empty progress track, and the bottom border. The text, the
+// links, and the progress fill then fade in, so only they change.
+#{$_atelier-bar-expected}:not(:has(> .atelier-bar))::before {
+  content: "";
+  grid-column: screen-start / screen-end;
+  grid-row: bar-top / content-top;
+  border-bottom: $_atelier-bar-border-width solid var(--atelier-workshop-bar-border);
+  background: linear-gradient(
+    to top,
+    var(--atelier-workshop-bar-track) $_atelier-bar-track-height,
+    var(--atelier-workshop-bar-bg) $_atelier-bar-track-height
+  );
+}
+
+// `page-load.html` puts this frame of the module row under the navbar before
+// the first paint, and `reading-bar.html` swaps it for the row.
+#quarto-header > .atelier-bar-frame {
+  height: $_atelier-bar-one-line-height;
+  border-bottom: $_atelier-bar-border-width solid var(--atelier-workshop-bar-border);
+  background: linear-gradient(
+    to top,
+    var(--atelier-workshop-bar-track) $_atelier-bar-track-height,
+    var(--atelier-workshop-bar-bg) $_atelier-bar-track-height
+  );
+}
+
+@keyframes atelier-bar-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(#quarto-content, #quarto-header) > .atelier-bar :is(.atelier-bar-row, .atelier-bar-progress > span) {
+    animation: atelier-bar-fade 150ms ease-out;
+  }
+}
+
 .atelier-bar-progress {
   height: $_atelier-bar-track-height;
   background-color: var(--atelier-workshop-bar-track);
@@ -149,17 +204,21 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
 // while the page scrolls. The table of contents sticks below it, and anchors
 // and focused elements scroll to below it.
 @include media-breakpoint-up(lg) {
-  html:has(#quarto-content > .atelier-bar) {
+  #{$_atelier-bar-root} {
     scroll-padding-top: $_atelier-bar-height;
+  }
+
+  #quarto-content > .atelier-bar,
+  #{$_atelier-bar-expected}::before {
+    grid-column: body-start / screen-end;
   }
 
   #quarto-content > .atelier-bar {
     position: sticky;
     top: 0;
-    grid-column: body-start / screen-end;
   }
 
-  #quarto-content:has(> .atelier-bar) {
+  #{$_atelier-bar-content} {
     > #quarto-sidebar {
       grid-row: bar-top / page-bottom;
     }
@@ -173,9 +232,38 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
   }
 }
 
+// Below `md` the bar keeps one line, so it keeps the height that the page
+// reserves for it. The crumb shows only the page title, with an ellipsis, and
+// the previous and next links show only their arrows; their labels stay for
+// screen readers.
 @include media-breakpoint-down(md) {
+  .atelier-bar-row {
+    flex-wrap: nowrap;
+  }
+
+  .atelier-bar-crumb {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .atelier-bar-module {
+    display: none;
+  }
+
   .atelier-bar-actions {
-    margin-left: 0;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+
+    a {
+      padding-inline: 0.4rem;
+    }
+  }
+
+  .atelier-bar-label {
+    @include visually-hidden;
   }
 }
 
