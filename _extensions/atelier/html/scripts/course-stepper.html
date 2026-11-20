@@ -11,8 +11,9 @@
 		// script adds classes and elements only. All modules other than the
 		// current module are collapsed, and Quarto's toggle opens them again.
 		//
-		// This script is in the head. It runs on the "sidebar" stage of page-load.html,
-		// after course-model.html built the course, so the stepper is in the first paint.
+		// This script is in the head. It runs on the "sidebar" stage of
+		// page-load.html, after course-model.html built the course, so the
+		// stepper is in the first paint.
 		if (!window.atelierStages) {
 			console.warn("Atelier: the course stepper needs page-load.html, which is not in the head.");
 			return;

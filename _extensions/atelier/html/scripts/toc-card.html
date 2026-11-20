@@ -8,8 +8,9 @@
 		var toc = document.querySelector("#quarto-margin-sidebar #TOC");
 		if (!toc) return;
 
-		// In workshop mode, html/scripts/course.html draws the progress dots in
-		// place of this card.
+		// In workshop mode, the table of contents shows progress dots in place of
+		// this card. html/scripts/toc-early.html adds them, and
+		// html/scripts/course.html updates them.
 		if (window.atelierCourse && window.atelierCourse.mode === "workshop") return;
 
 		// html/scripts/toc-early.html adds the rows of the card in the head. This
@@ -39,8 +40,8 @@
 			return text.join("").split(/\s+/).filter(Boolean).length;
 		}
 		if (readingTime && toc.querySelector(".atelier-toc-reading-time")) {
-			// Quarto clones the card for narrow screens, so an update writes to
-			// each copy. The first text makes the meta row visible to assistive
+			// When content spans into the margin, Quarto clones the table of
+			// contents into a toggle, so an update writes to each copy. The first text makes the meta row visible to assistive
 			// technology, and fades it in.
 			var updateReadingTime = function () {
 				var text = readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
@@ -63,9 +64,9 @@
 			}
 		}
 
-		// Quarto clones the margin table of contents into a toggle on narrow
-		// pages, and a clone has no listeners. Delegate from the document so
-		// that the original and the clone both work.
+		// When content spans into the margin, Quarto clones the table of
+		// contents into a toggle, and a clone has no listeners. Delegate from
+		// the document so that the original and the clone both work.
 		var timers = new WeakMap();
 		document.addEventListener("click", function (event) {
 			var target = event.target;

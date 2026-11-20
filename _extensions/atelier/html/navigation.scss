@@ -366,8 +366,8 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     padding-inline: 0;
   }
 
-  // `html/scripts/sidebar-header.html` moves the tools out of the header, after the
-  // search field, so the row follows the header class as a later sibling.
+  // `html/scripts/sidebar-header.html` moves the tools out of the header, after
+  // the search field, so the row follows the header class as a later sibling.
   .sidebar-header.text-end .sidebar-tools-main,
   .sidebar-header.text-end ~ .sidebar-tools-main {
     justify-content: flex-end;
