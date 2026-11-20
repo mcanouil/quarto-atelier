@@ -433,6 +433,14 @@ body.floating .sidebar.sidebar-navigation {
   }
 }
 
+// Until the icon font loads, the sidebar chevron is a fallback glyph of
+// another width, so the chevron moves sideways when the font comes. The box
+// keeps the width of the icon glyph, which is one em, from the first paint.
+#quarto-sidebar .sidebar-item-toggle > .bi {
+  box-sizing: content-box;
+  width: 1em;
+}
+
 // The narrow-screen toggle sits in the secondary nav bar. It is a 32 px icon
 // button in the bar foreground; Quarto sizes it from the glyph alone.
 .quarto-secondary-nav .quarto-btn-toggle {
