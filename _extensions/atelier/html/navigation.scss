@@ -523,13 +523,29 @@ body.floating .sidebar.sidebar-navigation {
     text-transform: uppercase;
   }
 
+  // `html/scripts/toc-early.html` adds the meta row before the first paint,
+  // and `html/scripts/toc-card.html` writes the reading time later. Each item
+  // has its own line, so the late reading time cannot push the date to a new
+  // line, and its empty line keeps the height of one line. The entries then do
+  // not move when the text comes. The text fades in with the keyframes of
+  // `html/workshop.scss`.
   .atelier-toc-meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
+    flex-direction: column;
+    gap: 0.15rem;
     margin-bottom: 0.7rem;
     color: var(--atelier-toc-muted);
     font-size: 0.78rem;
+  }
+
+  .atelier-toc-reading-time {
+    min-height: 1lh;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .atelier-toc-meta.atelier-filled > .atelier-toc-reading-time {
+      animation: atelier-bar-fade 150ms ease-out;
+    }
   }
 
   ul {

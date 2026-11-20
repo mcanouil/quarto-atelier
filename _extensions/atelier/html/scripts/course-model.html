@@ -175,6 +175,19 @@
 					}
 				};
 
+				// The share of the current module read, in whole percent. The current
+				// page counts by the share of its headings read, given as a number
+				// from 0 to 1. Each other page of the module counts once visited.
+				course.moduleShare = function (pageShare) {
+					var module = modules[course.currentModule];
+					if (!module) return 0;
+					var total = module.pages.reduce(function (sum, index) {
+						if (index === current) return sum + pageShare;
+						return sum + (course.progress.visited.indexOf(pages[index].href) !== -1 ? 1 : 0);
+					}, 0);
+					return Math.round((100 * total) / module.pages.length);
+				};
+
 				course.isComplete = function (moduleIndex) {
 					var module = modules[moduleIndex];
 					return Boolean(module) && module.pages.every(function (index) {

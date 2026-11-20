@@ -161,6 +161,7 @@ contributes:
         - file: html/scripts/course-model.html
         - file: html/scripts/course-stepper.html
         - file: html/scripts/sidebar-header.html
+        - file: html/scripts/toc-early.html
       include-after-body:
         - file: html/scripts/current-year.html
         - file: html/scripts/external-links.html

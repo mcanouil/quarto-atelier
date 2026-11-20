@@ -48,7 +48,15 @@
 				var heading = document.getElementById(id);
 				if (heading) headings.push({ href: target, node: heading });
 			});
-			if (!headings.length) return;
+			// html/scripts/toc-early.html adds the class and the line in the head.
+			// With no heading to track, the table of contents goes back to the card.
+			if (!headings.length) {
+				toc.classList.remove("atelier-toc-dots");
+				toc.querySelectorAll(".atelier-toc-progress").forEach(function (line) {
+					line.remove();
+				});
+				return;
+			}
 
 			var key = course.current !== -1 ? course.pages[course.current].href : location.pathname;
 			var stored = course.progress.read[key];
@@ -58,9 +66,11 @@
 			});
 			var inModule = course.currentModule !== -1;
 
-			// A clone made before this block runs lacks the class and the line,
-			// so render() calls this on every root. It adds only what is missing.
-			// It returns the ring and the text node of the line, or null outside a module.
+			// html/scripts/toc-early.html adds the class and the line in the head,
+			// so a clone that Quarto makes on DOMContentLoaded has them. A clone
+			// made in another way can lack them, so render() calls this on every
+			// root. It adds only what is missing. It returns the ring and the text
+			// node of the line, or null outside a module.
 			function prepare(root) {
 				root.classList.add("atelier-toc-dots");
 				if (!inModule) return null;
@@ -81,17 +91,8 @@
 				return { ring: ring, text: text };
 			}
 
-			function share() {
-				var pages = course.modules[course.currentModule].pages;
-				var total = pages.reduce(function (sum, index) {
-					if (index === course.current) return sum + read.length / headings.length;
-					return sum + (course.progress.visited.indexOf(course.pages[index].href) !== -1 ? 1 : 0);
-				}, 0);
-				return Math.round((100 * total) / pages.length);
-			}
-
 			function render() {
-				var percent = inModule ? share() : 0;
+				var percent = inModule ? course.moduleShare(read.length / headings.length) : 0;
 				document.querySelectorAll("#quarto-margin-sidebar #TOC, .quarto-sidebar-toggle-contents #TOC").forEach(function (root) {
 					var line = prepare(root);
 					headings.forEach(function (heading) {
