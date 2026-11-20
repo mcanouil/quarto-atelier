@@ -233,8 +233,9 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
 }
 
 // Below `md` the bar keeps one line, so it keeps the height that the page
-// reserves for it. The crumb ends with an ellipsis, and the previous and next
-// links show only their arrows; their labels stay for screen readers.
+// reserves for it. The crumb shows only the page title, with an ellipsis, and
+// the previous and next links show only their arrows; their labels stay for
+// screen readers.
 @include media-breakpoint-down(md) {
   .atelier-bar-row {
     flex-wrap: nowrap;
@@ -246,6 +247,10 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  .atelier-bar-module {
+    display: none;
   }
 
   .atelier-bar-actions {

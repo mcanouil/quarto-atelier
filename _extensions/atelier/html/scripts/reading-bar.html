@@ -56,7 +56,7 @@
 		var active = document.querySelector("#quarto-sidebar .sidebar-link.active");
 		var inSection = Boolean(active && active.closest(".sidebar-item-section"));
 		if (module && module.title && module.title !== page.title && (workshop || inSection)) {
-			crumb.appendChild(document.createTextNode(module.title + " / "));
+			crumb.appendChild(element("span", "atelier-bar-module", module.title + " / "));
 		}
 		crumb.appendChild(element("b", "", page.title));
 		row.appendChild(crumb);
