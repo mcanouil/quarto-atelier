@@ -571,7 +571,10 @@ local function publish_workshop(meta)
       end
     end
     -- An unlisted page gets no workshop bar, so its CSS must not reserve the bar row.
-    local classes = data.listed and '"atelier-workshop"' or '"atelier-workshop", "atelier-workshop-unlisted"'
+    local classes = '"atelier-workshop"'
+    if not data.listed then
+      classes = classes .. ', "atelier-workshop-unlisted"'
+    end
     quarto.doc.include_text(
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'

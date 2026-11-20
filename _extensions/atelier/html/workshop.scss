@@ -25,9 +25,11 @@ $_atelier-bar-height: var(--atelier-bar-height, #{$_atelier-bar-row-height + $_a
 // sidebar gets the bar, unless it is a workshop page that no listed sidebar
 // holds. The layout around the bar uses both selectors, so the row is there
 // from the first paint.
-$_atelier-bar-expected: "html:not(.atelier-workshop-unlisted) > body:not(.nav-fixed, :has(#quarto-header > nav.navbar)) #quarto-content:has(#quarto-sidebar .sidebar-link.active)";
-$_atelier-bar-content: "#quarto-content:has(> .atelier-bar), #{$_atelier-bar-expected}";
-$_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier-workshop-unlisted, :has(#quarto-header > nav.navbar)):has(> body:not(.nav-fixed) #quarto-content #quarto-sidebar .sidebar-link.active)";
+$_atelier-bar-navbar: "#quarto-header > nav.navbar";
+$_atelier-bar-current: "#quarto-sidebar .sidebar-link.active";
+$_atelier-bar-content: "#quarto-content:has(> .atelier-bar), html:not(.atelier-workshop-unlisted) > body:not(.nav-fixed, :has(#{$_atelier-bar-navbar})) #quarto-content:has(#{$_atelier-bar-current})";
+// `:has()` does not nest, so the root puts the navbar test on `html`.
+$_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier-workshop-unlisted, :has(#{$_atelier-bar-navbar})):has(> body:not(.nav-fixed) #{$_atelier-bar-current})";
 
 .atelier-bar {
   grid-column: screen-start / screen-end;
