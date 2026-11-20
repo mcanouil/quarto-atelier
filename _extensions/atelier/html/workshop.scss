@@ -271,9 +271,9 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
 // S3 COURSE STEPPER
 // ===========================================================================
 // In workshop mode, `html/scripts/course-stepper.html` turns the sidebar menu
-// into a course stepper: a numbered dot before each module, a vertical line between
-// the dots, and the duration under the module title. The current page in the
-// open module keeps the S2 current item.
+// into a course stepper: a numbered dot before each module, a vertical line
+// between the dots, and the duration under the module title. The current page
+// in the open module keeps the S2 current item.
 
 // The dot column starts at the inset of the module row. The line runs through
 // the centre of the dots.
@@ -431,8 +431,9 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 // the share of the module read, and a dot before each entry that fills once
 // the heading is read. `html/scripts/toc-early.html` adds the structure, and
 // `html/scripts/course.html` updates it. The same rules apply to the clone in
-// the toggle that Quarto adds when content spans into the margin. The selector matches the id
-// selectors of the T2 card rules, which these rules replace.
+// the toggle that Quarto adds when content spans into the margin. The
+// selector matches the id selectors of the T2 card rules, which these rules
+// replace.
 :is(#quarto-margin-sidebar, .quarto-sidebar-toggle-contents) #TOC.atelier-toc-dots {
   .atelier-toc-progress {
     display: flex;

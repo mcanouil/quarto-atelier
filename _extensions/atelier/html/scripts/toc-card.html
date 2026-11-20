@@ -41,8 +41,9 @@
 		}
 		if (readingTime && toc.querySelector(".atelier-toc-reading-time")) {
 			// When content spans into the margin, Quarto clones the table of
-			// contents into a toggle, so an update writes to each copy. The first text makes the meta row visible to assistive
-			// technology, and fades it in.
+			// contents into a toggle, so an update writes to each copy. The
+			// first text makes the meta row visible to assistive technology,
+			// and fades it in.
 			var updateReadingTime = function () {
 				var text = readingTime.replace("{n}", Math.max(1, Math.round(countWords() / 200)));
 				document.querySelectorAll(".atelier-toc-reading-time").forEach(function (copy) {
