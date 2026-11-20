@@ -152,11 +152,28 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
 
 // Until the script inserts the bar, its row shows the frame of the bar: the
 // background, the empty progress track, and the bottom border. The text, the
-// links, and the progress fill then fade in, so only they change.
+// links, and the progress fill then fade in, so only they change. The same
+// holds for the module row under a navbar.
 #{$_atelier-bar-expected}:not(:has(> .atelier-bar))::before {
   content: "";
   grid-column: screen-start / screen-end;
   grid-row: bar-top / content-top;
+  border-bottom: $_atelier-bar-border-width solid var(--atelier-workshop-bar-border);
+  background: linear-gradient(
+    to top,
+    var(--atelier-workshop-bar-track) $_atelier-bar-track-height,
+    var(--atelier-workshop-bar-bg) $_atelier-bar-track-height
+  );
+}
+
+// With a navbar, the module row of a workshop page goes under the navbar. The
+// head script marks the page before the header is parsed, so the header has
+// the frame of the row when `page-load.html` measures it.
+html.atelier-workshop:not(.atelier-workshop-unlisted) #quarto-header:has(> nav.navbar):not(:has(> .atelier-bar))::after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  height: $_atelier-bar-one-line-height;
   border-bottom: $_atelier-bar-border-width solid var(--atelier-workshop-bar-border);
   background: linear-gradient(
     to top,
@@ -172,7 +189,7 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #quarto-content > .atelier-bar :is(.atelier-bar-row, .atelier-bar-progress > span) {
+  :is(#quarto-content, #quarto-header) > .atelier-bar :is(.atelier-bar-row, .atelier-bar-progress > span) {
     animation: atelier-bar-fade 150ms ease-out;
   }
 }
