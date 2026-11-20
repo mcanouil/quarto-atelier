@@ -150,6 +150,33 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
   font-variant-numeric: tabular-nums;
 }
 
+// Until the script inserts the bar, its row shows the frame of the bar: the
+// background, the empty progress track, and the bottom border. The text, the
+// links, and the progress fill then fade in, so only they change.
+#{$_atelier-bar-expected}:not(:has(> .atelier-bar))::before {
+  content: "";
+  grid-column: screen-start / screen-end;
+  grid-row: bar-top / content-top;
+  border-bottom: $_atelier-bar-border-width solid var(--atelier-workshop-bar-border);
+  background: linear-gradient(
+    to top,
+    var(--atelier-workshop-bar-track) $_atelier-bar-track-height,
+    var(--atelier-workshop-bar-bg) $_atelier-bar-track-height
+  );
+}
+
+@keyframes atelier-bar-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #quarto-content > .atelier-bar :is(.atelier-bar-row, .atelier-bar-progress > span) {
+    animation: atelier-bar-fade 150ms ease-out;
+  }
+}
+
 .atelier-bar-progress {
   height: $_atelier-bar-track-height;
   background-color: var(--atelier-workshop-bar-track);
@@ -169,10 +196,14 @@ $_atelier-bar-root: "html:has(#quarto-content > .atelier-bar), html:not(.atelier
     scroll-padding-top: $_atelier-bar-height;
   }
 
+  #quarto-content > .atelier-bar,
+  #{$_atelier-bar-expected}::before {
+    grid-column: body-start / screen-end;
+  }
+
   #quarto-content > .atelier-bar {
     position: sticky;
     top: 0;
-    grid-column: body-start / screen-end;
   }
 
   #{$_atelier-bar-content} {
