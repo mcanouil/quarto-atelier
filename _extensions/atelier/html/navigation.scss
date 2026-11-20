@@ -355,26 +355,8 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
       min-height: 32px;
     }
 
-    .gitlink-widget,
-    > a[href$="#gitlink-widget"] {
+    .gitlink-widget {
       order: 0;
-    }
-
-    // The gitlink widget replaces its placeholder link after the first paint,
-    // so the placeholder takes the size of the widget pill: otherwise the
-    // other tools in the row move. The pill drops its counts, whose width
-    // depends on the numbers; the menu items keep the counts. The width is
-    // the platform icon, the gap, the caret, the padding and the border of the
-    // trigger, less the side padding that Quarto gives the link. The height is
-    // the platform icon, as widget.css adds the padding and the border.
-    .gitlink-widget-stats {
-      display: none;
-    }
-
-    > a[href$="#gitlink-widget"] {
-      width: calc(20px + 6px + 16px + 1.2rem + 2px - 0.5rem);
-      height: 20px;
-      min-height: 0;
     }
   }
 
