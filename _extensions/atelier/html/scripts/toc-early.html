@@ -66,12 +66,10 @@
 		// between the title and the entries. html/scripts/toc-card.html fills the
 		// reading time, and handles the copy-link button.
 		function addCard(toc, labels) {
-			if (labels["toc-reading-time"] || labels["toc-updated"]) {
+			if (labels["toc-reading-time"]) {
 				var meta = element("div", "atelier-toc-meta");
 				meta.setAttribute("aria-hidden", "true");
-				if (labels["toc-reading-time"]) {
-					meta.appendChild(element("span", "atelier-toc-reading-time"));
-				}
+				meta.appendChild(element("span", "atelier-toc-reading-time"));
 				afterTitle(toc, meta);
 			}
 
@@ -101,24 +99,21 @@
 		}
 
 		// The date of the last change is in the title block, which is complete on
-		// the "title" stage. A meta row with no reading time is then final, and a
-		// row with nothing in it goes.
+		// the "title" stage. A row that has the reading time exists already. A
+		// page with only the date gets its row here, with its text, so no empty
+		// row is ever in the table of contents.
 		function addUpdated(toc, label) {
-			var meta = toc.querySelector(".atelier-toc-meta");
-			if (!meta) return;
 			var modified = document.querySelector(".quarto-title-meta .date-modified");
 			var date = modified && modified.textContent.trim();
-			if (label && date) {
-				var stamp = element("span", "atelier-toc-updated");
-				stamp.textContent = label.replace("{date}", date);
-				meta.appendChild(stamp);
+			if (!label || !date) return;
+			var stamp = element("span", "atelier-toc-updated");
+			stamp.textContent = label.replace("{date}", date);
+			var meta = toc.querySelector(".atelier-toc-meta");
+			if (!meta) {
+				meta = element("div", "atelier-toc-meta");
+				afterTitle(toc, meta);
 			}
-			if (meta.querySelector(".atelier-toc-reading-time")) return;
-			if (meta.children.length) {
-				meta.removeAttribute("aria-hidden");
-			} else {
-				meta.remove();
-			}
+			meta.appendChild(stamp);
 		}
 
 		window.atelierStages.on("toc", function () {
