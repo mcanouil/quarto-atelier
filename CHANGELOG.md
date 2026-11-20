@@ -4,6 +4,7 @@
 
 - fix: The page content no longer jumps down when the reading bar or the workshop bar appears.
   The bar frame shows from the first paint, and its text fades in. (#135)
+- fix: On a phone, the reading bar and the workshop bar stay on one line, with the page title only and Previous and Next shown as arrows. (#135)
 
 ## 0.15.1 (2026-11-20)
 
