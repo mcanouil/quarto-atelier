@@ -219,6 +219,9 @@
 				var stage = stages[i];
 				if (stage.done) continue;
 				if (!force && !stage.ready()) return;
+				if (force && stage.name === "sidebar" && document.getElementById("quarto-sidebar")) {
+					console.warn("Atelier: the side columns were set up on DOMContentLoaded, after the first paint. The scripts after the body may have read window.atelierCourse as null.");
+				}
 				runStage(stage);
 			}
 			observer.disconnect();
