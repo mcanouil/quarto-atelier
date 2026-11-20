@@ -73,7 +73,7 @@
 			link.href = quartoLink.href;
 			var label = course.label(kind);
 			if (!label) setLabel(link, "aria-label", quartoLink.textContent.trim());
-			var text = document.createTextNode(label);
+			var text = element("span", "atelier-bar-label", label);
 			if (kind === "previous") {
 				link.appendChild(icon(iconName));
 				link.appendChild(text);
