@@ -101,8 +101,11 @@
 				// With auto-filename, Code Window names the window after its language,
 				// or `default` when it has none. The language label replaces that
 				// name, so the header shows the language once, or no name at all.
-				var windowName = codeWindow.classList.contains("code-window-auto") &&
-					header.querySelector(":scope > pre");
+				// Code Window marks such a window `code-window-auto` when its
+				// post-render filter runs, and marks the code block `cw-auto` when it
+				// does not.
+				var named = codeWindow.classList.contains("code-window-auto") || pre.classList.contains("cw-auto");
+				var windowName = named && header.querySelector(":scope > pre");
 				var shownName = windowName && windowName.textContent.trim().toLowerCase();
 				var unnamed = shownName === "default";
 				if (unnamed || (language && shownName === language.toLowerCase())) {
@@ -122,7 +125,7 @@
 			});
 		}
 		setUpWindows();
-		// Code Window builds the wrappers for auto-filename blocks on DOMContentLoaded.
+		// Code Window builds some windows, such as a collapsible one, on DOMContentLoaded.
 		document.addEventListener("DOMContentLoaded", setUpWindows);
 	})();
 </script>

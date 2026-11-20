@@ -13,22 +13,6 @@
 		bar.setAttribute("role", "region");
 		if (labels["announcement-region"]) bar.setAttribute("aria-label", labels["announcement-region"]);
 
-		// The label names the type. The theme colours map to the notice label.
-		var typeClass = Array.prototype.find.call(bar.classList, function (name) {
-			return name.indexOf("alert-") === 0;
-		});
-		var type = (typeClass || "").slice(6);
-		var key = "announcement-" + (["info", "warning", "danger", "success"].includes(type) ? type : "notice");
-		var label = document.createElement("span");
-		label.className = "atelier-announcement-label";
-		var icon = bar.querySelector(".quarto-announcement-icon");
-		if (icon) {
-			icon.setAttribute("aria-hidden", "true");
-			label.appendChild(icon);
-		}
-		if (labels[key]) label.appendChild(document.createTextNode(labels[key]));
-		bar.insertBefore(label, bar.firstChild);
-
 		var button = bar.querySelector("button.quarto-announcement-action");
 		if (button) {
 			// Quarto removes the bar on dismissal, and the focused button goes with it,

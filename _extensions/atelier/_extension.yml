@@ -156,6 +156,8 @@ contributes:
           page-exclude:
             - index.qmd
             - 404.qmd
+      include-in-header:
+        - file: html/scripts/page-load.html
       include-after-body:
         - file: html/scripts/current-year.html
         - file: html/scripts/external-links.html

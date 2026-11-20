@@ -602,8 +602,11 @@ html .code-with-filename.atelier-terminal {
     }
   }
 
-  // Code Window sets the label of a generated name in small caps.
-  &.code-window-auto .code-with-filename-file pre {
+  // Code Window sets the label of a generated name in small caps. It marks
+  // that window `code-window-auto` when its post-render filter runs, as with
+  // a project copy, and marks the code block `cw-auto` when it does not, as
+  // with the embedded copy.
+  &:is(.code-window-auto, :has(pre.cw-auto)) .code-with-filename-file pre {
     text-align: start;
 
     strong {

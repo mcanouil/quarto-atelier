@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: The navbar now marks the tab of the page you're on, instead of "Home" on every page of a site with one sidebar. (#133)
+- fix: The page content no longer jumps down after a page loads with a navbar, an announcement bar, or code blocks. (#133)
+- fix: On a phone, the repository pill in the navbar shows only its icon, with the star and fork counts in its menu, so the navbar keeps its height while the page loads. (#133)
+
 ## 0.15.0 (2026-11-19)
 
 - feat: Show every code block in a code window, with its language once in the title bar.

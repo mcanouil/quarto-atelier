@@ -5,8 +5,9 @@
 -->
 <script id="atelier-chrome" type="text/javascript">
 	(function () {
-		// The other Atelier scripts read the options from here, so the block is
-		// parsed once. This script runs first.
+		// The other Atelier scripts that run after the body read the options from
+		// here. Of those scripts, this script runs first. page-load.html, in the
+		// head, reads the block on its own.
 		var options = {};
 		try {
 			options = JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
@@ -118,32 +119,16 @@
 			}
 		}
 
-		// The version pill follows the brand in the navbar and the title link in
-		// the sidebar. Without a version, neither is added. A navbar with a logo
-		// has two brand links in one container, so the pill goes once after the
-		// container's last child.
+		// The version pill follows the title link in the sidebar. Without a
+		// version, no pill is added. page-load.html adds the pill of the navbar.
 		if (options.version) {
-			document.querySelectorAll(".navbar-brand-container > :last-child, .sidebar-title > a").forEach(function (brand) {
+			document.querySelectorAll(".sidebar-title > a").forEach(function (title) {
 				var pill = document.createElement("span");
 				pill.className = "atelier-version";
 				pill.textContent = options.version;
-				brand.after(pill);
+				title.after(pill);
 			});
 		}
-
-		// Quarto marks the current navbar link with a class, and sets
-		// aria-current only on some pages. It can also mark a tab whose page is
-		// not the current page, so "page" is kept for a tab whose link is the
-		// current page, and any other marked tab gets "true". The sidebar link is
-		// handled in a11y-fixes.html.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190
-		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
-		// Remove when: the minimum Quarto version includes the fix.
-		var here = location.pathname.replace(/index\.html$/, "");
-		document.querySelectorAll(".navbar .nav-link.active").forEach(function (link) {
-			var target = new URL(link.href, location.href).pathname.replace(/index\.html$/, "");
-			link.setAttribute("aria-current", target === here ? "page" : "true");
-		});
 
 		// Quarto marks the current page in the breadcrumbs by class only, so the
 		// last crumb, a link or a span, gets aria-current when it has none.

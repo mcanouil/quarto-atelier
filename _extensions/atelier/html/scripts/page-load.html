@@ -1,0 +1,144 @@
+<script id="atelier-page-load" type="text/javascript">
+	/**
+	 * @license MIT
+	 * @copyright 2026 Mickaël Canouil
+	 * @author Mickaël Canouil
+	 */
+	// This script is in the head. It changes the header once the parser has
+	// written it, before the browser paints the page. A mutation observer
+	// callback runs before the next paint, so each change is in the first paint.
+	// A change that comes later makes the header taller, and the content moves.
+	// A page with no #quarto-content gets the same changes on DOMContentLoaded.
+	(function () {
+		function pageOf(path) {
+			return path.replace(/index\.html$/, "");
+		}
+
+		// Quarto marks the first navbar link whose page is also in the sidebar.
+		// With one sidebar that holds every page, that link is "Home" on every
+		// page. The mark moves to the link of the current page, with
+		// aria-current="page". A page that no navbar link opens keeps the mark
+		// of Quarto, with aria-current="true", because that tab is a section and
+		// not the page. The sidebar link is handled in a11y-fixes.html.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15392 (mark)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190 (aria-current)
+		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
+		// Remove when: the minimum Quarto version includes both fixes.
+		function markCurrentTab() {
+			var here = pageOf(location.pathname);
+			var links = Array.prototype.slice.call(document.querySelectorAll(".navbar .nav-link[href]"));
+			// The toggle of a navbar menu has href="#", which opens no page.
+			var current = links.find(function (link) {
+				var href = link.getAttribute("href");
+				return (
+					href !== "" &&
+					href.charAt(0) !== "#" &&
+					link.origin === location.origin &&
+					link.hash === "" &&
+					pageOf(link.pathname) === here
+				);
+			});
+			links.forEach(function (link) {
+				if (current && link !== current) {
+					link.classList.remove("active");
+					link.removeAttribute("aria-current");
+				} else if (link.classList.contains("active")) {
+					link.setAttribute("aria-current", current ? "page" : "true");
+				}
+			});
+			if (current) {
+				current.classList.add("active");
+				current.setAttribute("aria-current", "page");
+			}
+		}
+
+		// The version pill follows the brand in the navbar. A navbar with a logo
+		// has two brand links in one container, so the pill goes once after the
+		// last child of the container. chrome.html adds the pill of the sidebar,
+		// because the parser has not written the sidebar when this script runs.
+		function addVersionPill(version) {
+			var brand = document.querySelector(".navbar-brand-container > :last-child");
+			if (!version || !brand) return;
+			var pill = document.createElement("span");
+			pill.className = "atelier-version";
+			pill.textContent = version;
+			brand.after(pill);
+		}
+
+		// The label of the announcement names its type. The theme colours map
+		// to the notice label.
+		function labelAnnouncement(bar, labels) {
+			var typeClass = Array.prototype.find.call(bar.classList, function (name) {
+				return name.indexOf("alert-") === 0;
+			});
+			var type = (typeClass || "").slice(6);
+			var key = "announcement-" + (["info", "warning", "danger", "success"].includes(type) ? type : "notice");
+			var label = document.createElement("span");
+			label.className = "atelier-announcement-label";
+			var icon = bar.querySelector(".quarto-announcement-icon");
+			if (icon) {
+				icon.setAttribute("aria-hidden", "true");
+				label.appendChild(icon);
+			}
+			if (labels[key]) label.appendChild(document.createTextNode(labels[key]));
+			bar.insertBefore(label, bar.firstChild);
+		}
+
+		// Quarto shows the announcement and sets the top padding of the body
+		// only on DOMContentLoaded. Until then, the bar is hidden and the padding
+		// is 64px, which is less than the two rows of the Atelier header. Thus
+		// the content moves down after the first paint. This function sets the
+		// bar and the padding first, with the values that Quarto gives them later.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15405
+		// Remove when: the minimum Quarto version includes the fix.
+		function showAnnouncement(bar) {
+			var dismissed;
+			try {
+				dismissed = window.localStorage.getItem("quarto-announce-" + bar.getAttribute("data-announcement-id"));
+			} catch (error) {
+				// Blocked storage: Quarto then keeps the bar hidden, so the bar stays hidden here too.
+				return;
+			}
+			if (dismissed) {
+				bar.remove();
+			} else {
+				bar.classList.remove("hidden");
+			}
+		}
+
+		function settleHeader(bar) {
+			if (bar && bar.classList.contains("hidden")) showAnnouncement(bar);
+			var header = document.querySelector("header.fixed-top");
+			if (header) document.body.style.paddingTop = header.clientHeight + "px";
+		}
+
+		// chrome.html reads the options again, and warns when the block is not valid JSON.
+		function readOptions() {
+			try {
+				return JSON.parse(document.getElementById("atelier-options")?.textContent || "{}");
+			} catch (error) {
+				return {};
+			}
+		}
+
+		var done = false;
+		function run() {
+			done = true;
+			observer.disconnect();
+			var options = readOptions();
+			var bar = document.getElementById("quarto-announcement");
+			markCurrentTab();
+			addVersionPill(options.version);
+			if (bar) labelAnnouncement(bar, options.labels || {});
+			settleHeader(bar);
+		}
+
+		var observer = new MutationObserver(function () {
+			if (document.getElementById("quarto-content")) run();
+		});
+		observer.observe(document, { childList: true, subtree: true });
+		document.addEventListener("DOMContentLoaded", function () {
+			if (!done) run();
+		}, { once: true });
+	})();
+</script>

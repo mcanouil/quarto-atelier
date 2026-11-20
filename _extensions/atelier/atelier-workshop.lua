@@ -905,6 +905,9 @@ local function style_terminal(block)
     block.attributes['atelier-continuation'] = table.concat(continuations, ',')
   end
   if (block.attributes.filename or '') == '' and (block.attributes['code-window-auto-label'] or '') == '' then
+    -- Code Window keeps a block with `filename=""` as Quarto's own window, with
+    -- no name, so the empty attribute goes and the label applies.
+    block.attributes.filename = nil
     block.attributes['code-window-auto-label'] = state.labels.terminal
   end
   return block
