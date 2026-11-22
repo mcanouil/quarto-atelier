@@ -96,7 +96,8 @@
 		// closed on narrow screens. A page with a navbar keeps the navbar pill
 		// there, so the phone bar gets no second pill. In the phone bar the pill
 		// does not follow the site title, so a hidden label names it for screen
-		// readers.
+		// readers. The crumbs of that bar can end with an ellipsis, so each one
+		// carries its full text in a tooltip.
 		function addVersionPill(version, labels) {
 			if (!version) return;
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
@@ -109,6 +110,9 @@
 					pill.prepend(element("span", "visually-hidden", labels.version + " "));
 				}
 				bar.append(pill);
+				bar.querySelectorAll(".breadcrumb-item").forEach(function (crumb) {
+					crumb.title = crumb.textContent.trim();
+				});
 			}
 		}
 

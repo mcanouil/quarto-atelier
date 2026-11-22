@@ -56,6 +56,12 @@
   .breadcrumb-item a:focus-visible {
     outline-offset: -2px;
   }
+
+  // The parent crumbs give up their width first, so the current page keeps
+  // its name for as long as the bar has room for it.
+  .breadcrumb-item:not(:last-child) {
+    flex-shrink: 1000;
+  }
 }
 
 // Below the breakpoint the phone bar shows, so its pill is the one in view,
