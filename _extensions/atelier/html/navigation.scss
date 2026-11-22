@@ -59,9 +59,11 @@
 
   // The parent crumbs give up their width first, so the current page keeps
   // its name for as long as the bar has room for it. The value is a shrink
-  // weight, not a size.
+  // weight, not a size. Each parent keeps room for a letter and the
+  // ellipsis, so it stays a target for the pointer and the tooltip.
   .breadcrumb-item:not(:last-child) {
     flex-shrink: 1000;
+    min-width: 3ch;
   }
 }
 

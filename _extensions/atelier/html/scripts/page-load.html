@@ -109,15 +109,15 @@
 					pill.prepend(element("span", "visually-hidden", labels.version + " "));
 				}
 				bar.append(pill);
-				titleCrumbs(bar);
+				titleBarText(bar);
 			}
 		}
 
-		// Next to the pill, the crumbs of the phone bar can end with an ellipsis,
-		// so each one carries its full text in a tooltip.
-		function titleCrumbs(bar) {
-			bar.querySelectorAll(".breadcrumb-item").forEach(function (crumb) {
-				crumb.title = crumb.textContent.replace(/\s+/g, " ").trim();
+		// Next to the pill, the crumbs or the page title of the phone bar can end
+		// with an ellipsis, so each one carries its full text in a tooltip.
+		function titleBarText(bar) {
+			bar.querySelectorAll(".breadcrumb-item, .quarto-secondary-nav-title").forEach(function (item) {
+				item.title = item.textContent.replace(/\s+/g, " ").trim();
 			});
 		}
 
