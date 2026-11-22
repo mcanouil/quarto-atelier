@@ -11,7 +11,7 @@
 - fix: Update the embedded gitlink extension to 1.14.1, so the repository pill in a sidebar next to a navbar keeps the height of the tools row while it loads. (#136)
 - fix: On a page with a title banner, the sidebar now starts at the bottom of the banner, with no empty strip between them. (#137)
 - fix: On a phone, a site with a sidebar and no navbar shows the version pill in the top bar, so the version stays visible when the sidebar is closed. (#138)
-- fix: In the phone top bar, the parent breadcrumbs shorten before the current page name, and each breadcrumb or page title there shows its full text as a tooltip.
+- fix: On a phone, a site with a sidebar, no navbar and a version shortens the parent breadcrumbs in the top bar before the current page name, and each breadcrumb or page title there shows its full text as a tooltip. (#139)
 
 ## 0.15.1 (2026-11-20)
 
