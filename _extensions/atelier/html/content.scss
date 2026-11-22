@@ -721,13 +721,14 @@ html #code-annotation-line-highlight {
 
 // Quarto removes the margins under the banner on sidebar pages below 992 px
 // only. The sidebar has the chrome surface, so at wider widths these margins
-// show as an empty strip between the banner and the sidebar.
+// show as an empty strip between the banner and the sidebar. A title block
+// without a banner keeps its margin, which separates it from the content.
 body.nav-sidebar {
   .quarto-title-banner {
     margin-bottom: 0;
   }
 
-  #title-block-header {
+  #title-block-header:has(> .quarto-title-banner) {
     margin-block-end: 0;
   }
 }
