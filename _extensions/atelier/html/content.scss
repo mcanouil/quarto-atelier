@@ -734,6 +734,7 @@ html #code-annotation-line-highlight {
 // only. The sidebar has the chrome surface, so at wider widths these margins
 // show as an empty strip between the banner and the sidebar. A title block
 // without a banner keeps its margin, which separates it from the content.
+// Remove when: never, because Atelier paints the sidebar.
 body.nav-sidebar {
   .quarto-title-banner {
     margin-bottom: 0;
