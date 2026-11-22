@@ -21,6 +21,33 @@
   white-space: nowrap;
 }
 
+// In the phone bar of a page without a navbar, the pill takes the sidebar
+// tokens of the bar and keeps its full width. The breadcrumbs of that bar
+// shrink instead, and each crumb that does not fit ends with an ellipsis, so
+// the bar stays on one line.
+.quarto-secondary-nav .atelier-version {
+  flex-shrink: 0;
+  align-self: center;
+  background: var(--atelier-sidebar-accent-soft);
+  color: var(--atelier-sidebar-accent);
+}
+
+.quarto-secondary-nav .container-fluid:has(> .atelier-version) .quarto-page-breadcrumbs {
+  min-width: 0;
+  overflow: hidden;
+
+  .breadcrumb {
+    flex-wrap: nowrap;
+  }
+
+  .breadcrumb-item {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 // Below the breakpoint the label and the shortcut hide, and the button stays
 // the icon button that the control sizing makes it.
 .navbar #quarto-search .aa-DetachedSearchButton {

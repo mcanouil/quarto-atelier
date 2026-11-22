@@ -91,11 +91,19 @@
 		// has two brand links in one container, so the pill goes once after the
 		// last child of the container. sidebar-header.html adds the pill of the
 		// sidebar, because the parser has not written the sidebar when this
-		// script runs.
+		// script runs. A page without a navbar shows the pill also at the end of
+		// the phone bar, because the sidebar drawer that holds the other pill is
+		// closed on narrow screens. A page with a navbar keeps the navbar pill
+		// there, so the phone bar gets no second pill.
 		function addVersionPill(version) {
+			if (!version) return;
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
-			if (!version || !brand) return;
-			brand.after(versionPill(version));
+			if (brand) {
+				brand.after(versionPill(version));
+				return;
+			}
+			var bar = document.querySelector(".quarto-secondary-nav .container-fluid");
+			if (bar) bar.append(versionPill(version));
 		}
 
 		// The label of the announcement names its type. The theme colours map
