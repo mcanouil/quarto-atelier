@@ -730,6 +730,21 @@ html #code-annotation-line-highlight {
   border-color: var(--atelier-navbar-control-border);
 }
 
+// Quarto removes the margins under the banner on sidebar pages below 992 px
+// only. The sidebar has the chrome surface, so at wider widths these margins
+// show as an empty strip between the banner and the sidebar. A title block
+// without a banner keeps its margin, which separates it from the content.
+// Remove when: never, because Atelier paints the sidebar.
+body.nav-sidebar {
+  .quarto-title-banner {
+    margin-bottom: 0;
+  }
+
+  #title-block-header:has(> .quarto-title-banner) {
+    margin-block-end: 0;
+  }
+}
+
 // ===========================================================================
 // FIGURES, KEYS AND MARGIN CONTENT
 // ===========================================================================
