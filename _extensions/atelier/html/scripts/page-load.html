@@ -98,12 +98,9 @@
 		function addVersionPill(version) {
 			if (!version) return;
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
-			if (brand) {
-				brand.after(versionPill(version));
-				return;
-			}
 			var bar = document.querySelector(".quarto-secondary-nav .container-fluid");
-			if (bar) bar.append(versionPill(version));
+			if (brand) brand.after(versionPill(version));
+			else if (bar) bar.append(versionPill(version));
 		}
 
 		// The label of the announcement names its type. The theme colours map

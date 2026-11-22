@@ -35,7 +35,9 @@
 
 .quarto-secondary-nav .container-fluid:has(> .atelier-version) {
   .quarto-page-breadcrumbs,
-  a.flex-grow-1 {
+  a.flex-grow-1,
+  .breadcrumb-item,
+  .quarto-secondary-nav-title {
     min-width: 0;
     overflow: hidden;
   }
@@ -46,8 +48,6 @@
 
   .breadcrumb-item,
   .quarto-secondary-nav-title {
-    min-width: 0;
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
