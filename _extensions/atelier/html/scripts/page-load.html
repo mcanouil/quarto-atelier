@@ -96,8 +96,7 @@
 		// closed on narrow screens. A page with a navbar keeps the navbar pill
 		// there, so the phone bar gets no second pill. In the phone bar the pill
 		// does not follow the site title, so a hidden label names it for screen
-		// readers. The crumbs of that bar can end with an ellipsis, so each one
-		// carries its full text in a tooltip.
+		// readers.
 		function addVersionPill(version, labels) {
 			if (!version) return;
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
@@ -110,10 +109,16 @@
 					pill.prepend(element("span", "visually-hidden", labels.version + " "));
 				}
 				bar.append(pill);
-				bar.querySelectorAll(".breadcrumb-item").forEach(function (crumb) {
-					crumb.title = crumb.textContent.trim();
-				});
+				titleCrumbs(bar);
 			}
+		}
+
+		// Next to the pill, the crumbs of the phone bar can end with an ellipsis,
+		// so each one carries its full text in a tooltip.
+		function titleCrumbs(bar) {
+			bar.querySelectorAll(".breadcrumb-item").forEach(function (crumb) {
+				crumb.title = crumb.textContent.replace(/\s+/g, " ").trim();
+			});
 		}
 
 		// The label of the announcement names its type. The theme colours map

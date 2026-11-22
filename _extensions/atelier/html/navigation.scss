@@ -58,7 +58,8 @@
   }
 
   // The parent crumbs give up their width first, so the current page keeps
-  // its name for as long as the bar has room for it.
+  // its name for as long as the bar has room for it. The value is a shrink
+  // weight, not a size.
   .breadcrumb-item:not(:last-child) {
     flex-shrink: 1000;
   }
