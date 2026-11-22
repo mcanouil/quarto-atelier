@@ -5,6 +5,10 @@
 - fix: The page content no longer jumps down when the reading bar or the workshop bar appears.
   The bar frame shows from the first paint, and its text fades in. (#135)
 - fix: On a phone, the reading bar and the workshop bar stay on one line, with the page title only and Previous and Next shown as arrows. (#135)
+- fix: The course steps, the course summary and the table of contents keep their place while a page loads, and assistive technology gets their final state from the start. (#136)
+- fix: The sidebar search box and the sidebar version pill no longer push the sidebar down after the page appears. (#136)
+- fix: The table of contents card shows the reading time and the updated date on separate lines. (#136)
+- fix: Update the embedded gitlink extension to 1.14.1, so the repository pill in a sidebar next to a navbar keeps the height of the tools row while it loads. (#136)
 
 ## 0.15.1 (2026-11-20)
 

@@ -1771,6 +1771,17 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
 }
 
 // ===========================================================================
+// FADE IN
+// ===========================================================================
+// Content that a script fills after the first paint fades in: the reading bar
+// in `workshop.scss` and the reading time in `navigation.scss`.
+@keyframes atelier-bar-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+// ===========================================================================
 // MOTION GUARD
 // ===========================================================================
 // Every motion the theme owns or inherits is cancelled here, in one place.
