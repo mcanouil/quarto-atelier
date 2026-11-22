@@ -719,6 +719,17 @@ html #code-annotation-line-highlight {
   }
 }
 
+// The title block rules above use the id of the header, so these selectors
+// repeat it. The subtitle takes the banner text, which the page may colour,
+// and a chip on the banner takes the border of the bar.
+#{$_atelier-title-block} .quarto-title-banner .subtitle {
+  color: currentcolor;
+}
+
+#{$_atelier-title-block} .quarto-title-banner .quarto-category {
+  border-color: var(--atelier-navbar-control-border);
+}
+
 // Quarto removes the margins under the banner on sidebar pages below 992 px
 // only. The sidebar has the chrome surface, so at wider widths these margins
 // show as an empty strip between the banner and the sidebar. A title block
@@ -731,17 +742,6 @@ body.nav-sidebar {
   #title-block-header:has(> .quarto-title-banner) {
     margin-block-end: 0;
   }
-}
-
-// The title block rules above use the id of the header, so these selectors
-// repeat it. The subtitle takes the banner text, which the page may colour,
-// and a chip on the banner takes the border of the bar.
-#{$_atelier-title-block} .quarto-title-banner .subtitle {
-  color: currentcolor;
-}
-
-#{$_atelier-title-block} .quarto-title-banner .quarto-category {
-  border-color: var(--atelier-navbar-control-border);
 }
 
 // ===========================================================================
