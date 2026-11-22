@@ -57,6 +57,19 @@
   }
 }
 
+// Below the breakpoint the phone bar shows, so its pill is the one in view,
+// and the open drawer does not show a second pill under the sidebar title.
+// This holds for each sidebar style. The ids make the rule win over the pill
+// rule of the docked sidebar.
+@include media-breakpoint-down(lg) {
+  body:has(#quarto-header .quarto-secondary-nav .atelier-version)
+    #quarto-sidebar
+    .sidebar-title
+    .atelier-version {
+    display: none;
+  }
+}
+
 // Below the breakpoint the label and the shortcut hide, and the button stays
 // the icon button that the control sizing makes it.
 .navbar #quarto-search .aa-DetachedSearchButton {
@@ -339,18 +352,13 @@ body.docked:not(:has(#quarto-header .navbar)) .sidebar-navigation {
     }
 
     // The version is the navbar pill on the sidebar tokens, on its own line
-    // under the title. Below the breakpoint the phone bar carries the pill,
-    // so the open drawer does not show a second one.
+    // under the title.
     .atelier-version {
       display: flex;
       width: fit-content;
       margin: 0.4rem auto 0;
       background: var(--atelier-sidebar-accent-soft);
       color: var(--atelier-sidebar-accent);
-
-      @include media-breakpoint-down(lg) {
-        display: none;
-      }
     }
   }
 
