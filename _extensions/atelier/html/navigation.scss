@@ -22,9 +22,10 @@
 }
 
 // In the phone bar of a page without a navbar, the pill takes the sidebar
-// tokens of the bar and keeps its full width. The breadcrumbs of that bar
-// shrink instead, and each crumb that does not fit ends with an ellipsis, so
-// the bar stays on one line.
+// tokens of the bar and keeps its full width. The breadcrumbs or the page
+// title of that bar shrink instead, and the text that does not fit ends with
+// an ellipsis, so the bar stays on one line. The crumbs clip their content, so
+// the focus ring of a crumb link is drawn inside the link.
 .quarto-secondary-nav .atelier-version {
   flex-shrink: 0;
   align-self: center;
@@ -32,19 +33,27 @@
   color: var(--atelier-sidebar-accent);
 }
 
-.quarto-secondary-nav .container-fluid:has(> .atelier-version) .quarto-page-breadcrumbs {
-  min-width: 0;
-  overflow: hidden;
+.quarto-secondary-nav .container-fluid:has(> .atelier-version) {
+  .quarto-page-breadcrumbs,
+  a.flex-grow-1 {
+    min-width: 0;
+    overflow: hidden;
+  }
 
   .breadcrumb {
     flex-wrap: nowrap;
   }
 
-  .breadcrumb-item {
+  .breadcrumb-item,
+  .quarto-secondary-nav-title {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .breadcrumb-item a:focus-visible {
+    outline-offset: -2px;
   }
 }
 
