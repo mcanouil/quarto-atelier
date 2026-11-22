@@ -37,6 +37,7 @@ local LABELS = {
   'logo-link',
   'footnote-back',
   'code-window',
+  'version',
 }
 
 --- Version of the `site_libs` folder of the fonts, not of one package.
