@@ -56,6 +56,20 @@
   .breadcrumb-item a:focus-visible {
     outline-offset: -2px;
   }
+
+  // The parent crumbs give up their width first, so the current page keeps
+  // its name for as long as the bar has room for it. The value is a shrink
+  // weight, not a size. The first parent keeps room for a letter and the
+  // ellipsis, so it stays a target for the pointer and the tooltip. The
+  // later parents can shrink to their divider, so a deep trail still leaves
+  // room for the current page.
+  .breadcrumb-item:not(:last-child) {
+    flex-shrink: 1000;
+  }
+
+  .breadcrumb-item:first-child:not(:last-child) {
+    min-width: 3ch;
+  }
 }
 
 // Below the breakpoint the phone bar shows, so its pill is the one in view,
