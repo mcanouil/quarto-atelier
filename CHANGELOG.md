@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- feat: Run the embedded extensions in Typst and Reveal.js as well as HTML, so the `iconify` shortcode no longer fails in Typst.
-- feat: Embed the cascade, codefrag, tabset, a11y, typst-render, typst-extras and portable-links extensions.
+- feat: Run the embedded extensions in Typst and Reveal.js as well as HTML, so the `iconify` shortcode no longer fails in Typst. (#145)
+- feat: Embed the cascade, codefrag, tabset, a11y, typst-render, typst-extras and portable-links extensions. (#145)
 
 ## 0.15.3 (2026-11-23)
 
