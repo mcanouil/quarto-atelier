@@ -52,6 +52,41 @@ contributes:
       code-copy: true
       code-overflow: wrap
       code-link: false
+      # Each embedded extension under `_extensions/mcanouil/` runs through a
+      # wrapper in `bundled/`, at the stage that its own manifest sets. A
+      # wrapper does nothing when the project has its own copy of the same
+      # extension under `_extensions/`, with any owner, so a project that names
+      # its copy in `filters` runs that copy only. Quarto always loads the
+      # shortcodes of a copy, so they replace the embedded ones; name the copy
+      # in `filters` too, or the render warns.
+      shortcodes:
+        - iconify
+      filters:
+        - atelier-chrome.lua
+        - atelier-workshop.lua
+        - social-metadata.lua
+        - bundled/iconify.lua
+        - path: bundled/code-window.lua
+          at: pre-quarto
+        - path: bundled/gitlink.lua
+          at: post-quarto
+        - bundled/toc-depth.lua
+        - path: bundled/prism.lua
+          at: pre-ast
+        - path: bundled/div-reuse.lua
+          at: post-quarto
+        - bundled/highlight-text.lua
+        - path: bundled/offset-headings.lua
+          at: pre-ast
+        - path: bundled/preview-colour.lua
+          at: post-quarto
+        - path: bundled/veil.lua
+          at: pre-quarto
+        - path: bundled/typst-render.lua
+          at: pre-quarto
+        - path: bundled/typst-math.lua
+          at: post-quarto
+        - bundled/portable-links.lua
     html:
       respect-user-color-scheme: true
       # Quarto builds the canonical link from `website.site-url`, giving a
@@ -103,39 +138,10 @@ contributes:
         sidebar-width: 300px
         body-width: 1000px
         margin-width: 300px
-      # Each embedded extension under `_extensions/mcanouil/` runs through a
-      # wrapper in `bundled/`, at the stage that its own manifest sets. A
-      # wrapper does nothing when the project has its own copy of the same
-      # extension under `_extensions/`, with any owner, so a project that names
-      # its copy in `filters` runs that copy only. Quarto always loads the
-      # shortcodes of a copy, so they replace the embedded ones; name the copy
-      # in `filters` too, or the render warns.
-      shortcodes:
-        - iconify
       filters:
-        - atelier-chrome.lua
-        - atelier-workshop.lua
-        - social-metadata.lua
-        - bundled/iconify.lua
-        - path: bundled/code-window.lua
-          at: pre-quarto
-        - path: bundled/gitlink.lua
-          at: post-quarto
-        - bundled/toc-depth.lua
         - bundled/mobile-toc.lua
         - bundled/collapse-output.lua
-        - path: bundled/prism.lua
-          at: pre-ast
-        - path: bundled/div-reuse.lua
-          at: post-quarto
-        - bundled/highlight-text.lua
-        - path: bundled/offset-headings.lua
-          at: pre-ast
-        - path: bundled/preview-colour.lua
-          at: post-quarto
         - bundled/remember.lua
-        - path: bundled/veil.lua
-          at: pre-quarto
       # Each embedded extension keeps its own defaults, set per site under
       # `extensions:`, with these exceptions. gitlink shows its repository
       # widget, but does not rewrite references in prose. The widget shows only
@@ -178,3 +184,17 @@ contributes:
         - file: html/scripts/code-blocks.html
         - file: html/scripts/listings.html
         - file: html/scripts/table-scroll.html
+    typst:
+      filters:
+        - path: bundled/typst-extras.lua
+          at: post-quarto
+    revealjs:
+      revealjs-plugins:
+        - a11y
+        - codefrag
+        - tabset
+        - veil
+      filters:
+        - path: bundled/cascade.lua
+          at: pre-ast
+        - bundled/codefrag.lua
