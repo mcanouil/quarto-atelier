@@ -757,9 +757,10 @@ end
 --- spelling. The dark bundle replaces a missing or light-toned value with the
 --- Atelier dark page colour, as `html/dark.scss` does.
 --- @param scheme string The colour scheme, `light` or `dark`
---- A CSS colour that the module cannot read, such as `oklch()`, is kept,
---- because Sass reads it. A value that is not a CSS colour, such as a Sass
---- expression, gives no light background and the Atelier dark one.
+--- A value that is not a CSS colour, such as a Sass expression, gives no
+--- light background and the Atelier dark one. A CSS colour that the module
+--- cannot read, such as `oklch()`, is kept in the light scheme. In the dark
+--- scheme its tone is unknown, so it gives no background.
 --- @return string|nil The colour, or nil when the light bundle has none
 function M.page_background(scheme)
   local background = plain(brand_variables(scheme)['body-bg'])
@@ -774,7 +775,10 @@ function M.page_background(scheme)
       return ATELIER_DARK.bg
     end
     local parsed = M.parse(background)
-    if parsed ~= nil and M.tone(parsed) == 'light' then
+    if parsed == nil then
+      return nil
+    end
+    if M.tone(parsed) == 'light' then
       return ATELIER_DARK.bg
     end
   end
