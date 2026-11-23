@@ -858,8 +858,8 @@ end
 --- A command that ends with `\` goes on to the next line. The numbers of these
 --- next lines join `atelier-continuation`, and the style gives them the command
 --- colour with no prompt. An indented `$` line is output, as in usage text.
---- A block with no `filename` gets the `terminal` label in
---- `code-window-auto-label`, so Code Window draws a window with that label.
+--- The block gets the `terminal` label in `code-window-auto-label`.
+--- Code Window uses this label only for a block with no `filename`.
 --- A block with `filename=""` keeps a title bar with no name.
 --- This filter runs before Code Window. A `filename`, `code-window-auto-label`,
 --- `code-window-enabled`, or `code-window-no-auto-filename` on the block still
@@ -912,7 +912,7 @@ local function style_terminal(block)
   if #continuations > 0 then
     block.attributes['atelier-continuation'] = table.concat(continuations, ',')
   end
-  if block.attributes.filename == nil and (block.attributes['code-window-auto-label'] or '') == '' then
+  if (block.attributes['code-window-auto-label'] or '') == '' then
     block.attributes['code-window-auto-label'] = state.labels.terminal
   end
   return block
