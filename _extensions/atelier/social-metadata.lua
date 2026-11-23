@@ -305,7 +305,7 @@ end
 --- @param meta table The document metadata
 --- @return table|nil
 local function social_metadata(meta)
-  if not quarto.doc.is_format('html:js') then
+  if not quarto.doc.is_format('html:js') or quarto.doc.is_format('revealjs') then
     return nil
   end
 
