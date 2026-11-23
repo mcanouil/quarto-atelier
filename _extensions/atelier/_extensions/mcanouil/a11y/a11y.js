@@ -1,0 +1,2901 @@
+/**
+ * Reveal.js A11y - RevealJS Accessibility Plugin
+ * Enhances Reveal.js presentations with accessibility features including
+ * skip navigation, focus management, reduced motion, high contrast,
+ * font size controls, font selection, text spacing, slide landmarks,
+ * alt text warnings, link highlighting, and menu integration.
+ *
+ * @license MIT License
+ * @copyright 2026 Mickaël Canouil
+ * @author Mickaël Canouil
+ */
+
+window.RevealjsA11y =
+  window.RevealjsA11y ||
+  (() => {
+    const DEFAULT_CONFIG = {
+      skipNavigation: true,
+      focusIndicators: true,
+      viewportZoom: true,
+      reducedMotion: true,
+      highContrast: false,
+      fontSizeControls: true,
+      fontSelection: true,
+      textSpacing: true,
+      linkHighlight: true,
+      slideLandmarks: true,
+      altTextWarnings: false,
+      announceSlideNumbers: true,
+      announceFragments: true,
+      announceLanguageChanges: true,
+      slideChangeCue: { visual: true, audio: false },
+      transcript: { enabled: true, print: false },
+      pointerIndicator: false,
+      slideMenuA11y: true,
+      fontSizeStep: 10,
+      fontSizeMin: 50,
+      fontSizeMax: 200,
+      menu: { enabled: true, shortcut: "a", position: "right" },
+      fontFamilies: [
+        { name: "Default", value: "" },
+        { name: "System Sans", value: "system-ui, -apple-system, sans-serif" },
+        { name: "System Serif", value: "Georgia, 'Times New Roman', serif" },
+        { name: "System Mono", value: "ui-monospace, 'Courier New', monospace" },
+        {
+          name: "Atkinson Hyperlegible",
+          value: "'Atkinson Hyperlegible', sans-serif",
+          url: "https://fonts.bunny.net/css?family=atkinson-hyperlegible:400,400i,700,700i",
+        },
+        {
+          name: "Lexend",
+          value: "'Lexend', sans-serif",
+          url: "https://fonts.bunny.net/css?family=lexend:400,700",
+        },
+        {
+          name: "OpenDyslexic",
+          value: "'OpenDyslexic', 'Comic Sans MS', sans-serif",
+          url: "https://fonts.cdnfonts.com/css/opendyslexic",
+        },
+      ],
+    };
+
+    const CSS_PREFIX = "revealjs-a11y";
+    const STORAGE_PREFIX = "revealjs-a11y-";
+
+    let deck;
+    let config;
+    let revealElement;
+    let currentFontSize = 100;
+    let currentFontFamilyIndex = 0;
+    let currentLineHeight = 0;
+    let currentLetterSpacing = 0;
+    let currentWordSpacing = 0;
+    let menuPreviousFocus = null;
+    let menuPreviousKeyboard = null;
+    let menuOpen = false;
+    let reducedMotionMediaQuery = null;
+    let reducedMotionListener = null;
+    let reducedMotionPreviousTransitions = null;
+    let audioCtx = null;
+    let primeAudioClick = null;
+    let primeAudioKeydown = null;
+    let slideMenuObserver = null;
+    let slideMenuClassObserver = null;
+    let transcriptOpen = false;
+    let transcriptPreviousFocus = null;
+    let transcriptPreviousKeyboard = null;
+    let transcriptKeyHandler = null;
+    let pointerActive = false;
+    let pointerElement = null;
+    let pointerRafId = null;
+    let pointerMoveHandler = null;
+    let pointerFocusHandler = null;
+    let previousLang = null;
+    let landmarkObserver = null;
+    let landmarkFocusHandler = null;
+    let landmarkFrameId = null;
+    let lastSlideFocus = null;
+    const deckHandlers = [];
+
+    function deckOn(event, handler) {
+      deck.on(event, handler);
+      deckHandlers.push({ event, handler });
+    }
+
+    // =========================================================================
+    // Utilities
+    // =========================================================================
+
+    function kebabToCamel(str) {
+      return str.replace(/-([a-z])/g, (_match, letter) => letter.toUpperCase());
+    }
+
+    function isPrintPdfView() {
+      return /print-pdf/i.test(window.location.search);
+    }
+
+    // A slide takes the focus only with a `tabindex`. The one added here is
+    // marked, so the teardown removes it and leaves an author's own `tabindex`
+    // alone.
+    function focusSlide(slide, options) {
+      if (!slide) return;
+      if (!slide.hasAttribute("tabindex")) {
+        slide.setAttribute("tabindex", "-1");
+        slide.setAttribute(FOCUS_TARGET_ATTRIBUTE, "");
+      }
+      slide.focus(options);
+    }
+
+    // The focus is free to move when it is in the deck or nowhere. A dialog
+    // outside the deck keeps what it holds, and so does the browser: the body
+    // is also the active element when the reader works in the address bar or
+    // in another tab.
+    function focusIsFree() {
+      if (!document.hasFocus()) return false;
+      const holder = document.activeElement;
+      return (
+        holder === null ||
+        holder === document.body ||
+        revealElement.contains(holder)
+      );
+    }
+
+    function normaliseKeys(obj) {
+      if (!obj || typeof obj !== "object" || Array.isArray(obj)) return obj;
+      const result = {};
+      Object.entries(obj).forEach(([key, value]) => {
+        result[kebabToCamel(key)] = value;
+      });
+      return result;
+    }
+
+    function normaliseCue(value, fallback) {
+      if (typeof value === "boolean") {
+        return { visual: value, audio: value };
+      }
+      if (value && typeof value === "object") {
+        return {
+          visual: value.visual !== undefined ? value.visual : fallback.visual,
+          audio: value.audio !== undefined ? value.audio : fallback.audio,
+        };
+      }
+      return fallback;
+    }
+
+    function normaliseMenu(value, fallback) {
+      if (typeof value === "boolean") {
+        return Object.assign({}, fallback, { enabled: value });
+      }
+      if (value && typeof value === "object") {
+        return {
+          enabled:
+            value.enabled !== undefined ? value.enabled : fallback.enabled,
+          shortcut:
+            value.shortcut !== undefined ? value.shortcut : fallback.shortcut,
+          position:
+            value.position !== undefined ? value.position : fallback.position,
+        };
+      }
+      return fallback;
+    }
+
+    function normaliseTranscript(value, fallback) {
+      if (typeof value === "boolean") {
+        return { enabled: value, print: false };
+      }
+      if (value && typeof value === "object") {
+        return {
+          enabled:
+            value.enabled !== undefined ? value.enabled : fallback.enabled,
+          print: value.print !== undefined ? value.print : fallback.print,
+        };
+      }
+      return fallback;
+    }
+
+    const POINTER_DEFAULT_SIZE = 80;
+    const POINTER_MIN_SIZE = 16;
+    const POINTER_MAX_SIZE = 800;
+    const POINTER_DEFAULT_COLOUR = "rgba(74, 144, 217, 0.4)";
+
+    function logWarning(message) {
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[revealjs-a11y] " + message);
+      }
+    }
+
+    function validatePointerSize(value, fallback) {
+      if (value == null) return fallback;
+      const n = Number(value);
+      if (!Number.isFinite(n)) {
+        logWarning(
+          "pointer-indicator.size must be a number; got " +
+            JSON.stringify(value) +
+            ". Falling back to " +
+            fallback +
+            "px.",
+        );
+        return fallback;
+      }
+      if (n < POINTER_MIN_SIZE || n > POINTER_MAX_SIZE) {
+        const clamped = Math.min(POINTER_MAX_SIZE, Math.max(POINTER_MIN_SIZE, n));
+        logWarning(
+          "pointer-indicator.size " +
+            n +
+            " is out of range [" +
+            POINTER_MIN_SIZE +
+            ", " +
+            POINTER_MAX_SIZE +
+            "]. Clamped to " +
+            clamped +
+            "px.",
+        );
+        return clamped;
+      }
+      return n;
+    }
+
+    function isValidCssColour(value) {
+      if (typeof value !== "string" || value.length === 0) return false;
+      // Use the browser parser: assign to a probe element's style and check
+      // whether the value was accepted.
+      const probe = document.createElement("div");
+      probe.style.color = "";
+      probe.style.color = value;
+      return probe.style.color !== "";
+    }
+
+    function validatePointerColour(value, fallback) {
+      if (value == null) return fallback;
+      if (!isValidCssColour(value)) {
+        logWarning(
+          "pointer-indicator.colour " +
+            JSON.stringify(value) +
+            " is not a valid CSS colour. Falling back to default.",
+        );
+        return fallback;
+      }
+      return value;
+    }
+
+    function normalisePointer(value, fallback) {
+      if (typeof value === "boolean") {
+        return value
+          ? {
+              enabled: true,
+              size: POINTER_DEFAULT_SIZE,
+              colour: POINTER_DEFAULT_COLOUR,
+              shortcut: "p",
+            }
+          : false;
+      }
+      if (value && typeof value === "object") {
+        return {
+          enabled: value.enabled !== undefined ? value.enabled : true,
+          size: validatePointerSize(value.size, POINTER_DEFAULT_SIZE),
+          colour: validatePointerColour(
+            value.colour != null ? value.colour : value.color,
+            POINTER_DEFAULT_COLOUR,
+          ),
+          shortcut:
+            typeof value.shortcut === "string" && value.shortcut.length > 0
+              ? value.shortcut
+              : "p",
+        };
+      }
+      return fallback;
+    }
+
+    function resolveConfig(revealConfig) {
+      const userConfig = revealConfig["revealjs-a11y"] || {};
+      const merged = Object.assign({}, DEFAULT_CONFIG, normaliseKeys(userConfig));
+      merged.slideChangeCue = normaliseCue(
+        merged.slideChangeCue,
+        DEFAULT_CONFIG.slideChangeCue,
+      );
+      merged.transcript = normaliseTranscript(
+        merged.transcript,
+        DEFAULT_CONFIG.transcript,
+      );
+      merged.pointerIndicator = normalisePointer(
+        merged.pointerIndicator,
+        false,
+      );
+      merged.menu = normaliseMenu(merged.menu, DEFAULT_CONFIG.menu);
+      merged.fontSizeStep = Math.max(1, merged.fontSizeStep || DEFAULT_CONFIG.fontSizeStep);
+      return merged;
+    }
+
+    function createElement(tag, attrs, text) {
+      const el = document.createElement(tag);
+      Object.entries(attrs).forEach(([key, value]) => {
+        el.setAttribute(key, value);
+      });
+      if (text) {
+        el.textContent = text;
+      }
+      return el;
+    }
+
+    function storageGet(key) {
+      try {
+        return localStorage.getItem(STORAGE_PREFIX + key);
+      } catch (_e) {
+        return null;
+      }
+    }
+
+    function storageSet(key, value) {
+      try {
+        localStorage.setItem(STORAGE_PREFIX + key, value);
+      } catch (_e) {
+        // Storage unavailable; silently continue.
+      }
+    }
+
+    function getSlidesContainer() {
+      return revealElement.querySelector(".slides");
+    }
+
+    // =========================================================================
+    // Skip Navigation
+    // =========================================================================
+
+    function setupSkipNavigation() {
+      const link = createElement(
+        "a",
+        {
+          href: "#",
+          class: `${CSS_PREFIX}-skip-link`,
+          "aria-label": "Skip to slide content",
+        },
+        "Skip to slide content",
+      );
+
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        focusSlide(deck.getCurrentSlide());
+      });
+
+      revealElement.insertBefore(link, revealElement.firstChild);
+    }
+
+    // =========================================================================
+    // Focus Indicators
+    // =========================================================================
+
+    function setupFocusIndicators() {
+      revealElement.classList.add(`${CSS_PREFIX}-focus-indicators`);
+    }
+
+    // =========================================================================
+    // Viewport Zoom
+    // =========================================================================
+
+    // Reveal.js ships a viewport meta that disables zooming
+    // (`maximum-scale=1.0, user-scalable=no`), which fails WCAG 1.4.4. Allow
+    // users to pinch- and zoom-in on slide content.
+    function setupViewportZoom() {
+      const meta = document.querySelector('meta[name="viewport"]');
+      if (!meta) return;
+      meta.setAttribute("content", "width=device-width, initial-scale=1.0");
+    }
+
+    // =========================================================================
+    // Reduced Motion
+    // =========================================================================
+
+    function setupReducedMotion() {
+      reducedMotionMediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (!reducedMotionPreviousTransitions) {
+        const deckConfig = deck.getConfig();
+        reducedMotionPreviousTransitions = {
+          transition: deckConfig.transition,
+          backgroundTransition: deckConfig.backgroundTransition,
+        };
+      }
+
+      function applyReducedMotion(matches) {
+        if (matches) {
+          revealElement.classList.add(`${CSS_PREFIX}-reduced-motion`);
+          deck.configure({ transition: "none", backgroundTransition: "none" });
+        } else {
+          revealElement.classList.remove(`${CSS_PREFIX}-reduced-motion`);
+          if (reducedMotionPreviousTransitions) {
+            deck.configure({
+              transition: reducedMotionPreviousTransitions.transition,
+              backgroundTransition:
+                reducedMotionPreviousTransitions.backgroundTransition,
+            });
+          }
+        }
+      }
+
+      reducedMotionListener = (e) => applyReducedMotion(e.matches);
+      applyReducedMotion(reducedMotionMediaQuery.matches);
+      reducedMotionMediaQuery.addEventListener("change", reducedMotionListener);
+    }
+
+    // =========================================================================
+    // High Contrast
+    // =========================================================================
+
+    // The high-contrast class sits on the root element rather than on the deck.
+    // The settings panel, the transcript overlay and the pointer are appended
+    // to `document.body`, which is the deck's parent, so a rule rooted at the
+    // deck can never reach them, and neither can one aimed at
+    // `.reveal-viewport`, which RevealJS also puts on `document.body`. The root
+    // element is an ancestor of all four.
+    const HIGH_CONTRAST_CLASS = `${CSS_PREFIX}-high-contrast`;
+
+    /**
+     * Turn the high-contrast class on or off.
+     *
+     * @param {boolean} enabled
+     */
+    function toggleHighContrastClass(enabled) {
+      document.documentElement.classList.toggle(HIGH_CONTRAST_CLASS, enabled);
+    }
+
+    /**
+     * Whether high contrast is on.
+     *
+     * @returns {boolean}
+     */
+    function hasHighContrastClass() {
+      return document.documentElement.classList.contains(HIGH_CONTRAST_CLASS);
+    }
+
+    function setHighContrast(enabled) {
+      toggleHighContrastClass(enabled);
+      storageSet("high-contrast", String(enabled));
+      announceStatus(
+        enabled ? "High contrast mode enabled" : "High contrast mode disabled",
+      );
+      syncMenuState();
+    }
+
+    function setupHighContrast(skipStorage) {
+      const stored = skipStorage ? null : storageGet("high-contrast");
+      if (stored === "true" || (stored === null && config.highContrast)) {
+        toggleHighContrastClass(true);
+      }
+    }
+
+    // =========================================================================
+    // Font Size Controls
+    // =========================================================================
+
+    function applyFontSize() {
+      const container = getSlidesContainer();
+      if (container) {
+        container.style.fontSize = currentFontSize + "%";
+      }
+      storageSet("font-size", String(currentFontSize));
+    }
+
+    function setFontSize(value) {
+      currentFontSize = Math.max(
+        config.fontSizeMin,
+        Math.min(config.fontSizeMax, value),
+      );
+      applyFontSize();
+      announceStatus("Font size: " + currentFontSize + "%");
+      syncMenuState();
+    }
+
+    function changeFontSize(delta) {
+      setFontSize(currentFontSize + delta);
+    }
+
+    function resetFontSize() {
+      currentFontSize = 100;
+      applyFontSize();
+      announceStatus("Font size reset to default");
+      syncMenuState();
+    }
+
+    function setupFontSizeControls() {
+      const stored = storageGet("font-size");
+      if (stored) {
+        currentFontSize = parseInt(stored, 10) || 100;
+        applyFontSize();
+      }
+
+      deck.addKeyBinding(
+        { keyCode: 187, key: "+", description: "Increase font size" },
+        () => changeFontSize(config.fontSizeStep),
+      );
+
+      deck.addKeyBinding(
+        { keyCode: 189, key: "-", description: "Decrease font size" },
+        () => changeFontSize(-config.fontSizeStep),
+      );
+
+      deck.addKeyBinding(
+        { keyCode: 48, key: "0", description: "Reset font size" },
+        resetFontSize,
+      );
+    }
+
+    // =========================================================================
+    // Font Selection
+    // =========================================================================
+
+    function applyFontFamily() {
+      const family = config.fontFamilies[currentFontFamilyIndex];
+      if (family.value) {
+        revealElement.style.setProperty("--a11y-font-override", family.value);
+        revealElement.classList.add(`${CSS_PREFIX}-font-override`);
+      } else {
+        revealElement.style.removeProperty("--a11y-font-override");
+        revealElement.classList.remove(`${CSS_PREFIX}-font-override`);
+      }
+      storageSet("font-family", String(currentFontFamilyIndex));
+    }
+
+    function loadWebFont(entry) {
+      if (!entry.url) return;
+      const marker = "data-revealjs-a11y-font";
+      if (document.querySelector(`link[${marker}="${entry.name}"]`)) return;
+
+      const link = createElement("link", {
+        rel: "stylesheet",
+        href: entry.url,
+        [marker]: entry.name,
+      });
+      document.head.appendChild(link);
+    }
+
+    function selectFontByIndex(index) {
+      if (index < 0 || index >= config.fontFamilies.length) return;
+      currentFontFamilyIndex = index;
+      const family = config.fontFamilies[currentFontFamilyIndex];
+      loadWebFont(family);
+      applyFontFamily();
+      announceStatus("Font: " + family.name);
+      syncMenuState();
+    }
+
+    function setupFontSelection() {
+      const stored = storageGet("font-family");
+      if (stored !== null) {
+        const index = parseInt(stored, 10);
+        if (index >= 0 && index < config.fontFamilies.length) {
+          currentFontFamilyIndex = index;
+          loadWebFont(config.fontFamilies[index]);
+          applyFontFamily();
+        }
+      }
+    }
+
+    // =========================================================================
+    // Text Spacing (line height and letter spacing)
+    // =========================================================================
+
+    function applyTextSpacing() {
+      if (currentLineHeight > 0) {
+        revealElement.style.setProperty(
+          "--a11y-line-height",
+          String(1.2 + currentLineHeight * 0.2),
+        );
+        revealElement.classList.add(`${CSS_PREFIX}-line-height-override`);
+      } else {
+        revealElement.style.removeProperty("--a11y-line-height");
+        revealElement.classList.remove(`${CSS_PREFIX}-line-height-override`);
+      }
+
+      if (currentLetterSpacing > 0) {
+        revealElement.style.setProperty(
+          "--a11y-letter-spacing",
+          currentLetterSpacing * 0.5 + "px",
+        );
+        revealElement.classList.add(`${CSS_PREFIX}-letter-spacing-override`);
+      } else {
+        revealElement.style.removeProperty("--a11y-letter-spacing");
+        revealElement.classList.remove(
+          `${CSS_PREFIX}-letter-spacing-override`,
+        );
+      }
+
+      if (currentWordSpacing > 0) {
+        revealElement.style.setProperty(
+          "--a11y-word-spacing",
+          currentWordSpacing * 0.5 + "px",
+        );
+        revealElement.classList.add(`${CSS_PREFIX}-word-spacing-override`);
+      } else {
+        revealElement.style.removeProperty("--a11y-word-spacing");
+        revealElement.classList.remove(`${CSS_PREFIX}-word-spacing-override`);
+      }
+
+      storageSet("line-height", String(currentLineHeight));
+      storageSet("letter-spacing", String(currentLetterSpacing));
+      storageSet("word-spacing", String(currentWordSpacing));
+    }
+
+    function setupTextSpacing() {
+      const storedLH = storageGet("line-height");
+      const storedLS = storageGet("letter-spacing");
+      const storedWS = storageGet("word-spacing");
+      if (storedLH !== null) currentLineHeight = parseInt(storedLH, 10) || 0;
+      if (storedLS !== null)
+        currentLetterSpacing = parseInt(storedLS, 10) || 0;
+      if (storedWS !== null) currentWordSpacing = parseInt(storedWS, 10) || 0;
+      if (currentLineHeight > 0 || currentLetterSpacing > 0 || currentWordSpacing > 0) {
+        applyTextSpacing();
+      }
+    }
+
+    // =========================================================================
+    // Link Highlight
+    // =========================================================================
+
+    function setLinkHighlight(enabled) {
+      revealElement.classList.toggle(`${CSS_PREFIX}-link-highlight`, enabled);
+      storageSet("link-highlight", String(enabled));
+      announceStatus(
+        enabled ? "Link underlines enabled" : "Link underlines disabled",
+      );
+      syncMenuState();
+    }
+
+    function setupLinkHighlight() {
+      const stored = storageGet("link-highlight");
+      if (stored === "true" || (stored === null && config.linkHighlight)) {
+        revealElement.classList.add(`${CSS_PREFIX}-link-highlight`);
+      }
+    }
+
+    // =========================================================================
+    // Slide Landmarks
+    // =========================================================================
+
+    function getLandmarkSlides() {
+      return revealElement.querySelectorAll(
+        ".slides > section, .slides > section > section",
+      );
+    }
+
+    function setupSlideLandmarks() {
+      const slides = getLandmarkSlides();
+      slides.forEach((slide, index) => {
+        if (!slide.getAttribute("role")) {
+          slide.setAttribute("role", "region");
+        }
+        if (!slide.getAttribute("aria-label")) {
+          const heading = slide.querySelector("h1, h2, h3, h4, h5, h6");
+          const label = heading
+            ? heading.textContent.trim()
+            : "Slide " + (index + 1);
+          slide.setAttribute("aria-label", label);
+        }
+      });
+
+      // reveal.js hides the slide the reader leaves before it reports the
+      // change, and the browser drops the focus at that moment, so the last
+      // element focused inside a slide is recorded as it happens. The whole
+      // document is watched, because the menu, the font dialog, and the
+      // transcript sit outside the deck, and a focus in one of them must clear
+      // this record.
+      landmarkFocusHandler = (event) => {
+        const target = event.target;
+        lastSlideFocus =
+          target instanceof Element && target.closest(".slides section")
+            ? target
+            : null;
+      };
+      document.addEventListener("focusin", landmarkFocusHandler);
+
+      deckOn("ready", updateCurrentSlideLandmarks);
+      deckOn("slidechanged", updateCurrentSlideLandmarks);
+      deckOn("overviewshown", updateCurrentSlideLandmarks);
+      deckOn("overviewhidden", updateCurrentSlideLandmarks);
+      watchViewChanges();
+      updateCurrentSlideLandmarks();
+    }
+
+    // reveal.js gives no event for a change of view. It marks the viewport
+    // with a class, and it rebuilds the slides from a copy of their markup
+    // that it took when the scroll view started. That copy holds the `inert`
+    // attributes of the moment it was taken, so the slide the reader comes
+    // back to can return isolated. Watch both changes and correct the result.
+    function watchViewChanges() {
+      const viewport =
+        typeof deck.getViewportElement === "function"
+          ? deck.getViewportElement()
+          : revealElement;
+      const slidesContainer = getSlidesContainer();
+      landmarkObserver = new MutationObserver(updateCurrentSlideLandmarks);
+      if (viewport) {
+        landmarkObserver.observe(viewport, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+      }
+      if (slidesContainer) {
+        landmarkObserver.observe(slidesContainer, { childList: true });
+      }
+    }
+
+    // The print view prints every slide, so no slide is the current one there.
+    function isPrintView() {
+      return (
+        isPrintPdfView() ||
+        (typeof deck.isPrintView === "function" && deck.isPrintView())
+      );
+    }
+
+    // The scroll view puts every slide on one scrolling page. It keeps a
+    // current slide, but every other slide stays on screen.
+    function isScrollView() {
+      return typeof deck.isScrollView === "function" && deck.isScrollView();
+    }
+
+    // Each attribute the extension writes on a slide carries a marker, so the
+    // cleanup removes only what the extension added. A slide keeps whatever
+    // the author wrote on it, and a `section` nested inside a slide is never
+    // read as a slide, whichever view reveal.js has rebuilt the deck into.
+    const FOCUS_TARGET_ATTRIBUTE = "data-a11y-focus-target";
+    const ISOLATED_ATTRIBUTE = "data-a11y-isolated";
+    const CURRENT_ATTRIBUTE = "data-a11y-current";
+
+    function clearInertSlides() {
+      revealElement
+        .querySelectorAll(`.slides section[${ISOLATED_ATTRIBUTE}]`)
+        .forEach((slide) => {
+          slide.removeAttribute("inert");
+          slide.removeAttribute(ISOLATED_ATTRIBUTE);
+        });
+    }
+
+    function clearSlideIsolation() {
+      clearInertSlides();
+      revealElement
+        .querySelectorAll(
+          `.slides section[${CURRENT_ATTRIBUTE}], .slides section[${FOCUS_TARGET_ATTRIBUTE}]`,
+        )
+        .forEach((slide) => {
+          if (slide.hasAttribute(CURRENT_ATTRIBUTE)) {
+            slide.removeAttribute("aria-current");
+            slide.removeAttribute(CURRENT_ATTRIBUTE);
+          }
+          if (slide.hasAttribute(FOCUS_TARGET_ATTRIBUTE)) {
+            slide.removeAttribute("tabindex");
+            slide.removeAttribute(FOCUS_TARGET_ATTRIBUTE);
+          }
+        });
+    }
+
+    // `inert` takes a slide out of the tab order and out of the accessibility
+    // tree with one attribute, whatever the slide holds. reveal.js marks the
+    // slides it hides with `aria-hidden` itself, so this adds none.
+    //
+    // Three views show every slide at once, and none of them isolates a slide:
+    // the overview, where a slide must stay clickable, and the print view and
+    // the scroll view, where reveal.js also rebuilds the DOM around each slide.
+    // The slides that carry an attribute are read through that attribute, not
+    // through the landmark selector, because that selector matches nothing
+    // while reveal.js holds the slides in the wrappers of those two views.
+    function updateCurrentSlideLandmarks() {
+      const currentSlide = deck.getCurrentSlide();
+      const printView = isPrintView();
+      const isolate =
+        currentSlide != null &&
+        !printView &&
+        !isScrollView() &&
+        !deck.isOverview();
+
+      const marked = printView ? null : currentSlide;
+      revealElement
+        .querySelectorAll(`.slides section[${CURRENT_ATTRIBUTE}]`)
+        .forEach((slide) => {
+          if (slide !== marked) {
+            slide.removeAttribute("aria-current");
+            slide.removeAttribute(CURRENT_ATTRIBUTE);
+          }
+        });
+      if (marked && !marked.hasAttribute(CURRENT_ATTRIBUTE)) {
+        marked.setAttribute("aria-current", "step");
+        marked.setAttribute(CURRENT_ATTRIBUTE, "");
+      }
+
+      if (!isolate) {
+        clearInertSlides();
+        return;
+      }
+
+      // Only whole slides are isolated. A `section` that an author puts inside
+      // a slide is part of that slide and keeps the state of its slide.
+      getLandmarkSlides().forEach((slide) => {
+        const isolateThis = !slide.contains(currentSlide);
+        slide.toggleAttribute("inert", isolateThis);
+        slide.toggleAttribute(ISOLATED_ATTRIBUTE, isolateThis);
+      });
+
+      // The reader had the focus inside the deck, and the slide they were on
+      // is gone. Without this, the browser holds the focus on the body and the
+      // next Tab restarts from the top of the document.
+      const focusLost =
+        lastSlideFocus !== null &&
+        revealElement.contains(lastSlideFocus) &&
+        !currentSlide.contains(lastSlideFocus) &&
+        !currentSlide.contains(document.activeElement) &&
+        focusIsFree();
+      // The browser drops the focus of an element that becomes `inert` one
+      // frame after the attribute is written, so the move waits two frames.
+      if (focusLost) {
+        landmarkFrameId = requestAnimationFrame(() => {
+          landmarkFrameId = requestAnimationFrame(() => {
+            landmarkFrameId = null;
+            const slide = deck.getCurrentSlide();
+            if (!slide || slide.hasAttribute("inert")) return;
+            if (slide.contains(document.activeElement)) return;
+            // A dialog can have taken the focus in the meantime.
+            if (!focusIsFree()) return;
+            focusSlide(slide, { preventScroll: true });
+          });
+        });
+      }
+    }
+
+    // =========================================================================
+    // Alt Text Warnings
+    // =========================================================================
+
+    function checkAltText() {
+      const currentSlide = deck.getCurrentSlide();
+      if (!currentSlide) return;
+
+      const images = currentSlide.querySelectorAll("img");
+      images.forEach((img) => {
+        // Distinguish three states:
+        //   - alt attribute absent: warn (likely an authoring oversight).
+        //   - alt="" (or whitespace-only): valid decorative image; no warning.
+        //   - alt with text: valid; no warning.
+        const altMissing = !img.hasAttribute("alt");
+        img.classList.toggle(`${CSS_PREFIX}-missing-alt`, altMissing);
+
+        const nextSibling = img.nextElementSibling;
+        const hasLabel =
+          nextSibling &&
+          nextSibling.classList.contains(`${CSS_PREFIX}-missing-alt-label`);
+
+        if (altMissing && !hasLabel) {
+          const label = createElement(
+            "span",
+            {
+              class: `${CSS_PREFIX}-missing-alt-label`,
+              "aria-hidden": "true",
+            },
+            "Missing alt text",
+          );
+          img.insertAdjacentElement("afterend", label);
+        } else if (!altMissing && hasLabel) {
+          nextSibling.remove();
+        }
+      });
+    }
+
+    function setupAltTextWarnings() {
+      deckOn("slidechanged", checkAltText);
+      deckOn("ready", checkAltText);
+    }
+
+    // =========================================================================
+    // Slide Number Announcements
+    // =========================================================================
+
+    function announceSlideChange(event) {
+      const slide = event.currentSlide;
+      if (!slide) return;
+
+      const indices = deck.getIndices();
+      const heading = slide.querySelector("h1, h2, h3, h4, h5, h6");
+      const title = heading ? heading.textContent.trim() : "";
+
+      const total = deck.getTotalSlides();
+      let message = "Slide " + (indices.h + 1) + " of " + total;
+      if (indices.v > 0) {
+        message += ", sub-slide " + (indices.v + 1);
+      }
+      if (title) {
+        message += ": " + title;
+      }
+
+      announceStatus(message);
+    }
+
+    function setupSlideAnnouncements() {
+      deckOn("slidechanged", announceSlideChange);
+    }
+
+    // =========================================================================
+    // Fragment Announcements
+    // =========================================================================
+
+    function announceFragmentShown(event) {
+      const fragment = event.fragment;
+      if (!fragment) return;
+      const text = fragment.textContent.trim();
+      if (text) {
+        announceStatus(text);
+      }
+    }
+
+    function announceFragmentHidden(event) {
+      const fragment = event.fragment;
+      if (!fragment) return;
+      const text = fragment.textContent.trim();
+      if (text) {
+        announceStatus("Hidden: " + text);
+      }
+    }
+
+    function setupFragmentAnnouncements() {
+      deckOn("fragmentshown", announceFragmentShown);
+      deckOn("fragmenthidden", announceFragmentHidden);
+    }
+
+    // =========================================================================
+    // Language Change Announcements
+    // =========================================================================
+
+    function resolveSlideLang(slide) {
+      const baseline = document.documentElement.lang || "";
+      if (!slide) return baseline;
+      const element = slide.matches("[lang]")
+        ? slide
+        : slide.closest("[lang]");
+      return (element && element.getAttribute("lang")) || baseline;
+    }
+
+    function describeLang(lang) {
+      try {
+        const display = new Intl.DisplayNames([navigator.language || "en"], {
+          type: "language",
+        });
+        return display.of(lang) || lang;
+      } catch (_e) {
+        return lang;
+      }
+    }
+
+    function announceLanguageChange(event) {
+      if (!event.currentSlide) return;
+      const lang = resolveSlideLang(event.currentSlide);
+      if (previousLang === null) {
+        previousLang = lang;
+        return;
+      }
+      if (lang === previousLang) return;
+      previousLang = lang;
+      if (lang) {
+        announceStatus("Language: " + describeLang(lang));
+      }
+    }
+
+    function setupLanguageAnnouncements() {
+      const currentSlide = deck.getCurrentSlide();
+      previousLang = currentSlide ? resolveSlideLang(currentSlide) : null;
+      deckOn("ready", (event) => {
+        previousLang = resolveSlideLang(event.currentSlide);
+      });
+      deckOn("slidechanged", announceLanguageChange);
+    }
+
+    const announcementQueue = [];
+    let announcementTimer = null;
+    const ANNOUNCEMENT_INTERVAL_MS = 150;
+
+    function getStatusElement() {
+      let statusEl = revealElement.querySelector(`.${CSS_PREFIX}-status`);
+      if (!statusEl) {
+        statusEl = createElement("div", {
+          class: `${CSS_PREFIX}-status`,
+          "aria-live": "polite",
+          "aria-atomic": "true",
+          role: "status",
+        });
+        revealElement.appendChild(statusEl);
+      }
+      return statusEl;
+    }
+
+    function flushAnnouncement() {
+      const next = announcementQueue.shift();
+      if (next === undefined) {
+        announcementTimer = null;
+        return;
+      }
+      const statusEl = getStatusElement();
+      statusEl.textContent = "";
+      requestAnimationFrame(() => {
+        statusEl.textContent = next;
+      });
+      announcementTimer = window.setTimeout(
+        flushAnnouncement,
+        ANNOUNCEMENT_INTERVAL_MS,
+      );
+    }
+
+    function announceStatus(message) {
+      if (typeof message !== "string" || message.length === 0) return;
+      // Coalesce: drop a duplicate of the most recent pending message.
+      const lastQueued = announcementQueue[announcementQueue.length - 1];
+      if (lastQueued === message) return;
+      announcementQueue.push(message);
+      if (announcementTimer === null) flushAnnouncement();
+    }
+
+    function resetAnnouncementQueue() {
+      announcementQueue.length = 0;
+      if (announcementTimer !== null) {
+        window.clearTimeout(announcementTimer);
+        announcementTimer = null;
+      }
+    }
+
+    // =========================================================================
+    // Slide Change Cue (visual and/or audio)
+    // =========================================================================
+
+    function setupSlideChangeCue(cue) {
+      if (cue.visual) {
+        const indicator = createElement("div", {
+          class: `${CSS_PREFIX}-slide-change-indicator`,
+          "aria-hidden": "true",
+        });
+        if (storageGet("visual-cue") === "false") {
+          indicator.hidden = true;
+        }
+        document.body.appendChild(indicator);
+
+        const onVisualCue = () => {
+          if (indicator.hidden) return;
+          indicator.classList.remove(`${CSS_PREFIX}-slide-change-active`);
+          void indicator.offsetWidth;
+          indicator.classList.add(`${CSS_PREFIX}-slide-change-active`);
+        };
+
+        deckOn("slidechanged", onVisualCue);
+      }
+
+      if (cue.audio) {
+        const ensureAudioContext = () => {
+          if (!audioCtx) {
+            audioCtx = new AudioContext();
+          }
+          return audioCtx;
+        };
+
+        const playTone = () => {
+          if (storageGet("audio-cue") === "false") return;
+          const ctx = ensureAudioContext();
+          const schedule = () => {
+            const now = ctx.currentTime;
+
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(660, now);
+            oscillator.frequency.setValueAtTime(880, now + 0.06);
+
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+            oscillator.start(now);
+            oscillator.stop(now + 0.2);
+          };
+
+          if (ctx.state === "suspended") {
+            ctx.resume().then(schedule);
+          } else {
+            schedule();
+          }
+        };
+
+        primeAudioClick = () => {
+          ensureAudioContext();
+          if (audioCtx.state === "suspended") {
+            audioCtx.resume();
+          }
+          document.removeEventListener("click", primeAudioClick);
+          document.removeEventListener("keydown", primeAudioKeydown);
+        };
+        primeAudioKeydown = primeAudioClick;
+        document.addEventListener("click", primeAudioClick);
+        document.addEventListener("keydown", primeAudioKeydown);
+
+        deckOn("slidechanged", playTone);
+      }
+    }
+
+    // =========================================================================
+    // Transcript View
+    // =========================================================================
+
+    function escapeHtml(text) {
+      const el = document.createElement("span");
+      el.textContent = text;
+      return el.innerHTML;
+    }
+
+    function getSlideContent(slide) {
+      const transcriptDiv = slide.querySelector(":scope > .transcript");
+      if (transcriptDiv) {
+        return transcriptDiv.innerHTML;
+      }
+
+      const clone = slide.cloneNode(true);
+      clone.querySelectorAll("aside.notes").forEach((el) => el.remove());
+      clone.querySelectorAll(".transcript").forEach((el) => el.remove());
+      clone
+        .querySelectorAll('[aria-hidden="true"]')
+        .forEach((el) => el.remove());
+      clone
+        .querySelectorAll(".slide-background")
+        .forEach((el) => el.remove());
+
+      const heading = clone.querySelector("h1, h2, h3, h4, h5, h6");
+      if (heading) heading.remove();
+
+      const content = clone.innerHTML.trim();
+      if (!content) {
+        return '<p class="no-content">(No content on this slide.)</p>';
+      }
+      return content;
+    }
+
+    function buildTranscript() {
+      const title =
+        document.title ||
+        (revealElement.querySelector(".slides h1") || {}).textContent ||
+        "Presentation";
+
+      let html = "<h1>" + escapeHtml(title) + "</h1>";
+      let slideNumber = 0;
+
+      const topSections = revealElement.querySelectorAll(
+        ".slides > section",
+      );
+      topSections.forEach((section) => {
+        const nested = section.querySelectorAll(":scope > section");
+        if (nested.length > 0) {
+          nested.forEach((sub) => {
+            slideNumber++;
+            const heading = sub.querySelector("h1, h2, h3, h4, h5, h6");
+            const slideTitle = heading
+              ? escapeHtml(heading.textContent.trim())
+              : "Slide " + slideNumber;
+            html +=
+              "<article><h3>" +
+              slideTitle +
+              "</h3>" +
+              getSlideContent(sub) +
+              "</article>";
+          });
+        } else {
+          slideNumber++;
+          const heading = section.querySelector("h1, h2, h3, h4, h5, h6");
+          const slideTitle = heading
+            ? escapeHtml(heading.textContent.trim())
+            : "Slide " + slideNumber;
+          html +=
+            "<article><h2>" +
+            slideTitle +
+            "</h2>" +
+            getSlideContent(section) +
+            "</article>";
+        }
+      });
+
+      return html;
+    }
+
+    function openTranscript() {
+      transcriptOpen = true;
+      transcriptPreviousFocus = document.activeElement;
+      transcriptPreviousKeyboard = deck.getConfig().keyboard;
+      deck.configure({ keyboard: false });
+
+      const overlay = createElement("div", {
+        class: `${CSS_PREFIX}-transcript`,
+        role: "document",
+        "aria-label": "Presentation transcript",
+      });
+
+      const header = createElement("div", {
+        class: `${CSS_PREFIX}-transcript-header`,
+      });
+      const closeBtn = createElement(
+        "button",
+        {
+          class: `${CSS_PREFIX}-transcript-close`,
+          "aria-label": "Close transcript",
+        },
+        "\u00D7",
+      );
+      closeBtn.addEventListener("click", closeTranscript);
+      header.appendChild(
+        createElement("span", {}, "Transcript"),
+      );
+      header.appendChild(closeBtn);
+      overlay.appendChild(header);
+
+      const body = createElement("div", {
+        class: `${CSS_PREFIX}-transcript-body`,
+      });
+      body.innerHTML = buildTranscript();
+      overlay.appendChild(body);
+
+      transcriptKeyHandler = (e) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeTranscript();
+          return;
+        }
+
+        if (e.key === "Tab") {
+          const focusable = getFocusableElements(overlay);
+          if (focusable.length === 0) return;
+
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      };
+      document.addEventListener("keydown", transcriptKeyHandler);
+
+      document.body.appendChild(overlay);
+      closeBtn.focus();
+      announceStatus("Transcript view opened");
+    }
+
+    function closeTranscript() {
+      const overlay = document.querySelector(`.${CSS_PREFIX}-transcript`);
+      if (overlay) overlay.remove();
+
+      if (transcriptKeyHandler) {
+        document.removeEventListener("keydown", transcriptKeyHandler);
+        transcriptKeyHandler = null;
+      }
+
+      if (transcriptPreviousKeyboard !== null) {
+        deck.configure({ keyboard: transcriptPreviousKeyboard });
+        transcriptPreviousKeyboard = null;
+      }
+
+      if (transcriptPreviousFocus) {
+        transcriptPreviousFocus.focus();
+        transcriptPreviousFocus = null;
+      }
+
+      transcriptOpen = false;
+      announceStatus("Transcript view closed");
+    }
+
+    function toggleTranscript() {
+      if (transcriptOpen) {
+        closeTranscript();
+      } else {
+        openTranscript();
+      }
+    }
+
+    function setupPrintTranscript() {
+      const topSections = revealElement.querySelectorAll(
+        ".slides > section",
+      );
+      topSections.forEach((section) => {
+        const nested = section.querySelectorAll(":scope > section");
+        const targets = nested.length > 0 ? nested : [section];
+        targets.forEach((slide) => {
+          if (slide.querySelector(":scope > .transcript")) return;
+          const div = document.createElement("div");
+          div.className = "transcript";
+          div.innerHTML = getSlideContent(slide);
+          slide.appendChild(div);
+        });
+      });
+    }
+
+    function setupTranscript() {
+      deck.addKeyBinding(
+        { keyCode: 84, key: "T", description: "Open/close transcript view" },
+        toggleTranscript,
+      );
+
+      const printEnabled =
+        storageGet("transcript-print") === "true" || config.transcript.print;
+      if (printEnabled && isPrintPdfView()) {
+        setupPrintTranscript();
+      }
+    }
+
+    // =========================================================================
+    // Pointer / Focus Indicator
+    // =========================================================================
+
+    function activatePointer() {
+      pointerActive = true;
+      pointerElement.hidden = false;
+
+      var lastX = 0;
+      var lastY = 0;
+      pointerMoveHandler = (e) => {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        if (!pointerRafId) {
+          pointerRafId = requestAnimationFrame(() => {
+            pointerElement.style.transform =
+              "translate(" +
+              lastX +
+              "px, " +
+              lastY +
+              "px) translate(-50%, -50%)";
+            pointerRafId = null;
+          });
+        }
+      };
+      document.addEventListener("mousemove", pointerMoveHandler);
+
+      pointerFocusHandler = (e) => {
+        const rect = e.target.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) return;
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        pointerElement.style.transform =
+          "translate(" + cx + "px, " + cy + "px) translate(-50%, -50%)";
+      };
+      document.addEventListener("focusin", pointerFocusHandler);
+
+      storageSet("pointer-indicator", "true");
+      announceStatus("Pointer indicator enabled");
+      syncMenuState();
+    }
+
+    function deactivatePointer() {
+      pointerActive = false;
+      pointerElement.hidden = true;
+
+      if (pointerMoveHandler) {
+        document.removeEventListener("mousemove", pointerMoveHandler);
+        pointerMoveHandler = null;
+      }
+      if (pointerFocusHandler) {
+        document.removeEventListener("focusin", pointerFocusHandler);
+        pointerFocusHandler = null;
+      }
+      if (pointerRafId) {
+        cancelAnimationFrame(pointerRafId);
+        pointerRafId = null;
+      }
+
+      storageSet("pointer-indicator", "false");
+      announceStatus("Pointer indicator disabled");
+      syncMenuState();
+    }
+
+    function togglePointer() {
+      if (pointerActive) {
+        deactivatePointer();
+      } else {
+        activatePointer();
+      }
+    }
+
+    function setupPointerIndicator(pointerConfig) {
+      pointerElement = createElement("div", {
+        class: CSS_PREFIX + "-pointer",
+        "aria-hidden": "true",
+      });
+      pointerElement.hidden = true;
+      pointerElement.style.setProperty(
+        "--a11y-pointer-size",
+        pointerConfig.size + "px",
+      );
+      pointerElement.style.setProperty(
+        "--a11y-pointer-colour",
+        pointerConfig.colour,
+      );
+      document.body.appendChild(pointerElement);
+
+      const storedSize = storageGet("pointer-size");
+      if (storedSize) {
+        pointerElement.style.setProperty(
+          "--a11y-pointer-size",
+          storedSize + "px",
+        );
+      }
+
+      const storedColour = storageGet("pointer-colour");
+      if (storedColour) {
+        pointerElement.style.setProperty(
+          "--a11y-pointer-colour",
+          storedColour,
+        );
+      }
+
+      const shortcutKey = pointerConfig.shortcut.toUpperCase();
+      deck.addKeyBinding(
+        {
+          keyCode: shortcutKey.charCodeAt(0),
+          key: shortcutKey,
+          description: "Toggle pointer indicator",
+        },
+        togglePointer,
+      );
+
+      if (storageGet("pointer-indicator") === "true") {
+        activatePointer();
+      }
+    }
+
+    // =========================================================================
+    // Local Font Picker (progressive enhancement, Chromium only)
+    // =========================================================================
+
+    const FONT_LIST_CHUNK_SIZE = 50;
+
+    function buildFontListItem(family, onPick) {
+      const item = createElement("li", {
+        role: "option",
+        tabindex: "0",
+        "data-font": family,
+        style: "font-family: '" + family.replace(/'/g, "\\'") + "'",
+      });
+      item.textContent = family;
+      item.addEventListener("click", () => onPick(family));
+      item.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onPick(family);
+        }
+      });
+      return item;
+    }
+
+    async function openLocalFontPicker() {
+      if (!("queryLocalFonts" in window)) {
+        announceStatus(
+          "Local font picker is not supported in this browser. Use Chrome or Edge to enable this feature.",
+        );
+        return;
+      }
+
+      let fonts;
+      try {
+        fonts = await window.queryLocalFonts();
+      } catch (error) {
+        const name = error && error.name;
+        if (name === "NotAllowedError" || name === "SecurityError") {
+          announceStatus(
+            "Permission to access local fonts was denied. Allow the local fonts permission for this site and try again.",
+          );
+        } else if (name === "InvalidStateError") {
+          announceStatus(
+            "Local fonts are unavailable in this context (for example, inside an insecure frame).",
+          );
+        } else {
+          announceStatus(
+            "Could not access local fonts. Reload the page and try again.",
+          );
+        }
+        return;
+      }
+
+      const families = [...new Set(fonts.map((f) => f.family))].sort();
+
+      if (families.length === 0) {
+        announceStatus("No local fonts found");
+        return;
+      }
+
+      const dialog = createElement("dialog", {
+        class: `${CSS_PREFIX}-font-dialog`,
+        "aria-label": "Select a local font",
+      });
+
+      const heading = createElement("h3", {}, "Select a local font");
+      dialog.appendChild(heading);
+
+      const search = createElement("input", {
+        type: "search",
+        placeholder: "Search fonts\u2026",
+        class: `${CSS_PREFIX}-font-search`,
+        "aria-label": "Search fonts",
+      });
+      dialog.appendChild(search);
+
+      const list = createElement("ul", {
+        class: `${CSS_PREFIX}-font-list`,
+        role: "listbox",
+        "aria-label": "Available fonts",
+      });
+
+      const onPick = (family) => {
+        applyLocalFont(family);
+        dialog.close();
+      };
+
+      // Virtualise: render the current filtered slice in chunks via rAF so
+      // very large font collections do not block the main thread.
+      let filtered = families.slice();
+      let renderedCount = 0;
+      let renderToken = 0;
+
+      function renderChunk(token) {
+        if (token !== renderToken) return;
+        const end = Math.min(renderedCount + FONT_LIST_CHUNK_SIZE, filtered.length);
+        const fragment = document.createDocumentFragment();
+        for (let i = renderedCount; i < end; i++) {
+          fragment.appendChild(buildFontListItem(filtered[i], onPick));
+        }
+        list.appendChild(fragment);
+        renderedCount = end;
+        if (renderedCount < filtered.length) {
+          requestAnimationFrame(() => renderChunk(token));
+        }
+      }
+
+      function resetAndRender(nextFiltered) {
+        renderToken += 1;
+        filtered = nextFiltered;
+        renderedCount = 0;
+        list.replaceChildren();
+        renderChunk(renderToken);
+      }
+
+      resetAndRender(filtered);
+
+      dialog.appendChild(list);
+
+      const closeBtn = createElement(
+        "button",
+        { class: `${CSS_PREFIX}-font-dialog-close`, "aria-label": "Close" },
+        "Close",
+      );
+      closeBtn.addEventListener("click", () => dialog.close());
+      dialog.appendChild(closeBtn);
+
+      let searchDebounce = null;
+      search.addEventListener("input", () => {
+        if (searchDebounce !== null) window.clearTimeout(searchDebounce);
+        searchDebounce = window.setTimeout(() => {
+          const query = search.value.trim().toLowerCase();
+          const matching = query
+            ? families.filter((f) => f.toLowerCase().includes(query))
+            : families;
+          resetAndRender(matching);
+        }, 120);
+      });
+
+      dialog.addEventListener("close", () => {
+        renderToken += 1;
+        if (searchDebounce !== null) window.clearTimeout(searchDebounce);
+        dialog.remove();
+      });
+
+      document.body.appendChild(dialog);
+      dialog.showModal();
+      search.focus();
+    }
+
+    function applyLocalFont(family) {
+      revealElement.style.setProperty("--a11y-font-override", "'" + family + "'");
+      revealElement.classList.add(`${CSS_PREFIX}-font-override`);
+      currentFontFamilyIndex = -1;
+      storageSet("local-font", family);
+      storageSet("font-family", "-1");
+      announceStatus("Font: " + family);
+    }
+
+    // =========================================================================
+    // Menu State Synchronisation
+    // =========================================================================
+
+    function syncMenuState() {
+      const menu = document.getElementById("revealjs-a11y-menu");
+      if (!menu) return;
+
+      const hcSwitch = menu.querySelector('[data-setting="high-contrast"]');
+      if (hcSwitch) {
+        hcSwitch.setAttribute("aria-checked", String(hasHighContrastClass()));
+      }
+
+      const lhSwitch = menu.querySelector('[data-setting="link-highlight"]');
+      if (lhSwitch) {
+        const active = revealElement.classList.contains(
+          `${CSS_PREFIX}-link-highlight`,
+        );
+        lhSwitch.setAttribute("aria-checked", String(active));
+      }
+
+      const fsRange = menu.querySelector('[data-setting="font-size"]');
+      if (fsRange) {
+        fsRange.value = String(currentFontSize);
+        fsRange.setAttribute("aria-valuenow", String(currentFontSize));
+        fsRange.setAttribute("aria-valuetext", currentFontSize + "%");
+        const label = menu.querySelector('[data-label="font-size"]');
+        if (label) label.textContent = currentFontSize + "%";
+      }
+
+      const ffSelect = menu.querySelector('[data-setting="font-family"]');
+      if (ffSelect) {
+        ffSelect.value = String(currentFontFamilyIndex);
+      }
+
+      const lhRange = menu.querySelector('[data-setting="line-height"]');
+      if (lhRange) {
+        const lhText =
+          currentLineHeight === 0
+            ? "Default"
+            : (1.2 + currentLineHeight * 0.2).toFixed(1);
+        lhRange.value = String(currentLineHeight);
+        lhRange.setAttribute("aria-valuenow", String(currentLineHeight));
+        lhRange.setAttribute("aria-valuetext", lhText);
+        const label = menu.querySelector('[data-label="line-height"]');
+        if (label) label.textContent = lhText;
+      }
+
+      const lsRange = menu.querySelector('[data-setting="letter-spacing"]');
+      if (lsRange) {
+        const lsText =
+          currentLetterSpacing === 0
+            ? "Default"
+            : "+" + (currentLetterSpacing * 0.5).toFixed(1) + "px";
+        lsRange.value = String(currentLetterSpacing);
+        lsRange.setAttribute("aria-valuenow", String(currentLetterSpacing));
+        lsRange.setAttribute("aria-valuetext", lsText);
+        const label = menu.querySelector('[data-label="letter-spacing"]');
+        if (label) label.textContent = lsText;
+      }
+
+      const wsRange = menu.querySelector('[data-setting="word-spacing"]');
+      if (wsRange) {
+        const wsText =
+          currentWordSpacing === 0
+            ? "Default"
+            : "+" + (currentWordSpacing * 0.5).toFixed(1) + "px";
+        wsRange.value = String(currentWordSpacing);
+        wsRange.setAttribute("aria-valuenow", String(currentWordSpacing));
+        wsRange.setAttribute("aria-valuetext", wsText);
+        const label = menu.querySelector('[data-label="word-spacing"]');
+        if (label) label.textContent = wsText;
+      }
+
+      const overlaySelect = menu.querySelector(
+        '[data-setting="colour-overlay"]',
+      );
+      if (overlaySelect) {
+        overlaySelect.value = storageGet("colour-overlay") || "none";
+      }
+
+      const vcSwitch = menu.querySelector(
+        '[data-setting="visual-cue"]',
+      );
+      if (vcSwitch) {
+        vcSwitch.setAttribute(
+          "aria-checked",
+          String(storageGet("visual-cue") !== "false"),
+        );
+      }
+
+      const acSwitch = menu.querySelector(
+        '[data-setting="audio-cue"]',
+      );
+      if (acSwitch) {
+        acSwitch.setAttribute(
+          "aria-checked",
+          String(storageGet("audio-cue") !== "false"),
+        );
+      }
+
+      const tpSwitch = menu.querySelector(
+        '[data-setting="transcript-print"]',
+      );
+      if (tpSwitch) {
+        const active =
+          storageGet("transcript-print") === "true" ||
+          config.transcript.print;
+        tpSwitch.setAttribute("aria-checked", String(active));
+      }
+
+      const piSwitch = menu.querySelector(
+        '[data-setting="pointer-indicator"]',
+      );
+      if (piSwitch) {
+        piSwitch.setAttribute("aria-checked", String(pointerActive));
+      }
+
+      const psRange = menu.querySelector('[data-setting="pointer-size"]');
+      if (psRange && config.pointerIndicator) {
+        const size =
+          storageGet("pointer-size") || config.pointerIndicator.size;
+        psRange.value = String(size);
+        psRange.setAttribute("aria-valuenow", String(size));
+        psRange.setAttribute("aria-valuetext", size + "px");
+      }
+
+      const pcSelect = menu.querySelector(
+        '[data-setting="pointer-colour"]',
+      );
+      if (pcSelect && config.pointerIndicator) {
+        pcSelect.value =
+          storageGet("pointer-colour") || config.pointerIndicator.colour;
+      }
+    }
+
+    // =========================================================================
+    // Accessibility Settings Menu
+    // =========================================================================
+
+    function createSwitch(id, label, settingKey, checked) {
+      const row = createElement("div", { class: `${CSS_PREFIX}-menu-row` });
+      const lbl = createElement(
+        "span",
+        { class: `${CSS_PREFIX}-menu-label`, id: `${CSS_PREFIX}-label-${id}` },
+        label,
+      );
+      const btn = createElement("button", {
+        role: "switch",
+        "aria-checked": String(checked),
+        "aria-labelledby": `${CSS_PREFIX}-label-${id}`,
+        "data-setting": settingKey,
+        class: `${CSS_PREFIX}-menu-switch`,
+      });
+      const track = createElement("span", {
+        class: `${CSS_PREFIX}-menu-switch-track`,
+        "aria-hidden": "true",
+      });
+      const thumb = createElement("span", {
+        class: `${CSS_PREFIX}-menu-switch-thumb`,
+        "aria-hidden": "true",
+      });
+      track.appendChild(thumb);
+      btn.appendChild(track);
+      row.appendChild(lbl);
+      row.appendChild(btn);
+      return row;
+    }
+
+    function createRange(id, label, settingKey, min, max, step, value, formatValue) {
+      const row = createElement("div", { class: `${CSS_PREFIX}-menu-row` });
+      const lbl = createElement(
+        "label",
+        { for: `${CSS_PREFIX}-input-${id}`, class: `${CSS_PREFIX}-menu-label` },
+        label,
+      );
+      const valueLabel = createElement(
+        "span",
+        {
+          class: `${CSS_PREFIX}-menu-value`,
+          "data-label": settingKey,
+          "aria-hidden": "true",
+        },
+        formatValue(value),
+      );
+      const input = createElement("input", {
+        type: "range",
+        id: `${CSS_PREFIX}-input-${id}`,
+        "data-setting": settingKey,
+        min: String(min),
+        max: String(max),
+        step: String(step),
+        value: String(value),
+        "aria-valuemin": String(min),
+        "aria-valuemax": String(max),
+        "aria-valuenow": String(value),
+        "aria-valuetext": formatValue(value),
+        class: `${CSS_PREFIX}-menu-range`,
+      });
+      row.appendChild(lbl);
+      row.appendChild(valueLabel);
+      row.appendChild(input);
+      return row;
+    }
+
+    function createSelect(id, label, settingKey, options, selectedIndex) {
+      const row = createElement("div", { class: `${CSS_PREFIX}-menu-row` });
+      const lbl = createElement(
+        "label",
+        { for: `${CSS_PREFIX}-input-${id}`, class: `${CSS_PREFIX}-menu-label` },
+        label,
+      );
+      const select = createElement("select", {
+        id: `${CSS_PREFIX}-input-${id}`,
+        "data-setting": settingKey,
+        class: `${CSS_PREFIX}-menu-select`,
+      });
+      options.forEach((opt, i) => {
+        const option = createElement("option", { value: String(i) }, opt.name);
+        if (i === selectedIndex) option.selected = true;
+        select.appendChild(option);
+      });
+      row.appendChild(lbl);
+      row.appendChild(select);
+      return row;
+    }
+
+    function getFocusableElements(container) {
+      return Array.from(
+        container.querySelectorAll(
+          'button, input, select, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.disabled && el.offsetParent !== null);
+    }
+
+    function menuKeyHandler(e) {
+      const menu = document.getElementById("revealjs-a11y-menu");
+      if (!menu) return;
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+        return;
+      }
+
+      // Focus trap on Tab
+      if (e.key === "Tab") {
+        const focusable = getFocusableElements(menu);
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    function openMenu() {
+      if (menuOpen) return;
+
+      const menu = document.getElementById("revealjs-a11y-menu");
+      const backdrop = document.querySelector(`.${CSS_PREFIX}-menu-backdrop`);
+      if (!menu) return;
+
+      menuPreviousFocus = document.activeElement;
+      menuOpen = true;
+
+      syncMenuState();
+
+      menu.setAttribute("aria-hidden", "false");
+      menu.inert = false;
+      if (backdrop) backdrop.setAttribute("aria-hidden", "false");
+
+      menuPreviousKeyboard = deck.getConfig().keyboard;
+      deck.configure({ keyboard: false });
+
+      const closeBtn = menu.querySelector(`.${CSS_PREFIX}-menu-close`);
+      if (closeBtn) closeBtn.focus();
+
+      menu.addEventListener("keydown", menuKeyHandler);
+    }
+
+    function closeMenu() {
+      if (!menuOpen) return;
+
+      const menu = document.getElementById("revealjs-a11y-menu");
+      const backdrop = document.querySelector(`.${CSS_PREFIX}-menu-backdrop`);
+      if (!menu) return;
+
+      menuOpen = false;
+
+      menu.setAttribute("aria-hidden", "true");
+      if (backdrop) backdrop.setAttribute("aria-hidden", "true");
+
+      if (menuPreviousKeyboard !== null) {
+        deck.configure({ keyboard: menuPreviousKeyboard });
+      }
+      menuPreviousKeyboard = null;
+
+      menu.removeEventListener("keydown", menuKeyHandler);
+
+      if (menuPreviousFocus && menuPreviousFocus.focus) {
+        menuPreviousFocus.focus();
+      }
+      menuPreviousFocus = null;
+
+      // The element that held the focus can be gone, or on a slide the deck
+      // has left, which is inert and takes no focus. The focus then stays in
+      // the panel, or falls to the body when the reader closed the panel with
+      // the pointer. The current slide takes it instead, or the next `Tab`
+      // restarts from the top of the document.
+      const focusHolder = document.activeElement;
+      if (
+        !focusHolder ||
+        focusHolder === document.body ||
+        menu.contains(focusHolder)
+      ) {
+        focusSlide(deck.getCurrentSlide(), { preventScroll: true });
+      }
+
+      // This write comes after the focus goes back, because the browser drops
+      // the focus of an element that becomes inert.
+      menu.inert = true;
+    }
+
+    function toggleMenu() {
+      if (menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+
+    function setupMenu(menuConfig) {
+      // Backdrop
+      const backdrop = createElement("div", {
+        class: `${CSS_PREFIX}-menu-backdrop`,
+        "aria-hidden": "true",
+      });
+      backdrop.addEventListener("click", closeMenu);
+      document.body.appendChild(backdrop);
+
+      // Menu panel
+      const posClass =
+        menuConfig.position === "left" ? `${CSS_PREFIX}-menu--left` : "";
+      const menu = createElement("aside", {
+        class: `${CSS_PREFIX}-menu` + (posClass ? " " + posClass : ""),
+        id: "revealjs-a11y-menu",
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-labelledby": `${CSS_PREFIX}-menu-title`,
+        "aria-hidden": "true",
+        tabindex: "-1",
+      });
+      // The panel is built closed, so it starts out of the tab order.
+      menu.inert = true;
+
+      // Header
+      const header = createElement("div", {
+        class: `${CSS_PREFIX}-menu-header`,
+      });
+      const title = createElement(
+        "h2",
+        { id: `${CSS_PREFIX}-menu-title` },
+        "Accessibility Settings",
+      );
+      const closeBtn = createElement("button", {
+        class: `${CSS_PREFIX}-menu-close`,
+        "aria-label": "Close accessibility settings",
+      });
+      closeBtn.textContent = "\u00D7";
+      closeBtn.addEventListener("click", closeMenu);
+      header.appendChild(title);
+      header.appendChild(closeBtn);
+      menu.appendChild(header);
+
+      // Body
+      const body = createElement("div", {
+        class: `${CSS_PREFIX}-menu-body`,
+      });
+
+      // --- Display group ---
+      {
+        const fieldset = createElement("fieldset", {
+          class: `${CSS_PREFIX}-menu-group`,
+        });
+        fieldset.appendChild(createElement("legend", {}, "Display"));
+
+        {
+          const hcActive = hasHighContrastClass();
+          const row = createSwitch("hc", "High contrast", "high-contrast", hcActive);
+          const btn = row.querySelector('[data-setting="high-contrast"]');
+          btn.addEventListener("click", () => {
+            const current = btn.getAttribute("aria-checked") === "true";
+            setHighContrast(!current);
+          });
+          fieldset.appendChild(row);
+        }
+
+        {
+          const lhActive = revealElement.classList.contains(
+            `${CSS_PREFIX}-link-highlight`,
+          );
+          const row = createSwitch(
+            "lh",
+            "Underline links",
+            "link-highlight",
+            lhActive,
+          );
+          const btn = row.querySelector('[data-setting="link-highlight"]');
+          btn.addEventListener("click", () => {
+            const current = btn.getAttribute("aria-checked") === "true";
+            setLinkHighlight(!current);
+          });
+          fieldset.appendChild(row);
+        }
+
+        // Colour overlay
+        const overlayOptions = [
+          { name: "None", value: "none" },
+          { name: "Yellow", value: "rgba(255, 255, 0, 0.15)" },
+          { name: "Blue", value: "rgba(0, 100, 255, 0.1)" },
+          { name: "Pink", value: "rgba(255, 100, 150, 0.12)" },
+          { name: "Green", value: "rgba(0, 200, 100, 0.1)" },
+        ];
+        const overlayRow = createElement("div", {
+          class: `${CSS_PREFIX}-menu-row`,
+        });
+        const overlayLabel = createElement(
+          "label",
+          {
+            for: `${CSS_PREFIX}-input-overlay`,
+            class: `${CSS_PREFIX}-menu-label`,
+          },
+          "Colour overlay",
+        );
+        const overlaySelect = createElement("select", {
+          id: `${CSS_PREFIX}-input-overlay`,
+          "data-setting": "colour-overlay",
+          class: `${CSS_PREFIX}-menu-select`,
+        });
+        const storedOverlay = storageGet("colour-overlay") || "none";
+        overlayOptions.forEach((opt) => {
+          const option = createElement(
+            "option",
+            { value: opt.value },
+            opt.name,
+          );
+          if (opt.value === storedOverlay) option.selected = true;
+          overlaySelect.appendChild(option);
+        });
+        overlaySelect.addEventListener("change", () => {
+          const val = overlaySelect.value;
+          if (val === "none") {
+            revealElement.classList.remove(`${CSS_PREFIX}-colour-overlay`);
+            revealElement.style.removeProperty("--a11y-overlay-colour");
+            storageSet("colour-overlay", "none");
+            announceStatus("Colour overlay removed");
+          } else {
+            revealElement.style.setProperty("--a11y-overlay-colour", val);
+            revealElement.classList.add(`${CSS_PREFIX}-colour-overlay`);
+            storageSet("colour-overlay", val);
+            const name = overlayOptions.find((o) => o.value === val);
+            announceStatus(
+              "Colour overlay: " + (name ? name.name : "custom"),
+            );
+          }
+        });
+        overlayRow.appendChild(overlayLabel);
+        overlayRow.appendChild(overlaySelect);
+        fieldset.appendChild(overlayRow);
+
+        body.appendChild(fieldset);
+      }
+
+      // --- Typography group ---
+      const hasTypography =
+        config.fontSizeControls || config.fontSelection || config.textSpacing;
+      if (hasTypography) {
+        const fieldset = createElement("fieldset", {
+          class: `${CSS_PREFIX}-menu-group`,
+        });
+        fieldset.appendChild(createElement("legend", {}, "Typography"));
+
+        if (config.fontSizeControls) {
+          const row = createRange(
+            "fs",
+            "Font size",
+            "font-size",
+            config.fontSizeMin,
+            config.fontSizeMax,
+            config.fontSizeStep,
+            currentFontSize,
+            (v) => v + "%",
+          );
+          const input = row.querySelector('[data-setting="font-size"]');
+          input.addEventListener("input", () => {
+            const val = parseInt(input.value, 10);
+            setFontSize(val);
+          });
+          fieldset.appendChild(row);
+        }
+
+        if (config.fontSelection) {
+          const row = createSelect(
+            "ff",
+            "Font family",
+            "font-family",
+            config.fontFamilies,
+            currentFontFamilyIndex >= 0 ? currentFontFamilyIndex : 0,
+          );
+          const select = row.querySelector('[data-setting="font-family"]');
+          select.addEventListener("change", () => {
+            selectFontByIndex(parseInt(select.value, 10));
+          });
+          fieldset.appendChild(row);
+
+          if ("queryLocalFonts" in window) {
+            const localRow = createElement("div", {
+              class: `${CSS_PREFIX}-menu-row`,
+            });
+            const localBtn = createElement(
+              "button",
+              {
+                class: `${CSS_PREFIX}-menu-local-font`,
+                "aria-label": "Choose a font installed on your system",
+              },
+              "System fonts\u2026",
+            );
+            localBtn.addEventListener("click", () => {
+              closeMenu();
+              openLocalFontPicker();
+            });
+            localRow.appendChild(localBtn);
+            fieldset.appendChild(localRow);
+          }
+        }
+
+        if (config.textSpacing) {
+          const lhRow = createRange(
+            "lh-spacing",
+            "Line height",
+            "line-height",
+            0,
+            14,
+            1,
+            currentLineHeight,
+            (v) =>
+              parseInt(v, 10) === 0
+                ? "Default"
+                : (1.2 + parseInt(v, 10) * 0.2).toFixed(1),
+          );
+          const lhInput = lhRow.querySelector('[data-setting="line-height"]');
+          lhInput.addEventListener("input", () => {
+            currentLineHeight = parseInt(lhInput.value, 10);
+            applyTextSpacing();
+            if (currentLineHeight === 0) {
+              announceStatus("Line height reset to default");
+            } else {
+              announceStatus(
+                "Line height: " +
+                  (1.2 + currentLineHeight * 0.2).toFixed(1),
+              );
+            }
+            syncMenuState();
+          });
+          fieldset.appendChild(lhRow);
+
+          const lsRow = createRange(
+            "ls-spacing",
+            "Letter spacing",
+            "letter-spacing",
+            0,
+            20,
+            1,
+            currentLetterSpacing,
+            (v) =>
+              parseInt(v, 10) === 0
+                ? "Default"
+                : "+" + (parseInt(v, 10) * 0.5).toFixed(1) + "px",
+          );
+          const lsInput = lsRow.querySelector(
+            '[data-setting="letter-spacing"]',
+          );
+          lsInput.addEventListener("input", () => {
+            currentLetterSpacing = parseInt(lsInput.value, 10);
+            applyTextSpacing();
+            if (currentLetterSpacing === 0) {
+              announceStatus("Letter spacing reset to default");
+            } else {
+              announceStatus(
+                "Letter spacing: +" +
+                  (currentLetterSpacing * 0.5).toFixed(1) +
+                  "px",
+              );
+            }
+            syncMenuState();
+          });
+          fieldset.appendChild(lsRow);
+
+          const wsRow = createRange(
+            "ws-spacing",
+            "Word spacing",
+            "word-spacing",
+            0,
+            50,
+            1,
+            currentWordSpacing,
+            (v) =>
+              parseInt(v, 10) === 0
+                ? "Default"
+                : "+" + (parseInt(v, 10) * 0.5).toFixed(1) + "px",
+          );
+          const wsInput = wsRow.querySelector(
+            '[data-setting="word-spacing"]',
+          );
+          wsInput.addEventListener("input", () => {
+            currentWordSpacing = parseInt(wsInput.value, 10);
+            applyTextSpacing();
+            if (currentWordSpacing === 0) {
+              announceStatus("Word spacing reset to default");
+            } else {
+              announceStatus(
+                "Word spacing: +" +
+                  (currentWordSpacing * 0.5).toFixed(1) +
+                  "px",
+              );
+            }
+            syncMenuState();
+          });
+          fieldset.appendChild(wsRow);
+        }
+
+        body.appendChild(fieldset);
+      }
+
+      // --- Motion & Cues group ---
+      const hasCues =
+        config.slideChangeCue.visual || config.slideChangeCue.audio;
+      if (hasCues) {
+        const fieldset = createElement("fieldset", {
+          class: `${CSS_PREFIX}-menu-group`,
+        });
+        fieldset.appendChild(createElement("legend", {}, "Motion and Cues"));
+
+        if (config.slideChangeCue.visual) {
+          const indicator = document.querySelector(
+            `.${CSS_PREFIX}-slide-change-indicator`,
+          );
+          const active = indicator !== null && !indicator.hidden;
+          const row = createSwitch(
+            "vc",
+            "Visual slide cue",
+            "visual-cue",
+            active,
+          );
+          const btn = row.querySelector('[data-setting="visual-cue"]');
+          btn.addEventListener("click", () => {
+            const ind = document.querySelector(
+              `.${CSS_PREFIX}-slide-change-indicator`,
+            );
+            if (ind) {
+              ind.hidden = !ind.hidden;
+              storageSet("visual-cue", String(!ind.hidden));
+              btn.setAttribute("aria-checked", String(!ind.hidden));
+              announceStatus(
+                ind.hidden
+                  ? "Visual slide cue disabled"
+                  : "Visual slide cue enabled",
+              );
+            }
+          });
+          fieldset.appendChild(row);
+        }
+
+        if (config.slideChangeCue.audio) {
+          const audioActive = storageGet("audio-cue") !== "false";
+          const row = createSwitch(
+            "ac",
+            "Audio slide cue",
+            "audio-cue",
+            audioActive,
+          );
+          const btn = row.querySelector('[data-setting="audio-cue"]');
+          btn.addEventListener("click", () => {
+            const current = btn.getAttribute("aria-checked") === "true";
+            btn.setAttribute("aria-checked", String(!current));
+            storageSet("audio-cue", String(!current));
+            announceStatus(
+              !current
+                ? "Audio slide cue enabled"
+                : "Audio slide cue disabled",
+            );
+          });
+          fieldset.appendChild(row);
+        }
+
+        body.appendChild(fieldset);
+      }
+
+      // --- Tools group ---
+      {
+        const hasTools =
+          config.transcript.enabled ||
+          (config.pointerIndicator && config.pointerIndicator.enabled);
+        if (hasTools) {
+          const fieldset = createElement("fieldset", {
+            class: `${CSS_PREFIX}-menu-group`,
+          });
+          fieldset.appendChild(createElement("legend", {}, "Tools"));
+
+          if (config.transcript.enabled) {
+            const transcriptBtn = createElement(
+              "button",
+              {
+                class: `${CSS_PREFIX}-menu-action`,
+                "aria-label": "Open slide transcript",
+              },
+              "Open transcript",
+            );
+            transcriptBtn.addEventListener("click", () => {
+              closeMenu();
+              openTranscript();
+            });
+            const row = createElement("div", {
+              class: `${CSS_PREFIX}-menu-row`,
+            });
+            row.appendChild(transcriptBtn);
+            fieldset.appendChild(row);
+
+            const printActive =
+              storageGet("transcript-print") === "true" ||
+              config.transcript.print;
+            const printRow = createSwitch(
+              "tp",
+              "Print transcript",
+              "transcript-print",
+              printActive,
+            );
+            const printBtn = printRow.querySelector(
+              '[data-setting="transcript-print"]',
+            );
+            printBtn.addEventListener("click", () => {
+              const current =
+                printBtn.getAttribute("aria-checked") === "true";
+              printBtn.setAttribute("aria-checked", String(!current));
+              storageSet("transcript-print", String(!current));
+              announceStatus(
+                !current
+                  ? "Transcript will be included in print"
+                  : "Transcript excluded from print",
+              );
+            });
+            fieldset.appendChild(printRow);
+          }
+
+          if (config.pointerIndicator && config.pointerIndicator.enabled) {
+            const piRow = createSwitch(
+              "pi",
+              "Pointer indicator",
+              "pointer-indicator",
+              pointerActive,
+            );
+            const piBtn = piRow.querySelector(
+              '[data-setting="pointer-indicator"]',
+            );
+            piBtn.addEventListener("click", () => togglePointer());
+            fieldset.appendChild(piRow);
+
+            const storedSize =
+              storageGet("pointer-size") || config.pointerIndicator.size;
+            const sizeRow = createRange(
+              "ps",
+              "Pointer size",
+              "pointer-size",
+              20,
+              200,
+              10,
+              parseInt(storedSize, 10),
+              (v) => v + "px",
+            );
+            const sizeInput = sizeRow.querySelector(
+              '[data-setting="pointer-size"]',
+            );
+            sizeInput.addEventListener("input", () => {
+              const val = parseInt(sizeInput.value, 10);
+              if (pointerElement) {
+                pointerElement.style.setProperty(
+                  "--a11y-pointer-size",
+                  val + "px",
+                );
+              }
+              storageSet("pointer-size", String(val));
+              announceStatus("Pointer size: " + val + "px");
+              syncMenuState();
+            });
+            fieldset.appendChild(sizeRow);
+
+            const colourOptions = [
+              { name: "Blue", value: "rgba(74, 144, 217, 0.4)" },
+              { name: "Yellow", value: "rgba(255, 255, 0, 0.4)" },
+              { name: "Red", value: "rgba(255, 0, 0, 0.3)" },
+              { name: "Green", value: "rgba(0, 200, 100, 0.3)" },
+            ];
+            const storedColour =
+              storageGet("pointer-colour") ||
+              config.pointerIndicator.colour;
+            const colourRow = createElement("div", {
+              class: `${CSS_PREFIX}-menu-row`,
+            });
+            const colourLabel = createElement(
+              "label",
+              {
+                for: `${CSS_PREFIX}-input-pc`,
+                class: `${CSS_PREFIX}-menu-label`,
+              },
+              "Pointer colour",
+            );
+            const colourSelect = createElement("select", {
+              id: `${CSS_PREFIX}-input-pc`,
+              "data-setting": "pointer-colour",
+              class: `${CSS_PREFIX}-menu-select`,
+            });
+            colourOptions.forEach((opt) => {
+              const option = createElement(
+                "option",
+                { value: opt.value },
+                opt.name,
+              );
+              if (opt.value === storedColour) option.selected = true;
+              colourSelect.appendChild(option);
+            });
+            colourSelect.addEventListener("change", () => {
+              const val = colourSelect.value;
+              if (pointerElement) {
+                pointerElement.style.setProperty(
+                  "--a11y-pointer-colour",
+                  val,
+                );
+              }
+              storageSet("pointer-colour", val);
+              const name =
+                colourOptions.find((o) => o.value === val)?.name || val;
+              announceStatus("Pointer colour: " + name);
+            });
+            colourRow.appendChild(colourLabel);
+            colourRow.appendChild(colourSelect);
+            fieldset.appendChild(colourRow);
+          }
+
+          body.appendChild(fieldset);
+        }
+      }
+
+      menu.appendChild(body);
+
+      // Footer
+      const footer = createElement("div", {
+        class: `${CSS_PREFIX}-menu-footer`,
+      });
+      const resetBtn = createElement(
+        "button",
+        { class: `${CSS_PREFIX}-menu-reset` },
+        "Reset All",
+      );
+      resetBtn.addEventListener("click", () => {
+        resetAllPreferences();
+      });
+      footer.appendChild(resetBtn);
+      menu.appendChild(footer);
+
+      document.body.appendChild(menu);
+
+      // Open menu via Reveal.js key binding; Escape closes it.
+      const shortcutKey = menuConfig.shortcut.toUpperCase();
+      deck.addKeyBinding(
+        {
+          keyCode: shortcutKey.charCodeAt(0),
+          key: shortcutKey,
+          description: "Toggle accessibility settings menu",
+        },
+        toggleMenu,
+      );
+
+    }
+
+    // =========================================================================
+    // Slide Menu Accessibility (patches bundled reveal.js-menu plugin)
+    // =========================================================================
+
+    function setupSlideMenuA11y() {
+      slideMenuObserver = new MutationObserver((_mutations, obs) => {
+        const nav = document.querySelector(
+          ".slide-menu-wrapper nav.slide-menu",
+        );
+        if (!nav) return;
+        obs.disconnect();
+        slideMenuObserver = null;
+
+        nav.setAttribute("aria-label", "Slide navigation menu");
+
+        const toggleButton = document.querySelector(".slide-menu-button > a");
+        if (toggleButton && !toggleButton.getAttribute("aria-label")) {
+          toggleButton.setAttribute("aria-label", "Open slide navigation menu");
+        }
+
+        const toolbar = nav.querySelector("ol.slide-menu-toolbar");
+        if (toolbar) {
+          toolbar.setAttribute("role", "tablist");
+          toolbar
+            .querySelectorAll("li.toolbar-panel-button")
+            .forEach((li) => {
+              li.setAttribute("role", "tab");
+              li.setAttribute("tabindex", "0");
+              const label = li.querySelector(".slide-menu-toolbar-label");
+              if (label) {
+                li.setAttribute("aria-label", label.textContent);
+              }
+            });
+        }
+
+        nav.querySelectorAll(".slide-menu-items").forEach((ul) => {
+          ul.setAttribute("role", "menu");
+        });
+        nav.querySelectorAll(".slide-menu-item").forEach((li) => {
+          li.setAttribute("role", "menuitem");
+          li.setAttribute("tabindex", "0");
+          const title = li.querySelector(".slide-menu-item-title");
+          if (title) {
+            li.setAttribute(
+              "aria-label",
+              "Go to slide: " + title.textContent,
+            );
+          }
+        });
+
+        nav.querySelectorAll(".slide-tool-item a").forEach((a) => {
+          a.setAttribute("role", "button");
+        });
+
+        const wrapper = document.querySelector(".slide-menu-wrapper");
+        if (wrapper) {
+          wrapper.inert = true;
+
+          slideMenuClassObserver = new MutationObserver(() => {
+            const isOpen = nav.classList.contains("active");
+            wrapper.inert = !isOpen;
+            if (isOpen) {
+              const firstItem = nav.querySelector(
+                '[role="tab"], [role="menuitem"]',
+              );
+              if (firstItem) {
+                requestAnimationFrame(() => firstItem.focus());
+              }
+            } else {
+              requestAnimationFrame(() => {
+                const current = deck.getCurrentSlide();
+                if (current) {
+                  current.setAttribute("tabindex", "-1");
+                  current.focus();
+                }
+              });
+            }
+          });
+          slideMenuClassObserver.observe(nav, {
+            attributes: true,
+            attributeFilter: ["class"],
+          });
+        }
+      });
+
+      slideMenuObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+      setTimeout(() => {
+        if (slideMenuObserver) {
+          slideMenuObserver.disconnect();
+          slideMenuObserver = null;
+        }
+      }, 5000);
+    }
+
+    // =========================================================================
+    // Reset All Preferences
+    // =========================================================================
+
+    function resetAllPreferences() {
+      toggleHighContrastClass(false);
+      revealElement.classList.remove(
+        `${CSS_PREFIX}-link-highlight`,
+        `${CSS_PREFIX}-font-override`,
+        `${CSS_PREFIX}-line-height-override`,
+        `${CSS_PREFIX}-letter-spacing-override`,
+        `${CSS_PREFIX}-word-spacing-override`,
+        `${CSS_PREFIX}-colour-overlay`,
+      );
+      revealElement.style.removeProperty("--a11y-font-override");
+      revealElement.style.removeProperty("--a11y-line-height");
+      revealElement.style.removeProperty("--a11y-letter-spacing");
+      revealElement.style.removeProperty("--a11y-word-spacing");
+      revealElement.style.removeProperty("--a11y-overlay-colour");
+
+      currentFontSize = 100;
+      currentFontFamilyIndex = 0;
+      currentLineHeight = 0;
+      currentLetterSpacing = 0;
+      currentWordSpacing = 0;
+
+      const container = getSlidesContainer();
+      if (container) {
+        container.style.fontSize = "";
+      }
+
+      const keys = [
+        "high-contrast",
+        "link-highlight",
+        "font-size",
+        "font-family",
+        "local-font",
+        "line-height",
+        "letter-spacing",
+        "word-spacing",
+        "colour-overlay",
+        "visual-cue",
+        "audio-cue",
+        "transcript-print",
+        "pointer-indicator",
+        "pointer-size",
+        "pointer-colour",
+      ];
+      keys.forEach((key) => {
+        try {
+          localStorage.removeItem(STORAGE_PREFIX + key);
+        } catch (_e) {
+          // Ignore.
+        }
+      });
+
+      const visualIndicator = document.querySelector(
+        `.${CSS_PREFIX}-slide-change-indicator`,
+      );
+      if (visualIndicator) visualIndicator.hidden = false;
+
+      if (config.highContrast) {
+        toggleHighContrastClass(true);
+      }
+      if (config.linkHighlight) {
+        revealElement.classList.add(`${CSS_PREFIX}-link-highlight`);
+      }
+
+      if (pointerActive) deactivatePointer();
+      if (pointerElement && config.pointerIndicator) {
+        pointerElement.style.setProperty(
+          "--a11y-pointer-size",
+          config.pointerIndicator.size + "px",
+        );
+        pointerElement.style.setProperty(
+          "--a11y-pointer-colour",
+          config.pointerIndicator.colour,
+        );
+      }
+
+      announceStatus("All accessibility preferences reset");
+      syncMenuState();
+    }
+
+    // =========================================================================
+    // Plugin Entry Point
+    // =========================================================================
+
+    return {
+      id: "revealjs-a11y",
+
+      init: (reveal) => {
+        deck = reveal;
+        config = resolveConfig(deck.getConfig());
+        revealElement = deck.getRevealElement();
+        const isPrintPdf = isPrintPdfView();
+
+        if (!isPrintPdf) {
+          if (config.skipNavigation) setupSkipNavigation();
+          if (config.focusIndicators) setupFocusIndicators();
+          if (config.reducedMotion) setupReducedMotion();
+          if (config.viewportZoom) setupViewportZoom();
+        }
+        setupHighContrast(isPrintPdf);
+        if (!isPrintPdf) {
+          if (config.fontSizeControls) setupFontSizeControls();
+          if (config.fontSelection) setupFontSelection();
+          if (config.textSpacing) setupTextSpacing();
+        }
+        setupLinkHighlight();
+        if (config.slideLandmarks) setupSlideLandmarks();
+        if (config.altTextWarnings) setupAltTextWarnings();
+        if (!isPrintPdf) {
+          if (config.announceSlideNumbers) setupSlideAnnouncements();
+          if (config.announceFragments) setupFragmentAnnouncements();
+          if (config.announceLanguageChanges) setupLanguageAnnouncements();
+          if (config.slideChangeCue.visual || config.slideChangeCue.audio) {
+            setupSlideChangeCue(config.slideChangeCue);
+          }
+        }
+        if (config.transcript.enabled) setupTranscript();
+        if (
+          !isPrintPdf &&
+          config.pointerIndicator &&
+          config.pointerIndicator.enabled
+        ) {
+          setupPointerIndicator(config.pointerIndicator);
+        }
+
+        if (!isPrintPdf) {
+          // Restore local font if one was previously selected.
+          const storedLocalFont = storageGet("local-font");
+          const storedFamilyIdx = storageGet("font-family");
+          if (storedLocalFont && storedFamilyIdx === "-1") {
+            applyLocalFont(storedLocalFont);
+          }
+
+          // Restore colour overlay if one was previously selected.
+          const storedOverlay = storageGet("colour-overlay");
+          if (storedOverlay && storedOverlay !== "none") {
+            revealElement.style.setProperty(
+              "--a11y-overlay-colour",
+              storedOverlay,
+            );
+            revealElement.classList.add(`${CSS_PREFIX}-colour-overlay`);
+          }
+
+          if (config.menu.enabled) setupMenu(config.menu);
+          if (config.slideMenuA11y) setupSlideMenuA11y();
+        }
+
+        if (isPrintPdf) {
+          if (!document.title) {
+            const h1 = revealElement.querySelector(".slides h1");
+            if (h1) document.title = h1.textContent.trim();
+          }
+        }
+      },
+
+      destroy: () => {
+        const skipLink = revealElement.querySelector(
+          `.${CSS_PREFIX}-skip-link`,
+        );
+        if (skipLink) skipLink.remove();
+
+        resetAnnouncementQueue();
+        const statusEl = revealElement.querySelector(`.${CSS_PREFIX}-status`);
+        if (statusEl) statusEl.remove();
+
+        toggleHighContrastClass(false);
+        revealElement.classList.remove(
+          `${CSS_PREFIX}-focus-indicators`,
+          `${CSS_PREFIX}-reduced-motion`,
+          `${CSS_PREFIX}-link-highlight`,
+          `${CSS_PREFIX}-font-override`,
+          `${CSS_PREFIX}-line-height-override`,
+          `${CSS_PREFIX}-letter-spacing-override`,
+          `${CSS_PREFIX}-word-spacing-override`,
+          `${CSS_PREFIX}-colour-overlay`,
+        );
+        revealElement.style.removeProperty("--a11y-font-override");
+        revealElement.style.removeProperty("--a11y-line-height");
+        revealElement.style.removeProperty("--a11y-letter-spacing");
+        revealElement.style.removeProperty("--a11y-word-spacing");
+        revealElement.style.removeProperty("--a11y-overlay-colour");
+
+        const container = getSlidesContainer();
+        if (container) {
+          container.style.fontSize = "";
+        }
+
+        revealElement
+          .querySelectorAll(`.${CSS_PREFIX}-missing-alt-label`)
+          .forEach((el) => el.remove());
+        revealElement
+          .querySelectorAll(`.${CSS_PREFIX}-missing-alt`)
+          .forEach((el) => el.classList.remove(`${CSS_PREFIX}-missing-alt`));
+
+        if (landmarkObserver) {
+          landmarkObserver.disconnect();
+          landmarkObserver = null;
+        }
+        if (landmarkFocusHandler) {
+          document.removeEventListener("focusin", landmarkFocusHandler);
+          landmarkFocusHandler = null;
+        }
+        if (landmarkFrameId !== null) {
+          cancelAnimationFrame(landmarkFrameId);
+          landmarkFrameId = null;
+        }
+        lastSlideFocus = null;
+        clearSlideIsolation();
+
+        const changeIndicator = document.body.querySelector(
+          `.${CSS_PREFIX}-slide-change-indicator`,
+        );
+        if (changeIndicator) changeIndicator.remove();
+
+        if (transcriptOpen) closeTranscript();
+        transcriptOpen = false;
+        transcriptPreviousFocus = null;
+        transcriptPreviousKeyboard = null;
+
+        if (pointerActive) {
+          document.removeEventListener("mousemove", pointerMoveHandler);
+          document.removeEventListener("focusin", pointerFocusHandler);
+          if (pointerRafId) cancelAnimationFrame(pointerRafId);
+        }
+        if (pointerElement) {
+          pointerElement.remove();
+          pointerElement = null;
+        }
+        pointerActive = false;
+        pointerMoveHandler = null;
+        pointerFocusHandler = null;
+        pointerRafId = null;
+        previousLang = null;
+
+        document
+          .querySelectorAll("link[data-revealjs-a11y-font]")
+          .forEach((el) => el.remove());
+
+        const fontDialog = document.querySelector(
+          `.${CSS_PREFIX}-font-dialog`,
+        );
+        if (fontDialog) fontDialog.remove();
+
+        if (menuOpen) {
+          if (menuPreviousKeyboard !== null) {
+            deck.configure({ keyboard: menuPreviousKeyboard });
+          }
+          menuPreviousKeyboard = null;
+          menuOpen = false;
+        }
+
+        if (reducedMotionMediaQuery && reducedMotionListener) {
+          reducedMotionMediaQuery.removeEventListener(
+            "change",
+            reducedMotionListener,
+          );
+        }
+        if (reducedMotionPreviousTransitions) {
+          deck.configure({
+            transition: reducedMotionPreviousTransitions.transition,
+            backgroundTransition:
+              reducedMotionPreviousTransitions.backgroundTransition,
+          });
+        }
+        reducedMotionMediaQuery = null;
+        reducedMotionListener = null;
+        reducedMotionPreviousTransitions = null;
+
+        deckHandlers.forEach(({ event, handler }) => {
+          deck.off(event, handler);
+        });
+        deckHandlers.length = 0;
+
+        if (primeAudioClick) {
+          document.removeEventListener("click", primeAudioClick);
+          document.removeEventListener("keydown", primeAudioKeydown);
+          primeAudioClick = null;
+          primeAudioKeydown = null;
+        }
+
+        if (audioCtx) {
+          audioCtx.close();
+          audioCtx = null;
+        }
+
+        if (slideMenuObserver) {
+          slideMenuObserver.disconnect();
+          slideMenuObserver = null;
+        }
+        if (slideMenuClassObserver) {
+          slideMenuClassObserver.disconnect();
+          slideMenuClassObserver = null;
+        }
+
+        const menuEl = document.getElementById("revealjs-a11y-menu");
+        if (menuEl) menuEl.remove();
+        const menuBackdrop = document.querySelector(
+          `.${CSS_PREFIX}-menu-backdrop`,
+        );
+        if (menuBackdrop) menuBackdrop.remove();
+      },
+    };
+  });
