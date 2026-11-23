@@ -12,6 +12,7 @@
 - fix: On a page with a title banner, the sidebar now starts at the bottom of the banner, with no empty strip between them. (#137)
 - fix: On a phone, a site with a sidebar and no navbar shows the version pill in the top bar, so the version stays visible when the sidebar is closed. (#138)
 - fix: On a phone, a site with a sidebar, no navbar and a version shortens the parent breadcrumbs in the top bar before the current page name, and each breadcrumb or page title there shows its full text as a tooltip. (#139)
+- fix: A `.terminal` block with `filename=""` now keeps its title bar with no name, as it does in Quarto and Code Window, instead of showing "Terminal". (#141)
 
 ## 0.15.1 (2026-11-20)
 
