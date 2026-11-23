@@ -52,6 +52,12 @@ contributes:
       code-copy: true
       code-overflow: wrap
       code-link: false
+      # gitlink does not rewrite references in prose in any format. The widget
+      # shows only in HTML, where a navbar item or sidebar tool has the href
+      # `#gitlink-widget`.
+      extensions:
+        gitlink:
+          enabled: false
       # Each embedded extension under `_extensions/mcanouil/` runs through a
       # wrapper in `bundled/`, at the stage that its own manifest sets. A
       # wrapper does nothing when the project has its own copy of the same
@@ -144,9 +150,7 @@ contributes:
         - bundled/remember.lua
       # Each embedded extension keeps its own defaults, set per site under
       # `extensions:`, with these exceptions. gitlink shows its repository
-      # widget, but does not rewrite references in prose. The widget shows only
-      # where a navbar item or sidebar tool has the href `#gitlink-widget`.
-      # remember offers no resume on the home page and the 404 page; Quarto
+      # widget, and the common options keep it from rewriting prose. remember offers no resume on the home page and the 404 page; Quarto
       # joins this list with a site's own `page-exclude` list, so a site can add
       # pages but cannot remove these two. prism and offset-headings both run in
       # the pre-AST stage, where list order decides which runs first. prism
@@ -155,7 +159,6 @@ contributes:
       # reads it.
       extensions:
         gitlink:
-          enabled: false
           widget:
             enabled: true
         remember:

@@ -247,7 +247,7 @@ They also draw the dismiss control of the announcement bar so that the keyboard 
 | [cascade](https://github.com/mcanouil/quarto-revealjs-cascade) | Repeats the heading chain on each new slide that `---` creates, so you write each heading once. | `extensions.cascade` | Reveal.js |
 | [codefrag](https://github.com/mcanouil/quarto-revealjs-codefrag) | Turns code annotations into fragments that the arrow keys step through. | `extensions.codefrag` | Reveal.js |
 | [tabset](https://github.com/mcanouil/quarto-revealjs-tabset) | Lets the arrow keys step through the tabs of a tabset and its fragments, and gives each tab its own page in a PDF export. | none | Reveal.js |
-| [a11y](https://github.com/mcanouil/quarto-revealjs-a11y) | Adds a skip link, focus indicators, text controls and screen reader announcements to a deck. | `extensions.a11y` | Reveal.js |
+| [a11y](https://github.com/mcanouil/quarto-revealjs-a11y) | Adds a skip link, focus indicators, text controls and screen reader announcements to a deck. | `revealjs-a11y` | Reveal.js |
 | [typst-render](https://github.com/mcanouil/quarto-typst-render) | Compiles `typst` code blocks and inline expressions to images, so Typst figures and equations work in any format. | `extensions.typst-render` | All |
 | [typst-extras](https://github.com/mcanouil/quarto-typst-extras) | Adds lists of floats, chapter numbering, appendix sections and watermarks to a Typst document. | `extensions.typst-extras` | Typst |
 | [portable-links](https://github.com/mcanouil/quarto-portable-links) | Turns a relative link to another page into an absolute link built from `website.site-url`, in Typst and slide formats. | `extensions.portable-links` | Typst, Reveal.js |
@@ -256,7 +256,7 @@ They also draw the dismiss control of the announcement bar so that the keyboard 
 
 Each extension keeps its own defaults, and its repository lists its options.
 Atelier changes two defaults.
-gitlink shows only its widget, and does not change the references in your text.
+gitlink shows only its widget, which appears on HTML pages, and does not change the references in your text in any format.
 remember does not offer to resume on the home page (`index.qmd`) or the 404 page (`404.qmd`).
 To turn reference rewriting on, set:
 
