@@ -138,8 +138,8 @@ format:
       dark: _extensions/mcanouil/atelier/highlighting/atelier-quarto-dark.theme
 ```
 
-The script `scripts/generate-highlighting.py` in the repository writes `html/highlighting-tokens.scss` from the `.theme` files.
-Run it with `--check` to find a difference between the two.
+The script `scripts/generate-highlighting.py` in the repository writes `html/highlighting-tokens.scss` and `highlighting/tokens.lua` from the `.theme` files.
+Run it with `--check` to find a difference between the `.theme` files and these two files.
 
 ## Contrast
 

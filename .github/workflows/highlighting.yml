@@ -1,8 +1,9 @@
 name: Highlighting
 
-# The Sass token map in `html/highlighting-tokens.scss` is generated from the
-# `.theme` files. This check fails when the map is stale, so a hand edit to a
-# theme file cannot leave the page and the Sass rules with different colours.
+# The Sass token map in `html/highlighting-tokens.scss` and the Lua table in
+# `highlighting/tokens.lua` are generated from the `.theme` files. This check
+# fails when one of them is stale, so a hand edit to a theme file cannot leave
+# the page, the Sass rules and the Lua palette with different colours.
 # The script uses the Python standard library only, so the runner's own
 # Python is enough.
 on:
