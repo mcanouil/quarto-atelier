@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.15.3 (2026-11-23)
+
 - fix: A page that has no navbar link of its own now marks the navbar menu that holds it, or else the navbar tab of its sidebar section, in place of the first tab of the navbar.
   On a site with one sidebar, a page in a section with no tab marks no tab.
 
