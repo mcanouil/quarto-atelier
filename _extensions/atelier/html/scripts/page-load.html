@@ -52,10 +52,6 @@
 			return opensPage(link) && pageOf(link.pathname) === page;
 		}
 
-		function navbarTabs() {
-			return Array.prototype.slice.call(document.querySelectorAll(".navbar .nav-link[href]"));
-		}
-
 		function markTab(links, tab, value) {
 			links.forEach(function (link) {
 				if (link !== tab) {
@@ -71,7 +67,7 @@
 
 		function markCurrentTab() {
 			var here = pageOf(location.pathname);
-			var links = navbarTabs();
+			var links = Array.prototype.slice.call(document.querySelectorAll(".navbar .nav-link[href]"));
 			var current = links.find(function (link) {
 				return opens(link, here);
 			});
@@ -91,7 +87,7 @@
 			// The sidebar comes after the navbar, so the section tab waits for it.
 			markTab(links, null);
 			window.atelierStages.on("sidebar", function () {
-				markSectionTab(navbarTabs().filter(opensPage), here);
+				markSectionTab(links);
 			});
 		}
 
@@ -100,27 +96,25 @@
 				return opensPage(link) ? pageOf(link.pathname) : null;
 			});
 			return links.filter(function (link) {
-				return pages.indexOf(pageOf(link.pathname)) !== -1;
+				return opensPage(link) && pages.indexOf(pageOf(link.pathname)) !== -1;
 			});
 		}
 
-		function markSectionTab(links, here) {
+		function markSectionTab(links) {
 			var sidebar = document.getElementById("quarto-sidebar");
 			if (!sidebar) return;
-			var item = Array.prototype.find.call(sidebar.querySelectorAll("a.sidebar-link[href]"), function (link) {
-				return opens(link, here);
-			});
+			var item = sidebar.querySelector("a.sidebar-link.active");
 			var section = item && item.closest(".sidebar-item-section");
 			while (section) {
 				var tabs = tabOf(section, links);
 				if (tabs.length > 0) {
-					markTab(navbarTabs(), tabs[0], "true");
+					markTab(links, tabs[0], "true");
 					return;
 				}
 				section = section.parentElement.closest(".sidebar-item-section");
 			}
 			var sidebarTabs = tabOf(sidebar, links);
-			if (sidebarTabs.length === 1) markTab(navbarTabs(), sidebarTabs[0], "true");
+			if (sidebarTabs.length === 1) markTab(links, sidebarTabs[0], "true");
 		}
 
 		function element(tag, className, text) {
