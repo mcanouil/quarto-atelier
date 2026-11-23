@@ -11,7 +11,7 @@ Older releases drop the project's `extensions` options from any page that sets `
 They also draw the announcement dismiss control so that the keyboard cannot reach it.
 
 ```bash
-quarto add mcanouil/quarto-atelier@0.15.1
+quarto add mcanouil/quarto-atelier@0.15.2
 ```
 
 This will install the extension under the `_extensions` subdirectory.
@@ -28,7 +28,7 @@ Two templates give you a working site to start from: `documentation`, with a nav
 Run the two commands in an empty folder, in this order:
 
 ```bash
-quarto add mcanouil/quarto-atelier@0.15.1
+quarto add mcanouil/quarto-atelier@0.15.2
 quarto use template mcanouil/quarto-atelier/templates/documentation
 ```
 
