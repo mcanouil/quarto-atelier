@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix: A page that has no navbar link of its own now marks the navbar tab of its sidebar section, in place of the first tab of the navbar.
+  A page in a section with no tab marks no tab.
+
 ## 0.15.2 (2026-11-23)
 
 - fix: The page content no longer jumps down when the reading bar or the workshop bar appears.
