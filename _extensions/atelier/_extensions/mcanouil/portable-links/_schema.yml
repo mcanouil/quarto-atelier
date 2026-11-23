@@ -1,0 +1,9 @@
+# Schema for the portable-links extension
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json
+
+options:
+  enabled:
+    type: boolean
+    default: true
+    title: Enable portable links
+    description: Whether the filter rewrites relative cross-page links to absolute site-url links; set to false to disable it.

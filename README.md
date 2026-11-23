@@ -57,6 +57,13 @@ Atelier ships with the extensions below, so you don't install them yourself.
 | [prism](https://github.com/mcanouil/quarto-prism) | Applies an attribute in one format only, with a format prefix such as `atelier-html:style`. |
 | [remember](https://github.com/mcanouil/quarto-remember) | Offers to return a reader to the place where they stopped, in a banner below the page title. |
 | [veil](https://github.com/mcanouil/quarto-veil) | Shows or hides content by group, from a button on the page, with the `veil` class and the `group` attribute. |
+| [cascade](https://github.com/mcanouil/quarto-revealjs-cascade) | Repeats the heading chain on each new slide that `---` creates, so you write each heading once. |
+| [codefrag](https://github.com/mcanouil/quarto-revealjs-codefrag) | Turns code annotations into fragments that the arrow keys step through. |
+| [tabset](https://github.com/mcanouil/quarto-revealjs-tabset) | Lets the arrow keys step through the tabs of a tabset and its fragments, and gives each tab its own page in a PDF export. |
+| [a11y](https://github.com/mcanouil/quarto-revealjs-a11y) | Adds a skip link, focus indicators, text controls and screen reader announcements to a deck. |
+| [typst-render](https://github.com/mcanouil/quarto-typst-render) | Compiles `typst` code blocks and inline expressions to images, so Typst figures and equations work in any format. |
+| [typst-extras](https://github.com/mcanouil/quarto-typst-extras) | Adds lists of floats, chapter numbering, appendix sections and watermarks to a Typst document. |
+| [portable-links](https://github.com/mcanouil/quarto-portable-links) | Turns a relative link to another page into an absolute link built from `website.site-url`, in Typst and slide formats. |
 
 Each one lives in `_extensions/atelier/_extensions/mcanouil/<name>/`, and its `_extension.yml` records the release it came from.
 The [reference page](https://m.canouil.dev/quarto-atelier/reference.html) lists their options and the defaults that Atelier changes.

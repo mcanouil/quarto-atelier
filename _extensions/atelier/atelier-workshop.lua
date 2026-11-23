@@ -532,7 +532,7 @@ end
 --- @param meta table The document metadata
 --- @return table|nil The changed metadata of a workshop page, or nil
 local function publish_workshop(meta)
-  if not quarto.doc.is_format('html') then
+  if not quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return nil
   end
   local source = quarto.doc.input_file or ''
@@ -870,7 +870,7 @@ end
 --- @param block pandoc.CodeBlock The code block
 --- @return pandoc.CodeBlock|nil The block, or nil to keep it
 local function style_terminal(block)
-  if not quarto.doc.is_format('html') or not block.classes:includes('terminal') then
+  if not quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') or not block.classes:includes('terminal') then
     return nil
   end
   if not has_highlighted_class(block) then

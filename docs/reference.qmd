@@ -221,34 +221,42 @@ The script `scripts/generate-highlighting.py` writes it from the `.theme` files 
 
 ## Embedded extensions
 
-Atelier contains thirteen extensions, so you do not install them yourself.
-The `atelier-html` format runs their filters and shortcodes on each HTML page.
-The shortcodes work on HTML pages only: on a page in another format, such as Typst, Quarto stops with "Shortcode 'iconify' not found".
+Atelier contains twenty extensions, so you do not install them yourself.
+The `atelier-html`, `atelier-typst` and `atelier-revealjs` formats run the filters and shortcodes of each extension that supports the format.
+The `iconify` shortcode works in all three formats.
+The last column of the table lists the formats that run each extension.
 Atelier needs Quarto 1.12.1 or later.
 Older releases remove the `extensions` options of the project from a page that sets `extensions` in its front matter.
 They also draw the dismiss control of the announcement bar so that the keyboard cannot reach it.
 
-| Extension                                                             | What it does                                                                                         | Options under                |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------- |
-| [iconify](https://github.com/mcanouil/quarto-iconify)                 | Adds the `{{{< iconify >}}}` shortcode, for icons from the Iconify sets.                             | `extensions.iconify`         |
-| [gitlink](https://github.com/mcanouil/quarto-gitlink)                 | Shows a repository widget in place of a navbar item or sidebar tool with the href `#gitlink-widget`. | `extensions.gitlink`         |
-| [code-window](https://github.com/mcanouil/quarto-code-window)         | Shows a code block in a window frame with a title bar.                                               | `extensions.code-window`     |
-| [toc-depth](https://github.com/mcanouil/quarto-toc-depth)             | Sets the table of contents depth below a heading, with the `toc-depth` attribute.                    | `extensions.toc-depth`       |
-| [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc)           | Shows the table of contents in a bottom sheet on narrow screens, opened from a pill.                 | none                         |
-| [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option.                         | `extensions.collapse-output` |
-| [div-reuse](https://github.com/mcanouil/quarto-div-reuse)             | Shows the content of one div again in another, with the `reuse` attribute.                          | `extensions.div-reuse`       |
-| [highlight-text](https://github.com/mcanouil/quarto-highlight-text)   | Colours a span of text, with the `fg`, `bg`, and `bc` attributes.                                    | `extensions.highlight-text`  |
-| [offset-headings](https://github.com/mcanouil/quarto-offset-headings) | Moves a heading and the headings below it, with the `offset-headings-by` attribute.                  | `extensions.offset-headings` |
-| [preview-colour](https://github.com/mcanouil/quarto-preview-colour)   | Shows a swatch next to a colour in inline code. The swatch is a button that copies the colour.       | `extensions.preview-colour`  |
-| [prism](https://github.com/mcanouil/quarto-prism)                     | Applies an attribute in one format only, with a format prefix such as `atelier-html:style`.          | `extensions.prism`           |
-| [remember](https://github.com/mcanouil/quarto-remember)               | Offers to return a reader to the place where they stopped, in a banner below the page title.         | `extensions.remember`        |
-| [veil](https://github.com/mcanouil/quarto-veil)                       | Shows or hides content by group, with the `veil` class and the `group` attribute.                    | `extensions.veil`            |
+| Extension                                                             | What it does                                                                                         | Options under                | Formats                      |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------- | ---------------------------- |
+| [iconify](https://github.com/mcanouil/quarto-iconify)                 | Adds the `{{{< iconify >}}}` shortcode, for icons from the Iconify sets.                             | `extensions.iconify`         | All |
+| [gitlink](https://github.com/mcanouil/quarto-gitlink)                 | Shows a repository widget in place of a navbar item or sidebar tool with the href `#gitlink-widget`. | `extensions.gitlink`         | All |
+| [code-window](https://github.com/mcanouil/quarto-code-window)         | Shows a code block in a window frame with a title bar.                                               | `extensions.code-window`     | All |
+| [toc-depth](https://github.com/mcanouil/quarto-toc-depth)             | Sets the table of contents depth below a heading, with the `toc-depth` attribute.                    | `extensions.toc-depth`       | All |
+| [mobile-toc](https://github.com/mcanouil/quarto-mobile-toc)           | Shows the table of contents in a bottom sheet on narrow screens, opened from a pill.                 | none                         | HTML |
+| [collapse-output](https://github.com/mcanouil/quarto-collapse-output) | Puts cell output in a collapsible block, with the `output-fold` cell option.                         | `extensions.collapse-output` | HTML |
+| [div-reuse](https://github.com/mcanouil/quarto-div-reuse)             | Shows the content of one div again in another, with the `reuse` attribute.                          | `extensions.div-reuse`       | All |
+| [highlight-text](https://github.com/mcanouil/quarto-highlight-text)   | Colours a span of text, with the `fg`, `bg`, and `bc` attributes.                                    | `extensions.highlight-text`  | All |
+| [offset-headings](https://github.com/mcanouil/quarto-offset-headings) | Moves a heading and the headings below it, with the `offset-headings-by` attribute.                  | `extensions.offset-headings` | All |
+| [preview-colour](https://github.com/mcanouil/quarto-preview-colour)   | Shows a swatch next to a colour in inline code. The swatch is a button that copies the colour.       | `extensions.preview-colour`  | All |
+| [prism](https://github.com/mcanouil/quarto-prism)                     | Applies an attribute in one format only, with a format prefix such as `atelier-html:style`.          | `extensions.prism`           | All |
+| [remember](https://github.com/mcanouil/quarto-remember)               | Offers to return a reader to the place where they stopped, in a banner below the page title.         | `extensions.remember`        | HTML |
+| [veil](https://github.com/mcanouil/quarto-veil)                       | Shows or hides content by group, with the `veil` class and the `group` attribute.                    | `extensions.veil`            | All |
+| [cascade](https://github.com/mcanouil/quarto-revealjs-cascade) | Repeats the heading chain on each new slide that `---` creates, so you write each heading once. | `extensions.cascade` | Reveal.js |
+| [codefrag](https://github.com/mcanouil/quarto-revealjs-codefrag) | Turns code annotations into fragments that the arrow keys step through. | `extensions.codefrag` | Reveal.js |
+| [tabset](https://github.com/mcanouil/quarto-revealjs-tabset) | Lets the arrow keys step through the tabs of a tabset and its fragments, and gives each tab its own page in a PDF export. | none | Reveal.js |
+| [a11y](https://github.com/mcanouil/quarto-revealjs-a11y) | Adds a skip link, focus indicators, text controls and screen reader announcements to a deck. | `revealjs-a11y` | Reveal.js |
+| [typst-render](https://github.com/mcanouil/quarto-typst-render) | Compiles `typst` code blocks and inline expressions to images, so Typst figures and equations work in any format. | `extensions.typst-render` | All |
+| [typst-extras](https://github.com/mcanouil/quarto-typst-extras) | Adds lists of floats, chapter numbering, appendix sections and watermarks to a Typst document. | `extensions.typst-extras` | Typst |
+| [portable-links](https://github.com/mcanouil/quarto-portable-links) | Turns a relative link to another page into an absolute link built from `website.site-url`, in Typst and slide formats. | `extensions.portable-links` | Typst, Reveal.js |
 
-: Extensions that Atelier contains. {.striped .hover tbl-colwidths="[22,56,22]"}
+: Extensions that Atelier contains. {.striped .hover tbl-colwidths="[20,46,18,16]"}
 
 Each extension keeps its own defaults, and its repository lists its options.
 Atelier changes two defaults.
-gitlink shows only its widget, and does not change the references in your text.
+gitlink shows only its widget, which appears on HTML pages, and does not change the references in your text in any format.
 remember does not offer to resume on the home page (`index.qmd`) or the 404 page (`404.qmd`).
 To turn reference rewriting on, set:
 

@@ -128,7 +128,7 @@ end
 --- @param meta table The document metadata
 --- @return nil
 local function publish_options(meta)
-  if not quarto.doc.is_format('html') then
+  if not quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return nil
   end
   -- The preset is a Sass default, which Lua cannot read, so every page ships the fonts. The browser downloads a face only when a stylesheet names it.
@@ -165,7 +165,7 @@ end
 --- @param block table The code block
 --- @return table|nil The block with the attribute, or nil when it has no line spec
 local function copy_line_spec(block)
-  if not quarto.doc.is_format('html') then
+  if not quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
     return nil
   end
   local spec = read_line_spec(block)
@@ -208,7 +208,7 @@ end
 --- @param div table The div
 --- @return table|nil The marked hero, or nil when nothing changes
 local function mark_wide_hero(div)
-  if not quarto.doc.is_format('html') or not div.classes:includes('atelier-hero') then
+  if not quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') or not div.classes:includes('atelier-hero') then
     return nil
   end
   local wide = false
