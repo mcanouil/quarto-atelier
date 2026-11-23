@@ -184,7 +184,9 @@ def is_stale(path: Path, generated: str) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
-        "--check", action="store_true", help="Exit 1 if the partial is stale."
+        "--check",
+        action="store_true",
+        help="Exit 1 if the Sass partial or the Lua table is stale.",
     )
     parser.add_argument("--themes", type=Path, default=EXTENSION / "highlighting")
     parser.add_argument(

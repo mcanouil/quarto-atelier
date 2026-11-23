@@ -740,16 +740,32 @@ function M.painted_scheme(scheme)
   return scheme
 end
 
+--- Tell whether a value is written as a CSS colour: hex, a named colour, or
+--- a colour function such as `rgb()` or `oklch()`.
+--- @param value any
+--- @return boolean
+local function looks_like_css_colour(value)
+  if type(value) ~= 'string' then
+    return false
+  end
+  local text = value:lower():gsub('^%s+', ''):gsub('%s+$', '')
+  return text:match('^#%x+$') ~= nil or colour_mod.is_named_colour(text) or text:match('^[%a-]+%(.*%)$') ~= nil
+end
+
 --- The page background that the bundle of one scheme is painted with, as
 --- the brand or the preset writes it, so that a brand colour keeps its
 --- spelling. The dark bundle replaces a missing or light-toned value with the
 --- Atelier dark page colour, as `html/dark.scss` does.
 --- @param scheme string The colour scheme, `light` or `dark`
---- A brand value that the module cannot read is kept, because Sass reads it.
+--- A CSS colour that the module cannot read, such as `oklch()`, is kept,
+--- because Sass reads it. A value that is not a CSS colour, such as a Sass
+--- expression, gives no light background and the Atelier dark one.
 --- @return string|nil The colour, or nil when the light bundle has none
 function M.page_background(scheme)
   local background = plain(brand_variables(scheme)['body-bg'])
-  if background == nil then
+  if background ~= nil and not looks_like_css_colour(background) then
+    background = nil
+  elseif background == nil then
     local preset = PRESET_PAGE_BACKGROUNDS[M.preset(scheme)]
     background = preset and preset[scheme]
   end
