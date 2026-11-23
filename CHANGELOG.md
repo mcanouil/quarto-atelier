@@ -10,6 +10,7 @@
 - fix: The table of contents card shows the reading time and the updated date on separate lines. (#136)
 - fix: Update the embedded gitlink extension to 1.14.1, so the repository pill in a sidebar next to a navbar keeps the height of the tools row while it loads. (#136)
 - fix: On a page with a title banner, the sidebar now starts at the bottom of the banner, with no empty strip between them. (#137)
+- fix: On a phone, a site with a sidebar and no navbar shows the version pill in the top bar, so the version stays visible when the sidebar is closed. (#138)
 
 ## 0.15.1 (2026-11-20)
 

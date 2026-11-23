@@ -21,6 +21,56 @@
   white-space: nowrap;
 }
 
+// In the phone bar of a page without a navbar, the pill takes the sidebar
+// tokens of the bar and keeps its full width. The breadcrumbs or the page
+// title of that bar shrink instead, and the text that does not fit ends with
+// an ellipsis, so the bar stays on one line. The crumbs clip their content, so
+// the focus ring of a crumb link is drawn inside the link.
+.quarto-secondary-nav .atelier-version {
+  flex-shrink: 0;
+  align-self: center;
+  background: var(--atelier-sidebar-accent-soft);
+  color: var(--atelier-sidebar-accent);
+}
+
+.quarto-secondary-nav .container-fluid:has(> .atelier-version) {
+  .quarto-page-breadcrumbs,
+  a.flex-grow-1,
+  .breadcrumb-item,
+  .quarto-secondary-nav-title {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .breadcrumb {
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .breadcrumb-item,
+  .quarto-secondary-nav-title {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .breadcrumb-item a:focus-visible {
+    outline-offset: -2px;
+  }
+}
+
+// Below the breakpoint the phone bar shows, so its pill is the one in view,
+// and the open drawer does not show a second pill under the sidebar title.
+// This holds for each sidebar style. The ids make the rule win over the pill
+// rule of the docked sidebar.
+@include media-breakpoint-down(lg) {
+  body:has(#quarto-header .quarto-secondary-nav .atelier-version)
+    #quarto-sidebar
+    .sidebar-title
+    .atelier-version {
+    display: none;
+  }
+}
+
 // Below the breakpoint the label and the shortcut hide, and the button stays
 // the icon button that the control sizing makes it.
 .navbar #quarto-search .aa-DetachedSearchButton {
