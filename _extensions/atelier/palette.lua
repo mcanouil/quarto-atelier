@@ -11,6 +11,16 @@
 --- `html/chrome.scss`, `html/theme.scss` and `html/content.scss`. A change to
 --- one of these files needs the same change here; the palette parity test
 --- compares the two.
+---
+--- A brand sets Sass variables in `defaults.bootstrap.defaults`. This module
+--- reads these ones, and ignores the other `atelier-*` variables:
+--- `atelier-preset`, `atelier-chrome`, `atelier-chrome-bg`, `atelier-chrome-fg`,
+--- `atelier-chrome-muted`, `atelier-chrome-accent`,
+--- `atelier-chrome-accent-soft-alpha`, `atelier-chrome-light-{bg,fg,accent}`,
+--- `atelier-chrome-dark-{bg,fg,accent}`, `atelier-terminal-*` (colours),
+--- `atelier-terminal-decoration`, `atelier-code-ink`, `atelier-text-muted`,
+--- and the Bootstrap `body-bg`, `body-color`, `primary`, `secondary`,
+--- `link-color`, `headings-color`, `blue`, `green`, `yellow`, `orange`, `red`.
 
 local EXTENSION_NAME = 'atelier'
 
@@ -57,6 +67,41 @@ local function from_hex(hex)
   }
 end
 
+--- Read one `rgb()` channel or the alpha: a number, or a percentage of `full`.
+--- @param text string
+--- @param full number The value of 100%
+--- @return number|nil
+local function channel(text, full)
+  local number, percent = text:match('^([%d.]+)(%%?)$')
+  if number == nil or tonumber(number) == nil then
+    return nil
+  end
+  if percent == '%' then
+    return tonumber(number) / 100 * full
+  end
+  return tonumber(number)
+end
+
+--- Build a colour from the arguments of `rgb()` or `rgba()`, with commas
+--- (`16, 18, 22, 0.5`) or with spaces and a slash (`16 18 22 / 50%`).
+--- @param arguments string
+--- @return Colour|nil
+local function from_rgb_arguments(arguments)
+  local parts = {}
+  for part in arguments:gsub('/', ' '):gsub(',', ' '):gmatch('%S+') do
+    table.insert(parts, part)
+  end
+  if #parts ~= 3 and #parts ~= 4 then
+    return nil
+  end
+  local r, g, b = channel(parts[1], 255), channel(parts[2], 255), channel(parts[3], 255)
+  local a = parts[4] and channel(parts[4], 1) or 1
+  if r == nil or g == nil or b == nil or a == nil then
+    return nil
+  end
+  return { r = r, g = g, b = b, a = a }
+end
+
 --- Parse a CSS colour: hex, a named colour, `rgb()`, `rgba()`, `hsl()` or `hwb()`.
 --- @param value any A string, or a value that is not a colour
 --- @return Colour|nil The colour, or nil when the value is not a colour
@@ -74,9 +119,9 @@ function M.parse(value)
   if colour_mod.is_named_colour(text) then
     return from_hex(colour_mod.named_to_HTML(text):lower())
   end
-  local r, g, b, a = text:match('^rgba?%(%s*([%d.]+)%s*,%s*([%d.]+)%s*,%s*([%d.]+)%s*,?%s*([%d.]*)%s*%)$')
-  if r ~= nil then
-    return { r = tonumber(r), g = tonumber(g), b = tonumber(b), a = tonumber(a) or 1 }
+  local arguments = text:match('^rgba?%((.*)%)$')
+  if arguments ~= nil then
+    return from_rgb_arguments(arguments)
   end
   local converters = { hsl = colour_mod.HSL_to_HTML, hwb = colour_mod.HWB_to_HTML }
   local kind = text:match('^(%a+)%(')
@@ -700,6 +745,7 @@ end
 --- spelling. The dark bundle replaces a missing or light-toned value with the
 --- Atelier dark page colour, as `html/dark.scss` does.
 --- @param scheme string The colour scheme, `light` or `dark`
+--- A brand value that the module cannot read is kept, because Sass reads it.
 --- @return string|nil The colour, or nil when the light bundle has none
 function M.page_background(scheme)
   local background = plain(brand_variables(scheme)['body-bg'])
@@ -708,8 +754,11 @@ function M.page_background(scheme)
     background = preset and preset[scheme]
   end
   if scheme == 'dark' then
+    if background == nil then
+      return ATELIER_DARK.bg
+    end
     local parsed = M.parse(background)
-    if parsed == nil or M.tone(parsed) == 'light' then
+    if parsed ~= nil and M.tone(parsed) == 'light' then
       return ATELIER_DARK.bg
     end
   end
@@ -728,16 +777,19 @@ end
 -- SYNTAX HIGHLIGHTING
 -- ============================================================================
 
+--- The token styles of every highlighting theme, loaded on first use.
+local highlighting_themes = nil
+
 --- The token styles of the highlighting theme of one preset and scheme.
+--- These are the colours of the `.theme` file. `html/highlighting.scss` also
+--- holds each colour at 4.5:1 on the code backgrounds, so a caller that paints
+--- code must do the same with the backgrounds it uses.
 --- @param preset string `default`, `quarto` or `terminal`
 --- @param scheme string `light` or `dark`
 --- @return table<string, { color: string, bold: boolean, italic: boolean, underline: boolean }>
-local highlighting_themes = nil
-
 function M.highlighting(preset, scheme)
   highlighting_themes = highlighting_themes or dofile(HERE .. 'highlighting/tokens.lua')
-  local themes = highlighting_themes
-  local styles = themes[preset] and themes[preset][scheme]
+  local styles = highlighting_themes[preset] and highlighting_themes[preset][scheme]
   if styles == nil then
     error('Atelier palette: no highlighting theme for preset "' .. tostring(preset) ..
       '" and scheme "' .. tostring(scheme) .. '".')
