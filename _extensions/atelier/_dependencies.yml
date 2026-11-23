@@ -6,6 +6,9 @@ sources:
     version: "2.13.0"
     licence: MIT
     files:
+      colour.lua:
+        sha256: "eab8e12368b1ea3ff91ae5919863d9d435be39674a63e1514c9778e60790ba03"
+        runtime: any
       embedded.lua:
         sha256: "4ae81fc6d277913e3d2d1baa156db8b04576fe3533be46ba3504c1904d31649a"
         runtime: any
