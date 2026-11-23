@@ -101,7 +101,7 @@ end
 --- paints it (`atelier-rendered()`).
 --- @param c Colour
 --- @return Colour
-function M.rendered(c)
+local function rendered(c)
   return { r = round(c.r), g = round(c.g), b = round(c.b), a = c.a }
 end
 
@@ -140,7 +140,7 @@ end
 
 --- `atelier-mix()`: `mix()` rounded to whole channels.
 local function mix_rendered(c1, c2, weight)
-  return M.rendered(M.mix(c1, c2, weight))
+  return rendered(M.mix(c1, c2, weight))
 end
 
 --- The relative luminance, as Quarto's `luminance()` computes it.
@@ -216,7 +216,7 @@ local function contrast_all(c, bgs, goal)
   local target = toward(bgs[1])
   local painted = {}
   for index, bg in ipairs(bgs) do
-    painted[index] = M.rendered(bg)
+    painted[index] = rendered(bg)
   end
   for step = 0, 100 do
     local candidate = mix_rendered(target, c, step / 100)
@@ -247,7 +247,7 @@ end
 local function on(fill, bg, fg, goal)
   local start = M.ratio(fg, fill) > M.ratio(bg, fill) and fg or bg
   local target = M.ratio(WHITE, fill) > M.ratio(BLACK, fill) and WHITE or BLACK
-  local painted = M.rendered(fill)
+  local painted = rendered(fill)
   for step = 0, 100 do
     local candidate = mix_rendered(target, start, step / 100)
     if M.ratio(candidate, painted) >= goal then
@@ -266,18 +266,6 @@ local function hue_ink(hue, fg, bg)
   return contrast(M.mix(hue, fg, 0.62), bg, 4.5)
 end
 
---- Write a colour as CSS: `#rrggbb` when opaque, else `rgba(r, g, b, a)`.
---- Fractional channels are rounded, as the browser paints them.
---- @param c Colour
---- @return string
-function M.css(c)
-  local r = M.rendered(c)
-  if c.a >= 1 then
-    return string.format('#%02x%02x%02x', r.r, r.g, r.b)
-  end
-  return string.format('rgba(%d, %d, %d, %s)', r.r, r.g, r.b, tostring(c.a))
-end
-
 -- ============================================================================
 -- PRESETS
 -- ============================================================================
@@ -289,6 +277,14 @@ local PRESETS = { default = true, quarto = true, terminal = true }
 --- The presets that paint both schemes with the dark bundle.
 --- @type table<string, boolean>
 local DARK_PINNED_PRESETS = { terminal = true }
+
+--- The page background of each preset that paints the page, per scheme
+--- (`$body-bg` in `html/presets.scss`).
+--- @type table<string, table<string, string>>
+local PRESET_PAGE_BACKGROUNDS = {
+  quarto = { light = '#eef4fa', dark = '#0f1b2a' },
+  terminal = { light = '#101216', dark = '#101216' },
+}
 
 --- The dark palette of `html/chrome.scss`.
 local ATELIER_DARK = { bg = '#1b242e', fg = '#e8edf2', accent = '#7fa8c4' }
@@ -372,7 +368,7 @@ local function apply_preset(v, preset, scheme)
       if not brand_primary then
         v.default('atelier-chrome-accent', '#75aadb')
       end
-      v.default('body-bg', '#0f1b2a')
+      v.default('body-bg', PRESET_PAGE_BACKGROUNDS.quarto.dark)
       v.default('body-color', '#dbe6f0')
       v.default('primary', '#74aadb')
       v.default('atelier-chrome-bg', '#0a1524')
@@ -384,7 +380,7 @@ local function apply_preset(v, preset, scheme)
         v.default('atelier-code-ink', '#325c83')
         v.default('link-color', '#406993')
       end
-      v.default('body-bg', '#eef4fa')
+      v.default('body-bg', PRESET_PAGE_BACKGROUNDS.quarto.light)
       v.default('body-color', '#1f2a36')
       v.default('primary', '#47709a')
       v.default('atelier-chrome-bg', '#365f84')
@@ -405,7 +401,7 @@ local function apply_preset(v, preset, scheme)
     local green = '#7ee08a'
     local bg = '#16191e'
     local fg = '#d8dee9'
-    v.default('body-bg', '#101216')
+    v.default('body-bg', PRESET_PAGE_BACKGROUNDS.terminal[scheme])
     v.default('body-color', fg)
     v.default('primary', green)
     local terminal_hues = { blue = '#6cb6ff', green = green, red = '#ff7b72', orange = '#f0a35e', yellow = '#e3c45c' }
@@ -489,19 +485,25 @@ function M.resolve(inputs)
   local page_bg = v.colour('body-bg') or M.parse('#fff')
   local page_fg = v.colour('body-color') or M.parse('#212529')
   local page_accent = v.colour('primary') or M.parse('#0d6efd')
-  local pinned = chrome ~= 'auto' and ('atelier-chrome-' .. chrome .. '-') or nil
+  local pinned = nil
+  if chrome ~= 'auto' then
+    pinned = {}
+    for _, part in ipairs({ 'bg', 'fg', 'accent' }) do
+      pinned[part] = v.colour('atelier-chrome-' .. chrome .. '-' .. part)
+    end
+  end
 
   local t = {}
 
   -- The chrome palette.
-  local chrome_bg_source = pinned and v.colour(pinned .. 'bg') or mix_rendered(page_bg, page_fg, 0.94)
+  local chrome_bg_source = pinned and pinned.bg or mix_rendered(page_bg, page_fg, 0.94)
   t['navbar-bg'] = v.colour('atelier-chrome-bg') or chrome_bg_source
-  local chrome_fg_source = pinned and v.colour(pinned .. 'fg') or page_fg
+  local chrome_fg_source = pinned and pinned.fg or page_fg
   t['navbar-fg'] = v.colour('atelier-chrome-fg') or atelier_theme_contrast(chrome_fg_source, t['navbar-bg'])
   t['navbar-surface'] = mix_rendered(t['navbar-bg'], t['navbar-fg'], 0.9)
   local soft_alpha = v.number('atelier-chrome-accent-soft-alpha') or 0.16
   local accent_source = v.colour('atelier-chrome-accent')
-    or (pinned and v.colour(pinned .. 'accent'))
+    or (pinned and pinned.accent)
     or page_accent
   t['navbar-accent'] = v.colour('atelier-chrome-accent')
     or contrast_on_tint(accent_source, t['navbar-surface'], soft_alpha)
@@ -571,7 +573,7 @@ function M.resolve(inputs)
 
   -- html/theme.scss: the focus ring and the card link.
   t['focus'] = t['accent-ink']
-  t['card-link'] = atelier_theme_contrast(t['link'], M.rendered(landing_surface))
+  t['card-link'] = atelier_theme_contrast(t['link'], rendered(landing_surface))
 
   -- html/content.scss: the callouts.
   t['callout-border'] = hue_border(t['muted'], page_bg)
@@ -604,6 +606,18 @@ local function brand_mode(scheme)
   end
   local brand = _G.param('brand')
   return brand and (brand[scheme] or brand.light)
+end
+
+--- The brand of one scheme for its colours. Quarto adds a brand colour
+--- layer to a bundle only when the brand has that mode.
+--- @param scheme string The colour scheme, `light` or `dark`
+--- @return table|nil
+local function brand_colour_mode(scheme)
+  if type(_G.param) ~= 'function' then
+    return nil
+  end
+  local brand = _G.param('brand')
+  return brand and brand[scheme]
 end
 
 --- Read the Bootstrap defaults that the brand sets for one colour scheme.
@@ -644,7 +658,7 @@ local function brand_variables(scheme)
   for name, value in pairs(M.brand_defaults(scheme)) do
     values[name] = plain(value)
   end
-  local mode = brand_mode(scheme)
+  local mode = brand_colour_mode(scheme)
   local processed = mode and mode.processedData
   local colours = processed and processed.color or {}
   local data_colour = mode and mode.data and mode.data.color or {}
@@ -681,6 +695,27 @@ function M.painted_scheme(scheme)
   return scheme
 end
 
+--- The page background that the bundle of one scheme is painted with, as
+--- the brand or the preset writes it, so that a brand colour keeps its
+--- spelling. The dark bundle replaces a missing or light-toned value with the
+--- Atelier dark page colour, as `html/dark.scss` does.
+--- @param scheme string The colour scheme, `light` or `dark`
+--- @return string|nil The colour, or nil when the light bundle has none
+function M.page_background(scheme)
+  local background = plain(brand_variables(scheme)['body-bg'])
+  if background == nil then
+    local preset = PRESET_PAGE_BACKGROUNDS[M.preset(scheme)]
+    background = preset and preset[scheme]
+  end
+  if scheme == 'dark' then
+    local parsed = M.parse(background)
+    if parsed == nil or M.tone(parsed) == 'light' then
+      return ATELIER_DARK.bg
+    end
+  end
+  return background
+end
+
 --- The resolved tokens of the document for one colour scheme.
 --- @param scheme string The colour scheme, `light` or `dark`
 --- @return table<string, Colour>
@@ -697,8 +732,11 @@ end
 --- @param preset string `default`, `quarto` or `terminal`
 --- @param scheme string `light` or `dark`
 --- @return table<string, { color: string, bold: boolean, italic: boolean, underline: boolean }>
+local highlighting_themes = nil
+
 function M.highlighting(preset, scheme)
-  local themes = dofile(HERE .. 'highlighting/tokens.lua')
+  highlighting_themes = highlighting_themes or dofile(HERE .. 'highlighting/tokens.lua')
+  local themes = highlighting_themes
   local styles = themes[preset] and themes[preset][scheme]
   if styles == nil then
     error('Atelier palette: no highlighting theme for preset "' .. tostring(preset) ..

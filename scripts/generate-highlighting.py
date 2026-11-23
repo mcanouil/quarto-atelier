@@ -67,11 +67,19 @@ def colour_of(name: str, style: dict[str, object]) -> str:
     return colour.lower()
 
 
-def style_entry(name: str, style: dict[str, object]) -> str:
-    flags = ", ".join(
-        f'"{flag}": {str(bool(style[flag])).lower()}'
+Styles = dict[tuple[str, str], dict[str, dict[str, object]]]
+
+
+def flags_of(style: dict[str, object], template: str) -> str:
+    """Write the bold, italic and underline flags, each one with ``template``."""
+    return ", ".join(
+        template.format(flag=flag, value=str(bool(style[flag])).lower())
         for flag in ("bold", "italic", "underline")
     )
+
+
+def style_entry(name: str, style: dict[str, object]) -> str:
+    flags = flags_of(style, '"{flag}": {value}')
     return (
         f'        "{CLASSES[name]}": ("color": {colour_of(name, style)}, {flags}), '
         f"// {name}"
@@ -89,7 +97,15 @@ def read_styles(themes: Path, preset: str, scheme: str) -> dict[str, dict[str, o
     return styles
 
 
-def render(themes: Path) -> str:
+def read_all(themes: Path) -> Styles:
+    return {
+        (preset, scheme): read_styles(themes, preset, scheme)
+        for preset in PRESETS
+        for scheme in SCHEMES
+    }
+
+
+def render(all_styles: Styles) -> str:
     lines = [
         "// Generated file. Do not edit.",
         f"// Regenerate it with `{COMMAND}`.",
@@ -102,7 +118,7 @@ def render(themes: Path) -> str:
     for preset in PRESETS:
         lines.append(f'  "{preset}": (')
         for scheme in SCHEMES:
-            styles = read_styles(themes, preset, scheme)
+            styles = all_styles[(preset, scheme)]
             lines.append(f'    "{scheme}": (')
             lines.extend(style_entry(name, styles[name]) for name in CLASSES)
             lines.append("    ),")
@@ -126,7 +142,7 @@ def render(themes: Path) -> str:
     return "\n".join(lines) + "\n"
 
 
-def render_lua(themes: Path) -> str:
+def render_lua(all_styles: Styles) -> str:
     lines = [
         "-- Generated file. Do not edit.",
         f"-- Regenerate it with `{COMMAND}`.",
@@ -136,14 +152,11 @@ def render_lua(themes: Path) -> str:
     for preset in PRESETS:
         lines.append(f"  {preset} = {{")
         for scheme in SCHEMES:
-            styles = read_styles(themes, preset, scheme)
+            styles = all_styles[(preset, scheme)]
             lines.append(f"    {scheme} = {{")
             for name, css_class in CLASSES.items():
                 style = styles[name]
-                flags = ", ".join(
-                    f"{flag} = {str(bool(style[flag])).lower()}"
-                    for flag in ("bold", "italic", "underline")
-                )
+                flags = flags_of(style, "{flag} = {value}")
                 lines.append(
                     f'      ["{css_class}"] = {{ color = "{colour_of(name, style)}", '
                     f"{flags} }}, -- {name}"
@@ -182,9 +195,10 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    all_styles = read_all(args.themes)
     outputs = {
-        args.output: render(args.themes),
-        args.output_lua: render_lua(args.themes),
+        args.output: render(all_styles),
+        args.output_lua: render_lua(all_styles),
     }
     if args.check:
         stale = [path for path, text in outputs.items() if is_stale(path, text)]
