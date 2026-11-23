@@ -9,5 +9,5 @@ authors:
 repository-code: "https://github.com/mcanouil/quarto-atelier"
 url: "https://m.canouil.dev/quarto-atelier/"
 license: "MIT License"
-date-released: "2026-11-20"
-version: 0.15.1
+date-released: "2026-11-23"
+version: 0.15.2
