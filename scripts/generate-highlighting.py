@@ -1,10 +1,10 @@
 # /// script
 # requires-python = ">=3.11"
 # ///
-"""Generate the Sass token map of the highlighting themes.
+"""Generate the token maps of the highlighting themes, for Sass and for Lua.
 
-Run `uv run scripts/generate-highlighting.py` to write the partial.
-Run it with `--check` to exit 1 and print a diff when the partial is stale.
+Run `uv run scripts/generate-highlighting.py` to write the Sass partial and the Lua table.
+Run it with `--check` to exit 1 and print a diff when one of them is stale.
 """
 
 from __future__ import annotations
@@ -126,6 +126,48 @@ def render(themes: Path) -> str:
     return "\n".join(lines) + "\n"
 
 
+def render_lua(themes: Path) -> str:
+    lines = [
+        "-- Generated file. Do not edit.",
+        f"-- Regenerate it with `{COMMAND}`.",
+        "-- The token styles of each highlighting theme, read by `palette.lua`.",
+        "return {",
+    ]
+    for preset in PRESETS:
+        lines.append(f"  {preset} = {{")
+        for scheme in SCHEMES:
+            styles = read_styles(themes, preset, scheme)
+            lines.append(f"    {scheme} = {{")
+            for name, css_class in CLASSES.items():
+                style = styles[name]
+                flags = ", ".join(
+                    f"{flag} = {str(bool(style[flag])).lower()}"
+                    for flag in ("bold", "italic", "underline")
+                )
+                lines.append(
+                    f'      ["{css_class}"] = {{ color = "{colour_of(name, style)}", '
+                    f"{flags} }}, -- {name}"
+                )
+            lines.append("    },")
+        lines.append("  },")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
+def is_stale(path: Path, generated: str) -> bool:
+    current = path.read_text(encoding="utf-8") if path.is_file() else ""
+    if current == generated:
+        return False
+    diff = difflib.unified_diff(
+        current.splitlines(keepends=True),
+        generated.splitlines(keepends=True),
+        fromfile=f"{path} (on disk)",
+        tofile=f"{path} (generated)",
+    )
+    sys.stdout.writelines(diff)
+    return True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
@@ -135,25 +177,23 @@ def main() -> int:
     parser.add_argument(
         "--output", type=Path, default=EXTENSION / "html" / "highlighting-tokens.scss"
     )
+    parser.add_argument(
+        "--output-lua", type=Path, default=EXTENSION / "highlighting" / "tokens.lua"
+    )
     args = parser.parse_args()
 
-    generated = render(args.themes)
+    outputs = {
+        args.output: render(args.themes),
+        args.output_lua: render_lua(args.themes),
+    }
     if args.check:
-        current = (
-            args.output.read_text(encoding="utf-8") if args.output.is_file() else ""
-        )
-        if current == generated:
-            return 0
-        diff = difflib.unified_diff(
-            current.splitlines(keepends=True),
-            generated.splitlines(keepends=True),
-            fromfile=f"{args.output} (on disk)",
-            tofile=f"{args.output} (generated)",
-        )
-        sys.stdout.writelines(diff)
-        print(f"Stale partial. Run `{COMMAND}`.", file=sys.stderr)
-        return 1
-    args.output.write_text(generated, encoding="utf-8")
+        stale = [path for path, text in outputs.items() if is_stale(path, text)]
+        if stale:
+            print(f"Stale output. Run `{COMMAND}`.", file=sys.stderr)
+            return 1
+        return 0
+    for path, text in outputs.items():
+        path.write_text(text, encoding="utf-8")
     return 0
 
 
