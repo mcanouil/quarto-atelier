@@ -27,12 +27,41 @@
 			return path.replace(/index\.html$/, "");
 		}
 
+		// The toggle of a navbar menu has href="#", which opens no page.
+		function opensPage(link) {
+			var href = link.getAttribute("href");
+			return href !== "" && href.charAt(0) !== "#" && link.origin === location.origin && link.hash === "";
+		}
+
+		function opens(link, page) {
+			return opensPage(link) && pageOf(link.pathname) === page;
+		}
+
+		function markTab(links, tab, value) {
+			links.forEach(function (link) {
+				if (link !== tab) {
+					link.classList.remove("active");
+					link.removeAttribute("aria-current");
+				}
+			});
+			if (tab) {
+				tab.classList.add("active");
+				tab.setAttribute("aria-current", value);
+			}
+		}
+
 		// Quarto marks the first navbar link whose page is also in the sidebar.
 		// With one sidebar that holds every page, that link is "Home" on every
 		// page. The mark moves to the link of the current page, with
-		// aria-current="page". A page that no navbar link opens keeps the mark
-		// of Quarto, with aria-current="true", because that tab is a section and
-		// not the page. The sidebar link is handled in a11y-fixes.html.
+		// aria-current="page".
+		// A page in a navbar menu marks the toggle of the menu, with
+		// aria-current="true", and its menu item gets aria-current="page".
+		// Any other page gets the tab of its closest sidebar section, with
+		// aria-current="true", because that tab is a section and not the page.
+		// The tab of a section is the first navbar link whose page is in the
+		// section. A page in no such section gets a tab only when one navbar
+		// link opens a page of the sidebar, as on a site with one sidebar for
+		// each tab. The sidebar link is handled in a11y-fixes.html.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15392 (mark)
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15190 (aria-current)
 		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/11481
@@ -40,29 +69,54 @@
 		function markCurrentTab() {
 			var here = pageOf(location.pathname);
 			var links = Array.prototype.slice.call(document.querySelectorAll(".navbar .nav-link[href]"));
-			// The toggle of a navbar menu has href="#", which opens no page.
 			var current = links.find(function (link) {
-				var href = link.getAttribute("href");
-				return (
-					href !== "" &&
-					href.charAt(0) !== "#" &&
-					link.origin === location.origin &&
-					link.hash === "" &&
-					pageOf(link.pathname) === here
-				);
-			});
-			links.forEach(function (link) {
-				if (current && link !== current) {
-					link.classList.remove("active");
-					link.removeAttribute("aria-current");
-				} else if (link.classList.contains("active")) {
-					link.setAttribute("aria-current", current ? "page" : "true");
-				}
+				return opens(link, here);
 			});
 			if (current) {
-				current.classList.add("active");
-				current.setAttribute("aria-current", "page");
+				markTab(links, current, "page");
+				return;
 			}
+			var menuItem = Array.prototype.find.call(document.querySelectorAll(".navbar .dropdown-item[href]"), function (item) {
+				return opens(item, here);
+			});
+			var menu = menuItem && menuItem.closest(".dropdown");
+			var toggle = menu && menu.querySelector(".dropdown-toggle");
+			if (links.indexOf(toggle) !== -1) {
+				markTab(links, toggle, "true");
+				menuItem.setAttribute("aria-current", "page");
+				return;
+			}
+			// The sidebar comes after the navbar, so the section tab waits for it.
+			markTab(links, null);
+			window.atelierStages.on("sidebar", function () {
+				markSectionTab(links);
+			});
+		}
+
+		function tabOf(scope, links) {
+			var pages = Array.prototype.map.call(scope.querySelectorAll("a.sidebar-link[href]"), function (link) {
+				return opensPage(link) ? pageOf(link.pathname) : null;
+			});
+			return links.filter(function (link) {
+				return opensPage(link) && pages.indexOf(pageOf(link.pathname)) !== -1;
+			});
+		}
+
+		function markSectionTab(links) {
+			var sidebar = document.getElementById("quarto-sidebar");
+			if (!sidebar) return;
+			var item = sidebar.querySelector("a.sidebar-link.active");
+			var section = item && item.closest(".sidebar-item-section");
+			while (section) {
+				var tabs = tabOf(section, links);
+				if (tabs.length > 0) {
+					markTab(links, tabs[0], "true");
+					return;
+				}
+				section = section.parentElement.closest(".sidebar-item-section");
+			}
+			var sidebarTabs = tabOf(sidebar, links);
+			if (sidebarTabs.length === 1) markTab(links, sidebarTabs[0], "true");
 		}
 
 		function element(tag, className, text) {
