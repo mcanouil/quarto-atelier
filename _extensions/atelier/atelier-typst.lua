@@ -118,16 +118,6 @@ end
 -- DOCUMENT DATA
 -- ============================================================================
 
---- The scheme of the document: dark when `brand-mode` is `dark`.
---- @param meta table
---- @return string
-local function read_scheme(meta)
-  if meta['brand-mode'] ~= nil and str.stringify(meta['brand-mode']) == 'dark' then
-    return 'dark'
-  end
-  return 'light'
-end
-
 --- The five switches, as a Typst dictionary of booleans. A value that is not
 --- a boolean logs a warning and counts as `false`.
 --- @param options table The `extensions.atelier` options
@@ -267,7 +257,7 @@ end
 --- @return table
 local function publish(meta)
   local options = core.read_options(meta)
-  local scheme = read_scheme(meta)
+  local scheme = palette.document_scheme(meta)
   local painted = palette.painted_scheme(scheme)
   local preset = palette.preset(painted)
   local tokens = palette.tokens(scheme)

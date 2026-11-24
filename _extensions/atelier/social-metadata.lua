@@ -176,10 +176,19 @@ local function theme_colour(config, scheme)
   return palette.page_background(palette.painted_scheme(scheme))
 end
 
---- Collect the `theme-color` tags for the page.
+--- Collect the `theme-color` tags for the page. A Reveal.js deck has one
+--- scheme, so it gets one tag, with no media query.
 --- @param config table|nil The `extensions.atelier` configuration table
+--- @param meta table The document metadata
 --- @return table<integer, string>
-local function theme_colour_tags(config)
+local function theme_colour_tags(config, meta)
+  if quarto.doc.is_format('revealjs') then
+    local colour = theme_colour(config, palette.document_scheme(meta))
+    if str.is_empty(colour) then
+      return {}
+    end
+    return { string.format('<meta name="theme-color" content="%s">', str.escape_attribute(colour)) }
+  end
   local tags = {}
   for _, scheme in ipairs(THEME_COLOUR_SCHEMES) do
     local colour = theme_colour(config, scheme)
@@ -200,7 +209,7 @@ end
 --- @param meta table The document metadata
 --- @return table|nil
 local function social_metadata(meta)
-  if not quarto.doc.is_format('html:js') or quarto.doc.is_format('revealjs') then
+  if not quarto.doc.is_format('html:js') then
     return nil
   end
 
@@ -228,7 +237,7 @@ local function social_metadata(meta)
     end
   end
 
-  for _, tag in ipairs(theme_colour_tags(config)) do
+  for _, tag in ipairs(theme_colour_tags(config, meta)) do
     table.insert(tags, tag)
   end
 

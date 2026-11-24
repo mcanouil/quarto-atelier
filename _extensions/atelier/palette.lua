@@ -806,6 +806,17 @@ function M.page_background(scheme)
   return background
 end
 
+--- The scheme of a Typst document or of a Reveal.js deck, which has one
+--- scheme: dark when `brand-mode` is `dark`, else light.
+--- @param meta table The document metadata
+--- @return string `light` or `dark`
+function M.document_scheme(meta)
+  if meta['brand-mode'] ~= nil and pandoc.utils.stringify(meta['brand-mode']) == 'dark' then
+    return 'dark'
+  end
+  return 'light'
+end
+
 --- The resolved tokens of the document for one colour scheme.
 --- @param scheme string The colour scheme, `light` or `dark`
 --- @return table<string, Colour>
