@@ -49,8 +49,7 @@ end
 --- Filter tables run one after the other: pandoc finishes the `Meta` pass
 --- before the `Div` pass starts, so the model is complete when the block
 --- handlers read it. One table gives no such order between element types.
---- A writer can also finish the document after the blocks, and resolve the
---- citations after that, so a citation in a moved block is resolved too.
+--- A writer can also finish the document after the blocks.
 return {
   { Meta = publish_workshop },
   {
@@ -66,12 +65,7 @@ return {
   },
   {
     Pandoc = function(doc)
-      return writer and writer.finish and writer.finish(doc)
-    end,
-  },
-  {
-    Cite = function(cite)
-      return writer and writer.cite and writer.cite(cite)
+      return writer and writer.finish and writer.finish(doc, model)
     end,
   },
 }

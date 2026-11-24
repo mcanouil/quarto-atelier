@@ -15,7 +15,7 @@
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
-local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
+local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 
 --- Name that prefixes each warning.
@@ -38,12 +38,8 @@ local LABELS = {
   'author-orcid',
   'author-corresponding',
   'duration',
-  'solution-title',
   'solution-page',
   'solutions-title',
-  'objectives-title',
-  'exercise-title',
-  'terminal',
 }
 
 --- The report switches under `extensions.atelier`, each `false` by default.
@@ -133,28 +129,26 @@ local function read_scheme(meta)
   return 'light'
 end
 
---- The five switches, each `true` or `false`. A value that is not a boolean
---- logs a warning and counts as `false`.
+--- The five switches, as a Typst dictionary of booleans. A value that is not
+--- a boolean logs a warning and counts as `false`.
 --- @param options table The `extensions.atelier` options
---- @return table<string, boolean>
-local function read_switches(options)
+--- @return string
+local function switches_code(options)
   local switches = {}
   for _, name in ipairs(SWITCHES) do
     local value = options[name]
-    if value == nil then
-      switches[name] = false
-    elseif type(value) == 'boolean' then
-      switches[name] = value
+    if value == nil or type(value) == 'boolean' then
+      switches[name] = value == true and 'true' or 'false'
     else
       log.log_warning(
         EXTENSION_NAME,
         'extensions.atelier.' .. name .. ' must be true or false, but was "' .. str.stringify(value) ..
         '" in ' .. (quarto.doc.input_file or '') .. ', so it is off. Write `' .. name .. ': true` to turn it on.'
       )
-      switches[name] = false
+      switches[name] = 'false'
     end
   end
-  return switches
+  return typst_dict(switches)
 end
 
 --- The colour tokens, as a Typst dictionary.
@@ -273,18 +267,13 @@ end
 --- @param meta table
 --- @return table
 local function publish(meta)
-  local options = meta_mod.get_extension_config(meta, 'atelier') or {}
+  local options = core.read_options(meta)
   local scheme = read_scheme(meta)
   local painted = palette.painted_scheme(scheme)
   local preset = palette.preset(painted)
   local tokens = palette.tokens(scheme)
   local styles = palette.highlighting(preset, painted)
   local terminal_styles = palette.highlighting(preset, 'dark')
-  local switches = read_switches(options)
-  local switch_entries = {}
-  for name, value in pairs(switches) do
-    switch_entries[name] = value and 'true' or 'false'
-  end
   local lines = {
     '#let atelier-preset = ' .. typst_string(preset),
     '#let atelier-scheme = ' .. typst_string(painted),
@@ -295,7 +284,7 @@ local function publish(meta)
     }),
     '#let atelier-preset-fonts = ' .. fonts_code(preset),
     '#let atelier-labels = ' .. labels_code(),
-    '#let atelier-switches = ' .. typst_dict(switch_entries),
+    '#let atelier-switches = ' .. switches_code(options),
     '#let atelier-people = ' .. authors_code(meta),
   }
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })

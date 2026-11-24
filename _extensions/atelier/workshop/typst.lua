@@ -28,11 +28,6 @@ local EXTENSION_NAME = 'atelier'
 --- @type string[]
 local PLACEMENTS = { 'end', 'inline', 'hide' }
 
---- The state of one page: where the solutions go, the solutions to write at
---- the end, and the number of each solution identifier. `M.publish` resets it.
---- @type { placement: string, collected: table[], numbers: table<string, integer>, count: integer }
-local page = { placement = 'end', collected = {}, numbers = {}, count = 0 }
-
 --- The label of a numbered solution, such as "Solution 1". The text comes
 --- from the `language` files.
 --- @param number integer The number of the solution
@@ -72,12 +67,14 @@ local function read_placement(options)
   return PLACEMENTS[1]
 end
 
---- Set the workshop labels and the duration of a workshop handout.
+--- Set the workshop labels and the duration of a workshop handout, and add
+--- the solution state to the page model: where the solutions go, the
+--- solutions to write at the end, and the number of each solution identifier.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
 --- @return table|nil The changed metadata of a workshop page, or nil
 function M.publish(meta, model)
-  page = { placement = read_placement(model.options), collected = {}, numbers = {}, count = 0 }
+  model.solutions = { placement = read_placement(model.options), collected = {}, numbers = {}, count = 0 }
   if model.mode ~= core.MODE_WORKSHOP then
     return nil
   end
@@ -140,73 +137,45 @@ function M.div(div, model)
   return nil
 end
 
---- Tell whether a `Proof` node is a solution of a workshop handout. Unlike
---- HTML, a solution with a `sol-` identifier counts too: Typst has no
---- disclosure, so every solution follows the placement.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return boolean
-local function is_solution(proof, model)
-  return model.mode == core.MODE_WORKSHOP and pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
-end
-
 --- The label of a solution: "Solution 1", and its own title after a colon.
 --- @param proof table The `Proof` node
 --- @param number integer The number of the solution
---- @return string name The label with the number only, for references
---- @return string title The label with the title, for the block
+--- @return string
 local function solution_label(proof, number)
   local name = solution_name(number)
   local own = proof.div.attributes.title or pandoc.utils.stringify(proof.name or '')
   if own == '' then
-    return name, name
+    return name
   end
-  return name, name .. ': ' .. own
+  return name .. ': ' .. own
 end
 
---- Place a solution after `extensions.atelier.solutions`.
+--- Place a solution after `extensions.atelier.solutions`. Unlike HTML, a
+--- solution with a `sol-` identifier follows the placement too: Typst has no
+--- disclosure to keep it in.
 --- @param proof table The `Proof` node
 --- @param model table The page model
 --- @return pandoc.Blocks|nil
 function M.proof(proof, model)
-  if not is_solution(proof, model) then
+  if model.mode ~= core.MODE_WORKSHOP or not core.is_solution(proof) then
     return nil
   end
+  local page = model.solutions
   page.count = page.count + 1
   local number = page.count
   local identifier = proof.identifier or ''
   if identifier ~= '' then
     page.numbers[identifier] = number
   end
-  local name, title = solution_label(proof, number)
+  local title = solution_label(proof, number)
   local target = '<' .. (identifier ~= '' and identifier or ('atelier-solution-' .. number)) .. '>'
   if page.placement == 'hide' then
     return pandoc.Blocks({})
   elseif page.placement == 'inline' then
     return wrap(block_call('solution', title, nil), proof.div.content, target)
   end
-  page.collected[#page.collected + 1] = { name = name, title = title, target = target, content = proof.div.content }
+  page.collected[#page.collected + 1] = { title = title, target = target, content = proof.div.content }
   return pandoc.Blocks({ pandoc.RawBlock('typst', '#atelier-ws-solution-link(' .. target .. ')') })
-end
-
---- Write the solutions collected for the end: a "Solutions" heading, then
---- one heading and the content of each solution.
---- @param doc pandoc.Pandoc The document
---- @return pandoc.Pandoc|nil
-function M.finish(doc)
-  if #page.collected == 0 then
-    return nil
-  end
-  doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-ws-solutions-heading()'))
-  doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-chapter-end()'))
-  for _, entry in ipairs(page.collected) do
-    doc.blocks:insert(pandoc.RawBlock(
-      'typst',
-      '#heading(level: 2, numbering: none, ' .. typst_string(entry.title) .. ') ' .. entry.target
-    ))
-    doc.blocks:extend(entry.content)
-  end
-  return doc
 end
 
 --- Replace a citation of solutions, such as `@sol-a` or `[@sol-a; @sol-b]`,
@@ -214,8 +183,9 @@ end
 --- label has no link. A citation that mixes solutions with other references
 --- is left to Quarto, with a warning.
 --- @param cite pandoc.Cite The citation
+--- @param page table The solution state of the page model
 --- @return pandoc.Inlines|nil
-function M.cite(cite)
+local function solution_cite(cite, page)
   local known = 0
   for _, citation in ipairs(cite.citations) do
     if page.numbers[citation.id] ~= nil then
@@ -252,6 +222,31 @@ function M.cite(cite)
     inlines:extend(citation.suffix)
   end
   return inlines
+end
+
+--- Finish the handout after its blocks: write the solutions collected for
+--- the end, a "Solutions" heading, then one heading and the content of each
+--- solution. Then resolve the citations of solutions, the moved ones too.
+--- @param doc pandoc.Pandoc The document
+--- @param model table The page model
+--- @return pandoc.Pandoc|nil
+function M.finish(doc, model)
+  local page = model.solutions
+  if page.count == 0 then
+    return nil
+  end
+  if #page.collected > 0 then
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-ws-solutions-heading()'))
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-chapter-end()'))
+    for _, entry in ipairs(page.collected) do
+      doc.blocks:insert(pandoc.RawBlock(
+        'typst',
+        '#heading(level: 2, numbering: none, ' .. typst_string(entry.title) .. ') ' .. entry.target
+      ))
+      doc.blocks:extend(entry.content)
+    end
+  end
+  return doc:walk({ Cite = function(cite) return solution_cite(cite, page) end })
 end
 
 --- Draw a `.terminal` code block as a terminal: the code window takes the

@@ -289,9 +289,7 @@ end
 --- @param bgs Colour[] The backgrounds, which share one tone
 --- @param goal number The contrast ratio to reach on each background
 --- @return Colour
-function M.contrast_all(c, bgs, goal)
-  return contrast_all(c, bgs, goal)
-end
+M.contrast_all = contrast_all
 
 --- The colour as `#rrggbb`, painted on a background when it is translucent.
 --- @param c Colour
