@@ -467,14 +467,42 @@ body:is(.docked, .floating) .sidebar-navigation .sidebar-search {
   }
 }
 
+// The floating card and the table of contents card float with the same gap.
+// The table of contents column takes it as its padding, in place of Quarto's
+// 1em, on every sidebar style. At the default font size the two are equal.
+:root {
+  --atelier-side-card-gap: 14px;
+}
+
+#quarto-margin-sidebar {
+  padding-top: var(--atelier-side-card-gap);
+}
+
+@include media-breakpoint-up(lg) {
+  #quarto-margin-sidebar {
+    padding-bottom: var(--atelier-side-card-gap);
+  }
+}
+
 // A floating sidebar has no column of its own. It becomes a card on the sidebar
 // tokens, with the sidebar border and the theme radius, so that its links keep
 // contrast on the surface they sit on.
+// From the lg breakpoint up, the card keeps the gap under the header, under the
+// title banner, and above the viewport bottom and the footer. Quarto writes
+// `top` and `max-height` inline from the header height, so the card overrides
+// them with the offset that sidebar-offset.html copies.
+// Remove when: never, because Atelier makes the floating sidebar a card.
 body.floating .sidebar.sidebar-navigation {
   border: 1px solid var(--atelier-sidebar-border);
   border-radius: $border-radius;
   background-color: var(--atelier-sidebar-bg);
   color: var(--atelier-sidebar-fg);
+
+  @include media-breakpoint-up(lg) {
+    top: calc(var(--atelier-header-offset, 0px) + var(--atelier-side-card-gap)) !important;
+    max-height: calc(100vh - var(--atelier-header-offset, 0px) - 2 * var(--atelier-side-card-gap)) !important;
+    margin-block: var(--atelier-side-card-gap);
+  }
 
   .sidebar-item-container {
     color: var(--atelier-sidebar-fg);

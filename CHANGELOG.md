@@ -6,6 +6,7 @@
 - feat: Embed the cascade, codefrag, tabset, a11y, typst-render, typst-extras and portable-links extensions. (#145)
 - fix: A `body-bg` brand default that is a Sass expression, such as `$gray-100`, no longer goes into the `theme-color` tags. (#146)
 - feat: The solutions of a Reveal.js deck in workshop mode go into the veil group `solutions`, so the reader can hide or show them. (#147)
+- fix: A floating sidebar now keeps the same gap as the table of contents card, under the header, under the title banner and above the footer, so its rounded corners stay visible. (#149)
 - feat: Add the `atelier-typst` format, one PDF document type with the colours, fonts and highlighting of the site, tagged for PDF/UA-1. (#148)
 - feat: Turn on a cover, a contents page, chapter dividers, chapter contents and a closing page with five Typst switches under `extensions.atelier`. (#148)
 - feat: In workshop mode, a Typst handout shows the workshop blocks and puts the solutions at the end, inline, or nowhere, with `extensions.atelier.solutions`. (#148)
