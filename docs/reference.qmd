@@ -416,6 +416,21 @@ language:
 | `atelier-footnote-back`          | `Back to note {n} in the text`       | `Retour à la note {n} dans le texte`        |
 | `atelier-code-window`            | `Code`                               | `Code`                                      |
 | `atelier-version`                | `Version`                            | `Version`                                   |
+| `atelier-contents`               | `Contents`                           | `Sommaire`                                  |
+| `atelier-chapter`                | `Chapter`                            | `Chapitre`                                  |
+| `atelier-part`                   | `Part`                               | `Partie`                                    |
+| `atelier-in-this-chapter`        | `In this chapter`                    | `Dans ce chapitre`                          |
+| `atelier-closing-contact`        | `Contact`                            | `Contact`                                   |
+| `atelier-closing-licence`        | `Licence`                            | `Licence`                                   |
+| `atelier-colophon`               | `Colophon`                           | `Colophon`                                  |
+| `atelier-colophon-typeset`       | `Typeset with Quarto and Typst.`     | `Composé avec Quarto et Typst.`             |
+| `atelier-colophon-fonts`         | `Fonts`                              | `Polices`                                   |
+| `atelier-author-orcid`           | `ORCID`                              | `ORCID`                                     |
+| `atelier-author-corresponding`   | `Corresponding author`               | `Auteur correspondant`                      |
+| `atelier-duration`               | `Duration`                           | `Durée`                                     |
+| `atelier-solution-title`         | `Solution`                           | `Solution`                                  |
+| `atelier-solution-page`          | `Solution: page {page}`              | `Solution : page {page}`                    |
+| `atelier-solutions-title`        | `Solutions`                          | `Solutions`                                 |
 
 : The `language` keys of Atelier and their text in English and in French. {.striped .hover tbl-colwidths="[34,33,33]"}
 

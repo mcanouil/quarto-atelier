@@ -283,6 +283,29 @@ local function contrast(c, bg, goal)
   return contrast_all(c, { bg }, goal)
 end
 
+--- `atelier-contrast-all()`, for a caller that paints text on its own
+--- backgrounds, such as the highlighting of a Typst code block.
+--- @param c Colour The text colour
+--- @param bgs Colour[] The backgrounds, which share one tone
+--- @param goal number The contrast ratio to reach on each background
+--- @return Colour
+function M.contrast_all(c, bgs, goal)
+  return contrast_all(c, bgs, goal)
+end
+
+--- The colour as `#rrggbb`, painted on a background when it is translucent.
+--- @param c Colour
+--- @param bg Colour The background under a translucent colour
+--- @return string
+function M.hex(c, bg)
+  local painted = c
+  if c.a < 1 then
+    painted = M.mix({ r = c.r, g = c.g, b = c.b, a = 1 }, bg, c.a)
+  end
+  painted = rendered(painted)
+  return string.format('#%02x%02x%02x', painted.r, painted.g, painted.b)
+end
+
 --- `atelier-theme-contrast()`.
 local function atelier_theme_contrast(c, bg)
   return contrast(theme_contrast(c, bg, 4.5), bg, 4.5)

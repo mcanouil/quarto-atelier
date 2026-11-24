@@ -1,0 +1,127 @@
+// Atelier - Typst workshop blocks
+// The blocks of a workshop handout, as `workshop/typst.lua` writes them:
+// objectives, exercises and solutions, each a box with a head line that
+// holds an icon, the title and the duration. The icons and the list boxes
+// only decorate, so they are artefacts: the title names the block.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+// Corner radius of a workshop block, as the large Bootstrap radius of HTML.
+#let atelier-ws-radius = if atelier-preset == "terminal" { 0pt } else { 8pt }
+
+// Answer the icon of a block, drawn in the colour of its head.
+// - kind: `objectives`, `exercise` or `solution`.
+// - ink: colour of the icon.
+#let atelier-ws-icon(kind, ink) = {
+  let size = 1em
+  let pen = 1pt + ink
+  let drawing = if kind == "objectives" {
+    box(width: size, height: size, {
+      place(center + horizon, circle(radius: size * 0.45, stroke: pen))
+      place(center + horizon, circle(radius: size * 0.25, stroke: pen))
+      place(center + horizon, circle(radius: size * 0.07, fill: ink, stroke: none))
+    })
+  } else {
+    box(width: size, height: size, {
+      place(top + left, dy: size * 0.2, rect(width: size * 0.8, height: size * 0.8, radius: 1.5pt, stroke: pen))
+      place(top + left, line(start: (size * 0.35, size * 0.65), end: (size * 0.95, size * 0.05), stroke: 1.4pt + ink))
+    })
+  }
+  box(baseline: 0.15em, pdf.artifact(drawing))
+}
+
+// The fonts of the document, for the parts that need the monospace font.
+#let atelier-document-fonts = state("atelier-document-fonts", (base: none, headings: none, monospace: none))
+
+// Answer the duration of a block, in a pill, in the monospace font.
+// - time: the duration text.
+// - ink: colour of the pill.
+#let atelier-ws-time(time, ink) = context {
+  let monospace = atelier-document-fonts.get().monospace
+  set text(font: monospace) if monospace != none
+  box(inset: (x: 0.45em, y: 0.25em), radius: 99pt, stroke: 0.75pt + ink, text(size: 0.8em, weight: "medium", time))
+}
+
+// Answer a workshop block: a box with a head line and a body.
+// - kind: `objectives`, `exercise` or `solution`.
+// - title: title of the block.
+// - time: duration text, or none.
+// - body: content of the block.
+#let atelier-ws-block(kind, title, time, body) = {
+  let head-fill = (
+    objectives: atelier-colour("accent-soft"),
+    exercise: atelier-colour("workshop-bar-bg"),
+    solution: none,
+  ).at(kind)
+  let head-ink = (
+    objectives: atelier-colour("accent-ink"),
+    exercise: atelier-colour("workshop-bar-fg"),
+    solution: atelier-colour("accent-ink"),
+  ).at(kind)
+  let solution = kind == "solution"
+  block(
+    width: 100%,
+    above: 1em,
+    below: 1em,
+    breakable: true,
+    clip: true,
+    radius: atelier-ws-radius,
+    stroke: (
+      paint: atelier-colour(if solution { "control-border" } else { "border" }),
+      thickness: 0.75pt,
+      dash: if solution { "dashed" } else { none },
+    ),
+    {
+      block(
+        width: 100%,
+        below: 0pt,
+        fill: head-fill,
+        inset: (x: 1em, y: 0.6em),
+        sticky: true,
+        text(fill: head-ink, weight: "bold", size: 0.95em, context grid(
+          columns: (auto, 1fr, auto),
+          column-gutter: 0.6em,
+          align: horizon,
+          if not solution { atelier-ws-icon(kind, head-ink) },
+          title,
+          if time != none { atelier-ws-time(time, head-ink) },
+        )),
+      )
+      block(width: 100%, above: 0pt, inset: (x: 1em, top: 0.8em, bottom: 0.9em), {
+        set text(size: 0.95em)
+        body
+      })
+    },
+  )
+}
+
+// Answer the objectives list: each item after an empty box, with no
+// interaction. The box is an artefact.
+// - body: the list.
+#let atelier-ws-objectives(body) = {
+  let mark = pdf.artifact(box(
+    width: 0.75em,
+    height: 0.75em,
+    baseline: 0.1em,
+    radius: calc.min(atelier-radius, 2pt),
+    stroke: 1pt + atelier-colour("control-border"),
+  ))
+  set list(marker: mark, body-indent: 0.6em)
+  body
+}
+
+// Answer the link from an exercise to its solution at the end:
+// "Solution: page n".
+// - target: label of the solution heading.
+#let atelier-ws-solution-link(target) = context {
+  let number = counter(page).at(target).first()
+  block(above: 0.8em, link(target, atelier-labels.at("solution-page").replace("{page}", str(number))))
+}
+
+// Answer the heading of the solutions at the end of a handout, on a new page.
+#let atelier-ws-solutions-heading() = {
+  pagebreak(weak: true)
+  heading(level: 1, atelier-labels.at("solutions-title"))
+}
