@@ -313,7 +313,10 @@ function M.css(c)
   if c.a >= 1 then
     return string.format('#%02x%02x%02x', painted.r, painted.g, painted.b)
   end
-  local alpha = (string.format('%.3f', c.a):gsub('0+$', ''))
+  local alpha = (string.format('%.3f', c.a):gsub('%.?0+$', ''))
+  if alpha == '' then
+    alpha = '0'
+  end
   return string.format('rgba(%d, %d, %d, %s)', painted.r, painted.g, painted.b, alpha)
 end
 
