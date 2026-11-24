@@ -628,16 +628,16 @@ end
 --- A block with no bullet list logs a warning.
 --- @param div pandoc.Div The `.objectives` div
 --- @param model table The page model
---- @return { title: string, time: string|nil, blocks: pandoc.Blocks, list: pandoc.BulletList|nil } The block: `list` is the objectives list, one of `blocks`
+--- @return { title: string, time: string|nil, blocks: pandoc.Blocks, list: integer|nil } The block: `list` is the position of the objectives list in `blocks`. A position, not the node: pandoc nodes compare by content, so two equal lists would both match.
 function M.objectives(div, model)
   local time = attribute_duration(div, 'objectives', model.labels)
   if div.attributes.duration == nil and model.duration ~= nil then
     time = M.format_duration(model.duration, model.labels)
   end
   local list = nil
-  for _, block in ipairs(div.content) do
+  for position, block in ipairs(div.content) do
     if block.t == 'BulletList' then
-      list = block
+      list = position
       break
     end
   end

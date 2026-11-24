@@ -211,6 +211,10 @@ The summary text comes from the `title` attribute.
 If there is no `title`, it comes from the `name` attribute or from a heading at the start of the div.
 The default summary is "Show the solution".
 
+In a Reveal.js deck in workshop mode, each solution goes into the veil group `solutions`.
+The reader can then hide or show all the solutions of the deck with the veil controls.
+A solution with its own `.veil` class or its own `group` attribute keeps them.
+
 ```markdown
 ::: {.solution title="Solution"}
 

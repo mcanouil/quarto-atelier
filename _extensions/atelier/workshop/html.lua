@@ -159,8 +159,8 @@ end
 local function objectives_block(div, model)
   local block = core.objectives(div, model)
   local body = pandoc.Blocks({})
-  for _, content in ipairs(block.blocks) do
-    if content == block.list then
+  for position, content in ipairs(block.blocks) do
+    if position == block.list then
       body:extend(objective_labels(content))
     else
       body:insert(content)

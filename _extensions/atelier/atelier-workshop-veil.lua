@@ -7,11 +7,11 @@
 --- @description Veil runs at `pre-quarto` and reads the div that a `Proof`
 --- node holds, so this filter runs at `pre-quarto` too, just before Veil.
 --- In a Reveal.js deck in workshop mode, the div of each workshop solution
---- gets the `veil` class and `group="solutions"`, so the solution stays hidden
---- until the reader shows the group. A solution with its own `.veil` class
---- keeps it, and its own group. A solution with a `sol-` identifier is a
---- cross-reference target and stays shown, as in HTML. The other formats are
---- left as they are.
+--- gets the `veil` class and `group="solutions"`, so the reader can hide or
+--- show the solutions with the veil controls. A solution with its own `.veil`
+--- class or its own `group` keeps them. A solution with a `sol-` identifier
+--- is a cross-reference target and stays shown, as in HTML. The other formats
+--- are left as they are.
 
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 
@@ -41,7 +41,9 @@ local function veil_solution(proof)
     return nil
   end
   proof.div.classes:insert('veil')
-  proof.div.attributes.group = GROUP
+  if proof.div.attributes.group == nil then
+    proof.div.attributes.group = GROUP
+  end
   return proof
 end
 
