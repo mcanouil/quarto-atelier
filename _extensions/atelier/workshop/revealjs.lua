@@ -16,6 +16,7 @@
 --- terminal in both modes, with its `$` prompts in the text.
 
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
+local html = require(quarto.utils.resolve_path('workshop/html.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -74,37 +75,19 @@ function M.publish(meta, model)
   return meta
 end
 
---- Build the head line of a block.
---- @param title string The title
---- @param time string|nil The duration text
---- @return pandoc.Plain
-local function block_head(title, time)
-  local head = pandoc.Inlines({
-    pandoc.RawInline('html', '<p class="atelier-block-head">'),
-    pandoc.Str(title),
-  })
-  if time ~= nil then
-    head:insert(pandoc.RawInline('html', '<span class="atelier-block-time">'))
-    head:insert(pandoc.Str(time))
-    head:insert(pandoc.RawInline('html', '</span>'))
-  end
-  head:insert(pandoc.RawInline('html', '</p>'))
-  return pandoc.Plain(head)
-end
-
---- Build a block: the head line and the body.
+--- Build a block: the head line and the body, with the markup of the HTML
+--- writer, so the two formats share it.
 --- @param div pandoc.Div The div of the author
 --- @param class string The class of the div, such as `exercise`
+--- @param icon string|nil The Bootstrap Icons name, which the deck draws as a mask
 --- @param title string The title
 --- @param time string|nil The duration text
 --- @param body pandoc.Blocks The content
 --- @return pandoc.Div
-local function block(div, class, title, time, body)
-  local classes, attributes = core.other_attr(div, class)
-  table.insert(classes, 1, 'atelier-' .. class)
+local function block(div, class, icon, title, time, body)
   return pandoc.Div(
-    { block_head(title, time), pandoc.Div(body, pandoc.Attr('', { 'atelier-block-body' })) },
-    pandoc.Attr(div.identifier, classes, attributes)
+    { html.block_head(icon, title, time), html.block_body(body) },
+    html.block_attr(div, class)
   )
 end
 
@@ -140,10 +123,10 @@ function M.div(div, model)
     for position, content in ipairs(read.blocks) do
       body:insert(position == read.list and objective_list(content) or content)
     end
-    return block(div, 'objectives', read.title, read.time, body)
+    return block(div, 'objectives', 'bullseye', read.title, read.time, body)
   elseif div.classes:includes('exercise') then
     local read = core.exercise(div, model)
-    return block(div, 'exercise', read.title, read.time, read.blocks)
+    return block(div, 'exercise', 'pencil-square', read.title, read.time, read.blocks)
   end
   return nil
 end
@@ -164,7 +147,7 @@ function M.proof(proof, model)
   if title == '' then
     title = language_text('solution-title')
   end
-  local result = block(solution.div, 'solution', title, nil, solution.div.content)
+  local result = block(solution.div, 'solution', nil, title, nil, solution.div.content)
   if not result.classes:includes('veil') then
     result.classes:insert('veil')
     if result.attributes.group == nil then

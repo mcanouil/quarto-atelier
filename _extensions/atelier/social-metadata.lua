@@ -182,24 +182,16 @@ end
 --- @param meta table The document metadata
 --- @return table<integer, string>
 local function theme_colour_tags(config, meta)
-  if quarto.doc.is_format('revealjs') then
-    local colour = theme_colour(config, palette.document_scheme(meta))
-    if str.is_empty(colour) then
-      return {}
-    end
-    return { string.format('<meta name="theme-color" content="%s">', str.escape_attribute(colour)) }
-  end
+  local deck = quarto.doc.is_format('revealjs')
+  local schemes = deck and { palette.document_scheme(meta) } or THEME_COLOUR_SCHEMES
   local tags = {}
-  for _, scheme in ipairs(THEME_COLOUR_SCHEMES) do
+  for _, scheme in ipairs(schemes) do
     local colour = theme_colour(config, scheme)
     if not str.is_empty(colour) then
+      local media = deck and '' or string.format(' media="(prefers-color-scheme: %s)"', scheme)
       table.insert(
         tags,
-        string.format(
-          '<meta name="theme-color" content="%s" media="(prefers-color-scheme: %s)">',
-          str.escape_attribute(colour),
-          scheme
-        )
+        string.format('<meta name="theme-color" content="%s"%s>', str.escape_attribute(colour), media)
       )
     end
   end

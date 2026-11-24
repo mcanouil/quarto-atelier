@@ -45,14 +45,6 @@ local LABELS = {
 --- @type table<integer, string>
 local SWITCHES = { 'cover', 'toc-page', 'chapter-dividers', 'chapter-contents', 'closing-page' }
 
---- The fonts of each preset, as `html/presets.scss` sets them. A brand font
---- wins. The `default` preset sets none, so Typst keeps its own fonts.
---- @type table<string, table<string, string>>
-local PRESET_FONTS = {
-  quarto = { base = 'Alegreya Sans', headings = 'Alegreya Sans', monospace = 'Fira Code' },
-  terminal = { base = 'JetBrains Mono', headings = 'JetBrains Mono', monospace = 'JetBrains Mono' },
-}
-
 --- The Typst function of each Pandoc highlighting class.
 --- @type table<string, string>
 local TOKEN_FUNCTIONS = {
@@ -160,14 +152,13 @@ local function highlighting_code(styles, bgs)
   local entries = {}
   for class, style in pairs(styles) do
     local name = TOKEN_FUNCTIONS[class]
-    local colour = palette.parse(style.color)
-    if name ~= nil and colour ~= nil then
-      local held = palette.contrast_all(colour, bgs, 4.5)
+    local held = palette.held_style(style, bgs)
+    if name ~= nil and held ~= nil then
       entries[name] = typst_dict({
-        fill = typst_colour(held, bgs[1]),
-        weight = typst_string(style.bold and 'bold' or 'regular'),
-        style = typst_string(style.italic and 'italic' or 'normal'),
-        underline = style.underline and 'true' or 'false',
+        fill = 'rgb("' .. held.colour .. '")',
+        weight = typst_string(held.bold and 'bold' or 'regular'),
+        style = typst_string(held.italic and 'italic' or 'normal'),
+        underline = held.underline and 'true' or 'false',
       })
     end
   end
@@ -179,7 +170,7 @@ end
 --- @param preset string
 --- @return string
 local function fonts_code(preset)
-  local fonts = PRESET_FONTS[preset] or {}
+  local fonts = palette.PRESET_FONTS[preset] or {}
   local entries = {}
   for _, role in ipairs({ 'base', 'headings', 'monospace' }) do
     entries[role] = fonts[role] and typst_array({ typst_string(fonts[role]) }) or 'none'

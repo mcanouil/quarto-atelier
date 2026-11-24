@@ -304,6 +304,19 @@ function M.hex(c, bg)
   return string.format('#%02x%02x%02x', painted.r, painted.g, painted.b)
 end
 
+--- The colour as CSS: `#rrggbb` when opaque, `rgba()` when translucent, with
+--- whole channels, as the browser paints it.
+--- @param c Colour
+--- @return string
+function M.css(c)
+  local painted = rendered(c)
+  if c.a >= 1 then
+    return string.format('#%02x%02x%02x', painted.r, painted.g, painted.b)
+  end
+  local alpha = (string.format('%.3f', c.a):gsub('0+$', ''))
+  return string.format('rgba(%d, %d, %d, %s)', painted.r, painted.g, painted.b, alpha)
+end
+
 --- `atelier-theme-contrast()`.
 local function atelier_theme_contrast(c, bg)
   return contrast(theme_contrast(c, bg, 4.5), bg, 4.5)
@@ -828,6 +841,32 @@ end
 -- ============================================================================
 -- SYNTAX HIGHLIGHTING
 -- ============================================================================
+
+--- The style of one highlighting token, with its colour held at 4.5:1 on
+--- every background, as `html/highlighting.scss` holds it.
+--- @param style table A token style of `M.highlighting`
+--- @param bgs Colour[] The backgrounds of the code, of one tone
+--- @return { colour: string, bold: boolean, italic: boolean, underline: boolean }|nil
+function M.held_style(style, bgs)
+  local parsed = M.parse(style.color)
+  if parsed == nil then
+    return nil
+  end
+  return {
+    colour = M.hex(contrast_all(parsed, bgs, 4.5), bgs[1]),
+    bold = style.bold == true,
+    italic = style.italic == true,
+    underline = style.underline == true,
+  }
+end
+
+--- The fonts of each preset, as `html/presets.scss` sets them, for the
+--- formats with no Sass. A brand font wins. The `default` preset sets none.
+--- @type table<string, table<string, string>>
+M.PRESET_FONTS = {
+  quarto = { base = 'Alegreya Sans', headings = 'Alegreya Sans', monospace = 'Fira Code' },
+  terminal = { base = 'JetBrains Mono', headings = 'JetBrains Mono', monospace = 'JetBrains Mono' },
+}
 
 --- The token styles of every highlighting theme, loaded on first use.
 local highlighting_themes = nil

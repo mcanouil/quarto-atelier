@@ -72,13 +72,16 @@ function M.publish(meta, model)
 end
 
 --- Build the head line of a block.
---- @param icon string The Bootstrap Icons name, such as `bullseye`
+--- @param icon string|nil The Bootstrap Icons name, such as `bullseye`, or nil for no icon
 --- @param title string The title text
 --- @param time string|nil The formatted duration, or nil to leave the pill out
 --- @return pandoc.Plain The head paragraph
-local function block_head(icon, title, time)
+function M.block_head(icon, title, time)
   local head = pandoc.Inlines({
-    pandoc.RawInline('html', '<p class="atelier-block-head"><i class="bi bi-' .. icon .. '" aria-hidden="true"></i>'),
+    pandoc.RawInline(
+      'html',
+      '<p class="atelier-block-head">' .. (icon and ('<i class="bi bi-' .. icon .. '" aria-hidden="true"></i>') or '')
+    ),
     pandoc.Str(title),
   })
   if time ~= nil then
@@ -139,7 +142,7 @@ end
 --- @param div pandoc.Div The div
 --- @param class string The div class, such as `objectives`
 --- @return pandoc.Attr The attributes
-local function block_attr(div, class)
+function M.block_attr(div, class)
   local classes, attributes = core.other_attr(div, class)
   table.insert(classes, 1, 'atelier-' .. class)
   return pandoc.Attr(div.identifier, classes, attributes)
@@ -148,7 +151,7 @@ end
 --- Wrap blocks in the body container of a workshop block.
 --- @param blocks pandoc.Blocks The content
 --- @return pandoc.Div The body
-local function block_body(blocks)
+function M.block_body(blocks)
   return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-block-body' }))
 end
 
@@ -167,8 +170,8 @@ local function objectives_block(div, model)
     end
   end
   return pandoc.Div(
-    { block_head('bullseye', block.title, block.time), block_body(body) },
-    block_attr(div, 'objectives')
+    { M.block_head('bullseye', block.title, block.time), M.block_body(body) },
+    M.block_attr(div, 'objectives')
   )
 end
 
@@ -179,8 +182,8 @@ end
 local function exercise_block(div, model)
   local block = core.exercise(div, model)
   return pandoc.Div(
-    { block_head('pencil-square', block.title, block.time), block_body(block.blocks) },
-    block_attr(div, 'exercise')
+    { M.block_head('pencil-square', block.title, block.time), M.block_body(block.blocks) },
+    M.block_attr(div, 'exercise')
   )
 end
 
@@ -221,7 +224,7 @@ function M.proof(proof, model)
       pandoc.Str(solution.title),
       pandoc.RawInline('html', '</summary>'),
     }),
-    block_body(solution.div.content),
+    M.block_body(solution.div.content),
     pandoc.RawBlock('html', '</details>'),
   })
   local classes, attributes = core.other_attr(solution.div, 'solution')

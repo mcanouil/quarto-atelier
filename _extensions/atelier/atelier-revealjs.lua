@@ -17,16 +17,7 @@
 --- its slots: the title on the left, the footer of the author in the centre,
 --- and the slide number of Reveal.js on the right.
 
-local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
-
---- The fonts of each preset, as `html/presets.scss` sets them. A brand font
---- wins. The `default` preset sets none, so the deck keeps the theme fonts.
---- @type table<string, table<string, string>>
-local PRESET_FONTS = {
-  quarto = { base = 'Alegreya Sans', headings = 'Alegreya Sans', monospace = 'Fira Code' },
-  terminal = { base = 'JetBrains Mono', headings = 'JetBrains Mono', monospace = 'JetBrains Mono' },
-}
 
 --- The fallback family of each font role.
 --- @type table<string, string>
@@ -40,8 +31,28 @@ local BRAND_FONT_ROLES = {
   monospace = { 'monospace', 'monospace-block', 'monospace-inline' },
 }
 
+--- The Reveal.js, Quarto and a11y plugin properties that the theme paints
+--- from, and the token of each.
+--- @type table<string, string>
+local THEME_PROPERTIES = {
+  ['--r-background-color'] = 'bg',
+  ['--r-main-color'] = 'fg',
+  ['--r-heading-color'] = 'heading',
+  ['--r-link-color'] = 'link',
+  ['--r-link-color-hover'] = 'link-hover',
+  ['--r-link-color-dark'] = 'link',
+  ['--r-selection-background-color'] = 'accent-fill',
+  ['--r-selection-color'] = 'on-accent',
+  ['--quarto-body-bg'] = 'bg',
+  ['--quarto-body-color'] = 'fg',
+  ['--quarto-text-muted'] = 'muted',
+  ['--quarto-border-color'] = 'border',
+  ['--a11y-accent'] = 'focus',
+}
+
 --- The scope of the deck tokens and of the dark slide tokens.
---- `:root:root` wins over the `:root` rules of the theme, whatever the order.
+--- `:root:root` wins over the `:root` rules of the theme and of the plugins,
+--- whatever the order.
 --- @type string
 local ROOT_SCOPE = ':root:root'
 
@@ -77,23 +88,6 @@ local SECTION_CLASS = 'atelier-section'
 -- CSS
 -- ============================================================================
 
---- A palette colour as CSS: hex when opaque, `rgba()` when translucent.
---- @param colour table
---- @return string
-local function css_colour(colour)
-  if colour.a < 1 then
-    local alpha = (string.format('%.3f', colour.a):gsub('0+$', ''))
-    return string.format(
-      'rgba(%d, %d, %d, %s)',
-      math.floor(colour.r + 0.5),
-      math.floor(colour.g + 0.5),
-      math.floor(colour.b + 0.5),
-      alpha
-    )
-  end
-  return palette.hex(colour, colour)
-end
-
 --- Sorted keys of a table.
 --- @param entries table
 --- @return string[]
@@ -106,56 +100,47 @@ local function sorted_keys(entries)
   return names
 end
 
---- The declarations of the tokens of one scheme, with the Reveal.js and
---- Quarto properties that the theme paints from.
+--- The declarations of the tokens of one scheme, with the properties that
+--- the theme paints from.
 --- @param tokens table<string, table>
 --- @return string[]
 local function token_declarations(tokens)
   local lines = {}
   for _, name in ipairs(sorted_keys(tokens)) do
-    lines[#lines + 1] = '  --atelier-' .. name .. ': ' .. css_colour(tokens[name]) .. ';'
+    lines[#lines + 1] = '  --atelier-' .. name .. ': ' .. palette.css(tokens[name]) .. ';'
   end
-  local reveal = {
-    ['--r-background-color'] = 'bg',
-    ['--r-main-color'] = 'fg',
-    ['--r-heading-color'] = 'heading',
-    ['--r-link-color'] = 'link',
-    ['--r-link-color-hover'] = 'link-hover',
-    ['--r-link-color-dark'] = 'link',
-    ['--r-selection-background-color'] = 'accent-fill',
-    ['--r-selection-color'] = 'on-accent',
-    ['--quarto-body-bg'] = 'bg',
-    ['--quarto-body-color'] = 'fg',
-    ['--quarto-text-muted'] = 'muted',
-    ['--quarto-border-color'] = 'border',
-  }
-  for _, property in ipairs(sorted_keys(reveal)) do
-    lines[#lines + 1] = '  ' .. property .. ': var(--atelier-' .. reveal[property] .. ');'
+  for _, property in ipairs(sorted_keys(THEME_PROPERTIES)) do
+    lines[#lines + 1] = '  ' .. property .. ': var(--atelier-' .. THEME_PROPERTIES[property] .. ');'
   end
   return lines
 end
 
 --- The rules of one highlighting map under a scope. Each colour is held at
---- 4.5:1 on every background, as `html/highlighting.scss` does.
+--- 4.5:1 on every background, as `html/highlighting.scss` does. The Normal
+--- colour goes on every span, and the class rules outrank it.
 --- @param styles table The token styles of a highlighting theme
 --- @param scope string The selector of the code
 --- @param bgs table[] The backgrounds of the code, of one tone
---- @param normal boolean Write the Normal colour on every span
+--- @param normal string|nil The Normal colour, which replaces the one of the map
 --- @return string[]
 local function highlighting_rules(styles, scope, bgs, normal)
   local rules = {}
   for _, class in ipairs(sorted_keys(styles)) do
-    local style = styles[class]
-    local parsed = palette.parse(style.color)
-    if parsed ~= nil and (class ~= '' or normal) then
-      local selector = scope .. ' code span' .. (class ~= '' and ('.' .. class) or '')
-      local declarations = { 'color: ' .. palette.hex(palette.contrast_all(parsed, bgs, 4.5), bgs[1]) }
-      if class ~= '' then
-        declarations[#declarations + 1] = 'background-color: transparent'
-        declarations[#declarations + 1] = 'font-weight: ' .. (style.bold and 'bold' or 'normal')
-        declarations[#declarations + 1] = 'font-style: ' .. (style.italic and 'italic' or 'normal')
-        declarations[#declarations + 1] = 'text-decoration: ' .. (style.underline and 'underline' or 'none')
+    local held = palette.held_style(styles[class], bgs)
+    if held ~= nil then
+      local declarations
+      if class == '' then
+        declarations = { 'color: ' .. (normal or held.colour) }
+      else
+        declarations = {
+          'color: ' .. held.colour,
+          'background-color: transparent',
+          'font-weight: ' .. (held.bold and 'bold' or 'normal'),
+          'font-style: ' .. (held.italic and 'italic' or 'normal'),
+          'text-decoration: ' .. (held.underline and 'underline' or 'none'),
+        }
       end
+      local selector = scope .. ' code span' .. (class ~= '' and ('.' .. class) or '')
       rules[#rules + 1] = selector .. ' { ' .. table.concat(declarations, '; ') .. '; }'
     end
   end
@@ -163,29 +148,25 @@ local function highlighting_rules(styles, scope, bgs, normal)
 end
 
 --- The highlighting of one scheme: the page map on the code surfaces, and
---- the dark map on the terminal surfaces.
+--- the dark map on the terminal surfaces, with the terminal ink as Normal.
 --- @param scope string The scope of the scheme
 --- @param scheme string `light` or `dark`
+--- @param tokens table<string, table> The tokens of the scheme
 --- @return string[]
-local function scheme_highlighting(scope, scheme)
+local function scheme_highlighting(scope, scheme, tokens)
   local painted = palette.painted_scheme(scheme)
   local preset = palette.preset(painted)
-  local tokens = palette.tokens(scheme)
   local rules = highlighting_rules(
     palette.highlighting(preset, painted),
     scope .. ' pre',
     { tokens.surface, tokens['surface-strong'], tokens.bg, tokens['accent-soft'] },
-    true
+    nil
   )
-  -- The page map paints every span with its Normal colour, so the lines of a
-  -- terminal take the terminal ink back. Its token rules outrank this one.
-  rules[#rules + 1] = scope .. ' pre.atelier-terminal code span { color: ' ..
-    palette.hex(tokens['terminal-fg'], tokens['terminal-bg']) .. '; }'
   for _, rule in ipairs(highlighting_rules(
     palette.highlighting(preset, 'dark'),
     scope .. ' pre.atelier-terminal',
     { tokens['terminal-bg'], tokens['terminal-highlight'] },
-    false
+    palette.hex(tokens['terminal-fg'], tokens['terminal-bg'])
   )) do
     rules[#rules + 1] = rule
   end
@@ -216,7 +197,7 @@ end
 --- @param scheme string `light` or `dark`
 --- @return string[]
 local function font_declarations(scheme)
-  local fonts = PRESET_FONTS[palette.preset(palette.painted_scheme(scheme))] or {}
+  local fonts = palette.PRESET_FONTS[palette.preset(palette.painted_scheme(scheme))] or {}
   local lines = {}
   for _, role in ipairs({ 'base', 'headings', 'monospace' }) do
     if fonts[role] ~= nil and not brand_sets_font(scheme, role) then
@@ -228,10 +209,12 @@ end
 
 --- The style element of the deck.
 --- @param scheme string The scheme of the deck
+--- @param tokens table<string, table> The tokens of the deck
+--- @param dark table<string, table> The tokens of the dark slides
 --- @return string
-local function deck_style(scheme)
+local function deck_style(scheme, tokens, dark)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
-  for _, line in ipairs(token_declarations(palette.tokens(scheme))) do
+  for _, line in ipairs(token_declarations(tokens)) do
     lines[#lines + 1] = line
   end
   for _, line in ipairs(font_declarations(scheme)) do
@@ -239,14 +222,14 @@ local function deck_style(scheme)
   end
   lines[#lines + 1] = '}'
   lines[#lines + 1] = DARK_SCOPE .. ',\n' .. DARK_FRAME_SCOPE .. ' {'
-  for _, line in ipairs(token_declarations(palette.tokens('dark'))) do
+  for _, line in ipairs(token_declarations(dark)) do
     lines[#lines + 1] = line
   end
   lines[#lines + 1] = '}'
-  for _, rule in ipairs(scheme_highlighting('.reveal .slides', scheme)) do
+  for _, rule in ipairs(scheme_highlighting('.reveal .slides', scheme, tokens)) do
     lines[#lines + 1] = rule
   end
-  for _, rule in ipairs(scheme_highlighting(DARK_SCOPE, 'dark')) do
+  for _, rule in ipairs(scheme_highlighting(DARK_SCOPE, 'dark', dark)) do
     lines[#lines + 1] = rule
   end
   lines[#lines + 1] = '</style>'
@@ -257,19 +240,24 @@ end
 -- DECK
 -- ============================================================================
 
---- The state of the deck, which the block handlers read.
+--- What the block handlers read: the title of the deck, the background of
+--- the section slides and whether it is dark, and the background of the dark
+--- slides. `publish` fills it.
 --- @type table
-local deck = { scheme = 'light', tokens = nil, dark = nil, title = nil }
+local deck = {}
 
 --- Add the deck style and read the deck state.
 --- @param meta table
 --- @return nil
 local function publish(meta)
-  deck.scheme = palette.document_scheme(meta)
-  deck.tokens = palette.tokens(deck.scheme)
-  deck.dark = palette.tokens('dark')
-  deck.title = meta.title and str.stringify(meta.title) or ''
-  quarto.doc.include_text('in-header', deck_style(deck.scheme))
+  local scheme = palette.document_scheme(meta)
+  local tokens = palette.tokens(scheme)
+  local dark = palette.tokens('dark')
+  deck.title = meta.title and pandoc.utils.stringify(meta.title) or ''
+  deck.section_bg = palette.hex(tokens['navbar-bg'], tokens.bg)
+  deck.section_dark = palette.tone(tokens['navbar-bg']) == 'dark'
+  deck.dark_bg = palette.hex(dark.bg, dark.bg)
+  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark))
   return nil
 end
 
@@ -296,6 +284,15 @@ local function add_state(attr, state)
   attr.attributes['data-state'] = (states == '' and state) or (states .. ' ' .. state)
 end
 
+--- Give a slide its background colour, unless the author set one.
+--- @param attr pandoc.Attr
+--- @param colour string
+local function set_background(attr, colour)
+  if attr.attributes['background-color'] == nil then
+    attr.attributes['background-color'] = colour
+  end
+end
+
 --- Mark the section slides and the dark slides. Reveal.js paints the
 --- background of a slide on its own layer, so each one gets its colour.
 --- @param header pandoc.Header
@@ -304,18 +301,14 @@ local function mark_slide(header)
   if header.level == 1 then
     add_class(header.attr, SECTION_CLASS)
     add_state(header.attr, SECTION_STATE)
-    if header.attributes['background-color'] == nil then
-      header.attributes['background-color'] = palette.hex(deck.tokens['navbar-bg'], deck.tokens.bg)
-    end
-    if palette.tone(deck.tokens['navbar-bg']) == 'dark' then
+    set_background(header.attr, deck.section_bg)
+    if deck.section_dark then
       add_class(header.attr, DARK_BACKGROUND_CLASS)
     end
     return header
   end
   if header.classes:includes(DARK_CLASS) then
-    if header.attributes['background-color'] == nil then
-      header.attributes['background-color'] = palette.hex(deck.dark.bg, deck.dark.bg)
-    end
+    set_background(header.attr, deck.dark_bg)
     add_class(header.attr, DARK_BACKGROUND_CLASS)
     add_state(header.attr, DARK_STATE)
     return header
@@ -323,12 +316,15 @@ local function mark_slide(header)
   return nil
 end
 
---- Fill the footer slots. The footer of the author goes in the centre slot,
---- the title of the deck in the left one. The slide number of Reveal.js sits
---- in the right corner.
---- @param div pandoc.Div The `footer-default` div
---- @return pandoc.Div
+--- Fill the slots of the footer that Quarto adds to the deck. The footer of
+--- the author goes in the centre slot, the title of the deck in the left one.
+--- The slide number of Reveal.js sits in the right corner.
+--- @param div pandoc.Div
+--- @return pandoc.Div|nil
 local function fill_footer(div)
+  if not div.classes:includes('footer-default') then
+    return nil
+  end
   local own = pandoc.utils.blocks_to_inlines(div.content)
   div.content = pandoc.Blocks({
     pandoc.Plain({
@@ -340,21 +336,11 @@ local function fill_footer(div)
   return div
 end
 
---- Find the footer that Quarto adds to the deck.
---- @param div pandoc.Div
---- @return pandoc.Div|nil
-local function footer(div)
-  if div.classes:includes('footer-default') then
-    return fill_footer(div)
-  end
-  return nil
-end
-
 if not quarto.doc.is_format('revealjs') then
   return {}
 end
 
 return {
   { Meta = publish },
-  { Header = mark_slide, Div = footer },
+  { Header = mark_slide, Div = fill_footer },
 }
