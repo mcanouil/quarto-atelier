@@ -731,9 +731,11 @@ html #code-annotation-line-highlight {
 }
 
 // Quarto removes the margins under the banner on sidebar pages below 992 px
-// only. The sidebar has the chrome surface, so at wider widths these margins
-// show as an empty strip between the banner and the sidebar. A title block
-// without a banner keeps its margin, which separates it from the content.
+// only. A docked sidebar has the chrome surface, so at wider widths these
+// margins show as an empty strip between the banner and the sidebar. A
+// floating sidebar card keeps its own gap under the banner, from its margin in
+// navigation.scss. A title block without a banner keeps its margin, which
+// separates it from the content.
 // Remove when: never, because Atelier paints the sidebar.
 body.nav-sidebar {
   .quarto-title-banner {
