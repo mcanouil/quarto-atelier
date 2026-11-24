@@ -53,7 +53,7 @@ local function read_placement(options)
   if value == nil then
     return PLACEMENTS[1]
   end
-  local text = str.stringify(value)
+  local text = core.strip_rewrite(str.stringify(value))
   for _, placement in ipairs(PLACEMENTS) do
     if text == placement then
       return placement

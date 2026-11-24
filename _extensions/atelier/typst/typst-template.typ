@@ -25,15 +25,22 @@ $workshop.typ()$
 // body and the closing page, after the five report switches. Code has no
 // ligatures and no contextual alternates, so it reads as typed.
 // - meta: dictionary of the document: title, subtitle, date, duration,
-//   abstract, licence, copyright, lang, region, toc, toc-depth, numbering,
-//   fonts (base, headings, monospace, each an array or none), labels
-//   (authors, published, abstract) and logo.
+//   abstract, licence, copyright, keywords, lang, region, fontsize,
+//   linestretch, toc, toc-title, toc-depth, numbering, fonts (base,
+//   headings, monospace, each an array or none), labels (authors,
+//   published, abstract) and logo.
 // - body: the content of the document.
 #let atelier-document(meta, body) = {
   let fonts = meta.fonts
   let switches = atelier-switches
-  set document(title: meta.title)
+  set document(
+    title: meta.title,
+    author: atelier-people.authors.map(author => author.name),
+    keywords: meta.keywords,
+  )
   set text(lang: meta.lang, region: meta.region, fill: atelier-colour("fg"))
+  set text(size: meta.fontsize) if meta.fontsize != none
+  set par(leading: 0.65em * meta.linestretch) if meta.linestretch != none
   set text(font: fonts.base) if fonts.base != none
   show heading: set text(fill: atelier-colour("heading"))
   show heading: set text(font: fonts.headings) if fonts.headings != none
@@ -54,7 +61,7 @@ $workshop.typ()$
   }
   if meta.toc {
     if switches.at("toc-page") { pagebreak(weak: true) }
-    atelier-contents(meta.toc-depth)
+    atelier-contents(meta.toc-title, meta.toc-depth)
     if switches.at("toc-page") { pagebreak() }
   }
   body

@@ -24,12 +24,13 @@
 #let atelier-kicker(content) = text(size: 0.75em, weight: "bold", tracking: 0.08em, fill: atelier-colour("accent-text"), upper(content))
 
 // Answer the table of contents of the document.
+// - title: title of the contents, from Quarto's `toc-title`.
 // - depth: deepest heading level that it lists.
-#let atelier-contents(depth) = {
+#let atelier-contents(title, depth) = {
   show outline.entry.where(level: 1): set block(above: 1.1em)
   show outline.entry.where(level: 1): set text(weight: "bold")
   set outline.entry(fill: atelier-leaders())
-  outline(title: atelier-labels.at("contents"), depth: depth)
+  outline(title: title, depth: depth)
 }
 
 // Answer the headings that the contents of a chapter list: those under the

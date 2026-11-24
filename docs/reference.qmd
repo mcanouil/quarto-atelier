@@ -416,7 +416,6 @@ language:
 | `atelier-footnote-back`          | `Back to note {n} in the text`       | `Retour à la note {n} dans le texte`        |
 | `atelier-code-window`            | `Code`                               | `Code`                                      |
 | `atelier-version`                | `Version`                            | `Version`                                   |
-| `atelier-contents`               | `Contents`                           | `Sommaire`                                  |
 | `atelier-chapter`                | `Chapter`                            | `Chapitre`                                  |
 | `atelier-part`                   | `Part`                               | `Partie`                                    |
 | `atelier-in-this-chapter`        | `In this chapter`                    | `Dans ce chapitre`                          |

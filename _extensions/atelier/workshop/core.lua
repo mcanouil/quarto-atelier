@@ -177,7 +177,7 @@ end
 -- Remove when: the minimum Quarto version includes the fix.
 --- @param value string The value as the filter reads it
 --- @return string The value without the leading `../` and `./` segments
-local function strip_rewrite(value)
+function M.strip_rewrite(value)
   local text, count = value, 1
   while count > 0 do
     text, count = text:gsub('^%.%.?/', '')
@@ -195,7 +195,7 @@ function M.read_mode(meta, source, quiet)
   if value == nil then
     return MODE_DOCUMENTATION
   end
-  local text = strip_rewrite(pandoc.utils.stringify(value))
+  local text = M.strip_rewrite(pandoc.utils.stringify(value))
   if text == MODE_DOCUMENTATION or text == M.MODE_WORKSHOP then
     return text
   end
@@ -397,7 +397,7 @@ local function find_sidebar(options, page)
       local paths = collect_paths(sidebar.contents, base, {})
       for _, path in ipairs(paths) do
         if path == page then
-          return strip_rewrite(pandoc.utils.stringify(sidebar.id or '')), paths
+          return M.strip_rewrite(pandoc.utils.stringify(sidebar.id or '')), paths
         end
       end
     end

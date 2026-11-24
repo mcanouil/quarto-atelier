@@ -26,7 +26,6 @@ local EXTENSION_NAME = 'atelier'
 --- The text comes from the `language` files.
 --- @type table<integer, string>
 local LABELS = {
-  'contents',
   'chapter',
   'part',
   'in-this-chapter',

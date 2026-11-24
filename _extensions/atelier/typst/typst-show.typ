@@ -17,9 +17,13 @@
     abstract: $if(abstract)$[$abstract$]$else$none$endif$,
     licence: $if(license.text)$[$license.text$]$elseif(license)$[$license$]$else$none$endif$,
     copyright: $if(copyright.holder)$[© $if(copyright.year)$$copyright.year$ $endif$$copyright.holder$]$elseif(copyright)$[$copyright$]$else$none$endif$,
+    keywords: ($for(keywords)$"$keywords/nowrap$",$endfor$),
     lang: "$if(lang)$$lang$$else$en$endif$",
     region: $if(region)$"$region$"$else$none$endif$,
+    fontsize: $if(fontsize)$$fontsize$$elseif(brand.typography.base.size)$$brand.typography.base.size$$else$none$endif$,
+    linestretch: $if(linestretch)$$linestretch$$else$none$endif$,
     toc: $if(toc)$true$else$false$endif$,
+    toc-title: $if(toc-title)$[$toc-title$]$else$none$endif$,
     toc-depth: $if(toc-depth)$$toc-depth$$else$3$endif$,
     numbering: $if(section-numbering)$"$section-numbering$"$else$none$endif$,
     fonts: (
