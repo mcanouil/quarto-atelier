@@ -9,8 +9,10 @@
 	// values on the sidebar, which a stylesheet cannot read. This script copies
 	// the offset that Quarto computes into `--atelier-header-offset`, with 0
 	// when Headroom hides the header, so that the stylesheet can add the gap.
-	// Quarto sends `quarto-hrChanged` after each update except the first, so
-	// the script also runs once after Quarto's own DOMContentLoaded handler.
+	// Quarto sets `data-bs-offset` on the body at each update, the first one
+	// included, but sends no event for the first one. So the script watches
+	// that attribute. The call on DOMContentLoaded gives 0 to a page with no
+	// header, where Quarto does not set the attribute before it scrolls.
 	// Remove when: never, because Atelier makes the floating sidebar a card.
 	(function () {
 		var update = function () {
@@ -22,6 +24,9 @@
 			document.documentElement.style.setProperty("--atelier-header-offset", offset + "px");
 		};
 		document.addEventListener("DOMContentLoaded", update);
-		window.addEventListener("quarto-hrChanged", update);
+		new MutationObserver(update).observe(document.body, {
+			attributes: true,
+			attributeFilter: ["data-bs-offset"],
+		});
 	})();
 </script>
