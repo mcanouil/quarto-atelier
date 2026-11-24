@@ -214,6 +214,8 @@ The default summary is "Show the solution".
 In a Reveal.js deck in workshop mode, each solution goes into the veil group `solutions`.
 The reader can then hide or show all the solutions of the deck with the veil controls.
 A solution with its own `.veil` class or its own `group` attribute keeps them.
+If the deck declares groups under `extensions.veil.groups`, declare `solutions` there too.
+Veil warns about a group that the deck uses but does not declare.
 
 ```markdown
 ::: {.solution title="Solution"}
