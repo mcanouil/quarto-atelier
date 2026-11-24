@@ -1,0 +1,27 @@
+<script id="sidebar-offset" type="text/javascript">
+	/**
+	 * @license MIT
+	 * @copyright 2026 Mickaël Canouil
+	 * @author Mickaël Canouil
+	 */
+	// A floating sidebar is a card, and the card keeps a gap from the header.
+	// Quarto writes the header height only as inline `top` and `max-height`
+	// values on the sidebar, which a stylesheet cannot read. This script copies
+	// the offset that Quarto computes into `--atelier-header-offset`, with 0
+	// when Headroom hides the header, so that the stylesheet can add the gap.
+	// Quarto sends `quarto-hrChanged` after each update except the first, so
+	// the script also runs once after Quarto's own DOMContentLoaded handler.
+	// Remove when: never, because Atelier makes the floating sidebar a card.
+	(function () {
+		var update = function () {
+			var sidebar = document.getElementById("quarto-sidebar");
+			if (!sidebar || !document.body.classList.contains("floating")) return;
+			var offset = sidebar.classList.contains("sidebar-unpinned")
+				? 0
+				: Number(document.body.getAttribute("data-bs-offset")) || 0;
+			document.documentElement.style.setProperty("--atelier-header-offset", offset + "px");
+		};
+		document.addEventListener("DOMContentLoaded", update);
+		window.addEventListener("quarto-hrChanged", update);
+	})();
+</script>

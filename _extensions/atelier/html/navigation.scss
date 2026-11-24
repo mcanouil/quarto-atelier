@@ -504,6 +504,35 @@ body.floating .sidebar.sidebar-navigation {
   }
 }
 
+// The floating card and the table of contents card float with the same gap,
+// under the header, under the title banner, and above the viewport bottom and
+// the footer. Quarto writes `top` and `max-height` inline on the sidebar from
+// the header height, so the card overrides them with `!important` and reads
+// the offset from `--atelier-header-offset`, which the sidebar-offset script
+// sets. A docked sidebar is a bar, and stays flush.
+// Remove when: never, because Atelier makes the floating sidebar a card.
+$atelier-side-card-gap: 14px;
+
+:root {
+  --atelier-side-card-gap: #{$atelier-side-card-gap};
+}
+
+#quarto-margin-sidebar {
+  padding-top: var(--atelier-side-card-gap);
+}
+
+@include media-breakpoint-up(lg) {
+  body.floating #quarto-sidebar.sidebar-navigation {
+    top: calc(var(--atelier-header-offset, 0px) + var(--atelier-side-card-gap)) !important;
+    max-height: calc(100vh - var(--atelier-header-offset, 0px) - 2 * var(--atelier-side-card-gap)) !important;
+    margin-block: var(--atelier-side-card-gap);
+  }
+
+  #quarto-margin-sidebar {
+    padding-bottom: var(--atelier-side-card-gap);
+  }
+}
+
 // Until the icon font loads, the sidebar chevron is a fallback glyph of
 // another width, so the chevron moves sideways when the font comes. The box
 // keeps the width of the icon glyph, which is one em, from the first paint.
