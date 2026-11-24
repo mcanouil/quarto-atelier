@@ -1,0 +1,30 @@
+<script id="sidebar-offset" type="text/javascript">
+	/**
+	 * @license MIT
+	 * @copyright 2026 Mickaël Canouil
+	 * @author Mickaël Canouil
+	 */
+	// Copy the header offset that Quarto computes into `--atelier-header-offset`,
+	// with 0 when Headroom hides the header, so that the floating sidebar card
+	// can keep its gap. Quarto gives the offset only as inline styles. It sets
+	// `data-bs-offset` on the body at each update, but sends no event for the
+	// first one, so the script watches that attribute.
+	// Remove when: never, because Atelier makes the floating sidebar a card.
+	(function () {
+		var sidebar = document.getElementById("quarto-sidebar");
+		if (!sidebar || !document.body.classList.contains("floating")) return;
+		var root = document.documentElement;
+		var last = null;
+		new MutationObserver(function () {
+			var offset = sidebar.classList.contains("sidebar-unpinned")
+				? 0
+				: Number(document.body.getAttribute("data-bs-offset")) || 0;
+			if (offset === last) return;
+			last = offset;
+			root.style.setProperty("--atelier-header-offset", offset + "px");
+		}).observe(document.body, {
+			attributes: true,
+			attributeFilter: ["data-bs-offset"],
+		});
+	})();
+</script>

@@ -182,6 +182,7 @@ contributes:
         - file: html/scripts/a11y-fixes.html
         - file: html/scripts/navbar-tooltips.html
         - file: html/scripts/header-scroll.html
+        - file: html/scripts/sidebar-offset.html
         - file: html/scripts/chrome.html
         - file: html/scripts/reading-bar.html
         - file: html/scripts/course.html

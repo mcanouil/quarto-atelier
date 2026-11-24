@@ -6,6 +6,7 @@
 - feat: Embed the cascade, codefrag, tabset, a11y, typst-render, typst-extras and portable-links extensions. (#145)
 - fix: A `body-bg` brand default that is a Sass expression, such as `$gray-100`, no longer goes into the `theme-color` tags. (#146)
 - feat: The solutions of a Reveal.js deck in workshop mode go into the veil group `solutions`, so the reader can hide or show them. (#147)
+- fix: A floating sidebar now keeps the same gap as the table of contents card, under the header, under the title banner and above the footer, so its rounded corners stay visible. (#149)
 
 ## 0.15.3 (2026-11-23)
 
