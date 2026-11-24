@@ -10,27 +10,21 @@
 --- reader returns plain data, and the writer of each format turns that data
 --- into its output. This module writes no output.
 
---- The directory of this file, so that the module loads its neighbours from
---- any filter that requires it.
-local HERE = debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or './'
-
-local str = dofile(HERE .. '../_vendor/quarto-lua-modules/string.lua')
-local log = dofile(HERE .. '../_vendor/quarto-lua-modules/logging.lua')
-local meta_mod = dofile(HERE .. '../_vendor/quarto-lua-modules/metadata.lua')
+local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
+local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
+local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
 --- Modes that `extensions.atelier.mode` accepts.
 --- @type string
-M.MODE_DOCUMENTATION = 'documentation'
+local MODE_DOCUMENTATION = 'documentation'
 --- @type string
 M.MODE_WORKSHOP = 'workshop'
 
 --- Name that prefixes each warning.
 --- @type string
-M.EXTENSION_NAME = 'atelier'
-
-local EXTENSION_NAME = M.EXTENSION_NAME
+local EXTENSION_NAME = 'atelier'
 
 --- Page file extensions whose front matter holds a duration, in lower case.
 --- @type table<string, boolean>
@@ -199,10 +193,10 @@ end
 function M.read_mode(meta, source, quiet)
   local value = M.read_options(meta).mode
   if value == nil then
-    return M.MODE_DOCUMENTATION
+    return MODE_DOCUMENTATION
   end
   local text = strip_rewrite(pandoc.utils.stringify(value))
-  if text == M.MODE_DOCUMENTATION or text == M.MODE_WORKSHOP then
+  if text == MODE_DOCUMENTATION or text == M.MODE_WORKSHOP then
     return text
   end
   if not quiet then
@@ -212,7 +206,7 @@ function M.read_mode(meta, source, quiet)
       '\' in ' .. source .. '. Using documentation.'
     )
   end
-  return M.MODE_DOCUMENTATION
+  return MODE_DOCUMENTATION
 end
 
 -- ============================================================================
@@ -634,23 +628,23 @@ end
 --- A block with no bullet list logs a warning.
 --- @param div pandoc.Div The `.objectives` div
 --- @param model table The page model
---- @return { title: string, time: string|nil, blocks: pandoc.Blocks, list: integer|nil } The block: `list` is the position of the objectives list in `blocks`
+--- @return { title: string, time: string|nil, blocks: pandoc.Blocks, list: pandoc.BulletList|nil } The block: `list` is the objectives list, one of `blocks`
 function M.objectives(div, model)
   local time = attribute_duration(div, 'objectives', model.labels)
   if div.attributes.duration == nil and model.duration ~= nil then
     time = M.format_duration(model.duration, model.labels)
   end
   local list = nil
-  for position, block in ipairs(div.content) do
+  for _, block in ipairs(div.content) do
     if block.t == 'BulletList' then
-      list = position
+      list = block
       break
     end
   end
   if list == nil then
     log.log_warning(
       EXTENSION_NAME,
-      'The .objectives block in ' .. (quarto.doc.input_file or '') .. ' has no bullet list, so it shows no checkboxes. ' ..
+      'The .objectives block in ' .. (quarto.doc.input_file or '') .. ' has no bullet list, so it lists no objectives. ' ..
       'Write each objective as an item of a bullet list.'
     )
   end

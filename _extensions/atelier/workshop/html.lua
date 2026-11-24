@@ -14,10 +14,8 @@
 --- block, objective checkboxes, a `<details>` solution, and a terminal code
 --- block for the code-blocks script.
 
-local HERE = debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or './'
-
-local str = dofile(HERE .. '../_vendor/quarto-lua-modules/string.lua')
-local core = dofile(HERE .. 'core.lua')
+local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
+local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -56,7 +54,7 @@ function M.publish(meta, model)
     end
     -- An unlisted page gets no workshop bar, so its CSS must not reserve the bar row.
     local classes = '"atelier-workshop"'
-    if not data.listed then
+    if not course.listed then
       classes = classes .. ', "atelier-workshop-unlisted"'
     end
     quarto.doc.include_text(
@@ -161,8 +159,8 @@ end
 local function objectives_block(div, model)
   local block = core.objectives(div, model)
   local body = pandoc.Blocks({})
-  for position, content in ipairs(block.blocks) do
-    if position == block.list then
+  for _, content in ipairs(block.blocks) do
+    if content == block.list then
       body:extend(objective_labels(content))
     else
       body:insert(content)
