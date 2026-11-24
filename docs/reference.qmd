@@ -308,6 +308,8 @@ A button at the bottom left of the page opens the Veil panel, and the `u` key al
 In the panel, each group has a switch that shows or hides its content.
 A group that you do not declare starts shown.
 To set the order, the labels, the levels, or the start state of the groups, declare them under `extensions.veil.groups`.
+In workshop mode, the solutions of a Reveal.js deck are in the group `solutions`.
+If such a deck declares groups, declare `solutions` too.
 The [Veil documentation](https://m.canouil.dev/quarto-veil/) lists all of the options.
 
 ### Upgrade from separate copies
