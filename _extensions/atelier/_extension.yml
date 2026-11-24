@@ -86,6 +86,10 @@ contributes:
           at: pre-ast
         - path: bundled/preview-colour.lua
           at: post-quarto
+        # Runs just before veil, which reads the `.veil` class that it adds to
+        # the solutions of a Reveal.js workshop deck.
+        - path: atelier-workshop-veil.lua
+          at: pre-quarto
         - path: bundled/veil.lua
           at: pre-quarto
         - path: bundled/typst-render.lua

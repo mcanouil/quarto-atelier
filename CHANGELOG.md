@@ -5,6 +5,7 @@
 - feat: Run the embedded extensions in Typst and Reveal.js as well as HTML, so the `iconify` shortcode no longer fails in Typst. (#145)
 - feat: Embed the cascade, codefrag, tabset, a11y, typst-render, typst-extras and portable-links extensions. (#145)
 - fix: A `body-bg` brand default that is a Sass expression, such as `$gray-100`, no longer goes into the `theme-color` tags. (#146)
+- feat: The solutions of a Reveal.js deck in workshop mode go into the veil group `solutions`, so the reader can hide or show them. (#147)
 
 ## 0.15.3 (2026-11-23)
 
