@@ -467,8 +467,9 @@ body:is(.docked, .floating) .sidebar-navigation .sidebar-search {
   }
 }
 
-// The floating card and the table of contents card float with the same gap,
-// which the table of contents column takes as its padding.
+// The floating card and the table of contents card float with the same gap.
+// The table of contents column takes it as its padding, in place of Quarto's
+// 1em, on every sidebar style. At the default font size the two are equal.
 :root {
   --atelier-side-card-gap: 14px;
 }
