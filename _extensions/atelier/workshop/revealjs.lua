@@ -148,6 +148,8 @@ function M.proof(proof, model)
     title = language_text('solution-title')
   end
   local result = block(solution.div, 'solution', nil, title, nil, solution.div.content)
+  -- Quarto moves the identifier of the div to the `Proof` node.
+  result.identifier = solution.identifier
   if not result.classes:includes('veil') then
     result.classes:insert('veil')
     if result.attributes.group == nil then
