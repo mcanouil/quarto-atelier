@@ -144,12 +144,15 @@
 #let atelier-callout-icon(type, ink, size) = context {
   let cap = measure(text(top-edge: "cap-height", bottom-edge: "baseline", "H")).height
   let glyph = atelier-callout-glyphs.at(type)
+  // The tick is drawn in the coordinates of the ring, so it is placed at the
+  // top left. A glyph box spans the cap band and the advance of the glyph,
+  // so it is centred; tracking would widen one side only.
   let mark = if glyph == none {
-    atelier-callout-check(size, ink)
+    place(top + left, atelier-callout-check(size, ink))
   } else {
-    text(fill: ink, size: size * 0.6, weight: "black", tracking: -0.05em, top-edge: "cap-height", bottom-edge: "baseline", glyph)
+    place(center + horizon, text(fill: ink, size: size * 0.6, weight: "black", top-edge: "cap-height", bottom-edge: "baseline", glyph))
   }
-  let ring = box(width: size, height: size, radius: 50%, stroke: 1pt + ink, place(center + horizon, mark))
+  let ring = box(width: size, height: size, radius: 50%, stroke: 1pt + ink, mark)
   box(baseline: (size - cap) / 2, pdf.artifact(ring))
 }
 
