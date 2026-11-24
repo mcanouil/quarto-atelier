@@ -241,8 +241,8 @@ end
 -- ============================================================================
 
 --- What the block handlers read: the title of the deck, the background of
---- the section slides and whether it is dark, and the background of the dark
---- slides. `publish` fills it.
+--- the section slides and whether it is dark, and the backgrounds of the dark
+--- slides and of the dark section slides. `publish` fills it.
 --- @type table
 local deck = {}
 
@@ -257,6 +257,7 @@ local function publish(meta)
   deck.section_bg = palette.hex(tokens['navbar-bg'], tokens.bg)
   deck.section_dark = palette.tone(tokens['navbar-bg']) == 'dark'
   deck.dark_bg = palette.hex(dark.bg, dark.bg)
+  deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
   quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark))
   return nil
 end
@@ -294,20 +295,23 @@ local function set_background(attr, colour)
 end
 
 --- Mark the section slides and the dark slides. Reveal.js paints the
---- background of a slide on its own layer, so each one gets its colour.
+--- background of a slide on its own layer, so each one gets its colour. A
+--- section slide with the `dark` class takes the dark tokens, so it gets the
+--- section colour of the dark scheme.
 --- @param header pandoc.Header
 --- @return pandoc.Header|nil
 local function mark_slide(header)
+  local dark = header.classes:includes(DARK_CLASS)
   if header.level == 1 then
     add_class(header.attr, SECTION_CLASS)
-    add_state(header.attr, SECTION_STATE)
-    set_background(header.attr, deck.section_bg)
-    if deck.section_dark then
+    add_state(header.attr, dark and DARK_STATE or SECTION_STATE)
+    set_background(header.attr, dark and deck.dark_section_bg or deck.section_bg)
+    if dark or deck.section_dark then
       add_class(header.attr, DARK_BACKGROUND_CLASS)
     end
     return header
   end
-  if header.classes:includes(DARK_CLASS) then
+  if dark then
     set_background(header.attr, deck.dark_bg)
     add_class(header.attr, DARK_BACKGROUND_CLASS)
     add_state(header.attr, DARK_STATE)
