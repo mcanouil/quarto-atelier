@@ -5,9 +5,9 @@
 --- @author Mickaël Canouil
 --- @brief Publish the workshop mode, page duration, and blocks of a page.
 --- @description Reads the page model with `workshop/core.lua` in every
---- format, then gives the page and its blocks to the writer of the format.
---- Only HTML has a writer, `workshop/html.lua`; in the other formats the
---- blocks stay as they are.
+--- format, then gives the page and its blocks to the writer of the format:
+--- `workshop/html.lua` for HTML and `workshop/typst.lua` for Typst. In the
+--- other formats, Reveal.js included, the blocks stay as they are.
 
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local html = require(quarto.utils.resolve_path('workshop/html.lua'):gsub('%.lua$', ''))
