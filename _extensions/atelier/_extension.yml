@@ -193,9 +193,28 @@ contributes:
         - file: html/scripts/listings.html
         - file: html/scripts/table-scroll.html
     typst:
+      papersize: a4
+      margin:
+        x: 20mm
+        y: 25mm
+      # Typst cannot read the WOFF2 files, so `fonts/` also holds static TTF
+      # cuts of the Atelier fonts.
+      font-paths: fonts
+      pdf-standard: ua-1
       filters:
+        - atelier-typst.lua
         - path: bundled/typst-extras.lua
           at: post-quarto
+      template-partials:
+        - typst/tokens.typ
+        - typst/motifs.typ
+        - typst/elements.typ
+        - typst/chrome.typ
+        - typst/title.typ
+        - typst/toc.typ
+        - typst/workshop.typ
+        - typst/typst-template.typ
+        - typst/typst-show.typ
     revealjs:
       revealjs-plugins:
         - a11y

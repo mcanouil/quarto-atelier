@@ -5,12 +5,13 @@
 --- @author Mickaël Canouil
 --- @brief Publish the workshop mode, page duration, and blocks of a page.
 --- @description Reads the page model with `workshop/core.lua` in every
---- format, then gives the page and its blocks to the writer of the format.
---- Only HTML has a writer, `workshop/html.lua`; in the other formats the
---- blocks stay as they are.
+--- format, then gives the page and its blocks to the writer of the format:
+--- `workshop/html.lua` for HTML and `workshop/typst.lua` for Typst. In the
+--- other formats, Reveal.js included, the blocks stay as they are.
 
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local html = require(quarto.utils.resolve_path('workshop/html.lua'):gsub('%.lua$', ''))
+local typst = require(quarto.utils.resolve_path('workshop/typst.lua'):gsub('%.lua$', ''))
 
 --- The page model that the block handlers read.
 --- `publish_workshop` fills it in the first filter pass.
@@ -27,6 +28,8 @@ local writer = nil
 local function format_writer()
   if quarto.doc.is_format('html') and not quarto.doc.is_format('revealjs') then
     return html
+  elseif quarto.doc.is_format('typst') then
+    return typst
   end
   return nil
 end
@@ -43,9 +46,10 @@ local function publish_workshop(meta)
   return writer.publish(meta, model)
 end
 
---- Two filter tables: pandoc finishes the `Meta` pass before the `Div` pass
---- starts, so the model is complete when the block handlers read it. One
---- table gives no such order between element types.
+--- Filter tables run one after the other: pandoc finishes the `Meta` pass
+--- before the `Div` pass starts, so the model is complete when the block
+--- handlers read it. One table gives no such order between element types.
+--- A writer can also finish the document after the blocks.
 return {
   { Meta = publish_workshop },
   {
@@ -57,6 +61,11 @@ return {
     end,
     CodeBlock = function(block)
       return writer and writer.code_block(block, model)
+    end,
+  },
+  {
+    Pandoc = function(doc)
+      return writer and writer.finish and writer.finish(doc, model)
     end,
   },
 }

@@ -177,7 +177,7 @@ end
 -- Remove when: the minimum Quarto version includes the fix.
 --- @param value string The value as the filter reads it
 --- @return string The value without the leading `../` and `./` segments
-local function strip_rewrite(value)
+function M.strip_rewrite(value)
   local text, count = value, 1
   while count > 0 do
     text, count = text:gsub('^%.%.?/', '')
@@ -195,7 +195,7 @@ function M.read_mode(meta, source, quiet)
   if value == nil then
     return MODE_DOCUMENTATION
   end
-  local text = strip_rewrite(pandoc.utils.stringify(value))
+  local text = M.strip_rewrite(pandoc.utils.stringify(value))
   if text == MODE_DOCUMENTATION or text == M.MODE_WORKSHOP then
     return text
   end
@@ -397,7 +397,7 @@ local function find_sidebar(options, page)
       local paths = collect_paths(sidebar.contents, base, {})
       for _, path in ipairs(paths) do
         if path == page then
-          return strip_rewrite(pandoc.utils.stringify(sidebar.id or '')), paths
+          return M.strip_rewrite(pandoc.utils.stringify(sidebar.id or '')), paths
         end
       end
     end
@@ -680,6 +680,14 @@ function M.exercise(div, model)
   }
 end
 
+--- Tell whether a `Proof` node is a solution: Quarto's `Proof` of type
+--- `Solution`, from a `.solution` div or a `sol-` identifier.
+--- @param proof table The `Proof` node
+--- @return boolean
+function M.is_solution(proof)
+  return pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
+end
+
 --- Tell whether a `Proof` node is a workshop solution, which the workshop
 --- hides. Quarto turns a `.solution` div into a `Proof` node of type
 --- `Solution` before the `pre-quarto` filters run, and removes the class.
@@ -691,7 +699,7 @@ function M.is_workshop_solution(proof)
   if (proof.identifier or ''):find('^sol%-') then
     return false
   end
-  return pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
+  return M.is_solution(proof)
 end
 
 --- Read a solution from the `Proof` node that Quarto makes of a `.solution`
