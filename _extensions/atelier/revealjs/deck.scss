@@ -511,24 +511,18 @@ $code-block-font-size: 0.6em !default;
 // In workshop mode, the title slide and the section slides have the motif of
 // the preset in the top right corner of the window. Reveal.js scales the
 // slide to fit the window, centres it, and centres the content of a slide,
-// so a corner of the slide is not a corner of the window. The motif sits on
-// the background layer, which covers the window, when the current slide has
-// the state `atelier-motif-state`, and takes the size of the slide: 30% of
-// its width, 45% on a section slide. `atelier-revealjs.lua` sets the state
-// and writes the mask and its colour, from the palette. The motif only
-// decorates: a pseudo-element with no text, which forced colours remove.
+// so a corner of the slide is not a corner of the window. Reveal.js copies
+// the classes of a slide to its background, which covers the window, moves
+// with the slide, and fills each page of the PDF export, so the motif sits
+// on the background of each slide with the class `atelier-motif`, at the
+// size of the slide: 30% of its width, 45% on a section slide.
+// `atelier-revealjs.lua` adds the class and writes the mask and its colour,
+// from the palette. The motif only decorates: a pseudo-element with no text,
+// which forced colours remove.
 
-// Reveal.js lifts the background of the current slide with a z-index, so the
-// layer becomes a stacking context of its own, still under the slides, and
-// the motif goes above the slide backgrounds inside it.
-.atelier-motif-state .reveal .backgrounds {
-  z-index: 0;
-}
-
-.atelier-motif-state .reveal .backgrounds::after {
+.reveal .slide-background.atelier-motif::after {
   content: "";
   position: absolute;
-  z-index: 3;
   top: 0;
   right: 0;
   width: calc(var(--slide-width, 1280px) * var(--atelier-motif-size, 0.3) * var(--slide-scale, 1));
@@ -541,13 +535,12 @@ $code-block-font-size: 0.6em !default;
   mask-size: contain;
 }
 
-.atelier-motif-state.atelier-section-state,
-.atelier-motif-state.atelier-dark-state {
+.reveal .slide-background.atelier-motif.atelier-section {
   --atelier-motif-size: 0.45;
 }
 
 @media (forced-colors: active) {
-  .atelier-motif-state .reveal .backgrounds::after {
+  .reveal .slide-background.atelier-motif::after {
     display: none;
   }
 }

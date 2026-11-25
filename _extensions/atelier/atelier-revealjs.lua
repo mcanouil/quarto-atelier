@@ -86,12 +86,12 @@ local DARK_BACKGROUND_CLASS = 'has-dark-background'
 --- @type string
 local SECTION_CLASS = 'atelier-section'
 
---- The `data-state` of a slide that shows the motif, in workshop mode: the
---- title slide and the section slides. Reveal.js puts the state of the
---- current slide on the viewport, so the motif can sit on the background
---- layer, which covers the window.
+--- The class of a slide that shows the motif, in workshop mode: the title
+--- slide and the section slides. Reveal.js copies the classes of a slide to
+--- its background, which covers the window and moves with the slide, and
+--- which the PDF export draws on each page, so the motif sits on it.
 --- @type string
-local MOTIF_STATE = 'atelier-motif-state'
+local MOTIF_CLASS = 'atelier-motif'
 
 -- ============================================================================
 -- CSS
@@ -220,21 +220,21 @@ end
 --- its colour and opacity on the title slide, on the section slides and on
 --- the dark section slides, after the surface that `mark_slide` paints. A
 --- light surface takes the mark at `motifs.LIGHT_OPACITY`, and a dark one the
---- ink, or the chrome mark on a section slide. The motif sits on the
---- background layer, outside the slide, so the colours are written as they
---- resolve, not as the tokens of a slide.
+--- ink, or the chrome mark on a section slide. The motif sits on the slide
+--- background, outside the slide, so the colours are written as they resolve,
+--- not as the tokens of a slide.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
 --- @return string[]
 local function motif_rules(scheme, tokens, dark)
   local preset = palette.preset(palette.painted_scheme(scheme))
-  local state = '.' .. MOTIF_STATE
-  local lines = { state .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
+  local background = '.reveal .slide-background.' .. MOTIF_CLASS
+  local lines = { background .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
   local surfaces = {
-    { scope = state, palette = tokens, surface = 'bg', light = 'accent-mark', dark = 'accent-ink' },
-    { scope = state .. '.' .. SECTION_STATE, palette = tokens, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
-    { scope = state .. '.' .. DARK_STATE, palette = dark, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
+    { scope = background, palette = tokens, surface = 'bg', light = 'accent-mark', dark = 'accent-ink' },
+    { scope = background .. '.' .. SECTION_CLASS, palette = tokens, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
+    { scope = background .. '.' .. SECTION_CLASS .. '.' .. DARK_CLASS, palette = dark, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
   }
   for _, entry in ipairs(surfaces) do
     local values = entry.palette
@@ -309,10 +309,8 @@ local function publish(meta)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
   quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop))
   if deck.workshop then
-    local attributes = meta['title-slide-attributes'] or {}
-    local states = attributes['data-state'] and pandoc.utils.stringify(attributes['data-state']) or ''
-    attributes['data-state'] = pandoc.MetaString(states == '' and MOTIF_STATE or (states .. ' ' .. MOTIF_STATE))
-    meta['title-slide-attributes'] = attributes
+    -- `revealjs/title-slide.html` adds the motif class to the title slide.
+    meta['atelier-motif'] = true
     return meta
   end
   return nil
@@ -362,7 +360,7 @@ local function mark_slide(header)
     add_class(header.attr, SECTION_CLASS)
     add_state(header.attr, dark and DARK_STATE or SECTION_STATE)
     if deck.workshop then
-      add_state(header.attr, MOTIF_STATE)
+      add_class(header.attr, MOTIF_CLASS)
     end
     set_background(header.attr, dark and deck.dark_section_bg or deck.section_bg)
     if dark or deck.section_dark then
