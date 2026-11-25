@@ -168,29 +168,141 @@ $code-block-font-size: 0.6em !default;
   font-family: var(--atelier-font-base, var(--r-main-font));
 }
 
-.reveal .footer.atelier-footer {
+// THE BOTTOM ROW
+// The menu button, the chalkboard buttons and the footer sit in one row for
+// the whole deck: each item is a box of the row height at the same bottom,
+// so all items have the same centre line. `atelier-revealjs.lua` writes
+// `--atelier-row-left`, the start of the title slot, from the buttons that
+// the format options turn on.
+// The plugin stylesheets of Quarto load after the theme, so the rules of the
+// row repeat `.reveal` to win over them.
+// Remove when: never.
+:root {
+  --atelier-row-height: 40px;
+  --atelier-row-bottom: 12px;
+  --atelier-row-edge: 12px;
+  --atelier-hit: 32px;
+  --atelier-icon: 22px;
+}
+
+@media screen and (max-width: 800px) {
+  :root {
+    --atelier-row-height: 32px;
+    --atelier-row-bottom: 10px;
+    --atelier-row-edge: 10px;
+    --atelier-hit: 26px;
+    --atelier-icon: 18px;
+  }
+}
+
+.reveal.reveal :is(.slide-menu-button, .slide-chalkboard-buttons) {
+  position: fixed;
+  bottom: var(--atelier-row-bottom);
   display: flex;
-  gap: 1.5em;
-  left: 56px;
-  right: 120px;
-  bottom: 12px;
-  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  height: var(--atelier-row-height);
+  margin: 0;
+  line-height: 0;
+}
+
+.reveal.reveal .slide-menu-button {
+  left: var(--atelier-row-edge);
+}
+
+.reveal.reveal .slide-chalkboard-buttons {
+  left: var(--atelier-row-edge);
+}
+
+.reveal.reveal .slide-chalkboard-buttons.slide-menu-offset {
+  left: calc(var(--atelier-row-edge) + var(--atelier-hit) + 4px);
+}
+
+.reveal.reveal .slide-menu-button a,
+.reveal.reveal .slide-chalkboard-buttons > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--atelier-hit);
+  height: var(--atelier-hit);
+  margin: 0;
+}
+
+.reveal :is(.slide-menu-button, .slide-chalkboard-buttons) .fas {
+  display: block;
+  line-height: 0;
+}
+
+// Quarto sets `display` inline on the footer, to show it or the footer of a
+// slide. The row inside the footer holds the layout, so that toggle works.
+.reveal.reveal .footer.atelier-footer {
+  left: 0;
+  right: 0;
+  bottom: var(--atelier-row-bottom);
+  width: auto;
+  height: var(--atelier-row-height);
+  margin: 0;
   color: var(--atelier-muted);
   font-family: var(--atelier-font-base, var(--r-main-font));
+  pointer-events: none;
+}
+
+// The footer of one slide replaces the footer of the deck. It takes the same
+// row, centred, in the colours of the deck.
+.reveal.reveal > .footer:not(.atelier-footer) {
+  left: 0;
+  right: 0;
+  bottom: var(--atelier-row-bottom);
+  width: auto;
+  height: var(--atelier-row-height);
+  margin: 0;
+  color: var(--atelier-muted);
+  font-family: var(--atelier-font-base, var(--r-main-font));
+  line-height: var(--atelier-row-height);
+  text-align: center;
+}
+
+.reveal .footer.atelier-footer a {
+  pointer-events: auto;
+}
+
+// The side columns of the row are at least as wide as the left buttons, so
+// the centre slot stays at the centre and never runs into them. On a narrow
+// screen, the title slot can have no room left, and it does not show.
+.reveal .footer .atelier-footer-row {
+  display: grid;
+  grid-template-columns: minmax(var(--atelier-row-left), 1fr) auto minmax(var(--atelier-row-left), 1fr);
+  align-items: center;
+  column-gap: 24px;
+  height: 100%;
+  line-height: 1.2;
   text-align: left;
 }
 
-.reveal .footer.atelier-footer p {
-  display: contents;
+.reveal .footer .atelier-slot-left {
+  grid-column: 1;
+  box-sizing: border-box;
+  min-width: 0;
+  padding-left: var(--atelier-row-left);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .reveal .footer .atelier-slot-centre {
-  flex: 1;
+  grid-column: 2;
   text-align: center;
+  white-space: nowrap;
 }
 
 .reveal .footer .atelier-slot-centre:empty {
   visibility: hidden;
+}
+
+.reveal .footer .atelier-slot-logo {
+  grid-column: 3;
+  justify-self: end;
+  margin-right: var(--atelier-row-edge);
 }
 
 .atelier-section-state .reveal :is(.footer, .slide-number, .slide-number a, .controls, .slide-menu-button a) {

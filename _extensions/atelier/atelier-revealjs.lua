@@ -14,8 +14,8 @@
 --- The rules of `revealjs/deck.scss` read these properties.
 --- The filter gives each level-1 heading the section slide class, each
 --- `.dark` slide its background, the title slide its class, and the footer
---- its slots: the title on the left, the footer of the author in the centre,
---- and the slide number of Reveal.js on the right.
+--- one row of slots: the title on the left, the footer of the author in the
+--- centre, and the logo slot on the right.
 
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
@@ -248,14 +248,40 @@ local function motif_rules(scheme, tokens, dark)
   return lines
 end
 
+--- The number of buttons at the left of the bottom row: the menu button,
+--- unless `menu` is false, and the two chalkboard buttons, when `chalkboard`
+--- is set.
+--- @param meta table
+--- @return integer
+local function left_buttons(meta)
+  local count = 0
+  if meta.menu == nil or meta.menu ~= false then
+    count = count + 1
+  end
+  if meta.chalkboard ~= nil and meta.chalkboard ~= false then
+    count = count + 2
+  end
+  return count
+end
+
+--- The start of the title slot of the footer: the edge, one hit box and a
+--- 4px gap for each button at the left of the bottom row, and 12px.
+--- @param buttons integer
+--- @return string
+local function row_left(buttons)
+  return string.format('calc(var(--atelier-row-edge) + %d * (var(--atelier-hit) + 4px) + 12px)', buttons)
+end
+
 --- The style element of the deck.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
 --- @param workshop boolean True in workshop mode, which adds the motif
+--- @param buttons integer The number of buttons at the left of the bottom row
 --- @return string
-local function deck_style(scheme, tokens, dark, workshop)
+local function deck_style(scheme, tokens, dark, workshop, buttons)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
+  lines[#lines + 1] = '  --atelier-row-left: ' .. row_left(buttons) .. ';'
   for _, line in ipairs(token_declarations(tokens)) do
     lines[#lines + 1] = line
   end
@@ -307,7 +333,7 @@ local function publish(meta)
   deck.dark_bg = palette.hex(dark.bg, dark.bg)
   deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
-  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop))
+  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop, left_buttons(meta)))
   if deck.workshop then
     -- `revealjs/title-slide.html` adds the motif class to the title slide.
     meta['atelier-motif'] = true
@@ -378,8 +404,9 @@ local function mark_slide(header)
 end
 
 --- Fill the slots of the footer that Quarto adds to the deck. The footer of
---- the author goes in the centre slot, the title of the deck in the left one.
---- The slide number of Reveal.js sits in the right corner.
+--- the author goes in the centre slot, the title of the deck in the left one,
+--- and the logo slot stays at the right. The slots sit in one row inside the
+--- footer, so Quarto can still show or hide the footer itself.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 local function fill_footer(div)
@@ -387,11 +414,18 @@ local function fill_footer(div)
     return nil
   end
   local own = pandoc.utils.blocks_to_inlines(div.content)
+  local slot = function(name, content, attributes)
+    return pandoc.Span(content, pandoc.Attr('', { 'atelier-slot', 'atelier-slot-' .. name }, attributes or {}))
+  end
   div.content = pandoc.Blocks({
-    pandoc.Plain({
-      pandoc.Span(pandoc.Inlines(deck.title), pandoc.Attr('', { 'atelier-slot', 'atelier-slot-left' })),
-      pandoc.Span(own, pandoc.Attr('', { 'atelier-slot', 'atelier-slot-centre' })),
-    }),
+    pandoc.Div(
+      pandoc.Plain({
+        slot('left', pandoc.Inlines(deck.title), { title = deck.title }),
+        slot('centre', own),
+        slot('logo', {}),
+      }),
+      pandoc.Attr('', { 'atelier-footer-row' })
+    ),
   })
   add_class(div.attr, 'atelier-footer')
   return div
