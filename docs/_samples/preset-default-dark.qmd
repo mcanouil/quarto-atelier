@@ -1,0 +1,13 @@
+---
+title: "Field notes on river sampling"
+subtitle: "Results of the spring survey"
+author: Ana Diaz
+brand: _brand-default.yml
+brand-mode: dark
+format:
+  atelier-typst: default
+  atelier-revealjs:
+    output-file: preset-default-dark-slides.html
+---
+
+{{< include _preset-body.qmd >}}

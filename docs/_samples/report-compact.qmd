@@ -1,0 +1,46 @@
+---
+title: "Field notes on river sampling"
+subtitle: "A short report in the compact layout"
+author: Ana Diaz
+format: atelier-typst
+toc: true
+---
+
+# Method
+
+We took water samples at four sites along the river, once a week for six weeks.
+Each sample went to the laboratory on the same day.
+
+| Site | Distance (km) | Samples |
+|------|--------------:|--------:|
+| Weir | 0.0 | 6 |
+| Mill | 2.4 | 6 |
+| Ford | 5.1 | 6 |
+| Mouth | 9.8 | 6 |
+
+: Sampling sites.
+
+```python
+import polars as pl
+
+samples = pl.read_csv("samples.csv")
+samples.group_by("site").agg(pl.col("nitrate").mean())
+```
+
+# Results
+
+Nitrate levels went up from the weir to the mouth, and the change was largest after the mill.
+The ford had the most variation between weeks.
+
+| Site | Mean nitrate (mg/L) |
+|------|--------------------:|
+| Weir | 1.8 |
+| Mill | 2.9 |
+| Ford | 3.1 |
+| Mouth | 3.4 |
+
+: Mean nitrate by site.
+
+```python
+samples.filter(pl.col("site") == "Ford").select("week", "nitrate")
+```

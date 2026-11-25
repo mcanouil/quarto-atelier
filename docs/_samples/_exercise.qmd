@@ -1,0 +1,20 @@
+::: {.exercise title="Add a page" duration="10 min"}
+
+Make a file `notes.qmd`.
+Give the file a title and one paragraph of text.
+
+:::
+
+::: {.solution title="Solution"}
+
+Write this in `notes.qmd`.
+
+```markdown
+---
+title: "Notes"
+---
+
+My first page.
+```
+
+:::

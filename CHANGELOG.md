@@ -16,7 +16,7 @@
 - feat: Add the `.prerequisites` and `.checkpoint` workshop blocks, with a label, an icon and an optional duration, in HTML, Typst and Reveal.js. (#151)
 - feat: In workshop mode, the title block or title slide shows each author as a speaker, with a photo from `extensions.atelier.speakers`. (#151)
 - feat: In workshop mode, `extensions.atelier.closing` ends the page, the handout or the deck with a thank-you, links and the licence, and a deck that cites sources gets a references slide before it. (#151)
-- feat: In workshop mode, a CRediT table shows the contribution roles of the authors, from the `role` field of `author`, at the end of a handout or a deck and on the page that sets the closing. (#151)
+- feat: In workshop mode, a CRediT table shows the contribution roles of the authors, from the `roles` field of `author`, at the end of a handout or a deck and on the page that sets the closing. (#151)
 - feat: In workshop mode, the title block, the title slide and the section slides show the motif of the preset: steps, quadrants or dots. (#151)
 - fix: The entries of a bibliography that Quarto marks as a list keep their list item role, so screen readers announce the list again. (#151)
 - fix: A Typst page no longer logs the offset-headings warning about the heading shift of Quarto.

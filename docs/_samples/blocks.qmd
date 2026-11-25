@@ -1,0 +1,78 @@
+---
+title: "Your first site"
+subtitle: "The workshop blocks"
+format:
+  atelier-html: default
+  atelier-typst: default
+  atelier-revealjs:
+    output-file: blocks-slides.html
+extensions:
+  atelier:
+    mode: workshop
+---
+
+::: {.content-visible when-format="typst"}
+
+{{< pagebreak >}}
+
+:::
+
+## Objectives
+
+::: {.objectives title="After this page, you can" duration="15 min"}
+
+- Install Quarto.
+- Read the version of Quarto in a terminal.
+
+:::
+
+{{< pagebreak >}}
+
+## Exercise
+
+::: {.exercise title="Add a page" duration="10 min"}
+
+Make a file `notes.qmd`.
+Give the file a title and one paragraph of text.
+
+:::
+
+{{< pagebreak >}}
+
+## Solution
+
+::: {.solution title="Solution"}
+
+Write this in `notes.qmd`.
+
+:::
+
+{{< pagebreak >}}
+
+## Terminal
+
+```{.bash .terminal}
+$ quarto --version
+1.12.1
+```
+
+{{< pagebreak >}}
+
+## Prerequisites
+
+::: {.prerequisites title="Before you start" duration="5 min"}
+
+- Quarto 1.12.1 or later.
+- A text editor.
+
+:::
+
+{{< pagebreak >}}
+
+## Checkpoint
+
+::: {.checkpoint duration="5 min"}
+
+The command `quarto --version` shows 1.12.1 or later.
+
+:::

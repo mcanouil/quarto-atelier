@@ -1,0 +1,12 @@
+---
+title: "Field notes on river sampling"
+subtitle: "Results of the spring survey"
+author: Ana Diaz
+brand: _brand-quarto.yml
+format:
+  atelier-typst: default
+  atelier-revealjs:
+    output-file: preset-quarto-slides.html
+---
+
+{{< include _preset-body.qmd >}}

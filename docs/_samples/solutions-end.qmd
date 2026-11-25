@@ -1,0 +1,14 @@
+---
+title: "Add a page to a site"
+subtitle: "Solutions: end"
+author: Ana Diaz
+format: atelier-typst
+extensions:
+  atelier:
+    mode: workshop
+    solutions: end
+---
+
+# Notes
+
+{{< include _exercise.qmd >}}
