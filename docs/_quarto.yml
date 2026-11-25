@@ -85,6 +85,8 @@ website:
           text: "Templates"
         - href: workshop.qmd
           text: "Workshop mode"
+        - href: formats.qmd
+          text: "Typst and Reveal.js"
         - href: brand.qmd
           text: "Brand and colours"
         - href: reference.qmd

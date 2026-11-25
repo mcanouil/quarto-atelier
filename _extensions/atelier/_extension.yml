@@ -189,6 +189,11 @@ contributes:
         - file: html/scripts/listings.html
         - file: html/scripts/table-scroll.html
     typst:
+      # The Typst template relies on the shift that Quarto applies to the
+      # headings, so the offset-headings warning about that shift has no use.
+      extensions:
+        offset-headings:
+          quarto-shift-warning: false
       papersize: a4
       margin:
         x: 20mm

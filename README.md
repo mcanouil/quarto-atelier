@@ -38,6 +38,14 @@ The order matters: the templates don't carry the extension, and if you run `quar
 
 The [templates page](https://m.canouil.dev/quarto-atelier/templates.html) lists the files of each template and what to edit first.
 
+## Formats
+
+Atelier has three formats: `atelier-html` for the site, `atelier-typst` for a PDF, and `atelier-revealjs` for a slide deck.
+They share the brand, the preset and the workshop blocks.
+List the formats in the front matter of a page, and Quarto links them from the page.
+Give the deck its own `output-file`, because a page and a deck cannot both be `index.html`.
+The [formats page](https://m.canouil.dev/quarto-atelier/formats.html) shows the options.
+
 ## Embedded extensions
 
 Atelier ships with the extensions below, so you don't install them yourself.

@@ -168,6 +168,7 @@ Select a picture to open a live demo.
 
 The project type sets `format: atelier-html`.
 Configure it by that name: declaring `format: html` replaces it rather than configuring it.
+The defaults of `atelier-typst` and `atelier-revealjs` are in [Typst and Reveal.js formats](formats.qmd).
 
 | Key                          | Value                                               |
 | ---------------------------- | --------------------------------------------------- |
@@ -332,6 +333,10 @@ Keep your options under `extensions:`: both copies read them.
 | `subtitle`             | Used for the description tags when `description` is absent.                               |
 | `description-meta`     | Used as written, in preference to both. |
 | `extensions.atelier.duration` | The `duration` of a workshop page: `25 min`, `1 h`, `1 h 30 min`, or a number of minutes. See [Modules and durations](workshop.qmd#modules-and-durations). |
+| `extensions.atelier.speakers` | A map from the `id` or the name of an author to `{photo, alt}` or to a photo path. See [Speakers](workshop.qmd#speakers). |
+| `extensions.atelier.closing` | `true`, or a map with `title`, `links`, and `licence`. Set it on the last page of a workshop only. See [Closing](workshop.qmd#closing). |
+| `extensions.atelier.solutions` | `end` (the default), `inline`, or `hide`. Where a PDF puts the solutions. See [Workshop handouts](formats.qmd#workshop-handouts). |
+| `extensions.atelier.cover`, `toc-page`, `chapter-dividers`, `chapter-contents`, `closing-page` | Report switches of `atelier-typst`, each `false` by default. See [Report switches](formats.qmd#report-switches). |
 | `canonical-url: false` | Drops the canonical link. Set it on a page served from more than one URL, like `404.qmd`. |
 
 : Front matter keys the project type reads. {.striped .hover tbl-colwidths="[24,76]"}
