@@ -158,6 +158,7 @@ It shows the slide number as "n/total" and a progress bar.
 
 The deck is light, or dark if you set `brand-mode: dark`.
 
+
 ![A content slide in a deck with brand-mode dark.](assets/gallery/formats-deck-dark.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="A content slide on a dark navy page with a heading and three bullet points in light text."}
 A reader cannot switch the colour scheme of a deck.
 Use `.dark` on single slides when you want a contrast.
