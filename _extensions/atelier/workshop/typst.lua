@@ -98,7 +98,7 @@ local function wrap(call, blocks, label)
 end
 
 --- The call of a workshop block, without its content.
---- @param kind string `objectives`, `exercise` or `solution`
+--- @param kind string `objectives`, `solution`, or a key of `core.BLOCKS`
 --- @param title string The title
 --- @param time string|nil The duration text
 --- @return string
@@ -111,7 +111,8 @@ local function block_call(kind, title, time)
   )
 end
 
---- Turn the objectives and exercise divs into blocks, in workshop mode only.
+--- Turn the objectives div and the divs of `core.BLOCKS` into blocks, in
+--- workshop mode only.
 --- @param div pandoc.Div The div
 --- @param model table The page model
 --- @return pandoc.Blocks|nil
@@ -130,9 +131,11 @@ function M.div(div, model)
       end
     end
     return wrap(block_call('objectives', block.title, block.time), body)
-  elseif div.classes:includes('exercise') then
-    local block = core.exercise(div, model)
-    return wrap(block_call('exercise', block.title, block.time), block.blocks)
+  end
+  local kind = core.block_kind(div)
+  if kind ~= nil then
+    local block = core.block(div, kind, model)
+    return wrap(block_call(kind, block.title, block.time), block.blocks)
   end
   return nil
 end

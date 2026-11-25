@@ -109,7 +109,8 @@ local function objective_list(list)
   return pandoc.BulletList(items)
 end
 
---- Turn the objectives and exercise divs into blocks, in workshop mode only.
+--- Turn the objectives div and the divs of `core.BLOCKS` into blocks, in
+--- workshop mode only.
 --- @param div pandoc.Div The div
 --- @param model table The page model
 --- @return pandoc.Div|nil
@@ -124,9 +125,11 @@ function M.div(div, model)
       body:insert(position == read.list and objective_list(content) or content)
     end
     return block(div, 'objectives', 'bullseye', read.title, read.time, body)
-  elseif div.classes:includes('exercise') then
-    local read = core.exercise(div, model)
-    return block(div, 'exercise', 'pencil-square', read.title, read.time, read.blocks)
+  end
+  local kind = core.block_kind(div)
+  if kind ~= nil then
+    local read = core.block(div, kind, model)
+    return block(div, kind, core.BLOCKS[kind], read.title, read.time, read.blocks)
   end
   return nil
 end

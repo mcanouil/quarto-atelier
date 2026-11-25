@@ -518,10 +518,13 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 // ===========================================================================
 // W1 TO W3 BLOCKS
 // ===========================================================================
-// Objectives, exercises, and solutions are blocks with a hairline border and
-// a large radius. The Lua filter writes them in workshop mode only.
+// Prerequisites, objectives, checkpoints, exercises, and solutions are blocks
+// with a hairline border and a large radius. The Lua filter writes them in
+// workshop mode only.
 
+.atelier-prerequisites,
 .atelier-objectives,
+.atelier-checkpoint,
 .atelier-exercise,
 .atelier-solution {
   margin: 1rem 0;
@@ -637,6 +640,21 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
 .atelier-exercise > .atelier-block-head {
   background: var(--atelier-workshop-bar-bg);
   color: var(--atelier-workshop-bar-fg);
+}
+
+.atelier-prerequisites > .atelier-block-head {
+  background: var(--atelier-surface-strong);
+  color: var(--atelier-fg);
+}
+
+// A checkpoint is a stop in the work: a thick start border and a head in the
+// tip colour of the callouts, with no fill.
+.atelier-checkpoint {
+  border-left: 4px solid atelier-callout-border($callout-color-tip);
+
+  > .atelier-block-head {
+    color: atelier-callout-ink($callout-color-tip);
+  }
 }
 
 .atelier-solution {

@@ -402,6 +402,8 @@ language:
 | `atelier-toc-module-read`        | `{n}% of this module read`           | `{n} % de ce module lu`                     |
 | `atelier-objectives-title`       | `By the end of this module, you can` | `Objectifs de ce module`                    |
 | `atelier-exercise-title`         | `Exercise`                           | `Exercice`                                  |
+| `atelier-prerequisites-title`    | `Prerequisites`                      | `Prérequis`                                 |
+| `atelier-checkpoint-title`       | `Checkpoint`                         | `Point de contrôle`                         |
 | `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
 | `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
 | `atelier-workshop-author-single` | `Instructor`                         | `Formateur·rice`                            |

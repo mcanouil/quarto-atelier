@@ -175,15 +175,17 @@ local function objectives_block(div, model)
   )
 end
 
---- Build the exercise block.
---- @param div pandoc.Div The `.exercise` div
+--- Build a block of `core.BLOCKS`: the prerequisites, a checkpoint, or an
+--- exercise.
+--- @param div pandoc.Div The div
+--- @param kind string The class, a key of `core.BLOCKS`
 --- @param model table The page model
 --- @return pandoc.Div The block
-local function exercise_block(div, model)
-  local block = core.exercise(div, model)
+local function head_block(div, kind, model)
+  local block = core.block(div, kind, model)
   return pandoc.Div(
-    { M.block_head('pencil-square', block.title, block.time), M.block_body(block.blocks) },
-    M.block_attr(div, 'exercise')
+    { M.block_head(core.BLOCKS[kind], block.title, block.time), M.block_body(block.blocks) },
+    M.block_attr(div, kind)
   )
 end
 
@@ -197,8 +199,10 @@ function M.div(div, model)
   end
   if div.classes:includes('objectives') then
     return objectives_block(div, model)
-  elseif div.classes:includes('exercise') then
-    return exercise_block(div, model)
+  end
+  local kind = core.block_kind(div)
+  if kind ~= nil then
+    return head_block(div, kind, model)
   end
   return nil
 end
