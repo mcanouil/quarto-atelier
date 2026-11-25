@@ -83,13 +83,23 @@ GEOMETRY = {
       return { kind = 'quarter', x = round(88 - 13.6 * i), y = round(13.6 * j + 12), r = 12, opacity = opacity }
     end)
   end,
+  -- The space from the outer dots to the top and right edges is the space
+  -- between two dots, so each format puts the motif in its corner as is.
   dots = function()
+    local pitch, r = 7, 1.3
+    local gap = pitch - 2 * r
     local shapes = {}
     for i = 0, 9 do
       for j = 0, 9 do
         local opacity = 0.75 - math.sqrt(i * i + j * j) * 0.085
         if opacity > 0.04 then
-          shapes[#shapes + 1] = { kind = 'circle', x = 96 - i * 7, y = 4 + j * 7, r = 1.3, opacity = round(opacity) }
+          shapes[#shapes + 1] = {
+            kind = 'circle',
+            x = round(100 - gap - r - i * pitch),
+            y = round(gap + r + j * pitch),
+            r = r,
+            opacity = round(opacity),
+          }
         end
       end
     end
