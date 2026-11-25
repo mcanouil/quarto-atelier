@@ -212,10 +212,11 @@ If there is no `title`, it comes from the `name` attribute or from a heading at 
 The default summary is "Show the solution".
 
 In a Reveal.js deck in workshop mode, each solution goes into the veil group `solutions`.
-The reader can then hide or show all the solutions of the deck with the veil controls.
+The solutions are hidden when the deck opens.
+The reader can show or hide all the solutions of the deck with the veil controls.
 A solution with its own `.veil` class or its own `group` attribute keeps them.
-If the deck declares groups under `extensions.veil.groups`, declare `solutions` there too.
-Veil warns about a group that the deck uses but does not declare.
+Atelier declares the group `solutions` with the label "Solutions", hidden at first.
+To change the label or the start state, declare `solutions` under `extensions.veil.groups`, and Atelier keeps your declaration.
 
 ```markdown
 ::: {.solution title="Solution"}

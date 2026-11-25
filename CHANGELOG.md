@@ -10,6 +10,9 @@
 - feat: Add the `atelier-typst` format, one PDF document type with the colours, fonts and highlighting of the site, tagged for PDF/UA-1. (#148)
 - feat: Turn on a cover, a contents page, chapter dividers, chapter contents and a closing page with five Typst switches under `extensions.atelier`. (#148)
 - feat: In workshop mode, a Typst handout shows the workshop blocks and puts the solutions at the end, inline, or nowhere, with `extensions.atelier.solutions`. (#148)
+- feat: Add the `atelier-revealjs` format, a 1280x720 deck with the colours, fonts and highlighting of the site, light or dark with `brand-mode: dark`. (#150)
+- feat: A deck turns each level-1 heading into a section slide, gives slides with the `.dark` class the dark colours, and puts the title and the slide number in its footer. (#150)
+- feat: In workshop mode, a deck shows the workshop blocks and the session duration, and its solutions start hidden in the veil group `solutions`, which Atelier now declares. (#150)
 
 ## 0.15.3 (2026-11-23)
 

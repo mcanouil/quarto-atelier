@@ -86,10 +86,6 @@ contributes:
           at: pre-ast
         - path: bundled/preview-colour.lua
           at: post-quarto
-        # Runs just before veil, which reads the `.veil` class that it adds to
-        # the solutions of a Reveal.js workshop deck.
-        - path: atelier-workshop-veil.lua
-          at: pre-quarto
         - path: bundled/veil.lua
           at: pre-quarto
         - path: bundled/typst-render.lua
@@ -216,6 +212,17 @@ contributes:
         - typst/typst-template.typ
         - typst/typst-show.typ
     revealjs:
+      width: 1280
+      height: 720
+      slide-number: c/t
+      progress: true
+      # The colours come from `atelier-revealjs.lua`, which writes the
+      # `--atelier-*` tokens of `palette.lua`: Quarto gives the deck Sass no
+      # brand defaults, so the Sass cannot read the preset.
+      theme:
+        - revealjs/deck.scss
+      template-partials:
+        - revealjs/title-slide.html
       revealjs-plugins:
         - a11y
         - codefrag
@@ -225,3 +232,5 @@ contributes:
         - path: bundled/cascade.lua
           at: pre-ast
         - bundled/codefrag.lua
+        - path: atelier-revealjs.lua
+          at: post-quarto

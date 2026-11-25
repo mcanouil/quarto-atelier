@@ -1,0 +1,482 @@
+/*-- scss:defaults --*/
+
+// The sizes of the Atelier deck. The colours are not Sass values: Quarto
+// gives the deck Sass no brand defaults, so it cannot read the preset.
+// `atelier-revealjs.lua` writes the colours as `--atelier-*` custom
+// properties from `palette.lua`, and the rules below read them.
+$presentation-font-size-root: 32px !default;
+$presentation-line-height: 1.4 !default;
+$presentation-heading-font-weight: 700 !default;
+$presentation-heading-line-height: 1.15 !default;
+$presentation-h1-font-size: 2.2em !default;
+$presentation-h2-font-size: 1.5em !default;
+$presentation-h3-font-size: 1.15em !default;
+$presentation-title-slide-text-align: left !default;
+$code-block-font-size: 0.6em !default;
+
+/*-- scss:rules --*/
+
+// ===========================================================================
+// PAGE
+// ===========================================================================
+
+:root {
+  --atelier-radius: 8px;
+}
+
+
+.reveal-viewport {
+  background-color: var(--atelier-bg);
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section {
+  color: var(--atelier-fg);
+  font-family: var(--atelier-font-base, var(--r-main-font));
+}
+
+.reveal .slides section :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--atelier-font-headings, var(--r-heading-font));
+}
+
+.reveal .slides section :is(h1, h2) {
+  color: var(--atelier-fg);
+}
+
+// As on the site, h3 to h6 take the faded heading ink.
+.reveal .slides section :is(h3, h4, h5, h6) {
+  color: var(--atelier-heading);
+}
+
+.reveal .slides section a {
+  color: var(--atelier-link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.reveal .slides section a:hover {
+  color: var(--atelier-link-hover);
+}
+
+.reveal :focus-visible {
+  outline: 3px solid var(--atelier-focus);
+  outline-offset: 2px;
+}
+
+.reveal .slides section li::marker {
+  color: var(--atelier-accent-text);
+}
+
+.reveal .slides section blockquote {
+  width: auto;
+  margin: var(--r-block-margin) 0;
+  padding: 0.2em 0.8em;
+  border-left: 4px solid var(--atelier-accent-mark);
+  background: transparent;
+  box-shadow: none;
+  color: var(--atelier-fg);
+  font-style: italic;
+}
+
+.reveal .slides section table th,
+.reveal .slides section table td {
+  border-color: var(--atelier-border);
+}
+
+.reveal .slides section table thead th {
+  border-bottom: 2px solid var(--atelier-control-border);
+}
+
+// ===========================================================================
+// CODE
+// ===========================================================================
+
+.reveal .slides :not(pre) > code {
+  padding: 0 0.2em;
+  border-radius: 4px;
+  background: var(--atelier-surface-strong);
+  color: var(--atelier-code-ink);
+}
+
+.reveal :is(pre, code, kbd) {
+  font-family: var(--atelier-font-monospace, var(--r-code-font));
+  font-variant-ligatures: none;
+}
+
+.reveal .slides div.sourceCode,
+.reveal .slides pre {
+  border-color: var(--atelier-code-border);
+  border-radius: var(--atelier-radius);
+  background-color: var(--atelier-surface);
+  box-shadow: none;
+  color: var(--atelier-fg);
+}
+
+.reveal .slides pre code {
+  background-color: transparent;
+  color: inherit;
+}
+
+.reveal .code-with-filename {
+  --code-window-bg: var(--atelier-surface);
+  --code-window-title-bg: var(--atelier-surface-strong);
+
+  color: var(--atelier-fg);
+  border-color: var(--atelier-code-border);
+}
+
+// The title bar holds a `pre` for its label, which must not take the code
+// surface. The muted ink holds 4.5:1 on the strong surface.
+.reveal .slides .code-with-filename .code-with-filename-file pre {
+  border: 0;
+  background: transparent;
+  color: var(--atelier-muted);
+}
+
+// ===========================================================================
+// FRAME AROUND THE DECK
+// ===========================================================================
+// The progress bar, the controls, the slide number and the footer sit outside
+// the slides. Reveal.js puts the `data-state` of the current slide on the
+// viewport, so a section slide and a dark slide give them their own colours.
+
+.reveal .progress {
+  color: var(--atelier-accent-fill);
+}
+
+.reveal .controls,
+.reveal .slide-menu-button a {
+  color: var(--atelier-accent-text);
+}
+
+// Quarto bakes the Sass link colour into the menu icon. The deck colours are
+// custom properties, so the icon is drawn again as a mask in the colour of
+// its link.
+// Remove when: never.
+.reveal .slide-menu-button .fa-bars::before {
+  background: currentcolor;
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg>') center / contain no-repeat;
+}
+
+.reveal .slide-number,
+.reveal .slide-number a {
+  background: transparent;
+  color: var(--atelier-muted);
+  font-family: var(--atelier-font-base, var(--r-main-font));
+}
+
+.reveal .footer.atelier-footer {
+  display: flex;
+  gap: 1.5em;
+  left: 56px;
+  right: 120px;
+  bottom: 12px;
+  justify-content: space-between;
+  color: var(--atelier-muted);
+  font-family: var(--atelier-font-base, var(--r-main-font));
+  text-align: left;
+}
+
+.reveal .footer.atelier-footer p {
+  display: contents;
+}
+
+.reveal .footer .atelier-slot-centre {
+  flex: 1;
+  text-align: center;
+}
+
+.reveal .footer .atelier-slot-centre:empty {
+  visibility: hidden;
+}
+
+.atelier-section-state .reveal :is(.footer, .slide-number, .slide-number a, .controls, .slide-menu-button a) {
+  color: var(--atelier-navbar-muted);
+}
+
+.atelier-section-state .reveal .progress {
+  color: var(--atelier-navbar-accent);
+}
+
+// ===========================================================================
+// TITLE AND SECTION SLIDES
+// ===========================================================================
+
+.reveal .slides section.atelier-title-slide h1.title {
+  margin-bottom: 0.2em;
+}
+
+// The rule under the title is decoration.
+.reveal .slides section.atelier-title-slide h1.title::after,
+.reveal .slides section.atelier-section > h1::after {
+  content: "";
+  display: block;
+  width: 30%;
+  height: 4px;
+  margin-top: 0.3em;
+  border-radius: 2px;
+  background: var(--atelier-accent-mark);
+}
+
+.reveal .slides section.atelier-title-slide :is(.subtitle, .date, .atelier-duration) {
+  color: var(--atelier-muted);
+}
+
+.reveal .slides section.atelier-title-slide .quarto-title-authors {
+  justify-content: flex-start;
+}
+
+.reveal .slides section.atelier-section {
+  color: var(--atelier-navbar-fg);
+}
+
+.reveal .slides section.atelier-section > h1 {
+  color: var(--atelier-navbar-fg);
+}
+
+.reveal .slides section.atelier-section > h1::after {
+  background: var(--atelier-navbar-accent);
+}
+
+.reveal .slides section.atelier-section a {
+  color: var(--atelier-navbar-accent);
+}
+
+// ===========================================================================
+// CALLOUTS
+// ===========================================================================
+// A callout is a tinted outline with the title set into the top border as an
+// upper-case label, as in `html/content.scss`. The colours come from the
+// callout tokens of `palette.lua`. The icon is a mask in the label ink.
+// The label centres the cap band of its text on the icon and on the border:
+// the text box is trimmed to the cap band, the icon is a flex box, and the
+// label is one line high, so the margins put its middle on the border.
+
+.reveal .slides div.callout.callout {
+  --atelier-c3-pad: 22px;
+  --atelier-c3-border: 2px;
+
+  position: relative;
+  margin-top: 1.2em;
+  padding: var(--atelier-c3-pad) 18px 10px;
+  border: var(--atelier-c3-border) solid var(--atelier-callout-border);
+  border-radius: var(--atelier-radius);
+  background: transparent;
+  box-shadow: none;
+}
+
+@each $name in (note, tip, warning, caution, important) {
+  .reveal .slides div.callout.callout-#{$name} {
+    --atelier-callout-border: var(--atelier-callout-#{$name}-border);
+    --atelier-callout-ink: var(--atelier-callout-#{$name}-ink);
+  }
+
+  .reveal .slides div.callout.callout-#{$name} .callout-icon::before {
+    mask-image: url('data:image/svg+xml,#{map-get(map-get($callouts, $name), "icon")}');
+  }
+}
+
+.reveal .slides div.callout.callout .callout-body {
+  padding: 0;
+}
+
+.reveal .slides div.callout.callout div.callout-title {
+  $_edge: calc(var(--atelier-c3-pad) + var(--atelier-c3-border) / 2);
+
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  width: fit-content;
+  min-height: 1lh;
+  margin: calc(-1 * #{$_edge} - 0.5lh) 0 calc(#{$_edge} - 0.5lh) -6px;
+  padding: 0 0.45em;
+  background: var(--atelier-bg);
+  color: var(--atelier-callout-ink);
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  opacity: 1;
+  text-transform: uppercase;
+}
+
+.reveal .slides div.callout.callout div.callout-title > p {
+  margin: 0;
+  color: inherit;
+  text-box: trim-both cap alphabetic;
+}
+
+.reveal .slides div.callout.callout .callout-icon-container,
+.reveal .slides div.callout.callout .callout-icon {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.reveal .slides div.callout.callout .callout-icon::before {
+  content: "";
+  width: 1.2em;
+  height: 1.2em;
+  background: var(--atelier-callout-ink);
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.reveal .slides div.callout.callout div.callout-content {
+  padding: 0;
+}
+
+.reveal .slides div.callout.callout div.callout-content > :first-child {
+  margin-top: 0;
+}
+
+.reveal .slides div.callout.callout-style-simple.no-icon {
+  border-style: dashed;
+}
+
+// Forced colours draw the frame and the text, and remove the mask.
+@media (forced-colors: active) {
+  .reveal .slides .atelier-block-head .bi,
+  .reveal .slides div.callout.callout .callout-icon::before {
+    background: CanvasText;
+  }
+
+  .reveal .slides section.atelier-title-slide h1.title::after,
+  .reveal .slides section.atelier-section > h1::after {
+    display: none;
+  }
+}
+
+// ===========================================================================
+// WORKSHOP BLOCKS
+// ===========================================================================
+// Objectives, exercises and solutions are blocks with a hairline border and a
+// head line, as in `html/workshop.scss`. A deck has no interaction for the
+// objectives, so each one has a box glyph.
+
+.reveal .slides :is(.atelier-objectives, .atelier-exercise, .atelier-solution) {
+  margin: var(--r-block-margin) 0;
+  overflow: hidden;
+  border: 1px solid var(--atelier-border);
+  border-radius: 12px;
+  font-size: 0.8em;
+}
+
+.reveal .slides .atelier-block-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0;
+  padding: 0.4em 0.8em;
+  font-weight: 650;
+}
+
+// A deck loads no Bootstrap Icons font, so the two icons of the HTML block
+// heads are masks in the colour of the head. The paths are Bootstrap Icons
+// 1.11.3 (MIT), `bullseye` and `pencil-square`.
+.reveal .slides .atelier-block-head .bi {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  background: currentcolor;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.reveal .slides .atelier-block-head .bi-bullseye {
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M8 13A5 5 0 1 1 8 3a5 5 0 0 1 0 10m0 1A6 6 0 1 0 8 2a6 6 0 0 0 0 12"/><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M9.5 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/></svg>');
+}
+
+.reveal .slides .atelier-block-head .bi-pencil-square {
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/></svg>');
+}
+
+.reveal .slides .atelier-block-time {
+  margin-left: auto;
+  padding: 0.2em 0.5em;
+  border: 1px solid currentcolor;
+  border-radius: 99px;
+  font-family: var(--atelier-font-monospace, var(--r-code-font));
+  font-size: 0.8em;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.reveal .slides .atelier-block-body {
+  padding: 0.5em 0.8em;
+}
+
+.reveal .slides .atelier-block-body > :first-child {
+  margin-top: 0;
+}
+
+.reveal .slides .atelier-block-body > :last-child {
+  margin-bottom: 0;
+}
+
+.reveal .slides .atelier-objectives > .atelier-block-head {
+  background: var(--atelier-accent-soft);
+  color: var(--atelier-accent-ink);
+}
+
+.reveal .slides .atelier-objectives ul {
+  list-style: none;
+  margin-left: 0;
+}
+
+.reveal .slides .atelier-objectives .atelier-box {
+  color: var(--atelier-accent-text);
+}
+
+.reveal .slides .atelier-exercise > .atelier-block-head {
+  background: var(--atelier-workshop-bar-bg);
+  color: var(--atelier-workshop-bar-fg);
+}
+
+.reveal .slides .atelier-solution {
+  border-style: dashed;
+  border-color: var(--atelier-control-border);
+}
+
+.reveal .slides .atelier-solution > .atelier-block-head {
+  color: var(--atelier-accent-ink);
+}
+
+// ===========================================================================
+// TERMINAL
+// ===========================================================================
+// A `.terminal` code block is dark in both schemes, in its code window. The
+// highlighting rules of `atelier-revealjs.lua` colour its tokens.
+
+.reveal .slides .code-with-filename:has(pre.atelier-terminal) {
+  --code-window-bg: var(--atelier-terminal-bg);
+  --code-window-title-bg: var(--atelier-terminal-bg);
+
+  border-color: var(--atelier-terminal-border);
+  color: var(--atelier-terminal-fg);
+}
+
+.reveal .slides .code-with-filename:has(pre.atelier-terminal) .code-with-filename-file {
+  border-bottom-color: var(--atelier-terminal-border);
+}
+
+.reveal .slides .code-with-filename:has(pre.atelier-terminal) .code-with-filename-file pre {
+  color: var(--atelier-terminal-muted);
+}
+
+.reveal .slides div.sourceCode:has(> pre.atelier-terminal),
+.reveal .slides pre.atelier-terminal {
+  border-color: var(--atelier-terminal-border);
+  background-color: var(--atelier-terminal-bg);
+  color: var(--atelier-terminal-fg);
+}
+
+.reveal .slides pre.atelier-terminal code > span > a::before {
+  color: var(--atelier-terminal-muted);
+}

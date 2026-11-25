@@ -128,7 +128,11 @@ end
 --- @param meta table The document metadata
 --- @return nil
 local function publish_options(meta)
-  if not quarto.doc.is_format('html') or quarto.doc.is_format('revealjs') then
+  if quarto.doc.is_format('revealjs') then
+    add_fonts()
+    return nil
+  end
+  if not quarto.doc.is_format('html') then
     return nil
   end
   -- The preset is a Sass default, which Lua cannot read, so every page ships the fonts. The browser downloads a face only when a stylesheet names it.
