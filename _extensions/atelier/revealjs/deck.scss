@@ -204,6 +204,11 @@ $code-block-font-size: 0.6em !default;
   --atelier-row-left: calc(var(--atelier-row-edge) + var(--atelier-row-buttons, 1) * (var(--atelier-hit) + var(--atelier-row-gap)) + 12px);
 }
 
+// A PDF export hides the buttons, so the title slot starts at the edge.
+html.print-pdf:root {
+  --atelier-row-buttons: 0;
+}
+
 @media screen and (max-width: 800px) {
   :root {
     --atelier-row-height: 32px;
@@ -251,9 +256,6 @@ $code-block-font-size: 0.6em !default;
   width: auto;
   height: var(--atelier-row-height);
   margin: 0;
-}
-
-.reveal.reveal > .footer.atelier-footer {
   pointer-events: none;
 }
 
@@ -270,7 +272,8 @@ $code-block-font-size: 0.6em !default;
   font-family: var(--atelier-font-base, var(--r-main-font));
 }
 
-.reveal .footer.atelier-footer a {
+// The footer spans the row, so only its links take clicks.
+.reveal .footer a {
   pointer-events: auto;
 }
 

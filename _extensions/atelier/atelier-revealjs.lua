@@ -257,14 +257,23 @@ local function motif_rules(scheme, tokens, dark)
   return lines
 end
 
---- The number of buttons at the left of the bottom row. Quarto adds the
---- menu button unless `menu` is false, and the two chalkboard buttons when
---- `chalkboard` is set.
+--- Answer true when an option is off, or is a map whose `key` is false.
+--- @param value any
+--- @param key string
+--- @return boolean
+local function turned_off(value, key)
+  return value == false or (type(value) == 'table' and value[key] == false)
+end
+
+--- The number of buttons at the left of the bottom row. Quarto draws the
+--- menu button unless `menu` or `menu.openButton` is false, and the two
+--- chalkboard buttons when `chalkboard` is set and `chalkboard.buttons` is
+--- not false.
 --- @param meta table
 --- @return integer
 local function left_buttons(meta)
-  local count = meta.menu ~= false and 1 or 0
-  if meta.chalkboard then
+  local count = turned_off(meta.menu, 'openButton') and 0 or 1
+  if meta.chalkboard and not turned_off(meta.chalkboard, 'buttons') then
     count = count + 2
   end
   return count
