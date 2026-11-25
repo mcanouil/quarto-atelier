@@ -73,6 +73,15 @@ local DARK_STATE = 'atelier-dark-state'
 --- @type string
 local SECTION_STATE = 'atelier-section-state'
 
+--- The `data-state` of the title slide and of the section slides, which
+--- hide part of the bottom row: the title slide keeps only the centre slot
+--- of the footer, and both show no slide number.
+--- @type string
+local TITLE_STATE = 'atelier-title-state'
+
+--- @type string
+local NO_NUMBER_STATE = 'atelier-no-number-state'
+
 --- The class of a slide in the dark scheme.
 --- @type string
 local DARK_CLASS = 'dark'
@@ -248,28 +257,17 @@ local function motif_rules(scheme, tokens, dark)
   return lines
 end
 
---- The number of buttons at the left of the bottom row: the menu button,
---- unless `menu` is false, and the two chalkboard buttons, when `chalkboard`
---- is set.
+--- The number of buttons at the left of the bottom row. Quarto adds the
+--- menu button unless `menu` is false, and the two chalkboard buttons when
+--- `chalkboard` is set.
 --- @param meta table
 --- @return integer
 local function left_buttons(meta)
-  local count = 0
-  if meta.menu == nil or meta.menu ~= false then
-    count = count + 1
-  end
-  if meta.chalkboard ~= nil and meta.chalkboard ~= false then
+  local count = meta.menu ~= false and 1 or 0
+  if meta.chalkboard then
     count = count + 2
   end
   return count
-end
-
---- The start of the title slot of the footer: the edge, one hit box and a
---- 4px gap for each button at the left of the bottom row, and 12px.
---- @param buttons integer
---- @return string
-local function row_left(buttons)
-  return string.format('calc(var(--atelier-row-edge) + %d * (var(--atelier-hit) + 4px) + 12px)', buttons)
 end
 
 --- The style element of the deck.
@@ -281,7 +279,7 @@ end
 --- @return string
 local function deck_style(scheme, tokens, dark, workshop, buttons)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
-  lines[#lines + 1] = '  --atelier-row-left: ' .. row_left(buttons) .. ';'
+  lines[#lines + 1] = '  --atelier-row-buttons: ' .. buttons .. ';'
   for _, line in ipairs(token_declarations(tokens)) do
     lines[#lines + 1] = line
   end
@@ -319,10 +317,10 @@ end
 --- @type table
 local deck = {}
 
---- Add the deck style and read the deck state. A workshop deck marks its
---- title slide for the motif.
+--- Add the deck style and read the deck state. Give the title slide its
+--- state, and in a workshop deck mark it for the motif.
 --- @param meta table
---- @return table|nil The changed metadata of a workshop deck, or nil
+--- @return table The metadata, with the state of the title slide
 local function publish(meta)
   local scheme = palette.document_scheme(meta)
   local tokens = palette.tokens(scheme)
@@ -334,12 +332,18 @@ local function publish(meta)
   deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
   quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop, left_buttons(meta)))
+  if meta.chalkboard then
+    quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
+  end
+  local attributes = meta['title-slide-attributes'] or {}
+  local states = attributes['data-state'] and pandoc.utils.stringify(attributes['data-state']) or ''
+  attributes['data-state'] = (states == '' and TITLE_STATE) or (states .. ' ' .. TITLE_STATE)
+  meta['title-slide-attributes'] = attributes
   if deck.workshop then
     -- `revealjs/title-slide.html` adds the motif class to the title slide.
     meta['atelier-motif'] = true
-    return meta
   end
-  return nil
+  return meta
 end
 
 --- Add a class to an attribute set once.
@@ -385,6 +389,7 @@ local function mark_slide(header)
   if header.level == 1 then
     add_class(header.attr, SECTION_CLASS)
     add_state(header.attr, dark and DARK_STATE or SECTION_STATE)
+    add_state(header.attr, NO_NUMBER_STATE)
     if deck.workshop then
       add_class(header.attr, MOTIF_CLASS)
     end

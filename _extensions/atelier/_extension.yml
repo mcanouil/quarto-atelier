@@ -228,8 +228,6 @@ contributes:
         - revealjs/deck.scss
       template-partials:
         - revealjs/title-slide.html
-      include-after-body:
-        - file: revealjs/chalkboard-buttons.html
       revealjs-plugins:
         - a11y
         - codefrag

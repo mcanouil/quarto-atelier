@@ -164,7 +164,6 @@ $code-block-font-size: 0.6em !default;
   width: var(--atelier-icon);
   height: var(--atelier-icon);
   background: currentcolor;
-  vertical-align: top;
 }
 
 .reveal.reveal .slide-menu-button .fa-bars::before {
@@ -190,8 +189,8 @@ $code-block-font-size: 0.6em !default;
 // The menu button, the chalkboard buttons and the footer sit in one row for
 // the whole deck: each item is a box of the row height at the same bottom,
 // so all items have the same centre line. `atelier-revealjs.lua` writes
-// `--atelier-row-left`, the start of the title slot, from the buttons that
-// the format options turn on.
+// `--atelier-row-buttons`, the number of buttons that the format options
+// turn on, and the title slot starts after them.
 // The plugin stylesheets of Quarto load after the theme, so the rules of the
 // row repeat `.reveal` to win over them.
 // Remove when: never.
@@ -201,6 +200,8 @@ $code-block-font-size: 0.6em !default;
   --atelier-row-edge: 12px;
   --atelier-hit: 32px;
   --atelier-icon: 22px;
+  --atelier-row-gap: 4px;
+  --atelier-row-left: calc(var(--atelier-row-edge) + var(--atelier-row-buttons, 1) * (var(--atelier-hit) + var(--atelier-row-gap)) + 12px);
 }
 
 @media screen and (max-width: 800px) {
@@ -216,24 +217,17 @@ $code-block-font-size: 0.6em !default;
 .reveal.reveal :is(.slide-menu-button, .slide-chalkboard-buttons) {
   position: fixed;
   bottom: var(--atelier-row-bottom);
+  left: var(--atelier-row-edge);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--atelier-row-gap);
   height: var(--atelier-row-height);
   margin: 0;
   line-height: 0;
 }
 
-.reveal.reveal .slide-menu-button {
-  left: var(--atelier-row-edge);
-}
-
-.reveal.reveal .slide-chalkboard-buttons {
-  left: var(--atelier-row-edge);
-}
-
 .reveal.reveal .slide-chalkboard-buttons.slide-menu-offset {
-  left: calc(var(--atelier-row-edge) + var(--atelier-hit) + 4px);
+  left: calc(var(--atelier-row-edge) + var(--atelier-hit) + var(--atelier-row-gap));
 }
 
 .reveal.reveal .slide-menu-button a,
@@ -246,32 +240,24 @@ $code-block-font-size: 0.6em !default;
   margin: 0;
 }
 
-.reveal :is(.slide-menu-button, .slide-chalkboard-buttons) .fas {
-  display: block;
-  line-height: 0;
-}
-
-// Quarto sets `display` inline on the footer, to show it or the footer of a
-// slide. The row inside the footer holds the layout, so that toggle works.
-.reveal.reveal .footer.atelier-footer {
+// Quarto sets `display` inline on the footer, to show the footer of the deck
+// or the footer of a slide. The row inside the footer of the deck holds the
+// layout, so that toggle works. The footer of a slide takes the same row,
+// centred.
+.reveal.reveal > .footer {
   left: 0;
   right: 0;
   bottom: var(--atelier-row-bottom);
   width: auto;
   height: var(--atelier-row-height);
   margin: 0;
+}
+
+.reveal.reveal > .footer.atelier-footer {
   pointer-events: none;
 }
 
-// The footer of one slide replaces the footer of the deck. It takes the same
-// row, centred, in the colours of the deck.
 .reveal.reveal > .footer:not(.atelier-footer) {
-  left: 0;
-  right: 0;
-  bottom: var(--atelier-row-bottom);
-  width: auto;
-  height: var(--atelier-row-height);
-  margin: 0;
   line-height: var(--atelier-row-height);
   text-align: center;
 }
@@ -349,16 +335,17 @@ $code-block-font-size: 0.6em !default;
 // Remove when: never.
 .reveal.reveal .controls[data-controls-layout="bottom-right"] {
   right: var(--atelier-row-edge);
-  bottom: calc(var(--atelier-row-bottom) + var(--atelier-row-height) + 4px);
+  bottom: calc(var(--atelier-row-bottom) + var(--atelier-row-height) + var(--atelier-row-gap));
 }
 
 // The title slide shows only the centre slot of the footer. The title slide
 // and the section slides show no slide number. `visibility: hidden` keeps
 // the place of each item, so the row does not move from slide to slide, and
-// it takes the hidden buttons out of the tab order.
+// it takes the hidden buttons out of the tab order. `atelier-revealjs.lua`
+// gives these slides their `data-state`.
 // Remove when: never.
-.reveal-viewport:has(#title-slide.present) .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-logo),
-.reveal-viewport:has(section.atelier-section.present) .reveal .slide-number {
+.atelier-title-state .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-logo),
+.atelier-no-number-state .reveal .slide-number {
   visibility: hidden;
 }
 

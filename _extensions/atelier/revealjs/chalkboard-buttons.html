@@ -18,10 +18,12 @@
 				if (span.title) span.setAttribute("aria-label", span.title);
 				span.addEventListener("keydown", (event) => {
 					if (event.key !== "Enter" && event.key !== " ") return;
-					// Reveal.js reads Space as "next slide" on the document.
+					if (event.ctrlKey || event.altKey || event.metaKey) return;
+					// Reveal.js reads Space as "next slide" on the document. A held key
+					// repeats, and only its first press clicks.
 					event.preventDefault();
 					event.stopPropagation();
-					span.click();
+					if (!event.repeat) span.click();
 				});
 			});
 		};
