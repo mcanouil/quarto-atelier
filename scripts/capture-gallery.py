@@ -1,12 +1,13 @@
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["playwright"]
+# dependencies = ["pillow", "playwright"]
 # ///
 """Capture the gallery screenshots that the manifest lists.
 
-Run `uv run scripts/capture-gallery.py` to build the demos and write every image
-of `docs/_samples/_screenshots.tsv` to `docs/assets/gallery/`, with the digest of
-the inputs in `docs/assets/gallery/inputs.sha256`.
+Run `uv run scripts/capture-gallery.py` to build the demos, render the samples of
+`docs/_samples/`, and write every image of `docs/_samples/_screenshots.tsv` to
+`docs/assets/gallery/`, with the digest of the inputs in
+`docs/assets/gallery/inputs.sha256`.
 Pass `--only <name>...` to capture some shots only; the digest then stays as it is.
 Pass `--browser <path>` to choose a Chromium-based browser.
 """
@@ -29,11 +30,15 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, cast, get_args
 
+from PIL import Image, ImageChops
 from playwright.sync_api import Page, Response, sync_playwright
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCRIPT = ROOT / "docs" / "_scripts" / "build-demos.sh"
+SYNC_SCRIPT = ROOT / "docs" / "_scripts" / "sync-extension.sh"
+SAMPLES = ROOT / "docs" / "_samples"
+FONTS = ROOT / "_extensions" / "atelier" / "fonts"
 OUTPUT = ROOT / "docs" / "assets" / "gallery"
 MANIFEST = ROOT / "docs" / "_samples" / "_screenshots.tsv"
 DIGEST_FILE = OUTPUT / "inputs.sha256"
@@ -48,6 +53,16 @@ SKIPPED_DIRECTORIES = {".quarto", "__pycache__"}
 SKIPPED_FILES = {".DS_Store"}
 PREFIX = "/quarto-atelier"
 VIEWPORT = {"width": 1440, "height": 900}
+DECK_VIEWPORT = {"width": 1280, "height": 720}
+TYPST_PPI = 110
+CROP_SUFFIX = "+trim"
+FONT_WARNING = "unknown font family"
+DECK_READY = "() => window.Reveal !== undefined && window.Reveal.isReady()"
+GO_TO_SLIDE = """target => new Promise(resolve => {
+  Reveal.on("slidetransitionend", () => resolve());
+  setTimeout(resolve, 1000);
+  location.hash = target;
+})"""
 SCHEME_READY = "scheme => document.body.classList.contains(`quarto-${scheme}`)"
 BROWSER_VARIABLES = ("CHROME_PATH", "QUARTO_CHROMIUM")
 BROWSER_CANDIDATES = (
@@ -207,6 +222,152 @@ def build_demos(output_dir: Path, ids: Sequence[str]) -> None:
     subprocess.run([str(BUILD_SCRIPT), str(output_dir), *ids], check=True)
 
 
+def _sample_stem(shot: Shot) -> str | None:
+    parts = Path(shot.source).parts
+    if len(parts) > 1 and parts[0] == "samples":
+        return Path(parts[1]).stem
+    return None
+
+
+def sample_stems(shots: Sequence[Shot]) -> list[str]:
+    """Return the unique sample stems of the shots under `samples/`, in order."""
+    stems: list[str] = []
+    for shot in shots:
+        stem = _sample_stem(shot)
+        if stem is not None and stem not in stems:
+            stems.append(stem)
+    return stems
+
+
+def check_samples(shots: Sequence[Shot]) -> None:
+    """Stop when a sample has no shot, or a shot names a sample that does not exist.
+
+    Args:
+        shots: Every shot of the manifest.
+
+    Raises:
+        SystemExit: A `.qmd` file of `SAMPLES` without a leading underscore has
+            no shot, or a shot under `samples/` has no `.qmd` file.
+    """
+    samples = {p.stem for p in SAMPLES.glob("*.qmd") if not p.name.startswith("_")}
+    for shot in shots:
+        stem = _sample_stem(shot)
+        if stem is not None and stem not in samples:
+            raise SystemExit(
+                f"Shot {shot.name}: {shot.source} has no sample {stem}.qmd "
+                f"in {SAMPLES}."
+            )
+    orphans = sorted(f"{stem}.qmd" for stem in samples - set(sample_stems(shots)))
+    if orphans:
+        raise SystemExit(
+            f"No shot uses the sample {', '.join(orphans)} in {SAMPLES}. "
+            f"Add a line to {MANIFEST.name}, or remove the sample."
+        )
+
+
+def render_samples(build_root: Path, stems: Sequence[str]) -> None:
+    """Render the samples with the given stems into `build_root / "samples"`.
+
+    The samples render in a copy of `SAMPLES`, with a copy of the extension in
+    `_extensions/local/`, because Quarto does not follow symlinks to extensions.
+    The outputs stay next to the copied sources, so their relative paths hold.
+
+    Raises:
+        SystemExit: A render fails; the message holds the Quarto log.
+    """
+    work = build_root / "samples"
+    shutil.copytree(SAMPLES, work)
+    subprocess.run(
+        [str(SYNC_SCRIPT), str(work / "_extensions" / "local")],
+        check=True,
+        capture_output=True,
+    )
+    for stem in stems:
+        print(f"[samples] Rendering {stem}.qmd")
+        result = subprocess.run(
+            ["quarto", "render", f"{stem}.qmd"],
+            cwd=work,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise SystemExit(
+                f"quarto render {stem}.qmd failed in a copy of {SAMPLES}:\n"
+                f"{result.stdout}{result.stderr}"
+            )
+
+
+def parse_typst_target(target: str) -> tuple[int, bool]:
+    """Return the page number of a Typst target, and whether to trim the page.
+
+    Raises:
+        SystemExit: The target is not a page number from 1, with an optional
+            `+trim` suffix.
+    """
+    number = target.removesuffix(CROP_SUFFIX)
+    if not number.isdecimal() or int(number) < 1:
+        raise SystemExit(
+            f"Typst target {target!r} must be a page number from 1, "
+            f"with an optional {CROP_SUFFIX} suffix."
+        )
+    return int(number), target.endswith(CROP_SUFFIX)
+
+
+def capture_typst(typ: Path, page: int, out: Path) -> None:
+    """Compile one page of a Typst file to a PNG, with the fonts of the extension.
+
+    Raises:
+        SystemExit: The compile fails, or Typst does not find a font and would
+            use a fallback font.
+    """
+    command = [
+        "quarto",
+        "typst",
+        "compile",
+        str(typ),
+        str(out),
+        "--format",
+        "png",
+        "--pages",
+        str(page),
+        "--ppi",
+        str(TYPST_PPI),
+        "--font-path",
+        str(FONTS),
+        "--root",
+        str(typ.parent),
+    ]
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+    log = f"{result.stdout}{result.stderr}"
+    if result.returncode != 0 or FONT_WARNING in log or not out.is_file():
+        raise SystemExit(f"quarto typst compile {typ.name}, page {page}:\n{log}")
+
+
+def trim(path: Path, margin: int = 24) -> None:
+    """Crop a PNG to the pixels that differ from its top-left corner, plus a margin.
+
+    Raises:
+        SystemExit: Every pixel has the colour of the corner.
+    """
+    with Image.open(path) as image:
+        rgb = image.convert("RGB")
+        corner = Image.new("RGB", rgb.size, rgb.getpixel((0, 0)))
+        box = ImageChops.difference(rgb, corner).getbbox()
+        if box is None:
+            raise SystemExit(f"{path} is blank: there is nothing to trim to.")
+        left, top, right, bottom = box
+        cropped = image.crop(
+            (
+                max(left - margin, 0),
+                max(top - margin, 0),
+                min(right + margin, image.width),
+                min(bottom + margin, image.height),
+            )
+        )
+    cropped.save(path)
+
+
 def check_sources(build_root: Path, shots: Sequence[Shot]) -> None:
     """Stop on the first shot whose rendered source does not exist."""
     for shot in shots:
@@ -233,13 +394,32 @@ def watch_failures(page: Page, origin: str) -> list[str]:
     return failures
 
 
-def _capture_page(page: Page, origin: str, shot: Shot, out: Path) -> None:
+def screenshot_element(page: Page, shot: Shot, out: Path) -> None:
+    """Write a PNG of the one element that the CSS selector of the shot matches.
+
+    Raises:
+        SystemExit: The selector matches no element, or more than one.
+    """
+    locator = page.locator(shot.target)
+    count = locator.count()
+    if count != 1:
+        raise SystemExit(
+            f"Shot {shot.name}: the selector {shot.target!r} matches {count} "
+            f"elements in {shot.source}; it must match exactly one."
+        )
+    locator.screenshot(path=str(out))
+
+
+def _load(page: Page, origin: str, shot: Shot) -> None:
     failures = watch_failures(page, origin)
     timeout: PlaywrightTimeoutError | None = None
     try:
         page.goto(f"{origin}{PREFIX}/{shot.source}", wait_until="networkidle")
+        if shot.kind == "revealjs":
+            page.wait_for_function(DECK_READY)
         page.evaluate("document.fonts.ready")
-        page.wait_for_function(SCHEME_READY, arg=shot.scheme)
+        if shot.kind == "html":
+            page.wait_for_function(SCHEME_READY, arg=shot.scheme)
     except PlaywrightTimeoutError as error:
         if not failures:
             raise
@@ -248,7 +428,17 @@ def _capture_page(page: Page, origin: str, shot: Shot, out: Path) -> None:
         raise RuntimeError(
             f"Shot {shot.name} ({shot.source}) failed to load: " + ", ".join(failures)
         ) from timeout
-    page.screenshot(path=str(out))
+
+
+def _capture_browser(page: Page, origin: str, shot: Shot, out: Path) -> None:
+    _load(page, origin, shot)
+    if shot.kind == "revealjs":
+        page.evaluate(GO_TO_SLIDE, shot.target)
+        page.screenshot(path=str(out))
+    elif shot.target == "page":
+        page.screenshot(path=str(out))
+    else:
+        screenshot_element(page, shot, out)
 
 
 def capture(
@@ -264,14 +454,20 @@ def capture(
         with sync_playwright() as playwright:
             chromium = playwright.chromium.launch(executable_path=browser)
             for shot in shots:
-                if shot.kind != "html" or shot.target != "page":
-                    raise NotImplementedError(shot.kind)
+                out = staging / f"{shot.name}.png"
+                if shot.kind == "typst":
+                    page_number, trimmed = parse_typst_target(shot.target)
+                    capture_typst(build_root / shot.source, page_number, out)
+                    if trimmed:
+                        trim(out)
+                    print(f"[gallery] {shot.name}.png")
+                    continue
+                viewport = DECK_VIEWPORT if shot.kind == "revealjs" else VIEWPORT
                 context = chromium.new_context(
-                    viewport=VIEWPORT, color_scheme=shot.scheme
+                    viewport=viewport, color_scheme=shot.scheme
                 )
                 try:
-                    out = staging / f"{shot.name}.png"
-                    _capture_page(context.new_page(), origin, shot, out)
+                    _capture_browser(context.new_page(), origin, shot, out)
                 finally:
                     context.close()
                 print(f"[gallery] {shot.name}.png")
@@ -322,14 +518,16 @@ def _select(shots: Sequence[Shot], only: Sequence[str] | None) -> list[Shot]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Build the demos and capture the shots of the manifest."""
+    """Build the demos, render the samples and capture the shots of the manifest."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--browser", help="path to a Chromium-based browser")
     parser.add_argument(
         "--only", nargs="+", metavar="NAME", help="capture only these shots"
     )
     args = parser.parse_args(argv)
-    selected = _select(read_manifest(), args.only)
+    shots = read_manifest()
+    selected = _select(shots, args.only)
+    check_samples(shots)
     browser = find_browser(args.browser)
     digest = None if args.only else input_digest()
     with tempfile.TemporaryDirectory() as directory:
@@ -337,6 +535,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         ids = demo_ids(selected)
         if ids:
             build_demos(build_root, ids)
+        stems = sample_stems(selected)
+        if stems:
+            render_samples(build_root, stems)
         check_sources(build_root, selected)
         staging = Path(directory) / "staging"
         capture(build_root, browser, selected, staging)

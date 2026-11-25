@@ -12,3 +12,5 @@ preset-default-dark	demos/preset-default/get-started.html	html	page	dark
 preset-quarto-light	demos/preset-quarto/get-started.html	html	page	light
 preset-quarto-dark	demos/preset-quarto/get-started.html	html	page	dark
 preset-terminal-dark	demos/preset-terminal/get-started.html	html	page	dark
+formats-typst-compact	samples/report-compact.typ	typst	1	light
+formats-slide-title	samples/slides.html	revealjs	#/0	light
