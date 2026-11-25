@@ -1,0 +1,19 @@
+---
+title: "Field notes on river sampling"
+subtitle: "Results of the spring survey"
+format: atelier-revealjs
+brand-mode: dark
+footer: "Atelier"
+---
+
+# Results
+
+## What we found
+
+- Nitrate levels go up from the weir to the mouth.
+- The largest change is after the mill.
+- The ford has the most variation between weeks.
+
+## Next steps {.dark}
+
+Sample again in the autumn, at the same four sites.

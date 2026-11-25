@@ -1,0 +1,39 @@
+---
+title: "Field notes on river sampling"
+subtitle: "A report with every switch on"
+format: atelier-typst
+toc: true
+extensions:
+  atelier:
+    cover: true
+    toc-page: true
+    chapter-dividers: true
+    chapter-contents: true
+    closing-page: true
+---
+
+# Foundations {.part}
+
+# Method
+
+We took water samples at four sites along the river, once a week for six weeks.
+
+## Sites
+
+The sites are the weir, the mill, the ford, and the mouth.
+
+## Laboratory
+
+Each sample went to the laboratory on the same day.
+
+# Results
+
+Nitrate levels went up from the weir to the mouth.
+
+## Nitrate
+
+The change was largest after the mill.
+
+## Variation
+
+The ford had the most variation between weeks.

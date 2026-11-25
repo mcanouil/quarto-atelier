@@ -1,0 +1,13 @@
+---
+title: "Add a page to a site"
+subtitle: "Solutions: hide"
+format: atelier-typst
+extensions:
+  atelier:
+    mode: workshop
+    solutions: hide
+---
+
+# Notes
+
+{{< include _exercise.qmd >}}

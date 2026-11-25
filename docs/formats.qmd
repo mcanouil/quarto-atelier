@@ -56,6 +56,8 @@ By default, the PDF has a compact layout:
 - The table of contents, if `toc` is on.
 - Numbered sections.
 
+![The first page of a PDF in the compact layout.](assets/gallery/formats-typst-compact.png){.lightbox group="typst-compact" width="909" height="1286" fig-alt="The first page of a PDF in the compact layout: the title and subtitle at the top, the author and the date, a table of contents, and the start of the first numbered section."}
+
 The defaults are an A4 page, margins of 20 mm and 25 mm, and PDF/UA-1, so the PDF is tagged for assistive technology.
 Typst reads the fonts from the `fonts` folder of the extension.
 
@@ -82,6 +84,8 @@ extensions:
     cover: true
     toc-page: true
     chapter-dividers: true
+    chapter-contents: true
+    closing-page: true
 ```
 
 A level-1 heading with the class `.part` is a part of a book.
@@ -90,6 +94,22 @@ It has no number, and it gets a divider page if `chapter-dividers` is on.
 ```markdown
 # Foundations {.part}
 ```
+
+The pages below come from a report with the switches of this example, and a `.part` heading.
+
+::: {layout-ncol=3}
+![`cover`](assets/gallery/formats-typst-cover.png){.lightbox group="typst-switches" width="909" height="1286" loading="lazy" fig-alt="A cover page with the title, the subtitle, the author, and the date, and no other text."}
+
+![`toc-page`](assets/gallery/formats-typst-toc-page.png){.lightbox group="typst-switches" width="909" height="1286" loading="lazy" fig-alt="A page that holds only the table of contents, with the sections and their page numbers."}
+
+![A `.part` divider](assets/gallery/formats-typst-part.png){.lightbox group="typst-switches" width="909" height="1286" loading="lazy" fig-alt="A divider page with the label Part and the title Foundations in large letters."}
+
+![`chapter-dividers`](assets/gallery/formats-typst-chapter-divider.png){.lightbox group="typst-switches" width="909" height="1286" loading="lazy" fig-alt="A divider page with the label Chapter and the title Method in large letters."}
+
+![`chapter-contents`](assets/gallery/formats-typst-chapter-contents.png){.lightbox group="typst-switches" width="909" height="1286" loading="lazy" fig-alt="A page with the heading In this chapter and a list of the sections of the chapter with their page numbers."}
+
+![`closing-page`](assets/gallery/formats-typst-closing.png){.lightbox group="typst-switches" width="909" height="1286" loading="lazy" fig-alt="A closing page with the colophon Typeset with Quarto and Typst at the bottom left."}
+:::
 
 ### Workshop handouts
 
@@ -104,6 +124,15 @@ In workshop mode, the PDF also shows the session duration, the workshop labels, 
 
 : The values of `extensions.atelier.solutions`. {.striped .hover tbl-colwidths="[18,82]"}
 
+The three PDFs below hold the same exercise and the same solution.
+
+| `end` | `inline` | `hide` |
+| ----- | -------- | ------ |
+| ![The exercise page with solutions at the end.](assets/gallery/formats-solutions-end.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and a link, Solution: page 2, under it."} | ![The exercise page with the solution inline.](assets/gallery/formats-solutions-inline.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and its solution in a dashed frame under it."} | ![The exercise page with the solutions hidden.](assets/gallery/formats-solutions-hide.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and no solution."} |
+| ![The page with the solutions.](assets/gallery/formats-solutions-end-solution.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="The last page of the PDF with the heading Solutions and the text of the solution."} | | |
+
+: The same handout with each value of `extensions.atelier.solutions`. {.striped .hover}
+
 Any other value logs a warning, and Atelier uses `end`.
 A reference such as `@sol-a` links to the solution in each format.
 
@@ -117,7 +146,19 @@ It shows the slide number as "n/total" and a progress bar.
 - A slide with the class `.dark` uses the dark colours.
 - The footer has three slots: the title of the document on the left, your `footer` text in the centre, and the slide number on the right.
 
+::: {layout-ncol=2}
+![Title slide](assets/gallery/formats-slide-title.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="The title slide of a deck: the title, the subtitle, the author, and the date on a pale page."}
+
+![Section slide](assets/gallery/formats-slide-section.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="A section slide with the title Results and a blue rule under it, on a pale grey page."}
+
+![Content slide](assets/gallery/formats-slide-content.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="A content slide with a heading, three bullet points, and a footer with the document title, the footer text, and the slide number."}
+
+![Slide with the class `.dark`](assets/gallery/formats-slide-dark.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="A slide on a dark navy page with a heading and one sentence in light text."}
+:::
+
 The deck is light, or dark if you set `brand-mode: dark`.
+
+![A content slide in a deck with brand-mode dark.](assets/gallery/formats-deck-dark.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="A content slide on a dark navy page with a heading and three bullet points in light text."}
 A reader cannot switch the colour scheme of a deck.
 Use `.dark` on single slides when you want a contrast.
 

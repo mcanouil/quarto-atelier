@@ -14,3 +14,17 @@ preset-quarto-dark	demos/preset-quarto/get-started.html	html	page	dark
 preset-terminal-dark	demos/preset-terminal/get-started.html	html	page	dark
 formats-typst-compact	samples/report-compact.typ	typst	1	light
 formats-slide-title	samples/slides.html	revealjs	#/0	light
+formats-typst-cover	samples/report-full.typ	typst	1	light
+formats-typst-toc-page	samples/report-full.typ	typst	2	light
+formats-typst-part	samples/report-full.typ	typst	3	light
+formats-typst-chapter-divider	samples/report-full.typ	typst	4	light
+formats-typst-chapter-contents	samples/report-full.typ	typst	5	light
+formats-typst-closing	samples/report-full.typ	typst	10	light
+formats-solutions-end	samples/solutions-end.typ	typst	1	light
+formats-solutions-end-solution	samples/solutions-end.typ	typst	2	light
+formats-solutions-inline	samples/solutions-inline.typ	typst	1	light
+formats-solutions-hide	samples/solutions-hide.typ	typst	1	light
+formats-slide-section	samples/slides.html	revealjs	#/1	light
+formats-slide-content	samples/slides.html	revealjs	#/1/1	light
+formats-slide-dark	samples/slides.html	revealjs	#/1/2	light
+formats-deck-dark	samples/slides-dark.html	revealjs	#/1/1	dark

@@ -1,0 +1,13 @@
+---
+title: "Add a page to a site"
+subtitle: "Solutions: end"
+format: atelier-typst
+extensions:
+  atelier:
+    mode: workshop
+    solutions: end
+---
+
+# Notes
+
+{{< include _exercise.qmd >}}
