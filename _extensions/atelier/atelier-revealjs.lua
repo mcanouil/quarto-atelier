@@ -86,10 +86,12 @@ local DARK_BACKGROUND_CLASS = 'has-dark-background'
 --- @type string
 local SECTION_CLASS = 'atelier-section'
 
---- The attribute that marks a slide that shows the motif, in workshop mode.
---- Reveal.js writes it with the `data-` prefix.
+--- The `data-state` of a slide that shows the motif, in workshop mode: the
+--- title slide and the section slides. Reveal.js puts the state of the
+--- current slide on the viewport, so the motif can sit on the background
+--- layer, which covers the window.
 --- @type string
-local MOTIF_ATTRIBUTE = 'atelier-motif'
+local MOTIF_STATE = 'atelier-motif-state'
 
 -- ============================================================================
 -- CSS
@@ -216,24 +218,30 @@ end
 
 --- The rules of the motif of a workshop deck: the mask of the preset, and
 --- its colour and opacity on the title slide, on the section slides and on
---- the dark section slides, after the surface that `mark_slide` paints. A light surface takes the mark at `motifs.LIGHT_OPACITY`, and a
---- dark one the ink, or the chrome mark on a section slide.
+--- the dark section slides, after the surface that `mark_slide` paints. A
+--- light surface takes the mark at `motifs.LIGHT_OPACITY`, and a dark one the
+--- ink, or the chrome mark on a section slide. The motif sits on the
+--- background layer, outside the slide, so the colours are written as they
+--- resolve, not as the tokens of a slide.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
 --- @return string[]
 local function motif_rules(scheme, tokens, dark)
   local preset = palette.preset(palette.painted_scheme(scheme))
-  local lines = { ROOT_SCOPE .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
+  local state = '.' .. MOTIF_STATE
+  local lines = { state .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
   local surfaces = {
-    { scope = ROOT_SCOPE, surface = tokens.bg, light = 'accent-mark', dark = 'accent-ink' },
-    { scope = '.reveal .slides section.' .. SECTION_CLASS, surface = tokens['navbar-bg'], light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
-    { scope = DARK_SCOPE .. '.' .. SECTION_CLASS, surface = dark['navbar-bg'], light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
+    { scope = state, palette = tokens, surface = 'bg', light = 'accent-mark', dark = 'accent-ink' },
+    { scope = state .. '.' .. SECTION_STATE, palette = tokens, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
+    { scope = state .. '.' .. DARK_STATE, palette = dark, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
   }
   for _, entry in ipairs(surfaces) do
-    local is_dark = palette.tone(entry.surface) == 'dark'
+    local values = entry.palette
+    local is_dark = palette.tone(values[entry.surface]) == 'dark'
+    local paint = values[is_dark and entry.dark or entry.light]
     lines[#lines + 1] = entry.scope .. ' {'
-    lines[#lines + 1] = '  --atelier-motif-paint: var(--atelier-' .. (is_dark and entry.dark or entry.light) .. ');'
+    lines[#lines + 1] = '  --atelier-motif-paint: ' .. palette.hex(paint, values[entry.surface]) .. ';'
     lines[#lines + 1] = '  --atelier-motif-opacity: ' .. (is_dark and '1' or string.format('%g', motifs.LIGHT_OPACITY)) .. ';'
     lines[#lines + 1] = '}'
   end
@@ -302,7 +310,8 @@ local function publish(meta)
   quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop))
   if deck.workshop then
     local attributes = meta['title-slide-attributes'] or {}
-    attributes['data-' .. MOTIF_ATTRIBUTE] = pandoc.MetaString('')
+    local states = attributes['data-state'] and pandoc.utils.stringify(attributes['data-state']) or ''
+    attributes['data-state'] = pandoc.MetaString(states == '' and MOTIF_STATE or (states .. ' ' .. MOTIF_STATE))
     meta['title-slide-attributes'] = attributes
     return meta
   end
@@ -351,10 +360,10 @@ local function mark_slide(header)
   local dark = header.classes:includes(DARK_CLASS)
   if header.level == 1 then
     add_class(header.attr, SECTION_CLASS)
-    if deck.workshop then
-      header.attributes[MOTIF_ATTRIBUTE] = ''
-    end
     add_state(header.attr, dark and DARK_STATE or SECTION_STATE)
+    if deck.workshop then
+      add_state(header.attr, MOTIF_STATE)
+    end
     set_background(header.attr, dark and deck.dark_section_bg or deck.section_bg)
     if dark or deck.section_dark then
       add_class(header.attr, DARK_BACKGROUND_CLASS)
