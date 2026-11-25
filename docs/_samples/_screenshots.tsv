@@ -1,0 +1,14 @@
+name	source	kind	target	scheme
+workshop-sidebar-light	demos/workshop-sidebar/workshop/first-site/index.html	html	page	light
+workshop-sidebar-dark	demos/workshop-sidebar/workshop/first-site/index.html	html	page	dark
+workshop-navbar-light	demos/workshop-navbar/workshop/first-site/index.html	html	page	light
+workshop-navbar-dark	demos/workshop-navbar/workshop/first-site/index.html	html	page	dark
+docs-navbar-light	demos/docs-navbar/get-started.html	html	page	light
+docs-navbar-dark	demos/docs-navbar/get-started.html	html	page	dark
+docs-sidebar-light	demos/docs-sidebar/get-started.html	html	page	light
+docs-sidebar-dark	demos/docs-sidebar/get-started.html	html	page	dark
+preset-default-light	demos/preset-default/get-started.html	html	page	light
+preset-default-dark	demos/preset-default/get-started.html	html	page	dark
+preset-quarto-light	demos/preset-quarto/get-started.html	html	page	light
+preset-quarto-dark	demos/preset-quarto/get-started.html	html	page	dark
+preset-terminal-dark	demos/preset-terminal/get-started.html	html	page	dark
