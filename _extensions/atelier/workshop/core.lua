@@ -307,38 +307,52 @@ function M.author_name(author)
   return text_of(author.name.literal or author.name)
 end
 
---- Read a photo file of a speaker as a data URI, so the page carries it.
---- A file that does not exist, or that is not an image type that a browser
---- shows, logs a warning and gives nil.
+--- Resolve a photo path against the folder of the document.
+--- @param path string The path, relative to the document
+--- @return string
+local function photo_file(path)
+  if path:sub(1, 1) ~= '/' and quarto.doc.input_file then
+    return pandoc.path.join({ pandoc.path.directory(quarto.doc.input_file), path })
+  end
+  return path
+end
+
+--- Check the photo file of a speaker. A file that does not exist, or that is
+--- not an image type that a browser shows, logs a warning.
 --- @param path string The path, relative to the document
 --- @param key string The key of the speaker, for the warning
---- @return string|nil The data URI
-local function photo_uri(path, key)
+--- @return boolean True when the photo can be shown
+local function photo_ok(path, key)
   local subject = 'extensions.atelier.speakers.' .. key .. '.photo'
-  local media = PHOTO_TYPES[(path:match('%.([^./\\]+)$') or ''):lower()]
-  if media == nil then
+  if PHOTO_TYPES[(path:match('%.([^./\\]+)$') or ''):lower()] == nil then
     log.log_warning(
       EXTENSION_NAME,
       subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
       ' is not an svg, png, jpg, gif or webp file, so the speaker has no photo.'
     )
-    return nil
+    return false
   end
-  local full = path
-  if path:sub(1, 1) ~= '/' and quarto.doc.input_file then
-    full = pandoc.path.join({ pandoc.path.directory(quarto.doc.input_file), path })
-  end
-  local file = io.open(full, 'rb')
+  local file = io.open(photo_file(path), 'rb')
   if file == nil then
     log.log_warning(
       EXTENSION_NAME,
       subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
       ' does not exist, so the speaker has no photo. Correct the path, relative to the document.'
     )
-    return nil
+    return false
   end
+  file:close()
+  return true
+end
+
+--- Read the photo of a speaker as a data URI, so the page carries it.
+--- @param path string The path of a photo that `M.speakers` checked
+--- @return string The data URI
+function M.photo_uri(path)
+  local file = assert(io.open(photo_file(path), 'rb'))
   local content = file:read('a')
   file:close()
+  local media = PHOTO_TYPES[path:match('%.([^./\\]+)$'):lower()]
   return 'data:' .. media .. ';base64,' .. quarto.base64.encode(content)
 end
 
@@ -349,7 +363,7 @@ end
 --- is next to it.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { name: string, degrees: string[], affiliation: string|nil, photo: string|nil, uri: string|nil, alt: string }[] The speakers, empty outside workshop mode
+--- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers, empty outside workshop mode: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
 function M.speakers(meta, model)
   if model.mode ~= M.MODE_WORKSHOP then
     return {}
@@ -357,13 +371,13 @@ function M.speakers(meta, model)
   local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
   local used = {}
   local speakers = {}
-  for _, author in ipairs(meta['by-author'] or {}) do
+  for index, author in ipairs(meta['by-author'] or {}) do
     local name = M.author_name(author)
     if name ~= '' then
       local id = text_of(author.id)
       local key = (id ~= '' and photos[id] ~= nil) and id or name
       local entry = photos[key]
-      local speaker = { name = name, degrees = {}, alt = '' }
+      local speaker = { index = index, name = name, degrees = {}, alt = '' }
       for _, degree in ipairs(author.degrees or {}) do
         speaker.degrees[#speaker.degrees + 1] = text_of(degree)
       end
@@ -374,9 +388,8 @@ function M.speakers(meta, model)
       if type(entry) == 'table' then
         used[key] = true
         local photo = text_of(entry.photo)
-        if photo ~= '' then
-          speaker.uri = photo_uri(photo, key)
-          speaker.photo = speaker.uri and photo or nil
+        if photo ~= '' and photo_ok(photo, key) then
+          speaker.photo = photo
           speaker.alt = text_of(entry.alt)
         end
       end
@@ -416,33 +429,35 @@ function M.credit(meta, model)
   if model.mode ~= M.MODE_WORKSHOP then
     return nil
   end
-  local authors, rows, by_role = {}, {}, {}
+  local authors, people = {}, {}
   for _, author in ipairs(meta['by-author'] or {}) do
     local name = M.author_name(author)
     if name ~= '' then
       authors[#authors + 1] = name
-      for _, role in ipairs(author.roles or {}) do
-        local term = text_of(role['vocab-term'] or role.role)
-        if term ~= '' then
-          local row = by_role[term]
-          if row == nil then
-            row = { role = term:sub(1, 1):upper() .. term:sub(2), cells = {} }
-            by_role[term] = row
-            rows[#rows + 1] = row
+      people[#people + 1] = author
+    end
+  end
+  local rows, by_role = {}, {}
+  for column, author in ipairs(people) do
+    for _, role in ipairs(author.roles or {}) do
+      local term = text_of(role['vocab-term'] or role.role)
+      if term ~= '' then
+        local row = by_role[term]
+        if row == nil then
+          row = { role = term:sub(1, 1):upper() .. term:sub(2), cells = {} }
+          for other = 1, #people do
+            row.cells[other] = ''
           end
-          local degree = text_of(role['degree-of-contribution']):lower()
-          row.cells[#authors] = model.labels['credit-' .. (DEGREES[degree] and degree or 'contributed')]
+          by_role[term] = row
+          rows[#rows + 1] = row
         end
+        local degree = text_of(role['degree-of-contribution']):lower()
+        row.cells[column] = model.labels['credit-' .. (DEGREES[degree] and degree or 'contributed')]
       end
     end
   end
   if #rows == 0 then
     return nil
-  end
-  for _, row in ipairs(rows) do
-    for column = 1, #authors do
-      row.cells[column] = row.cells[column] or ''
-    end
   end
   return { authors = authors, rows = rows }
 end
@@ -960,12 +975,16 @@ M.BLOCKS = {
   exercise = 'pencil-square',
 }
 
+--- The classes of `M.BLOCKS`, in the order that `M.block_kind` tries them.
+--- @type string[]
+local BLOCK_ORDER = { 'prerequisites', 'checkpoint', 'exercise' }
+
 --- Answer the class of the first block of `M.BLOCKS` that a div has, in the
 --- order prerequisites, checkpoint, exercise.
 --- @param div pandoc.Div The div
 --- @return string|nil The class, or nil when the div is no such block
 function M.block_kind(div)
-  for _, kind in ipairs({ 'prerequisites', 'checkpoint', 'exercise' }) do
+  for _, kind in ipairs(BLOCK_ORDER) do
     if div.classes:includes(kind) then
       return kind
     end

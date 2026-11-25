@@ -12,6 +12,12 @@
 
 local M = {}
 
+--- The factor of every opacity of a motif on a light surface. On a dark
+--- surface the opacities stay as they are. `html/workshop.scss` holds the
+--- same value, as Sass cannot read this module.
+--- @type number
+M.LIGHT_OPACITY = 0.85
+
 --- The motif of each preset.
 --- @type table<string, string>
 local PRESET_MOTIFS = {
@@ -48,32 +54,34 @@ end
 --- arc to the top right; a `circle` has the centre `x`, `y` and the radius
 --- `r`. Each shape has an `opacity`.
 --- @type table<string, fun(): table[]>
-local GEOMETRY = {
-  steps = function()
-    local shapes = {}
-    for i = 0, 3 do
-      for j = 0, 3 - i do
-        shapes[#shapes + 1] = { kind = 'rect', x = 88 - 13 * i, y = 13 * j, size = 12, opacity = grid_opacity(i, j) }
-      end
+local GEOMETRY
+
+--- The cells of the four-column grid of `steps` and `quadrants`: 4, 3, 2
+--- and 1 cells from the corner, each made by `make`.
+--- @param make fun(i: integer, j: integer, opacity: number): table The shape of the cell in column `i` and row `j`
+--- @return table[]
+local function grid(make)
+  local shapes = {}
+  for i = 0, 3 do
+    for j = 0, 3 - i do
+      shapes[#shapes + 1] = make(i, j, grid_opacity(i, j))
     end
-    return shapes
+  end
+  return shapes
+end
+
+GEOMETRY = {
+  steps = function()
+    return grid(function(i, j, opacity)
+      return { kind = 'rect', x = 88 - 13 * i, y = 13 * j, size = 12, opacity = opacity }
+    end)
   end,
   -- The quarter discs take only the geometry of the Quarto icon. Every disc
   -- turns the same way, so the four-disc icon never forms.
   quadrants = function()
-    local shapes = {}
-    for i = 0, 3 do
-      for j = 0, 3 - i do
-        shapes[#shapes + 1] = {
-          kind = 'quarter',
-          x = round(88 - 13.6 * i),
-          y = round(13.6 * j + 12),
-          r = 12,
-          opacity = grid_opacity(i, j),
-        }
-      end
-    end
-    return shapes
+    return grid(function(i, j, opacity)
+      return { kind = 'quarter', x = round(88 - 13.6 * i), y = round(13.6 * j + 12), r = 12, opacity = opacity }
+    end)
   end,
   dots = function()
     local shapes = {}
@@ -107,7 +115,7 @@ end
 --- a mask needs.
 --- @param name string A motif name of `M.name`
 --- @return string
-function M.svg(name)
+local function svg(name)
   local parts = { '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" data-motif="' .. name .. '">' }
   for _, shape in ipairs(M.shapes(name)) do
     local opacity = ' fill-opacity="' .. number(shape.opacity) .. '"/>'
@@ -130,7 +138,7 @@ end
 --- @param name string A motif name of `M.name`
 --- @return string Such as `url("data:image/svg+xml,...")`
 function M.mask(name)
-  local encoded = M.svg(name):gsub('[^%w%-%._~/:=,]', function(char)
+  local encoded = svg(name):gsub('[^%w%-%._~/:=,]', function(char)
     return string.format('%%%02X', string.byte(char))
   end)
   return 'url("data:image/svg+xml,' .. encoded .. '")'

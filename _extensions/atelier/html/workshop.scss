@@ -520,9 +520,10 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 // ===========================================================================
 // The title block of a workshop page has the motif of the preset in its top
 // right corner. `workshop/html.lua` writes the shapes as the mask
-// `--atelier-motif`. The motif is flat colour: the accent mark at 85% on a
-// light page, the accent ink on a dark one. It only decorates: a pseudo-element
-// with no text, which forced colours remove.
+// `--atelier-motif`. The motif is flat colour: the accent mark at 85%, as
+// `motifs.LIGHT_OPACITY`, on a light page, and the accent ink on a dark one.
+// It only decorates: a pseudo-element with no text, which forced colours
+// remove.
 
 html.atelier-workshop #title-block-header {
   position: relative;

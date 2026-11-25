@@ -15,8 +15,11 @@
 			"#title-block-header .quarto-title-meta-contents > p",
 		);
 		speakers.forEach(function (speaker) {
+			// The line starts with the name, then the degrees after a comma, or
+			// the contact links after a space, so "Ann" does not match "Anna".
 			var line = Array.prototype.find.call(names, function (name) {
-				return name.textContent.trim().indexOf(speaker.name) === 0;
+				var text = name.textContent.trim();
+				return text === speaker.name || (text.indexOf(speaker.name) === 0 && /^[,\s]/.test(text.slice(speaker.name.length)));
 			});
 			if (!line) {
 				return;

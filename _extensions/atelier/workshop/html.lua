@@ -73,8 +73,8 @@ function M.publish(meta, model)
     )
     local photos = {}
     for _, speaker in ipairs(core.speakers(meta, model)) do
-      if speaker.uri ~= nil then
-        photos[#photos + 1] = { name = speaker.name, photo = speaker.uri, alt = speaker.alt }
+      if speaker.photo ~= nil then
+        photos[#photos + 1] = { name = speaker.name, photo = core.photo_uri(speaker.photo), alt = speaker.alt }
       end
     end
     if #photos > 0 then

@@ -74,7 +74,7 @@ function M.publish(meta, model)
       name = pandoc.MetaString(speaker.name),
       degrees = #speaker.degrees > 0 and pandoc.MetaString(table.concat(speaker.degrees, ', ')) or nil,
       affiliation = speaker.affiliation and pandoc.MetaString(speaker.affiliation) or nil,
-      photo = speaker.uri and pandoc.MetaString(speaker.uri) or nil,
+      photo = speaker.photo and pandoc.MetaString(core.photo_uri(speaker.photo)) or nil,
       alt = pandoc.MetaString(speaker.alt),
     })
   end
@@ -192,6 +192,9 @@ local CROSSREF = {
 --- @return boolean refs
 local function references(doc)
   local cites, refs = false, false
+  if doc.meta.bibliography == nil and doc.meta.references == nil then
+    return cites, refs
+  end
   doc:walk({
     Cite = function(cite)
       for _, citation in ipairs(cite.citations) do

@@ -214,44 +214,29 @@ local function font_declarations(scheme)
   return lines
 end
 
---- The custom properties of the motif in one scope: the colour and the
---- opacity, after the tone of the surface. A light surface takes the mark at
---- 85%, a dark one the ink.
---- @param surface table The colour under the motif
---- @param light string The token on a light surface
---- @param dark string The token on a dark surface
---- @return string[]
-local function motif_paint(surface, light, dark)
-  local is_dark = palette.tone(surface) == 'dark'
-  return {
-    '  --atelier-motif-paint: var(--atelier-' .. (is_dark and dark or light) .. ');',
-    '  --atelier-motif-opacity: ' .. (is_dark and '1' or '0.85') .. ';',
-  }
-end
-
 --- The rules of the motif of a workshop deck: the mask of the preset, and
---- its colour on the page, on the dark slides and on the section slides.
+--- its colour and opacity on the page, on the dark slides and on the section
+--- slides. A light surface takes the mark at `motifs.LIGHT_OPACITY`, and a
+--- dark one the ink, or the chrome mark on a section slide.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
 --- @return string[]
 local function motif_rules(scheme, tokens, dark)
   local preset = palette.preset(palette.painted_scheme(scheme))
-  local lines = { ROOT_SCOPE .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';' }
-  for _, line in ipairs(motif_paint(tokens.bg, 'accent-mark', 'accent-ink')) do
-    lines[#lines + 1] = line
+  local lines = { ROOT_SCOPE .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
+  local surfaces = {
+    { scope = ROOT_SCOPE, surface = tokens.bg, light = 'accent-mark', dark = 'accent-ink' },
+    { scope = DARK_SCOPE, surface = dark.bg, light = 'accent-mark', dark = 'accent-ink' },
+    { scope = '.reveal .slides section.' .. SECTION_CLASS, surface = tokens['navbar-bg'], light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
+  }
+  for _, entry in ipairs(surfaces) do
+    local is_dark = palette.tone(entry.surface) == 'dark'
+    lines[#lines + 1] = entry.scope .. ' {'
+    lines[#lines + 1] = '  --atelier-motif-paint: var(--atelier-' .. (is_dark and entry.dark or entry.light) .. ');'
+    lines[#lines + 1] = '  --atelier-motif-opacity: ' .. (is_dark and '1' or string.format('%g', motifs.LIGHT_OPACITY)) .. ';'
+    lines[#lines + 1] = '}'
   end
-  lines[#lines + 1] = '}'
-  lines[#lines + 1] = DARK_SCOPE .. ' {'
-  for _, line in ipairs(motif_paint(dark.bg, 'accent-mark', 'accent-ink')) do
-    lines[#lines + 1] = line
-  end
-  lines[#lines + 1] = '}'
-  lines[#lines + 1] = '.reveal .slides section.' .. SECTION_CLASS .. ' {'
-  for _, line in ipairs(motif_paint(tokens['navbar-bg'], 'navbar-accent-mark', 'navbar-accent-mark')) do
-    lines[#lines + 1] = line
-  end
-  lines[#lines + 1] = '}'
   return lines
 end
 
