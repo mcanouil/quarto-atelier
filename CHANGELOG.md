@@ -22,6 +22,9 @@
 - fix: A Typst page no longer logs the offset-headings warning about the heading shift of Quarto.
 - feat: The workshop and documentation templates offer the PDF and the slide deck on their home page, with the link change of the PDF and the deck off until you set `website.site-url`.
 - docs: Add a page on the `atelier-typst` and `atelier-revealjs` formats, and document the prerequisites, checkpoint, speakers, closing, CRediT table and motifs of workshop mode.
+- fix: The menu, the chalkboard buttons and the footer of a deck share one row with one centre line, and the two footer slots no longer run together.
+- fix: The keyboard reaches the chalkboard buttons of a deck, and screen readers announce them as buttons.
+- feat: The title slide of a deck shows only your `footer` text at the bottom, and the title and section slides show no slide number.
 
 ## 0.15.3 (2026-11-23)
 
