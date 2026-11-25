@@ -1,0 +1,8 @@
+# Results
+
+Nitrate levels went up from the weir to the mouth.
+The largest change was after the mill.
+
+```python
+samples.group_by("site").agg(pl.col("nitrate").mean())
+```

@@ -47,6 +47,8 @@ Every value of a preset is a default.
 A `color` key, a `typography` key, or a `defaults.bootstrap.defaults` value in your `_brand.yml` wins over the preset.
 The preset fills in only what the brand leaves out.
 
+The [gallery](gallery.qmd#presets) shows each preset on a web page, in a PDF, and in a deck.
+
 ### The default preset
 
 This is the Atelier look.

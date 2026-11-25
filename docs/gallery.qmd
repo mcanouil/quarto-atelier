@@ -141,6 +141,30 @@ The presets have no live demo.
 ![Dark](assets/gallery/preset-default-dark.png){group="preset-default" width="1440" height="900" loading="lazy" fig-alt="The default preset in the dark colour scheme: a dark slate page with a grey navbar and sidebar, a table of contents, and a code block with cyan highlights."}
 :::
 
+The same preset in the PDF and the deck:
+
+Light scheme:
+
+::: {layout-ncol=3}
+![PDF](assets/gallery/preset-default-typst-light.png){group="preset-default-typst" width="909" height="1286" loading="lazy" fig-alt="The PDF page of the default preset in the light colour scheme: a white page in a serif face, with a blue underline under the title and a pale grey code block."}
+
+![Title slide](assets/gallery/preset-default-title-light.png){group="preset-default-title" width="1280" height="720" loading="lazy" fig-alt="The title slide of the default preset in the light colour scheme: a pale title slide with a dark title, a slate rule, the author, and the date."}
+
+![Section slide](assets/gallery/preset-default-section-light.png){group="preset-default-section" width="1280" height="720" loading="lazy" fig-alt="The section slide of the default preset in the light colour scheme: a pale section slide with a heading, one paragraph, and a code block."}
+
+:::
+
+Dark scheme:
+
+::: {layout-ncol=3}
+![PDF](assets/gallery/preset-default-typst-dark.png){group="preset-default-typst" width="909" height="1286" loading="lazy" fig-alt="The PDF page of the default preset in the dark colour scheme: a dark page with a light title and a dark code block."}
+
+![Title slide](assets/gallery/preset-default-title-dark.png){group="preset-default-title" width="1280" height="720" loading="lazy" fig-alt="The title slide of the default preset in the dark colour scheme: a dark title slide with a light title, a rule, the author, and the date."}
+
+![Section slide](assets/gallery/preset-default-section-dark.png){group="preset-default-section" width="1280" height="720" loading="lazy" fig-alt="The section slide of the default preset in the dark colour scheme: a dark section slide with a heading, one paragraph, and a code block."}
+
+:::
+
 ```{.yaml filename="_brand.yml"}
 defaults:
   bootstrap:
@@ -156,6 +180,30 @@ defaults:
 ![Dark](assets/gallery/preset-quarto-dark.png){group="preset-quarto" width="1440" height="900" loading="lazy" fig-alt="The quarto preset in the dark colour scheme: a dark blue page with a navy navbar and sidebar, and light blue links."}
 :::
 
+The same preset in the PDF and the deck:
+
+Light scheme:
+
+::: {layout-ncol=3}
+![PDF](assets/gallery/preset-quarto-typst-light.png){group="preset-quarto-typst" width="909" height="1286" loading="lazy" fig-alt="The PDF page of the quarto preset in the light colour scheme: a white page with a blue underline under the title and a pale code block."}
+
+![Title slide](assets/gallery/preset-quarto-title-light.png){group="preset-quarto-title" width="1280" height="720" loading="lazy" fig-alt="The title slide of the quarto preset in the light colour scheme: a pale blue title slide with a dark title, a blue rule, the author, and the date."}
+
+![Section slide](assets/gallery/preset-quarto-section-light.png){group="preset-quarto-section" width="1280" height="720" loading="lazy" fig-alt="The section slide of the quarto preset in the light colour scheme: a pale blue section slide with a heading, a blue rule, one paragraph, and a code block."}
+
+:::
+
+Dark scheme:
+
+::: {layout-ncol=3}
+![PDF](assets/gallery/preset-quarto-typst-dark.png){group="preset-quarto-typst" width="909" height="1286" loading="lazy" fig-alt="The PDF page of the quarto preset in the dark colour scheme: a dark page with a light title and a dark code block."}
+
+![Title slide](assets/gallery/preset-quarto-title-dark.png){group="preset-quarto-title" width="1280" height="720" loading="lazy" fig-alt="The title slide of the quarto preset in the dark colour scheme: a dark navy title slide with a light title, a blue rule, the author, and the date."}
+
+![Section slide](assets/gallery/preset-quarto-section-dark.png){group="preset-quarto-section" width="1280" height="720" loading="lazy" fig-alt="The section slide of the quarto preset in the dark colour scheme: a dark navy section slide with a heading, a blue rule, one paragraph, and a code block."}
+
+:::
+
 ```{.yaml filename="_brand.yml"}
 defaults:
   bootstrap:
@@ -168,6 +216,19 @@ defaults:
 The terminal preset has a dark colour scheme only.
 
 ![Dark](assets/gallery/preset-terminal-dark.png){width="1440" height="900" loading="lazy" fig-alt="The terminal preset: a near-black page with green accents, a prompt and a cursor in the title, and monospace text."}
+
+The same preset in the PDF and the deck:
+
+Dark scheme:
+
+::: {layout-ncol=3}
+![PDF](assets/gallery/preset-terminal-typst-dark.png){group="preset-terminal-typst" width="909" height="1286" loading="lazy" fig-alt="The PDF page of the terminal preset in the dark colour scheme: a near-black page in monospace type, with a green underline under the title and a code block with a window bar."}
+
+![Title slide](assets/gallery/preset-terminal-title-dark.png){group="preset-terminal-title" width="1280" height="720" loading="lazy" fig-alt="The title slide of the terminal preset in the dark colour scheme: a near-black title slide in monospace type with a green rule, the author, and the date."}
+
+![Section slide](assets/gallery/preset-terminal-section-dark.png){group="preset-terminal-section" width="1280" height="720" loading="lazy" fig-alt="The section slide of the terminal preset in the dark colour scheme: a near-black section slide in monospace type with a heading, one paragraph, and a code block."}
+
+:::
 
 ```{.yaml filename="_brand.yml"}
 defaults:
