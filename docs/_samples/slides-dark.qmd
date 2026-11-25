@@ -1,6 +1,7 @@
 ---
 title: "Field notes on river sampling"
 subtitle: "Results of the spring survey"
+author: Ana Diaz
 format: atelier-revealjs
 brand-mode: dark
 footer: "Atelier"

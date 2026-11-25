@@ -1,6 +1,7 @@
 ---
 title: "Field notes on river sampling"
 subtitle: "A report with every switch on"
+author: Ana Diaz
 format: atelier-typst
 toc: true
 extensions:

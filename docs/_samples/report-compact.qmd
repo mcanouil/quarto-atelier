@@ -1,6 +1,7 @@
 ---
 title: "Field notes on river sampling"
 subtitle: "A short report in the compact layout"
+author: Ana Diaz
 format: atelier-typst
 toc: true
 ---

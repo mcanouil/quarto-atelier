@@ -55,7 +55,15 @@ PREFIX = "/quarto-atelier"
 VIEWPORT = {"width": 1440, "height": 900}
 DECK_VIEWPORT = {"width": 1280, "height": 720}
 TYPST_PPI = 110
+# The header and the footer of `atelier-typst` sit in the outer 17.5 mm of the
+# 25 mm page margins (`margin.y` in `_extension.yml`, less the 30% header
+# ascent and footer descent of Typst). A trimmed page leaves out a 20 mm band.
+# The first page has no header, but the motif can be in its top margin.
+TYPST_FURNITURE = round(20 / 25.4 * TYPST_PPI)
 CROP_SUFFIX = "+trim"
+# The deck of a sample with more than one format has `output-file:
+# <stem>-slides.html`, because its HTML page takes `<stem>.html`.
+DECK_SUFFIX = "-slides"
 FONT_WARNING = "unknown font family"
 DECK_READY = "() => window.Reveal !== undefined && window.Reveal.isReady()"
 GO_TO_SLIDE = """target => new Promise(resolve => {
@@ -224,9 +232,12 @@ def build_demos(output_dir: Path, ids: Sequence[str]) -> None:
 
 def _sample_stem(shot: Shot) -> str | None:
     parts = Path(shot.source).parts
-    if len(parts) > 1 and parts[0] == "samples":
-        return Path(parts[1]).stem
-    return None
+    if len(parts) < 2 or parts[0] != "samples":
+        return None
+    stem = Path(parts[1]).stem
+    if shot.kind == "revealjs":
+        return stem.removesuffix(DECK_SUFFIX)
+    return stem
 
 
 def sample_stems(shots: Sequence[Shot]) -> list[str]:
@@ -344,25 +355,37 @@ def capture_typst(typ: Path, page: int, out: Path) -> None:
         raise SystemExit(f"quarto typst compile {typ.name}, page {page}:\n{log}")
 
 
-def trim(path: Path, margin: int = 24) -> None:
-    """Crop a PNG to the pixels that differ from its top-left corner, plus a margin.
+def trim(path: Path, margin: int = 24, header: int = 0, footer: int = 0) -> None:
+    """Crop a PNG to the rows that differ from its top-left corner, plus a margin.
+
+    The crop keeps the full width, so trimmed pages of one size show their
+    content at the same scale.
+
+    Args:
+        path: The PNG to crop in place.
+        margin: The space to keep above and below the content, in pixels.
+        header: The height of the band at the top of the page that holds the
+            page header, in pixels. The crop leaves out this band.
+        footer: The height of the band at the bottom of the page that holds
+            the page footer, in pixels. The crop leaves out this band.
 
     Raises:
-        SystemExit: Every pixel has the colour of the corner.
+        SystemExit: Every pixel between the bands has the colour of the corner.
     """
     with Image.open(path) as image:
         rgb = image.convert("RGB")
         corner = Image.new("RGB", rgb.size, rgb.getpixel((0, 0)))
-        box = ImageChops.difference(rgb, corner).getbbox()
+        body = (0, header, rgb.width, rgb.height - footer)
+        box = ImageChops.difference(rgb, corner).crop(body).getbbox()
         if box is None:
             raise SystemExit(f"{path} is blank: there is nothing to trim to.")
-        left, top, right, bottom = box
+        _, top, _, bottom = box
         cropped = image.crop(
             (
-                max(left - margin, 0),
-                max(top - margin, 0),
-                min(right + margin, image.width),
-                min(bottom + margin, image.height),
+                0,
+                max(header + top - margin, header),
+                image.width,
+                min(header + bottom + margin, image.height - footer),
             )
         )
     cropped.save(path)
@@ -459,7 +482,11 @@ def capture(
                     page_number, trimmed = parse_typst_target(shot.target)
                     capture_typst(build_root / shot.source, page_number, out)
                     if trimmed:
-                        trim(out)
+                        trim(
+                            out,
+                            header=TYPST_FURNITURE if page_number > 1 else 0,
+                            footer=TYPST_FURNITURE,
+                        )
                     print(f"[gallery] {shot.name}.png")
                     continue
                 viewport = DECK_VIEWPORT if shot.kind == "revealjs" else VIEWPORT

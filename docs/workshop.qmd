@@ -304,6 +304,83 @@ Some blocks change with the format:
 - A solution is a disclosure on the web page, a hidden veil group in the deck, and a placed block in the PDF, as `extensions.atelier.solutions` says.
 - A terminal block keeps its prompt and its code window in each format.
 
+These pictures show each block in the three formats, in the light colour scheme.
+The HTML picture shows the block only, the PDF picture shows the block on its page, and the Reveal.js picture shows its slide.
+The PDF puts the solution at the end, as `solutions: end` says.
+Select a picture to see it larger.
+
+**Objectives**
+
+::: {layout-ncol=3}
+
+![HTML](assets/gallery/workshop-objectives-html.png){.lightbox group="workshop-blocks" width="996" height="132" loading="lazy" fig-alt="An objectives block on a web page: a blue header with a target icon, the title After this page, you can, a 15 min badge, and two items with a box to tick."}
+
+![PDF](assets/gallery/workshop-objectives-typst.png){.lightbox group="workshop-blocks" width="909" height="178" loading="lazy" fig-alt="An objectives block in a PDF under the heading Objectives: a blue header with the title and the 15 min badge, and two items with an empty box."}
+
+![Reveal.js](assets/gallery/workshop-objectives-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="An objectives slide with the same blue block, the two items with an empty box, and the deck footer."}
+
+:::
+
+**Exercise**
+
+::: {layout-ncol=3}
+
+![HTML](assets/gallery/workshop-exercise-html.png){.lightbox group="workshop-blocks" width="996" height="98" loading="lazy" fig-alt="An exercise block on a web page: a grey header with a pencil icon, the title Add a page, a 10 min badge, and two sentences of instructions."}
+
+![PDF](assets/gallery/workshop-exercise-typst.png){.lightbox group="workshop-blocks" width="909" height="154" loading="lazy" fig-alt="An exercise block in a PDF under the heading Exercise: a grey header with the title Add a page and the 10 min badge, and the instructions."}
+
+![Reveal.js](assets/gallery/workshop-exercise-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="An exercise slide with the same grey block, the title Add a page, the 10 min badge, and the instructions."}
+
+:::
+
+**Solution**
+
+::: {layout-ncol=3}
+
+![HTML](assets/gallery/workshop-solution-html.png){.lightbox group="workshop-blocks" width="996" height="47" loading="lazy" fig-alt="A closed solution on a web page: one line with an arrow and the summary Solution, in a dashed frame."}
+
+![PDF](assets/gallery/workshop-solution-typst.png){.lightbox group="workshop-blocks" width="909" height="126" loading="lazy" fig-alt="The solution at the end of a PDF: the heading Solutions, the heading Solution 1: Solution, and the text of the solution."}
+
+![Reveal.js](assets/gallery/workshop-solution-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="A solution slide that shows only its heading, because the veil hides the solution when the deck opens."}
+
+:::
+
+**Terminal**
+
+::: {layout-ncol=3}
+
+![HTML](assets/gallery/workshop-terminal-html.png){.lightbox group="workshop-blocks" width="996" height="102" loading="lazy" fig-alt="A terminal block on a web page: a dark window with three grey dots, the label Terminal, a copy button, a command after a dollar prompt, and its output."}
+
+![PDF](assets/gallery/workshop-terminal-typst.png){.lightbox group="workshop-blocks" width="909" height="162" loading="lazy" fig-alt="A terminal block in a PDF: a dark window with three coloured dots, the label Terminal, a command after a dollar prompt, and its output."}
+
+![Reveal.js](assets/gallery/workshop-terminal-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="A terminal slide with the dark window, the command after a dollar prompt, and its output."}
+
+:::
+
+**Prerequisites**
+
+::: {layout-ncol=3}
+
+![HTML](assets/gallery/workshop-prerequisites-html.png){.lightbox group="workshop-blocks" width="996" height="121" loading="lazy" fig-alt="A prerequisites block on a web page: a grey header with a list icon, the title Before you start, a 5 min badge, and two items."}
+
+![PDF](assets/gallery/workshop-prerequisites-typst.png){.lightbox group="workshop-blocks" width="909" height="175" loading="lazy" fig-alt="A prerequisites block in a PDF under the heading Prerequisites: a grey header with the title Before you start and the 5 min badge, and two items."}
+
+![Reveal.js](assets/gallery/workshop-prerequisites-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="A prerequisites slide with the same block, the title Before you start, the 5 min badge, and two items."}
+
+:::
+
+**Checkpoint**
+
+::: {layout-ncol=3}
+
+![HTML](assets/gallery/workshop-checkpoint-html.png){.lightbox group="workshop-blocks" width="996" height="99" loading="lazy" fig-alt="A checkpoint block on a web page: a green bar on the left, a flag icon, the title Checkpoint, a 5 min badge, and one sentence."}
+
+![PDF](assets/gallery/workshop-checkpoint-typst.png){.lightbox group="workshop-blocks" width="909" height="154" loading="lazy" fig-alt="A checkpoint block in a PDF under the heading Checkpoint: a green bar on the left, the title Checkpoint, the 5 min badge, and one sentence."}
+
+![Reveal.js](assets/gallery/workshop-checkpoint-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="A checkpoint slide with the same green block, the title Checkpoint, the 5 min badge, and one sentence."}
+
+:::
+
 ## Workshop extras
 
 These features are for workshop mode.
@@ -336,6 +413,18 @@ The photo can be an SVG, PNG, JPG, GIF, or WebP file.
 If you write no `alt`, the photo is decorative, because the name is next to it.
 If a key matches no author, or the file is missing, Atelier logs a warning and shows no photo.
 
+These pictures show a speaker with a photo in each format.
+
+::: {layout-ncol=3}
+
+![The title block of a web page.](assets/gallery/workshop-speakers-html.png){.lightbox group="workshop-speakers" width="996" height="295" loading="lazy" fig-alt="The title block of a web page: the title, the subtitle, a round photo next to the name Ana Diaz under the label Instructor, the affiliation, and the session date."}
+
+![The title block of a PDF.](assets/gallery/workshop-speakers-typst.png){.lightbox group="workshop-speakers" width="909" height="333" loading="lazy" fig-alt="The title block of a PDF: the title with a blue rule, the subtitle, a round photo next to the name Ana Diaz under the label Instructor, the affiliation, the session date, and the motif in the top right corner."}
+
+![The title slide of a deck.](assets/gallery/workshop-speakers-revealjs.png){.lightbox group="workshop-speakers" width="1280" height="720" loading="lazy" fig-alt="The title slide of a deck: the title, the subtitle, a round photo next to the name Ana Diaz and the affiliation, the date, and the motif in the top right corner."}
+
+:::
+
 ### Closing
 
 `extensions.atelier.closing` ends a page, a handout, or a deck with a thank-you, links, and a licence.
@@ -363,23 +452,42 @@ Do not set it in `_quarto.yml`.
 There it reaches every page, and each page repeats the closing and the CRediT table.
 A deck that cites sources shows a references slide before the closing slide.
 
+These pictures show the closing in each format.
+The PDF and the deck also show the CRediT table.
+
+::: {layout-ncol=3}
+
+![The closing of a web page.](assets/gallery/workshop-closing-html.png){.lightbox group="workshop-closing" width="996" height="190" loading="lazy" fig-alt="The closing at the end of a web page: the heading Thank you, the link Ask a question, and the licence CC BY 4.0."}
+
+![The closing of a PDF.](assets/gallery/workshop-closing-typst.png){.lightbox group="workshop-closing" width="909" height="251" loading="lazy" fig-alt="The end of a PDF: the table Author contributions (CRediT), a blue rule, the heading Thank you, the link Ask a question, and the licence CC BY 4.0."}
+
+![The closing slide of a deck.](assets/gallery/workshop-closing-revealjs.png){.lightbox group="workshop-closing" width="1280" height="720" loading="lazy" fig-alt="The closing slide of a deck: the heading Thank you, the link Ask a question, the licence CC BY 4.0, and a small CRediT table."}
+
+:::
+
 ### CRediT table
 
-The `role` field of an author gives the contribution roles, with the CRediT terms of Quarto.
-Atelier shows them as a table, with a row for each role and a column for each author.
-A cell shows "Lead", "Equal", "Supporting", or "Contributed", from the `degree-of-contribution` of the role.
+The `roles` field of an author gives the contribution roles, with the CRediT terms of Quarto.
+A role is a term, such as `writing`, or a term and its degree, such as `writing: lead`.
+Atelier shows the roles as a table, with a row for each role and a column for each author.
+A cell shows "Lead", "Equal", "Supporting", or "Contributed", from the degree of the role.
+A role with no degree shows "Contributed".
 
 ```{.yaml filename="index.qmd"}
 author:
   - name: Ana Diaz
     roles:
-      - role: writing
-        degree-of-contribution: lead
+      - writing: lead
 ```
 
 The PDF and the deck always show the table, at the end and on the closing slide.
 A web page shows it only where `closing` is set.
 A page with no roles shows no table.
+
+On a web page, the table comes before the closing.
+The [Closing](#closing) pictures show the table in the PDF and in the deck.
+
+![The CRediT table of a web page.](assets/gallery/workshop-credit-html.png){.lightbox group="workshop-credit" width="996" height="160" loading="lazy" fig-alt="The table Author contributions (CRediT) on a web page: a column Role and a column Ana Diaz, with the row Writing, original draft, and the value Lead."}
 
 ### Motifs
 
@@ -396,6 +504,7 @@ Each preset has its own motif:
 
 The motif takes its colour from the palette of the preset, and assistive technology skips it.
 You cannot choose another motif.
+The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each preset.
 
 ## Title block labels
 

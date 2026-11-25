@@ -1,0 +1,43 @@
+---
+title: "Publish your site"
+subtitle: "The workshop extras"
+format:
+  atelier-html: default
+  atelier-typst: default
+  atelier-revealjs:
+    output-file: extras-slides.html
+author:
+  - id: ana
+    name: Ana Diaz
+    affiliations:
+      - name: Example University
+    roles:
+      - writing: lead
+extensions:
+  atelier:
+    mode: workshop
+    speakers:
+      ana:
+        photo: speaker.svg
+        alt: "A drawn portrait of Ana Diaz"
+    closing:
+      links:
+        - "[Ask a question](https://github.com/owner/project/discussions)"
+license: "CC BY 4.0"
+---
+
+::: {.content-visible when-format="typst"}
+
+{{< pagebreak >}}
+
+:::
+
+## Publish
+
+Run `quarto publish` to put the site on the web.
+
+::: {.content-visible when-format="typst"}
+
+{{< pagebreak >}}
+
+:::

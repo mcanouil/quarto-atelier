@@ -1,6 +1,7 @@
 ---
 title: "Add a page to a site"
 subtitle: "Solutions: inline"
+author: Ana Diaz
 format: atelier-typst
 extensions:
   atelier:
