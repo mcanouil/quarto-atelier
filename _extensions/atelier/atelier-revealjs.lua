@@ -428,14 +428,23 @@ local function fill_footer(div)
     return nil
   end
   local own = pandoc.utils.blocks_to_inlines(div.content)
-  local slot = function(name, content, attributes)
-    return pandoc.Span(content, pandoc.Attr('', { 'atelier-slot', 'atelier-slot-' .. name }, attributes or {}))
+  local slot = function(name, content)
+    return pandoc.Span(content, pandoc.Attr('', { 'atelier-slot', 'atelier-slot-' .. name }))
+  end
+  -- A slot can cut its text, so the text sits in a span that takes hover and
+  -- carries the full text as its title.
+  local text = function(content)
+    if #content == 0 then
+      return {}
+    end
+    local plain = pandoc.utils.stringify(content)
+    return { pandoc.Span(content, pandoc.Attr('', { 'atelier-slot-text' }, { title = plain })) }
   end
   div.content = pandoc.Blocks({
     pandoc.Div(
       pandoc.Plain({
-        slot('left', pandoc.Inlines(deck.title), { title = deck.title }),
-        slot('centre', own),
+        slot('left', text(pandoc.Inlines(deck.title))),
+        slot('centre', text(own)),
         slot('logo', {}),
       }),
       pandoc.Attr('', { 'atelier-footer-row' })

@@ -302,8 +302,17 @@ html.print-pdf:root {
 
 .reveal .footer .atelier-slot-centre {
   grid-column: 2;
+  min-width: 0;
+  overflow: hidden;
   text-align: center;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// The text of a slot takes hover, so the title of a cut text shows, but the
+// rest of the row lets clicks through.
+.reveal .footer .atelier-slot-text {
+  pointer-events: auto;
 }
 
 .reveal .footer .atelier-slot-centre:empty {
