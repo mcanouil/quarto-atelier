@@ -266,6 +266,130 @@ function M.apply_title_labels(meta, labels)
 end
 
 -- ============================================================================
+-- SPEAKERS
+-- ============================================================================
+
+--- The media types of the photo files that a speaker can have, by extension.
+--- @type table<string, string>
+local PHOTO_TYPES = {
+  svg = 'image/svg+xml',
+  png = 'image/png',
+  jpg = 'image/jpeg',
+  jpeg = 'image/jpeg',
+  gif = 'image/gif',
+  webp = 'image/webp',
+}
+
+--- The plain text of a metadata value, or an empty string.
+--- @param value any
+--- @return string
+local function text_of(value)
+  if value == nil then
+    return ''
+  end
+  return pandoc.utils.stringify(value)
+end
+
+--- Answer the name of an author as Quarto normalises it.
+--- @param author table An entry of `by-author`
+--- @return string
+function M.author_name(author)
+  if author.name == nil then
+    return ''
+  end
+  return text_of(author.name.literal or author.name)
+end
+
+--- Read a photo file of a speaker as a data URI, so the page carries it.
+--- A file that does not exist, or that is not an image type that a browser
+--- shows, logs a warning and gives nil.
+--- @param path string The path, relative to the document
+--- @param key string The key of the speaker, for the warning
+--- @return string|nil The data URI
+local function photo_uri(path, key)
+  local subject = 'extensions.atelier.speakers.' .. key .. '.photo'
+  local media = PHOTO_TYPES[(path:match('%.([^./\\]+)$') or ''):lower()]
+  if media == nil then
+    log.log_warning(
+      EXTENSION_NAME,
+      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
+      ' is not an svg, png, jpg, gif or webp file, so the speaker has no photo.'
+    )
+    return nil
+  end
+  local full = path
+  if path:sub(1, 1) ~= '/' and quarto.doc.input_file then
+    full = pandoc.path.join({ pandoc.path.directory(quarto.doc.input_file), path })
+  end
+  local file = io.open(full, 'rb')
+  if file == nil then
+    log.log_warning(
+      EXTENSION_NAME,
+      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
+      ' does not exist, so the speaker has no photo. Correct the path, relative to the document.'
+    )
+    return nil
+  end
+  local content = file:read('a')
+  file:close()
+  return 'data:' .. media .. ';base64,' .. quarto.base64.encode(content)
+end
+
+--- Read the speakers of a workshop page: each author of Quarto's `author`
+--- list, with the photo of `extensions.atelier.speakers`, a map from the
+--- author `id`, else the author name, to `photo` and `alt`. A key that names
+--- no author logs a warning. A photo with no `alt` is decorative, as the name
+--- is next to it.
+--- @param meta table The document metadata
+--- @param model table The page model
+--- @return { name: string, degrees: string[], affiliation: string|nil, photo: string|nil, uri: string|nil, alt: string }[] The speakers, empty outside workshop mode
+function M.speakers(meta, model)
+  if model.mode ~= M.MODE_WORKSHOP then
+    return {}
+  end
+  local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
+  local used = {}
+  local speakers = {}
+  for _, author in ipairs(meta['by-author'] or {}) do
+    local name = M.author_name(author)
+    if name ~= '' then
+      local id = text_of(author.id)
+      local key = (id ~= '' and photos[id] ~= nil) and id or name
+      local entry = photos[key]
+      local speaker = { name = name, degrees = {}, alt = '' }
+      for _, degree in ipairs(author.degrees or {}) do
+        speaker.degrees[#speaker.degrees + 1] = text_of(degree)
+      end
+      local affiliation = (author.affiliations or {})[1]
+      if affiliation ~= nil and text_of(affiliation.name) ~= '' then
+        speaker.affiliation = text_of(affiliation.name)
+      end
+      if type(entry) == 'table' then
+        used[key] = true
+        local photo = text_of(entry.photo)
+        if photo ~= '' then
+          speaker.uri = photo_uri(photo, key)
+          speaker.photo = speaker.uri and photo or nil
+          speaker.alt = text_of(entry.alt)
+        end
+      end
+      speakers[#speakers + 1] = speaker
+    end
+  end
+  for key in pairs(photos) do
+    if not used[key] then
+      log.log_warning(
+        EXTENSION_NAME,
+        "extensions.atelier.speakers has '" .. key .. "' in " .. (quarto.doc.input_file or '') ..
+        ', which is the id or the name of no author, so its photo is not shown. ' ..
+        'Use the id or the name of an author of the author list.'
+      )
+    end
+  end
+  return speakers
+end
+
+-- ============================================================================
 -- COURSE MODEL
 -- ============================================================================
 

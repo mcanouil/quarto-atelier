@@ -4,7 +4,8 @@
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 --- @brief Write the workshop parts of a Reveal.js deck.
---- @description In workshop mode, the title slide gets the session duration,
+--- @description In workshop mode, the title slide gets the session duration
+--- and the speakers, each with the photo of `extensions.atelier.speakers`,
 --- and the blocks of `workshop/core.lua` become blocks with a head line, as
 --- in HTML. A deck has no interaction for the objectives, so each objective
 --- has a box glyph in place of a checkbox. A solution is a block too, in the
@@ -67,6 +68,19 @@ function M.publish(meta, model)
     return nil
   end
   declare_group(meta)
+  local speakers = pandoc.List({})
+  for _, speaker in ipairs(core.speakers(meta, model)) do
+    speakers:insert({
+      name = pandoc.MetaString(speaker.name),
+      degrees = #speaker.degrees > 0 and pandoc.MetaString(table.concat(speaker.degrees, ', ')) or nil,
+      affiliation = speaker.affiliation and pandoc.MetaString(speaker.affiliation) or nil,
+      photo = speaker.uri and pandoc.MetaString(speaker.uri) or nil,
+      alt = pandoc.MetaString(speaker.alt),
+    })
+  end
+  if #speakers > 0 then
+    meta['atelier-speakers'] = speakers
+  end
   core.apply_title_labels(meta, model.labels)
   if model.duration ~= nil then
     meta['atelier-duration'] = pandoc.MetaInlines({ pandoc.Str(core.format_duration(model.duration, model.labels)) })

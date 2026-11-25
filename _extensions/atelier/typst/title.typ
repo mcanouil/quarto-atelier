@@ -28,11 +28,29 @@
   ))
 }
 
-// Answer the line of one author: the name, the degrees, the affiliation
-// numbers, a mark for the corresponding author, and the ORCID badge.
-// - author: dictionary with name, degrees, affiliations, orcid, email and corresponding.
+// Answer the round photo of a speaker. A photo with no alternative text is
+// decorative, because the name is next to it, so it is an artefact.
+// - author: dictionary with photo and alt.
+#let atelier-speaker-photo(author) = {
+  let photo = box(
+    width: 1.8em,
+    height: 1.8em,
+    radius: 50%,
+    clip: true,
+    baseline: 0.55em,
+    image(author.photo, width: 100%, height: 100%, fit: "cover", alt: author.alt),
+  )
+  if author.alt == none { pdf.artifact(photo) } else { photo }
+}
+
+// Answer the line of one author: the photo of a speaker, the name, the
+// degrees, the affiliation numbers, a mark for the corresponding author, and
+// the ORCID badge.
+// - author: dictionary with name, degrees, affiliations, orcid, email,
+//   corresponding, photo and alt.
 #let atelier-author-line(author) = {
   let parts = (
+    if author.photo != none { atelier-speaker-photo(author) },
     text(weight: "bold", author.name),
     if author.degrees.len() > 0 { text(size: 0.8em, fill: atelier-colour("muted"), author.degrees.join(", ")) },
     if author.affiliations.len() > 0 { super(author.affiliations.map(str).join(",")) },

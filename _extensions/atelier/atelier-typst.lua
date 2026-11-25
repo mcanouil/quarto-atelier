@@ -201,10 +201,18 @@ local function text_of(value)
 end
 
 --- The authors of the document, with their affiliations as numbers into the
---- list of affiliations, as a Typst dictionary.
+--- list of affiliations, and, in workshop mode, the photo of each speaker
+--- from `extensions.atelier.speakers`, as a Typst dictionary.
 --- @param meta table
 --- @return string
 local function authors_code(meta)
+  local model = { mode = core.read_mode(meta, quarto.doc.input_file or '', true), options = core.read_options(meta) }
+  local photos = {}
+  for _, speaker in ipairs(core.speakers(meta, model)) do
+    if speaker.photo ~= nil then
+      photos[speaker.name] = speaker
+    end
+  end
   local affiliations = {}
   local numbers = {}
   for _, affiliation in ipairs(meta['by-affiliation'] or {}) do
@@ -237,6 +245,8 @@ local function authors_code(meta)
         orcid = typst_string(text_of(author.orcid)),
         email = typst_string(text_of(author.email)),
         corresponding = attributes.corresponding == true and 'true' or 'false',
+        photo = photos[name] and typst_string(photos[name].photo) or 'none',
+        alt = photos[name] and photos[name].alt ~= '' and typst_string(photos[name].alt) or 'none',
       })
     end
   end

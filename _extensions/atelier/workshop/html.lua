@@ -7,7 +7,9 @@
 --- @description Writes one JSON block into the head of each HTML page. It
 --- holds the mode, the project offset, the translated labels, and, in
 --- workshop mode, the page duration, the sidebar that lists the page, and the
---- durations of every page in that sidebar. A workshop page also gets the
+--- durations of every page in that sidebar, and the photos of the speakers,
+--- which `html/scripts/title-block.html` puts in the title block. A workshop
+--- page also gets the
 --- `atelier-workshop` class on `<html>`, and a workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
 --- The blocks of `workshop/core.lua` become the head line and body of each
@@ -61,6 +63,15 @@ function M.publish(meta, model)
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
     )
+    local photos = {}
+    for _, speaker in ipairs(core.speakers(meta, model)) do
+      if speaker.uri ~= nil then
+        photos[#photos + 1] = { name = speaker.name, photo = speaker.uri, alt = speaker.alt }
+      end
+    end
+    if #photos > 0 then
+      data.speakers = photos
+    end
     core.apply_title_labels(meta, model.labels)
     changed = meta
   end

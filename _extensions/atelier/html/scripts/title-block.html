@@ -5,6 +5,30 @@
 -->
 <script id="atelier-title-block" type="text/javascript">
 	(function () {
+		// In workshop mode, the workshop data holds the photo of each speaker
+		// that has one. Quarto's title block has no place for a photo, so each
+		// photo goes in front of the name of its author. Without JavaScript the
+		// title block stays as Quarto wrote it, with the names only.
+		var data = document.getElementById("atelier-workshop");
+		var speakers = data ? JSON.parse(data.textContent).speakers || [] : [];
+		var names = document.querySelectorAll(
+			"#title-block-header .quarto-title-meta-contents > p",
+		);
+		speakers.forEach(function (speaker) {
+			var line = Array.prototype.find.call(names, function (name) {
+				return name.textContent.trim().indexOf(speaker.name) === 0;
+			});
+			if (!line) {
+				return;
+			}
+			var photo = document.createElement("img");
+			photo.className = "atelier-speaker-photo";
+			photo.src = speaker.photo;
+			photo.alt = speaker.alt;
+			line.prepend(photo);
+		});
+	})();
+	(function () {
 		// Quarto writes the keywords as one comma-separated paragraph by design.
 		// The chip design needs one element for each keyword, so the paragraph is
 		// split here. Without JavaScript the paragraph stays as Quarto wrote it.

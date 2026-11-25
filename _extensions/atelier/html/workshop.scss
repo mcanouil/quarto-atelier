@@ -516,6 +516,21 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 }
 
 // ===========================================================================
+// SPEAKERS
+// ===========================================================================
+// `html/scripts/title-block.html` puts the photo of each speaker in front of
+// the name in the title block, as a round picture.
+
+#title-block-header .atelier-speaker-photo {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+// ===========================================================================
 // W1 TO W3 BLOCKS
 // ===========================================================================
 // Prerequisites, objectives, checkpoints, exercises, and solutions are blocks
