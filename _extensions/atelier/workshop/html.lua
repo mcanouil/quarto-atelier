@@ -78,7 +78,9 @@ function M.publish(meta, model)
     local photos = {}
     for _, speaker in ipairs(core.speakers(meta, model)) do
       if speaker.photo ~= nil then
-        photos[#photos + 1] = { name = speaker.name, photo = core.photo_uri(speaker.photo), alt = speaker.alt }
+        -- A file, not a data URI: the pages of a course share it in the cache.
+        quarto.doc.add_resource(speaker.photo)
+        photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
       end
     end
     if #photos > 0 then

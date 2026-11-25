@@ -358,7 +358,8 @@ end
 
 --- Read the speakers of a workshop page: each author of Quarto's `author`
 --- list, with the photo of `extensions.atelier.speakers`, a map from the
---- author `id`, else the author name, to `photo` and `alt`. A key that names
+--- author `id`, else the author name, to `photo` and `alt`, or to the photo
+--- path alone. A key that names
 --- no author logs a warning. A photo with no `alt` is decorative, as the name
 --- is next to it.
 --- @param meta table The document metadata
@@ -385,8 +386,12 @@ function M.speakers(meta, model)
       if affiliation ~= nil and text_of(affiliation.name) ~= '' then
         speaker.affiliation = text_of(affiliation.name)
       end
-      if type(entry) == 'table' then
+      if entry ~= nil then
         used[key] = true
+        -- A bare value is the photo path, with no alt text.
+        if pandoc.utils.type(entry) ~= 'table' then
+          entry = { photo = entry }
+        end
         local photo = text_of(entry.photo)
         if photo ~= '' and photo_ok(photo, key) then
           speaker.photo = photo
