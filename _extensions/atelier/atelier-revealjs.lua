@@ -64,7 +64,7 @@ local DARK_SCOPE = '.reveal .slides section.dark'
 --- The frame around the deck on a dark slide: Reveal.js puts the
 --- `data-state` of the current slide on the viewport.
 --- @type string
-local DARK_FRAME_SCOPE = '.atelier-dark-state .reveal > :is(.footer, .slide-number, .controls, .progress, .slide-menu-button)'
+local DARK_FRAME_SCOPE = '.atelier-dark-state .reveal > :is(.footer, .slide-number, .controls, .progress, .slide-menu-button, .slide-chalkboard-buttons)'
 
 --- The `data-state` of a dark slide and of a section slide.
 --- @type string
