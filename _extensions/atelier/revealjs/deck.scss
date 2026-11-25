@@ -326,6 +326,24 @@ $code-block-font-size: 0.6em !default;
   margin-right: var(--atelier-row-edge);
 }
 
+// The arrows of the bottom-right layout sit above the row, so the logo slot
+// keeps the corner. The arrows of the edges layout do not move.
+// Remove when: never.
+.reveal.reveal .controls[data-controls-layout="bottom-right"] {
+  right: var(--atelier-row-edge);
+  bottom: calc(var(--atelier-row-bottom) + var(--atelier-row-height) + 4px);
+}
+
+// The title slide shows only the centre slot of the footer. The title slide
+// and the section slides show no slide number. `visibility: hidden` keeps
+// the place of each item, so the row does not move from slide to slide, and
+// it takes the hidden buttons out of the tab order.
+// Remove when: never.
+.reveal-viewport:has(#title-slide.present) .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-logo),
+.reveal-viewport:has(section.atelier-section.present) .reveal .slide-number {
+  visibility: hidden;
+}
+
 .atelier-section-state .reveal :is(.footer, .slide-number, .slide-number a, .controls, .slide-menu-button a, .slide-chalkboard-buttons) {
   color: var(--atelier-navbar-muted);
 }
