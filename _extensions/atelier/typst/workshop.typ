@@ -148,3 +148,21 @@
   pagebreak(weak: true)
   heading(level: 1, atelier-labels.at("solutions-title"))
 }
+
+// Answer the CRediT table: the contribution of each author to each role,
+// under its heading. The first column names the role.
+// - title: the heading.
+// - head: the header row, the role label then the author names.
+// - rows: one array for each role, the role then the degree for each author.
+#let atelier-ws-credit(title, head, rows) = {
+  heading(level: 2, numbering: none, outlined: false, title)
+  set text(size: 0.9em)
+  table(
+    columns: (1fr,) + (auto,) * (head.len() - 1),
+    align: (col, _) => if col == 0 { left } else { center },
+    inset: (x: 0.6em, y: 0.45em),
+    stroke: (x: none, y: 0.5pt + atelier-colour("border")),
+    table.header(..head.map(cell => text(weight: "bold", cell))),
+    ..rows.flatten(),
+  )
+}

@@ -227,15 +227,50 @@ local function solution_cite(cite, page)
   return inlines
 end
 
+--- The Typst code of the CRediT table: a call of `atelier-ws-credit` with
+--- the title, the header row and the rows.
+--- @param credit table The table of `core.credit`
+--- @param labels table<string, string> The resolved labels
+--- @return string
+local function credit_call(credit, labels)
+  local function row(cells)
+    local items = {}
+    for _, text in ipairs(cells) do
+      items[#items + 1] = typst_string(text)
+    end
+    return '(' .. table.concat(items, ', ') .. ',)'
+  end
+  local head = { labels['credit-role'] }
+  for _, name in ipairs(credit.authors) do
+    head[#head + 1] = name
+  end
+  local rows = {}
+  for _, entry in ipairs(credit.rows) do
+    local cells = { entry.role }
+    for _, text in ipairs(entry.cells) do
+      cells[#cells + 1] = text
+    end
+    rows[#rows + 1] = row(cells)
+  end
+  return string.format(
+    '#atelier-ws-credit(%s, %s, (%s,))',
+    typst_string(labels['credit-title']),
+    row(head),
+    table.concat(rows, ', ')
+  )
+end
+
 --- Finish the handout after its blocks: write the solutions collected for
 --- the end, a "Solutions" heading, then one heading and the content of each
---- solution. Then resolve the citations of solutions, the moved ones too.
+--- solution, then the CRediT table. Then resolve the citations of
+--- solutions, the moved ones too.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
   local page = model.solutions
-  if page.count == 0 then
+  local credit = core.credit(doc.meta, model)
+  if page.count == 0 and credit == nil then
     return nil
   end
   if #page.collected > 0 then
@@ -248,6 +283,12 @@ function M.finish(doc, model)
       ))
       doc.blocks:extend(entry.content)
     end
+  end
+  if credit ~= nil then
+    doc.blocks:insert(pandoc.RawBlock('typst', credit_call(credit, model.labels)))
+  end
+  if page.count == 0 then
+    return doc
   end
   return doc:walk({ Cite = function(cite) return solution_cite(cite, page) end })
 end

@@ -61,6 +61,12 @@ local LABELS = {
   'exercise-title',
   'prerequisites-title',
   'checkpoint-title',
+  'credit-title',
+  'credit-role',
+  'credit-lead',
+  'credit-equal',
+  'credit-supporting',
+  'credit-contributed',
   'solution-summary',
   'terminal',
   'workshop-author-single',
@@ -387,6 +393,91 @@ function M.speakers(meta, model)
     end
   end
   return speakers
+end
+
+-- ============================================================================
+-- CREDIT
+-- ============================================================================
+
+--- The degrees of contribution that have a label of their own.
+--- @type table<string, boolean>
+local DEGREES = { lead = true, equal = true, supporting = true }
+
+--- Read the contribution roles of the authors, from the `role` field of
+--- Quarto's `author` list, which Quarto maps to the CRediT terms. The rows
+--- are the roles in order of first use, and each cell holds the label of the
+--- degree of contribution of one author: lead, equal, supporting, else
+--- contributed, or an empty string when the author has not that role.
+--- @param meta table The document metadata
+--- @param model table The page model
+--- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil outside workshop mode or when no author has a role
+function M.credit(meta, model)
+  if model.mode ~= M.MODE_WORKSHOP then
+    return nil
+  end
+  local authors, rows, by_role = {}, {}, {}
+  for _, author in ipairs(meta['by-author'] or {}) do
+    local name = M.author_name(author)
+    if name ~= '' then
+      authors[#authors + 1] = name
+      for _, role in ipairs(author.roles or {}) do
+        local term = text_of(role['vocab-term'] or role.role)
+        if term ~= '' then
+          local row = by_role[term]
+          if row == nil then
+            row = { role = term:sub(1, 1):upper() .. term:sub(2), cells = {} }
+            by_role[term] = row
+            rows[#rows + 1] = row
+          end
+          local degree = text_of(role['degree-of-contribution']):lower()
+          row.cells[#authors] = model.labels['credit-' .. (DEGREES[degree] and degree or 'contributed')]
+        end
+      end
+    end
+  end
+  if #rows == 0 then
+    return nil
+  end
+  for _, row in ipairs(rows) do
+    for column = 1, #authors do
+      row.cells[column] = row.cells[column] or ''
+    end
+  end
+  return { authors = authors, rows = rows }
+end
+
+--- Build the CRediT table as a pandoc table: a header row with the role
+--- label and the author names, then one row for each role, whose first cell
+--- is a row header.
+--- @param credit table The table of `M.credit`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Table
+function M.credit_table(credit, labels)
+  local function cell(text, scope)
+    local attr = scope and pandoc.Attr('', {}, { scope = scope }) or pandoc.Attr()
+    return pandoc.Cell(pandoc.Blocks({ pandoc.Plain(pandoc.Inlines(text)) }), pandoc.AlignDefault, 1, 1, attr)
+  end
+  local head = { cell(labels['credit-role'], 'col') }
+  local specs = { { pandoc.AlignLeft, pandoc.ColWidthDefault } }
+  for _, name in ipairs(credit.authors) do
+    head[#head + 1] = cell(name, 'col')
+    specs[#specs + 1] = { pandoc.AlignCenter, pandoc.ColWidthDefault }
+  end
+  local body = {}
+  for _, row in ipairs(credit.rows) do
+    local cells = { cell(row.role, 'row') }
+    for _, text in ipairs(row.cells) do
+      cells[#cells + 1] = cell(text)
+    end
+    body[#body + 1] = pandoc.Row(cells)
+  end
+  return pandoc.Table(
+    { long = {}, short = {} },
+    specs,
+    pandoc.TableHead({ pandoc.Row(head) }),
+    { { attr = pandoc.Attr(), body = body, head = {}, row_head_columns = 1 } },
+    pandoc.TableFoot()
+  )
 end
 
 -- ============================================================================

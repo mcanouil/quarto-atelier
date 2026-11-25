@@ -218,6 +218,30 @@ function M.div(div, model)
   return nil
 end
 
+--- Build the CRediT section: a heading and the table.
+--- @param credit table The table of `core.credit`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Div
+function M.credit_section(credit, labels)
+  return pandoc.Div({
+    pandoc.Header(2, pandoc.Inlines(labels['credit-title']), pandoc.Attr('atelier-credit-title', { 'unnumbered' })),
+    core.credit_table(credit, labels),
+  }, pandoc.Attr('', { 'atelier-credit' }))
+end
+
+--- Finish a workshop page after its blocks: the CRediT table at the end.
+--- @param doc pandoc.Pandoc The document
+--- @param model table The page model
+--- @return pandoc.Pandoc|nil
+function M.finish(doc, model)
+  local credit = core.credit(doc.meta, model)
+  if credit == nil then
+    return nil
+  end
+  doc.blocks:insert(M.credit_section(credit, model.labels))
+  return doc
+end
+
 --- Turn a solution into the closed disclosure. When the div has other classes
 --- or attributes, a div that carries them wraps the disclosure, so that a
 --- filter that runs later still finds them, for example Veil with

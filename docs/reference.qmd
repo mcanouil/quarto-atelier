@@ -404,6 +404,12 @@ language:
 | `atelier-exercise-title`         | `Exercise`                           | `Exercice`                                  |
 | `atelier-prerequisites-title`    | `Prerequisites`                      | `Prérequis`                                 |
 | `atelier-checkpoint-title`       | `Checkpoint`                         | `Point de contrôle`                         |
+| `atelier-credit-title`           | `Author contributions (CRediT)`      | `Contributions des auteurs (CRediT)`        |
+| `atelier-credit-role`            | `Role`                               | `Rôle`                                      |
+| `atelier-credit-lead`            | `Lead`                               | `Principal`                                 |
+| `atelier-credit-equal`           | `Equal`                              | `Égal`                                      |
+| `atelier-credit-supporting`      | `Supporting`                         | `Appui`                                     |
+| `atelier-credit-contributed`     | `Contributed`                        | `A contribué`                               |
 | `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
 | `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
 | `atelier-workshop-author-single` | `Instructor`                         | `Formateur·rice`                            |
