@@ -159,7 +159,7 @@ $code-block-font-size: 0.6em !default;
 // the same line weight: three lines for the menu, and the Bootstrap `easel2`
 // and `brush` glyphs for the chalkboard.
 // Remove when: never.
-.reveal.reveal :is(.slide-menu-button, .slide-chalkboard-buttons) .fas::before {
+.reveal.reveal :is(.slide-menu-button .fa-bars, .slide-chalkboard-buttons :is(.fa-easel2, .fa-brush))::before {
   display: block;
   width: var(--atelier-icon);
   height: var(--atelier-icon);
