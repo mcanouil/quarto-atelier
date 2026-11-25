@@ -1,4 +1,4 @@
-// Atelier - Typst contents, dividers and closing page
+// Atelier - Typst contents, dividers, closing section and closing page
 // The table of contents of the document, the divider page of a chapter or a
 // book part, the contents page of a chapter, and the closing page. Every
 // contents entry links to its heading; the dot leaders and the rules are
@@ -133,18 +133,47 @@
   atelier-part-next.update(false)
 }
 
-// Answer the closing page: the contact of each author, the licence and the
-// colophon.
+// The closing of a workshop handout, from `extensions.atelier.closing`: a
+// dictionary of title, links and licence, or none.
+#let atelier-closing-data = state("atelier-closing-data", none)
+
+// Answer the title and the links of the closing.
+// - data: the closing, see atelier-closing-data.
+// - level: level of the heading.
+#let atelier-closing-head(data, level: 1) = {
+  heading(level: level, numbering: none, outlined: false, data.title)
+  if data.links.len() > 0 {
+    list(..data.links)
+  }
+}
+
+// Answer the closing section at the end of a workshop handout, when the
+// handout has a closing and no closing page.
+#let atelier-closing-section() = context {
+  let data = atelier-closing-data.final()
+  if data == none { return }
+  block(above: 2em, {
+    atelier-rule(30%)
+    atelier-closing-head(data)
+    if data.licence != none { block(above: 1em, text(fill: atelier-colour("muted"), data.licence)) }
+  })
+}
+
+// Answer the closing page: the closing of a workshop handout, the contact of
+// each author, the licence and the colophon. The licence of the closing wins
+// over the licence of the document.
 // - meta: the document, see atelier-document().
-#let atelier-closing-page(meta) = {
+#let atelier-closing-page(meta) = context {
   let part(label, content) = block(above: 1.6em, {
     block(below: 0.6em, atelier-kicker(label))
     content
   })
+  let data = atelier-closing-data.final()
   pagebreak(weak: true)
   atelier-surface("closing")
   v(1fr)
   atelier-rule(30%)
+  if data != none { atelier-closing-head(data, level: 2) }
   let contacts = atelier-people.authors.filter(it => it.email != "" or it.orcid != "")
   if contacts.len() > 0 {
     part(atelier-labels.at("closing-contact"), stack(spacing: 0.6em, ..contacts.map(it => {
@@ -154,8 +183,9 @@
       parts.join(h(0.8em))
     })))
   }
-  if meta.licence != none or meta.copyright != none {
-    part(atelier-labels.at("closing-licence"), (meta.copyright, meta.licence).filter(it => it != none).join(linebreak()))
+  let licence = if data != none and data.licence != none { data.licence } else { meta.licence }
+  if licence != none or meta.copyright != none {
+    part(atelier-labels.at("closing-licence"), (meta.copyright, licence).filter(it => it != none).join(linebreak()))
   }
   let families = (meta.fonts.base, meta.fonts.headings, meta.fonts.monospace)
     .filter(it => it != none)

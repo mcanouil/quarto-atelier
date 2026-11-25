@@ -1,6 +1,6 @@
 // Atelier - Typst workshop blocks
 // The blocks of a workshop handout, as `workshop/typst.lua` writes them:
-// objectives, exercises and solutions, each a box with a head line that
+// prerequisites, objectives, checkpoints, exercises and solutions, each a box with a head line that
 // holds an icon, the title and the duration. The icons and the list boxes
 // only decorate, so they are artefacts: the title names the block.
 //
@@ -12,7 +12,7 @@
 #let atelier-ws-radius = if atelier-preset == "terminal" { 0pt } else { 8pt }
 
 // Answer the icon of a block, drawn in the colour of its head.
-// - kind: `objectives`, `exercise` or `solution`.
+// - kind: `prerequisites`, `objectives`, `checkpoint` or `exercise`.
 // - ink: colour of the icon.
 #let atelier-ws-icon(kind, ink) = {
   let size = 1em
@@ -22,6 +22,20 @@
       place(center + horizon, circle(radius: size * 0.45, stroke: pen))
       place(center + horizon, circle(radius: size * 0.25, stroke: pen))
       place(center + horizon, circle(radius: size * 0.07, fill: ink, stroke: none))
+    })
+  } else if kind == "prerequisites" {
+    box(width: size, height: size, {
+      for row in range(3) {
+        let y = size * (0.2 + 0.3 * row)
+        place(top + left, line(start: (0pt, y), end: (size * 0.12, y + size * 0.1), stroke: pen))
+        place(top + left, line(start: (size * 0.12, y + size * 0.1), end: (size * 0.25, y - size * 0.08), stroke: pen))
+        place(top + left, line(start: (size * 0.4, y), end: (size, y), stroke: pen))
+      }
+    })
+  } else if kind == "checkpoint" {
+    box(width: size, height: size, {
+      place(top + left, line(start: (size * 0.15, 0pt), end: (size * 0.15, size), stroke: pen))
+      place(top + left, polygon(fill: ink, stroke: none, (size * 0.15, 0pt), (size * 0.95, size * 0.06), (size * 0.95, size * 0.5), (size * 0.15, size * 0.56)))
     })
   } else {
     box(width: size, height: size, {
@@ -45,18 +59,22 @@
 }
 
 // Answer a workshop block: a box with a head line and a body.
-// - kind: `objectives`, `exercise` or `solution`.
+// - kind: `prerequisites`, `objectives`, `checkpoint`, `exercise` or `solution`.
 // - title: title of the block.
 // - time: duration text, or none.
 // - body: content of the block.
 #let atelier-ws-block(kind, title, time, body) = {
   let head-fill = (
+    prerequisites: atelier-colour("surface-strong"),
     objectives: atelier-colour("accent-soft"),
+    checkpoint: none,
     exercise: atelier-colour("workshop-bar-bg"),
     solution: none,
   ).at(kind)
   let head-ink = (
+    prerequisites: atelier-colour("fg"),
     objectives: atelier-colour("accent-ink"),
+    checkpoint: atelier-colour("callout-tip-ink"),
     exercise: atelier-colour("workshop-bar-fg"),
     solution: atelier-colour("accent-ink"),
   ).at(kind)
@@ -68,11 +86,16 @@
     breakable: true,
     clip: true,
     radius: atelier-ws-radius,
-    stroke: (
-      paint: atelier-colour(if solution { "control-border" } else { "border" }),
-      thickness: 0.75pt,
-      dash: if solution { "dashed" } else { none },
-    ),
+    stroke: {
+      let edge = (
+        paint: atelier-colour(if solution { "control-border" } else { "border" }),
+        thickness: 0.75pt,
+        dash: if solution { "dashed" } else { none },
+      )
+      if kind == "checkpoint" {
+        (rest: edge, left: 3pt + atelier-colour("callout-tip-border"))
+      } else { edge }
+    },
     {
       block(
         width: 100%,
@@ -124,4 +147,24 @@
 #let atelier-ws-solutions-heading() = {
   pagebreak(weak: true)
   heading(level: 1, atelier-labels.at("solutions-title"))
+}
+
+// Answer the CRediT table: the contribution of each author to each role,
+// under a heading of its own level, as the solutions have. The first column
+// names the role.
+// - title: the heading.
+// - head: the header row, the role label then the author names.
+// - rows: one array for each role, the role then the degree for each author.
+#let atelier-ws-credit(title, head, rows) = {
+  heading(level: 1, numbering: none, title)
+  atelier-chapter-end()
+  set text(size: 0.9em)
+  table(
+    columns: (1fr,) + (auto,) * (head.len() - 1),
+    align: (col, _) => if col == 0 { left } else { center },
+    inset: (x: 0.6em, y: 0.45em),
+    stroke: (x: none, y: 0.5pt + atelier-colour("border")),
+    table.header(..head.map(cell => text(weight: "bold", cell))),
+    ..rows.flatten(),
+  )
 }

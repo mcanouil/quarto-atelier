@@ -516,12 +516,90 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 }
 
 // ===========================================================================
+// MOTIF
+// ===========================================================================
+// The title block of a workshop page has the motif of the preset in its top
+// right corner. `workshop/html.lua` writes the shapes as the mask
+// `--atelier-motif`. The motif is flat colour: the accent mark at 85%, as
+// `motifs.LIGHT_OPACITY`, on a light page, and the accent ink on a dark one.
+// It only decorates: a pseudo-element with no text, which forced colours
+// remove.
+
+html.atelier-workshop #title-block-header {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: clamp(4.5rem, 14vw, 9rem);
+    aspect-ratio: 1;
+    pointer-events: none;
+    mask-image: var(--atelier-motif);
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    @if tone($body-bg) == "dark" {
+      background-color: var(--atelier-accent-ink);
+      opacity: 1;
+    } @else {
+      background-color: var(--atelier-accent-mark);
+      opacity: 0.85;
+    }
+
+    @media (forced-colors: active) {
+      display: none;
+    }
+  }
+}
+
+// ===========================================================================
+// SPEAKERS
+// ===========================================================================
+// `html/scripts/title-block.html` puts the photo of each speaker in front of
+// the name in the title block, as a round picture.
+
+#title-block-header .atelier-speaker-photo {
+  flex: none;
+  vertical-align: middle;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+// ===========================================================================
+// CREDIT AND CLOSING
+// ===========================================================================
+// The Lua filter ends a workshop page with the CRediT table of the authors,
+// then the closing: a thank-you, the links and the licence.
+
+.atelier-closing {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--atelier-border);
+
+  .atelier-closing-links ul {
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .atelier-closing-licence {
+    color: var(--atelier-muted);
+  }
+}
+
+// ===========================================================================
 // W1 TO W3 BLOCKS
 // ===========================================================================
-// Objectives, exercises, and solutions are blocks with a hairline border and
-// a large radius. The Lua filter writes them in workshop mode only.
+// Prerequisites, objectives, checkpoints, exercises, and solutions are blocks
+// with a hairline border and a large radius. The Lua filter writes them in
+// workshop mode only.
 
+.atelier-prerequisites,
 .atelier-objectives,
+.atelier-checkpoint,
 .atelier-exercise,
 .atelier-solution {
   margin: 1rem 0;
@@ -637,6 +715,21 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
 .atelier-exercise > .atelier-block-head {
   background: var(--atelier-workshop-bar-bg);
   color: var(--atelier-workshop-bar-fg);
+}
+
+.atelier-prerequisites > .atelier-block-head {
+  background: var(--atelier-surface-strong);
+  color: var(--atelier-fg);
+}
+
+// A checkpoint is a stop in the work: a thick start border and a head in the
+// tip colour of the callouts, with no fill.
+.atelier-checkpoint {
+  border-left: 4px solid atelier-callout-border($callout-color-tip);
+
+  > .atelier-block-head {
+    color: atelier-callout-ink($callout-color-tip);
+  }
 }
 
 .atelier-solution {

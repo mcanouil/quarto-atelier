@@ -59,6 +59,14 @@
   let kind() = atelier-surface-at(here().page())
   set page(
     fill: atelier-colour("bg"),
+    // The workshop motif sits in the top right corner of the first page,
+    // with the title block or the cover.
+    background: context {
+      let motif = atelier-motif-data
+      if motif != none and here().page() == 1 {
+        atelier-motif(motif.shapes, top + right, 45mm, motif.paint, factor: motif.factor)
+      }
+    },
     header: context {
       if kind() == none and here().page() > 1 {
         block(

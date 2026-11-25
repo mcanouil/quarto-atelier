@@ -1,9 +1,19 @@
-<section id="$idprefix$title-slide"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$ class="quarto-title-block atelier-title-slide">
+<section id="$idprefix$title-slide"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$ class="quarto-title-block atelier-title-slide$if(atelier-motif)$ atelier-motif$endif$">
   <h1 class="title">$title$</h1>
 $if(subtitle)$
   <p class="subtitle">$subtitle$</p>
 $endif$
 
+$if(atelier-speakers)$
+<div class="atelier-speakers">
+$for(atelier-speakers)$
+<div class="atelier-speaker">
+$if(it.photo)$<img class="atelier-speaker-photo" src="$it.photo$" alt="$it.alt$">$endif$
+<p class="atelier-speaker-text"><span class="atelier-speaker-name">$it.name$</span>$if(it.degrees)$, $it.degrees$$endif$$if(it.affiliation)$<br><span class="atelier-speaker-affiliation">$it.affiliation$</span>$endif$</p>
+</div>
+$endfor$
+</div>
+$else$
 <div class="quarto-title-authors">
 $for(by-author)$
 <div class="quarto-title-author">
@@ -31,6 +41,7 @@ $endif$
 </div>
 $endfor$
 </div>
+$endif$
 
 $if(date)$
   <p class="date">$date$</p>

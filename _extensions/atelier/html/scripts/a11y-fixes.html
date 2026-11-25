@@ -172,7 +172,10 @@
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15171 (appendix cite as)
 		// Remove when: the minimum Quarto version includes the fix.
 		// Not SCSS: removing an ARIA role is a DOM change, which CSS cannot make.
+		// An item whose parent is a list, such as an entry of a bibliography
+		// that Quarto marks `role="list"`, keeps its role.
 		document.querySelectorAll('[role="listitem"]').forEach((el) => {
+			if (el.parentElement && el.parentElement.getAttribute("role") === "list") return;
 			el.removeAttribute("role");
 		});
 

@@ -7,8 +7,11 @@
 --- @description Writes one JSON block into the head of each HTML page. It
 --- holds the mode, the project offset, the translated labels, and, in
 --- workshop mode, the page duration, the sidebar that lists the page, and the
---- durations of every page in that sidebar. A workshop page also gets the
---- `atelier-workshop` class on `<html>`, and a workshop page that no listed
+--- durations of every page in that sidebar, and the photos of the speakers,
+--- which `html/scripts/title-block.html` puts in the title block. A workshop
+--- page also gets the
+--- `atelier-workshop` class on `<html>` and the motif of its preset, and a
+--- workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
 --- The blocks of `workshop/core.lua` become the head line and body of each
 --- block, objective checkboxes, a `<details>` solution, and a terminal code
@@ -16,6 +19,8 @@
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
+local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
+local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -61,6 +66,26 @@ function M.publish(meta, model)
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
     )
+    -- The motif of the preset, which `html/workshop.scss` draws in the title
+    -- block. A brand can set a preset for each scheme, so the dark page takes
+    -- the motif of its own preset.
+    local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
+    local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
+    if dark ~= light then
+      style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
+    end
+    quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
+    local photos = {}
+    for _, speaker in ipairs(core.speakers(meta, model)) do
+      if speaker.photo ~= nil then
+        -- A file, not a data URI: the pages of a course share it in the cache.
+        quarto.doc.add_resource(speaker.photo)
+        photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
+      end
+    end
+    if #photos > 0 then
+      data.speakers = photos
+    end
     core.apply_title_labels(meta, model.labels)
     changed = meta
   end
@@ -175,15 +200,17 @@ local function objectives_block(div, model)
   )
 end
 
---- Build the exercise block.
---- @param div pandoc.Div The `.exercise` div
+--- Build a block of `core.BLOCKS`: the prerequisites, a checkpoint, or an
+--- exercise.
+--- @param div pandoc.Div The div
+--- @param kind string The class, a key of `core.BLOCKS`
 --- @param model table The page model
 --- @return pandoc.Div The block
-local function exercise_block(div, model)
-  local block = core.exercise(div, model)
+local function head_block(div, kind, model)
+  local block = core.block(div, kind, model)
   return pandoc.Div(
-    { M.block_head('pencil-square', block.title, block.time), M.block_body(block.blocks) },
-    M.block_attr(div, 'exercise')
+    { M.block_head(core.BLOCKS[kind], block.title, block.time), M.block_body(block.blocks) },
+    M.block_attr(div, kind)
   )
 end
 
@@ -197,10 +224,47 @@ function M.div(div, model)
   end
   if div.classes:includes('objectives') then
     return objectives_block(div, model)
-  elseif div.classes:includes('exercise') then
-    return exercise_block(div, model)
+  end
+  local kind = core.block_kind(div)
+  if kind ~= nil then
+    return head_block(div, kind, model)
   end
   return nil
+end
+
+--- Build the CRediT section: a heading and the table.
+--- @param credit table The table of `core.credit`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Div
+function M.credit_section(credit, labels)
+  return pandoc.Div({
+    pandoc.Header(2, pandoc.Inlines(labels['credit-title']), pandoc.Attr('atelier-credit-title', { 'unnumbered' })),
+    core.credit_table(credit, labels),
+  }, pandoc.Attr('', { 'atelier-credit' }))
+end
+
+--- Finish a workshop page after its blocks: the CRediT table, then the
+--- closing, at the end of the page that sets `extensions.atelier.closing`.
+--- The pages of a course share their authors, so only the page that closes
+--- the workshop shows the table.
+--- @param doc pandoc.Pandoc The document
+--- @param model table The page model
+--- @return pandoc.Pandoc|nil
+function M.finish(doc, model)
+  local closing = core.closing(doc.meta, model)
+  if closing == nil then
+    return nil
+  end
+  local credit = core.credit(doc.meta, model)
+  if credit ~= nil then
+    doc.blocks:insert(M.credit_section(credit, model.labels))
+  end
+  local blocks = pandoc.Blocks({
+    pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
+  })
+  blocks:extend(core.closing_parts(closing))
+  doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
+  return doc
 end
 
 --- Turn a solution into the closed disclosure. When the div has other classes

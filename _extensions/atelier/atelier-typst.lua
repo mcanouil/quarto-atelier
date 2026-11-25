@@ -6,7 +6,8 @@
 --- @brief Give the Typst partials the data of the document.
 --- @description Quarto compiles no Sass for Typst, so this filter reads the
 --- colours from `palette.lua` and writes them, with the fonts of the preset,
---- the labels, the five report switches and the authors, into the
+--- the labels, the five report switches, the authors and the workshop
+--- motif of `motifs.lua`, into the
 --- `atelier-typst-data` metadata. The `typst/tokens.typ` partial writes that
 --- value in front of the template, so every partial can read it.
 --- The filter also marks each callout with its type and appearance, ends
@@ -17,6 +18,7 @@ local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
+local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 
 --- Name that prefixes each warning.
 --- @type string
@@ -201,10 +203,18 @@ local function text_of(value)
 end
 
 --- The authors of the document, with their affiliations as numbers into the
---- list of affiliations, as a Typst dictionary.
+--- list of affiliations, and, in workshop mode, the photo of each speaker
+--- from `extensions.atelier.speakers`, as a Typst dictionary.
 --- @param meta table
+--- @param model table The mode and the `extensions.atelier` options
 --- @return string
-local function authors_code(meta)
+local function authors_code(meta, model)
+  local photos = {}
+  for _, speaker in ipairs(core.speakers(meta, model)) do
+    if speaker.photo ~= nil then
+      photos[speaker.index] = speaker
+    end
+  end
   local affiliations = {}
   local numbers = {}
   for _, affiliation in ipairs(meta['by-affiliation'] or {}) do
@@ -215,8 +225,8 @@ local function authors_code(meta)
     end
   end
   local authors = {}
-  for _, author in ipairs(meta['by-author'] or {}) do
-    local name = author.name and text_of(author.name.literal or author.name) or ''
+  for index, author in ipairs(meta['by-author'] or {}) do
+    local name = core.author_name(author)
     if name ~= '' then
       local own = {}
       for _, affiliation in ipairs(author.affiliations or {}) do
@@ -237,10 +247,32 @@ local function authors_code(meta)
         orcid = typst_string(text_of(author.orcid)),
         email = typst_string(text_of(author.email)),
         corresponding = attributes.corresponding == true and 'true' or 'false',
+        photo = photos[index] and typst_string(photos[index].photo) or 'none',
+        alt = photos[index] and photos[index].alt ~= '' and typst_string(photos[index].alt) or 'none',
       })
     end
   end
   return typst_dict({ authors = typst_array(authors), affiliations = typst_array(affiliations) })
+end
+
+--- The corner motif of a workshop handout, as a Typst dictionary of its
+--- shapes, colour and opacity factor, or `none` outside workshop mode. On a
+--- light page the motif takes the accent mark at 85% of its opacities, and on
+--- a dark page the accent ink.
+--- @param model table The mode and the `extensions.atelier` options
+--- @param preset string
+--- @param tokens table<string, table>
+--- @return string
+local function motif_code(model, preset, tokens)
+  if model.mode ~= core.MODE_WORKSHOP then
+    return 'none'
+  end
+  local dark = palette.tone(tokens.bg) == 'dark'
+  return typst_dict({
+    shapes = motifs.typst(motifs.name(preset)),
+    paint = typst_colour(tokens[dark and 'accent-ink' or 'accent-mark'], tokens.bg),
+    factor = dark and '100%' or string.format('%g%%', motifs.LIGHT_OPACITY * 100),
+  })
 end
 
 --- Write the document data into `atelier-typst-data`.
@@ -248,6 +280,7 @@ end
 --- @return table
 local function publish(meta)
   local options = core.read_options(meta)
+  local model = { mode = core.read_mode(meta, quarto.doc.input_file or '', true), options = options }
   local scheme = palette.document_scheme(meta)
   local painted = palette.painted_scheme(scheme)
   local preset = palette.preset(painted)
@@ -264,7 +297,8 @@ local function publish(meta)
     '#let atelier-preset-fonts = ' .. fonts_code(preset),
     '#let atelier-labels = ' .. labels_code(),
     '#let atelier-switches = ' .. switches_code(options),
-    '#let atelier-people = ' .. authors_code(meta),
+    '#let atelier-people = ' .. authors_code(meta, model),
+    '#let atelier-motif-data = ' .. motif_code(model, preset, tokens),
   }
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })
   return meta

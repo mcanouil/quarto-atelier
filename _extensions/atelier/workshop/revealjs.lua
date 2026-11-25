@@ -4,7 +4,8 @@
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 --- @brief Write the workshop parts of a Reveal.js deck.
---- @description In workshop mode, the title slide gets the session duration,
+--- @description In workshop mode, the title slide gets the session duration
+--- and the speakers, each with the photo of `extensions.atelier.speakers`,
 --- and the blocks of `workshop/core.lua` become blocks with a head line, as
 --- in HTML. A deck has no interaction for the objectives, so each objective
 --- has a box glyph in place of a checkbox. A solution is a block too, in the
@@ -67,6 +68,19 @@ function M.publish(meta, model)
     return nil
   end
   declare_group(meta)
+  local speakers = pandoc.List({})
+  for _, speaker in ipairs(core.speakers(meta, model)) do
+    speakers:insert({
+      name = pandoc.MetaString(speaker.name),
+      degrees = #speaker.degrees > 0 and pandoc.MetaString(table.concat(speaker.degrees, ', ')) or nil,
+      affiliation = speaker.affiliation and pandoc.MetaString(speaker.affiliation) or nil,
+      photo = speaker.photo and pandoc.MetaString(core.photo_uri(speaker.photo)) or nil,
+      alt = pandoc.MetaString(speaker.alt),
+    })
+  end
+  if #speakers > 0 then
+    meta['atelier-speakers'] = speakers
+  end
   core.apply_title_labels(meta, model.labels)
   if model.duration ~= nil then
     meta['atelier-duration'] = pandoc.MetaInlines({ pandoc.Str(core.format_duration(model.duration, model.labels)) })
@@ -109,7 +123,8 @@ local function objective_list(list)
   return pandoc.BulletList(items)
 end
 
---- Turn the objectives and exercise divs into blocks, in workshop mode only.
+--- Turn the objectives div and the divs of `core.BLOCKS` into blocks, in
+--- workshop mode only.
 --- @param div pandoc.Div The div
 --- @param model table The page model
 --- @return pandoc.Div|nil
@@ -124,9 +139,11 @@ function M.div(div, model)
       body:insert(position == read.list and objective_list(content) or content)
     end
     return block(div, 'objectives', 'bullseye', read.title, read.time, body)
-  elseif div.classes:includes('exercise') then
-    local read = core.exercise(div, model)
-    return block(div, 'exercise', 'pencil-square', read.title, read.time, read.blocks)
+  end
+  local kind = core.block_kind(div)
+  if kind ~= nil then
+    local read = core.block(div, kind, model)
+    return block(div, kind, core.BLOCKS[kind], read.title, read.time, read.blocks)
   end
   return nil
 end
@@ -157,6 +174,77 @@ function M.proof(proof, model)
     end
   end
   return result
+end
+
+--- The prefixes of Quarto cross-reference identifiers. A citation with
+--- another identifier cites the bibliography.
+--- @type table<string, boolean>
+local CROSSREF = {
+  fig = true, tbl = true, lst = true, sec = true, eq = true, thm = true, lem = true,
+  cor = true, prp = true, cnj = true, def = true, exm = true, exr = true, sol = true,
+  rem = true, nte = true, tip = true, wrn = true, imp = true, cau = true,
+}
+
+--- Tell whether a deck cites the bibliography, and whether it has a `#refs`
+--- div of its own.
+--- @param doc pandoc.Pandoc
+--- @return boolean cites
+--- @return boolean refs
+local function references(doc)
+  local cites, refs = false, false
+  if doc.meta.bibliography == nil and doc.meta.references == nil then
+    return cites, refs
+  end
+  doc:walk({
+    Cite = function(cite)
+      for _, citation in ipairs(cite.citations) do
+        if not CROSSREF[citation.id:match('^(%a+)%-') or ''] then
+          cites = true
+        end
+      end
+    end,
+    Div = function(div)
+      if div.identifier == 'refs' then
+        refs = true
+      end
+    end,
+  })
+  return cites, refs
+end
+
+--- Finish a workshop deck after its blocks. With a closing: a references
+--- slide when the deck cites the bibliography and has no `#refs` div, then
+--- the closing slide, with the links, the licence and the CRediT table.
+--- Without a closing, the CRediT table has a slide of its own.
+--- @param doc pandoc.Pandoc The document
+--- @param model table The page model
+--- @return pandoc.Pandoc|nil
+function M.finish(doc, model)
+  local closing = core.closing(doc.meta, model)
+  local credit = core.credit(doc.meta, model)
+  if closing == nil and credit == nil then
+    return nil
+  end
+  local table_blocks = credit and pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' }))
+  if closing == nil then
+    doc.blocks:insert(pandoc.Header(2, pandoc.Inlines(model.labels['credit-title']), pandoc.Attr('atelier-credit-slide', { 'unnumbered' })))
+    doc.blocks:insert(table_blocks)
+    return doc
+  end
+  local cites, refs = references(doc)
+  if cites and not refs then
+    local title = (quarto.doc.language or {})['section-title-references']
+    doc.blocks:insert(pandoc.Header(2, pandoc.Inlines(type(title) == 'string' and title or ''),
+      pandoc.Attr('atelier-references', { 'unnumbered' })))
+    doc.blocks:insert(pandoc.Div({}, pandoc.Attr('refs')))
+  end
+  doc.blocks:insert(pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing', { 'atelier-closing', 'unnumbered' })))
+  doc.blocks:extend(core.closing_parts(closing))
+  if table_blocks ~= nil then
+    table_blocks.content:insert(1, pandoc.Para({ pandoc.Strong(pandoc.Inlines(model.labels['credit-title'])) }))
+    doc.blocks:insert(table_blocks)
+  end
+  return doc
 end
 
 --- Draw a `.terminal` code block as a terminal, in both modes. The prompts

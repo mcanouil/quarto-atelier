@@ -59,6 +59,15 @@ local LABELS = {
   'toc-module-read',
   'objectives-title',
   'exercise-title',
+  'prerequisites-title',
+  'checkpoint-title',
+  'credit-title',
+  'credit-role',
+  'credit-lead',
+  'credit-equal',
+  'credit-supporting',
+  'credit-contributed',
+  'closing-thanks',
   'solution-summary',
   'terminal',
   'workshop-author-single',
@@ -261,6 +270,300 @@ function M.apply_title_labels(meta, labels)
     values.modified = pandoc.Inlines(labels['workshop-modified'])
   end
   meta.labels = values
+end
+
+-- ============================================================================
+-- SPEAKERS
+-- ============================================================================
+
+--- The media types of the photo files that a speaker can have, by extension.
+--- @type table<string, string>
+local PHOTO_TYPES = {
+  svg = 'image/svg+xml',
+  png = 'image/png',
+  jpg = 'image/jpeg',
+  jpeg = 'image/jpeg',
+  gif = 'image/gif',
+  webp = 'image/webp',
+}
+
+--- The plain text of a metadata value, or an empty string.
+--- @param value any
+--- @return string
+local function text_of(value)
+  if value == nil then
+    return ''
+  end
+  return pandoc.utils.stringify(value)
+end
+
+--- Answer the name of an author as Quarto normalises it.
+--- @param author table An entry of `by-author`
+--- @return string
+function M.author_name(author)
+  if author.name == nil then
+    return ''
+  end
+  return text_of(author.name.literal or author.name)
+end
+
+--- Resolve a photo path against the folder of the document.
+--- @param path string The path, relative to the document
+--- @return string
+local function photo_file(path)
+  if path:sub(1, 1) ~= '/' and quarto.doc.input_file then
+    return pandoc.path.join({ pandoc.path.directory(quarto.doc.input_file), path })
+  end
+  return path
+end
+
+--- Check the photo file of a speaker. A file that does not exist, or that is
+--- not an image type that a browser shows, logs a warning.
+--- @param path string The path, relative to the document
+--- @param key string The key of the speaker, for the warning
+--- @return boolean True when the photo can be shown
+local function photo_ok(path, key)
+  local subject = 'extensions.atelier.speakers.' .. key .. '.photo'
+  if PHOTO_TYPES[(path:match('%.([^./\\]+)$') or ''):lower()] == nil then
+    log.log_warning(
+      EXTENSION_NAME,
+      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
+      ' is not an svg, png, jpg, gif or webp file, so the speaker has no photo.'
+    )
+    return false
+  end
+  local file = io.open(photo_file(path), 'rb')
+  if file == nil then
+    log.log_warning(
+      EXTENSION_NAME,
+      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
+      ' does not exist, so the speaker has no photo. Correct the path, relative to the document.'
+    )
+    return false
+  end
+  file:close()
+  return true
+end
+
+--- Read the photo of a speaker as a data URI, so the page carries it.
+--- @param path string The path of a photo that `M.speakers` checked
+--- @return string The data URI
+function M.photo_uri(path)
+  local file = assert(io.open(photo_file(path), 'rb'))
+  local content = file:read('a')
+  file:close()
+  local media = PHOTO_TYPES[path:match('%.([^./\\]+)$'):lower()]
+  return 'data:' .. media .. ';base64,' .. quarto.base64.encode(content)
+end
+
+--- Read the speakers of a workshop page: each author of Quarto's `author`
+--- list, with the photo of `extensions.atelier.speakers`, a map from the
+--- author `id`, else the author name, to `photo` and `alt`, or to the photo
+--- path alone. A key that names
+--- no author logs a warning. A photo with no `alt` is decorative, as the name
+--- is next to it.
+--- @param meta table The document metadata
+--- @param model table The page model
+--- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers, empty outside workshop mode: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
+function M.speakers(meta, model)
+  if model.mode ~= M.MODE_WORKSHOP then
+    return {}
+  end
+  local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
+  local used = {}
+  local speakers = {}
+  for index, author in ipairs(meta['by-author'] or {}) do
+    local name = M.author_name(author)
+    if name ~= '' then
+      local id = text_of(author.id)
+      local key = (id ~= '' and photos[id] ~= nil) and id or name
+      local entry = photos[key]
+      local speaker = { index = index, name = name, degrees = {}, alt = '' }
+      for _, degree in ipairs(author.degrees or {}) do
+        speaker.degrees[#speaker.degrees + 1] = text_of(degree)
+      end
+      local affiliation = (author.affiliations or {})[1]
+      if affiliation ~= nil and text_of(affiliation.name) ~= '' then
+        speaker.affiliation = text_of(affiliation.name)
+      end
+      if entry ~= nil then
+        used[key] = true
+        -- A bare value is the photo path, with no alt text.
+        if pandoc.utils.type(entry) ~= 'table' then
+          entry = { photo = entry }
+        end
+        local photo = text_of(entry.photo)
+        if photo ~= '' and photo_ok(photo, key) then
+          speaker.photo = photo
+          speaker.alt = text_of(entry.alt)
+        end
+      end
+      speakers[#speakers + 1] = speaker
+    end
+  end
+  for key in pairs(photos) do
+    if not used[key] then
+      log.log_warning(
+        EXTENSION_NAME,
+        "extensions.atelier.speakers has '" .. key .. "' in " .. (quarto.doc.input_file or '') ..
+        ', which is the id or the name of no author, so its photo is not shown. ' ..
+        'Use the id or the name of an author of the author list.'
+      )
+    end
+  end
+  return speakers
+end
+
+-- ============================================================================
+-- CREDIT
+-- ============================================================================
+
+--- The degrees of contribution that have a label of their own.
+--- @type table<string, boolean>
+local DEGREES = { lead = true, equal = true, supporting = true }
+
+--- Read the contribution roles of the authors, from the `role` field of
+--- Quarto's `author` list, which Quarto maps to the CRediT terms. The rows
+--- are the roles in order of first use, and each cell holds the label of the
+--- degree of contribution of one author: lead, equal, supporting, else
+--- contributed, or an empty string when the author has not that role.
+--- @param meta table The document metadata
+--- @param model table The page model
+--- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil outside workshop mode or when no author has a role
+function M.credit(meta, model)
+  if model.mode ~= M.MODE_WORKSHOP then
+    return nil
+  end
+  local authors, people = {}, {}
+  for _, author in ipairs(meta['by-author'] or {}) do
+    local name = M.author_name(author)
+    if name ~= '' then
+      authors[#authors + 1] = name
+      people[#people + 1] = author
+    end
+  end
+  local rows, by_role = {}, {}
+  for column, author in ipairs(people) do
+    for _, role in ipairs(author.roles or {}) do
+      local term = text_of(role['vocab-term'] or role.role)
+      if term ~= '' then
+        local row = by_role[term]
+        if row == nil then
+          row = { role = term:sub(1, 1):upper() .. term:sub(2), cells = {} }
+          for other = 1, #people do
+            row.cells[other] = ''
+          end
+          by_role[term] = row
+          rows[#rows + 1] = row
+        end
+        local degree = text_of(role['degree-of-contribution']):lower()
+        row.cells[column] = model.labels['credit-' .. (DEGREES[degree] and degree or 'contributed')]
+      end
+    end
+  end
+  if #rows == 0 then
+    return nil
+  end
+  return { authors = authors, rows = rows }
+end
+
+--- Build the CRediT table as a pandoc table: a header row with the role
+--- label and the author names, then one row for each role, whose first cell
+--- is a row header.
+--- @param credit table The table of `M.credit`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Table
+function M.credit_table(credit, labels)
+  local function cell(text, scope)
+    local attr = scope and pandoc.Attr('', {}, { scope = scope }) or pandoc.Attr()
+    return pandoc.Cell(pandoc.Blocks({ pandoc.Plain(pandoc.Inlines(text)) }), pandoc.AlignDefault, 1, 1, attr)
+  end
+  local head = { cell(labels['credit-role'], 'col') }
+  local specs = { { pandoc.AlignLeft, pandoc.ColWidthDefault } }
+  for _, name in ipairs(credit.authors) do
+    head[#head + 1] = cell(name, 'col')
+    specs[#specs + 1] = { pandoc.AlignCenter, pandoc.ColWidthDefault }
+  end
+  local body = {}
+  for _, row in ipairs(credit.rows) do
+    local cells = { cell(row.role, 'row') }
+    for _, text in ipairs(row.cells) do
+      cells[#cells + 1] = cell(text)
+    end
+    body[#body + 1] = pandoc.Row(cells)
+  end
+  return pandoc.Table(
+    { long = {}, short = {} },
+    specs,
+    pandoc.TableHead({ pandoc.Row(head) }),
+    { { attr = pandoc.Attr(), body = body, head = {}, row_head_columns = 1 } },
+    pandoc.TableFoot()
+  )
+end
+
+-- ============================================================================
+-- CLOSING
+-- ============================================================================
+
+--- Turn a metadata value into inlines.
+--- @param value any A string, inlines or blocks
+--- @return pandoc.Inlines
+local function to_inlines(value)
+  local kind = pandoc.utils.type(value)
+  if kind == 'Inlines' then
+    return value
+  elseif kind == 'Blocks' then
+    return pandoc.utils.blocks_to_inlines(value)
+  end
+  return pandoc.Inlines(text_of(value))
+end
+
+--- Read the closing of a workshop page from `extensions.atelier.closing`:
+--- `true`, or a map with `title`, `links` and `licence`. The title is the
+--- closing label by default, and the licence is the Quarto `license`.
+--- @param meta table The document metadata
+--- @param model table The page model
+--- @return { title: pandoc.Inlines, links: pandoc.Inlines[], licence: pandoc.Inlines|nil }|nil The closing, or nil outside workshop mode or when unset
+function M.closing(meta, model)
+  local value = model.options.closing
+  if model.mode ~= M.MODE_WORKSHOP or value == nil or value == false then
+    return nil
+  end
+  local options = type(value) == 'table' and value or {}
+  local closing = {
+    title = options.title and to_inlines(options.title) or pandoc.Inlines(model.labels['closing-thanks']),
+    links = {},
+  }
+  for _, link in ipairs(options.links or {}) do
+    closing.links[#closing.links + 1] = to_inlines(link)
+  end
+  local licence = options.licence
+  if licence == nil and meta.license ~= nil then
+    licence = pandoc.utils.type(meta.license) == 'table' and meta.license.text or meta.license
+  end
+  if licence ~= nil and text_of(licence) ~= '' then
+    closing.licence = to_inlines(licence)
+  end
+  return closing
+end
+
+--- Build the parts of the closing: the links as a list and the licence, each
+--- in a div of its own class.
+--- @param closing table The closing of `M.closing`
+--- @return pandoc.Blocks
+function M.closing_parts(closing)
+  local blocks = pandoc.Blocks({})
+  if #closing.links > 0 then
+    local items = {}
+    for _, link in ipairs(closing.links) do
+      items[#items + 1] = { pandoc.Plain(link) }
+    end
+    blocks:insert(pandoc.Div({ pandoc.BulletList(items) }, pandoc.Attr('', { 'atelier-closing-links' })))
+  end
+  if closing.licence ~= nil then
+    blocks:insert(pandoc.Div({ pandoc.Para(closing.licence) }, pandoc.Attr('', { 'atelier-closing-licence' })))
+  end
+  return blocks
 end
 
 -- ============================================================================
@@ -668,14 +971,42 @@ function M.objective_text(item)
   return pandoc.Inlines({}), 1
 end
 
---- Read the exercise block.
---- @param div pandoc.Div The `.exercise` div
+--- The blocks with a head line and a body, other than the objectives, by
+--- class, with the Bootstrap Icons name of the icon of each one.
+--- @type table<string, string>
+M.BLOCKS = {
+  prerequisites = 'list-check',
+  checkpoint = 'flag',
+  exercise = 'pencil-square',
+}
+
+--- The classes of `M.BLOCKS`, in the order that `M.block_kind` tries them.
+--- @type string[]
+local BLOCK_ORDER = { 'prerequisites', 'checkpoint', 'exercise' }
+
+--- Answer the class of the first block of `M.BLOCKS` that a div has, in the
+--- order prerequisites, checkpoint, exercise.
+--- @param div pandoc.Div The div
+--- @return string|nil The class, or nil when the div is no such block
+function M.block_kind(div)
+  for _, kind in ipairs(BLOCK_ORDER) do
+    if div.classes:includes(kind) then
+      return kind
+    end
+  end
+  return nil
+end
+
+--- Read a block of `M.BLOCKS`: the `title` attribute, else the label of the
+--- kind, and the `duration` attribute.
+--- @param div pandoc.Div The div
+--- @param kind string The class, a key of `M.BLOCKS`
 --- @param model table The page model
 --- @return { title: string, time: string|nil, blocks: pandoc.Blocks } The block
-function M.exercise(div, model)
+function M.block(div, kind, model)
   return {
-    title = div.attributes.title or model.labels['exercise-title'],
-    time = attribute_duration(div, 'exercise', model.labels),
+    title = div.attributes.title or model.labels[kind .. '-title'],
+    time = attribute_duration(div, kind, model.labels),
     blocks = div.content,
   }
 end
