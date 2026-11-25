@@ -67,6 +67,7 @@ local LABELS = {
   'credit-equal',
   'credit-supporting',
   'credit-contributed',
+  'closing-thanks',
   'solution-summary',
   'terminal',
   'workshop-author-single',
@@ -478,6 +479,71 @@ function M.credit_table(credit, labels)
     { { attr = pandoc.Attr(), body = body, head = {}, row_head_columns = 1 } },
     pandoc.TableFoot()
   )
+end
+
+-- ============================================================================
+-- CLOSING
+-- ============================================================================
+
+--- Turn a metadata value into inlines.
+--- @param value any A string, inlines or blocks
+--- @return pandoc.Inlines
+local function to_inlines(value)
+  local kind = pandoc.utils.type(value)
+  if kind == 'Inlines' then
+    return value
+  elseif kind == 'Blocks' then
+    return pandoc.utils.blocks_to_inlines(value)
+  end
+  return pandoc.Inlines(text_of(value))
+end
+
+--- Read the closing of a workshop page from `extensions.atelier.closing`:
+--- `true`, or a map with `title`, `links` and `licence`. The title is the
+--- closing label by default, and the licence is the Quarto `license`.
+--- @param meta table The document metadata
+--- @param model table The page model
+--- @return { title: pandoc.Inlines, links: pandoc.Inlines[], licence: pandoc.Inlines|nil }|nil The closing, or nil outside workshop mode or when unset
+function M.closing(meta, model)
+  local value = model.options.closing
+  if model.mode ~= M.MODE_WORKSHOP or value == nil or value == false then
+    return nil
+  end
+  local options = type(value) == 'table' and value or {}
+  local closing = {
+    title = options.title and to_inlines(options.title) or pandoc.Inlines(model.labels['closing-thanks']),
+    links = {},
+  }
+  for _, link in ipairs(options.links or {}) do
+    closing.links[#closing.links + 1] = to_inlines(link)
+  end
+  local licence = options.licence
+  if licence == nil and meta.license ~= nil then
+    licence = pandoc.utils.type(meta.license) == 'table' and meta.license.text or meta.license
+  end
+  if licence ~= nil and text_of(licence) ~= '' then
+    closing.licence = to_inlines(licence)
+  end
+  return closing
+end
+
+--- Build the parts of the closing: the links as a list and the licence, each
+--- in a div of its own class.
+--- @param closing table The closing of `M.closing`
+--- @return pandoc.Blocks
+function M.closing_parts(closing)
+  local blocks = pandoc.Blocks({})
+  if #closing.links > 0 then
+    local items = {}
+    for _, link in ipairs(closing.links) do
+      items[#items + 1] = { pandoc.Plain(link) }
+    end
+    blocks:insert(pandoc.Div({ pandoc.BulletList(items) }, pandoc.Attr('', { 'atelier-closing-links' })))
+  end
+  if closing.licence ~= nil then
+    blocks:insert(pandoc.Div({ pandoc.Para(closing.licence) }, pandoc.Attr('', { 'atelier-closing-licence' })))
+  end
+  return blocks
 end
 
 -- ============================================================================

@@ -260,9 +260,36 @@ local function credit_call(credit, labels)
   )
 end
 
+--- The Typst code that stores the closing in the state `atelier-closing-data`,
+--- which the closing section or the closing page shows: the title, the
+--- links and the licence, each as content.
+--- @param closing table The closing of `core.closing`
+--- @return pandoc.Plain
+local function closing_update(closing)
+  local inlines = pandoc.Inlines({ pandoc.RawInline('typst', '#atelier-closing-data.update((title: [') })
+  inlines:extend(closing.title)
+  inlines:insert(pandoc.RawInline('typst', '], links: ('))
+  for _, link in ipairs(closing.links) do
+    inlines:insert(pandoc.RawInline('typst', '['))
+    inlines:extend(link)
+    inlines:insert(pandoc.RawInline('typst', '], '))
+  end
+  inlines:insert(pandoc.RawInline('typst', '), licence: '))
+  if closing.licence ~= nil then
+    inlines:insert(pandoc.RawInline('typst', '['))
+    inlines:extend(closing.licence)
+    inlines:insert(pandoc.RawInline('typst', ']'))
+  else
+    inlines:insert(pandoc.RawInline('typst', 'none'))
+  end
+  inlines:insert(pandoc.RawInline('typst', '))'))
+  return pandoc.Plain(inlines)
+end
+
 --- Finish the handout after its blocks: write the solutions collected for
 --- the end, a "Solutions" heading, then one heading and the content of each
---- solution, then the CRediT table. Then resolve the citations of
+--- solution, then the CRediT table and the closing, which the template
+--- shows after the body. Then resolve the citations of
 --- solutions, the moved ones too.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
@@ -270,7 +297,8 @@ end
 function M.finish(doc, model)
   local page = model.solutions
   local credit = core.credit(doc.meta, model)
-  if page.count == 0 and credit == nil then
+  local closing = core.closing(doc.meta, model)
+  if page.count == 0 and credit == nil and closing == nil then
     return nil
   end
   if #page.collected > 0 then
@@ -286,6 +314,9 @@ function M.finish(doc, model)
   end
   if credit ~= nil then
     doc.blocks:insert(pandoc.RawBlock('typst', credit_call(credit, model.labels)))
+  end
+  if closing ~= nil then
+    doc.blocks:insert(closing_update(closing))
   end
   if page.count == 0 then
     return doc

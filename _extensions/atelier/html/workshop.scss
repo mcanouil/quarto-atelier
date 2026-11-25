@@ -531,6 +531,31 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 }
 
 // ===========================================================================
+// CREDIT AND CLOSING
+// ===========================================================================
+// The Lua filter ends a workshop page with the CRediT table of the authors,
+// then the closing: a thank-you, the links and the licence.
+
+.atelier-credit table {
+  width: auto;
+}
+
+.atelier-closing {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--atelier-border);
+
+  .atelier-closing-links ul {
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .atelier-closing-licence {
+    color: var(--atelier-muted);
+  }
+}
+
+// ===========================================================================
 // W1 TO W3 BLOCKS
 // ===========================================================================
 // Prerequisites, objectives, checkpoints, exercises, and solutions are blocks

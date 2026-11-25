@@ -506,6 +506,31 @@ $code-block-font-size: 0.6em !default;
 }
 
 // ===========================================================================
+// CLOSING
+// ===========================================================================
+// The last slide of a workshop deck: a thank-you, the links, the licence and
+// the CRediT table of the authors.
+
+.reveal .slides section.atelier-closing .atelier-closing-links ul {
+  margin-left: 0;
+  list-style: none;
+  font-size: 0.8em;
+}
+
+.reveal .slides section.atelier-closing .atelier-closing-licence {
+  font-size: 0.6em;
+  color: var(--atelier-muted);
+}
+
+.reveal .slides section.atelier-closing .atelier-credit {
+  font-size: 0.5em;
+}
+
+.reveal .slides section.atelier-closing .atelier-credit table {
+  margin: 0;
+}
+
+// ===========================================================================
 // TERMINAL
 // ===========================================================================
 // A `.terminal` code block is dark in both schemes, in its code window. The

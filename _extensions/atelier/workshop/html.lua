@@ -229,16 +229,27 @@ function M.credit_section(credit, labels)
   }, pandoc.Attr('', { 'atelier-credit' }))
 end
 
---- Finish a workshop page after its blocks: the CRediT table at the end.
+--- Finish a workshop page after its blocks: the CRediT table, then the
+--- closing, at the end of the page.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
   local credit = core.credit(doc.meta, model)
-  if credit == nil then
+  local closing = core.closing(doc.meta, model)
+  if credit == nil and closing == nil then
     return nil
   end
-  doc.blocks:insert(M.credit_section(credit, model.labels))
+  if credit ~= nil then
+    doc.blocks:insert(M.credit_section(credit, model.labels))
+  end
+  if closing ~= nil then
+    local blocks = pandoc.Blocks({
+      pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
+    })
+    blocks:extend(core.closing_parts(closing))
+    doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
+  end
   return doc
 end
 

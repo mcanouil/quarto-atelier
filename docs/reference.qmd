@@ -410,6 +410,7 @@ language:
 | `atelier-credit-equal`           | `Equal`                              | `Égal`                                      |
 | `atelier-credit-supporting`      | `Supporting`                         | `Appui`                                     |
 | `atelier-credit-contributed`     | `Contributed`                        | `A contribué`                               |
+| `atelier-closing-thanks`         | `Thank you`                          | `Merci`                                     |
 | `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
 | `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
 | `atelier-workshop-author-single` | `Instructor`                         | `Formateur·rice`                            |
