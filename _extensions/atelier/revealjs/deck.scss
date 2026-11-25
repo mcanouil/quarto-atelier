@@ -326,6 +326,20 @@ $code-block-font-size: 0.6em !default;
   margin-right: var(--atelier-row-edge);
 }
 
+// Without a logo, Quarto puts the slide number in the bottom-right corner.
+// It sits on the row there, on the same centre line. With a logo, Quarto
+// moves it to the top-right corner, and it stays there.
+// Remove when: never.
+.reveal.reveal:not(.has-logo) .slide-number {
+  right: var(--atelier-row-edge);
+  bottom: var(--atelier-row-bottom);
+  display: flex;
+  align-items: center;
+  height: var(--atelier-row-height);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 // The arrows of the bottom-right layout sit above the row, so the logo slot
 // keeps the corner. The arrows of the edges layout do not move.
 // Remove when: never.
