@@ -19,6 +19,9 @@
 - feat: In workshop mode, a CRediT table shows the contribution roles of the authors, from the `role` field of `author`, at the end of a handout or a deck and on the page that sets the closing. (#151)
 - feat: In workshop mode, the title block, the title slide and the section slides show the motif of the preset: steps, quadrants or dots. (#151)
 - fix: The entries of a bibliography that Quarto marks as a list keep their list item role, so screen readers announce the list again. (#151)
+- fix: A Typst page no longer logs the offset-headings warning about the heading shift of Quarto.
+- feat: The workshop and documentation templates offer the PDF and the slide deck on their home page, with the link change of the PDF and the deck off until you set `website.site-url`.
+- docs: Add a page on the `atelier-typst` and `atelier-revealjs` formats, and document the prerequisites, checkpoint, speakers, closing, CRediT table and motifs of workshop mode.
 
 ## 0.15.3 (2026-11-23)
 

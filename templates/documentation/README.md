@@ -28,6 +28,18 @@ quarto preview
 
 Quarto opens the site in your browser and updates it each time you save a file.
 
+## Other formats
+
+The home page, `index.qmd`, lists three formats in its front matter: the web page, a PDF made with Typst, and a Reveal.js deck.
+Quarto shows the PDF and the deck in the "Other Formats" list of the page.
+The deck has its own file name, `index-slides.html`, because a page and a deck cannot both be `index.html`.
+To offer the formats on another page, copy the `format` block of `index.qmd` and change the file name of the deck.
+To drop them, delete the block.
+
+To make the links of the PDF and the deck work outside the site, set `website.site-url` in `_quarto.yml` to the address of your site.
+Then remove the `portable-links` lines from `extensions`, which switch the link change off until you do this.
+With a `site-url`, the 404 page also loads its files from that address, so set it when you publish.
+
 ## Files to edit first
 
 - `_quarto.yml` holds the title, the description, the repository address, and the navigation.

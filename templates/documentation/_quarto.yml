@@ -31,3 +31,7 @@ brand: _brand.yml
 extensions:
   atelier:
     version: "1.0.0"
+  # Off until you set website.site-url: the PDF and the deck then turn relative
+  # links into links to the published site. Remove these two lines after you set it.
+  portable-links:
+    enabled: false

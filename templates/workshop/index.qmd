@@ -1,5 +1,11 @@
 ---
 title: "Welcome"
+format:
+  atelier-html: default
+  atelier-typst: default
+  # A site page and its deck share the name index.html, so the deck gets its own file name.
+  atelier-revealjs:
+    output-file: index-slides.html
 extensions:
   atelier:
     duration: 5

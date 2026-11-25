@@ -77,6 +77,13 @@ Then run `quarto add` first, and `quarto use template` second.
 You cannot skip the prompt with `--no-prompt`.
 With that option, `quarto use template` stops because the folder that `quarto add` filled is not empty.
 
+## Other formats
+
+The home page of each template lists three formats: the web page, a PDF, and a slide deck.
+The demos show them: open the [workshop PDF](demos/workshop-sidebar/index.pdf) or the [workshop deck](demos/workshop-sidebar/index-slides.html).
+The [Typst and Reveal.js formats](formats.qmd) page tells how the `format` block works, and why the deck has its own file name.
+To make the links of the PDF and the deck work outside the site, set `website.site-url` in `_quarto.yml`, then remove the `portable-links` lines from `extensions`.
+
 ## Edit the template
 
 Edit these files first:
@@ -112,7 +119,7 @@ Change it before you publish the site, because the edit and issue links of each 
 | `_quarto.yml`            | The project type, `mode: workshop`, `navbar: false`, the search in the sidebar, and `metadata-files`. |
 | `_sidebars.yml`          | The workshop sidebar with its anchor, and the alias in `extensions.atelier.sidebars`.         |
 | `_brand.yml`             | The colours, with a comment on each key.                                                      |
-| `index.qmd`              | The welcome page. It is a module of one page.                                                 |
+| `index.qmd`              | The welcome page. It is a module of one page, and it lists the PDF and deck formats.           |
 | `workshop/setup/`        | The "Set-up" module: two pages.                                                               |
 | `workshop/first-site/`   | The "Your first site" module: a page and an exercise page.                                    |
 | `workshop/publish/`      | The "Publish" module: one page.                                                               |
