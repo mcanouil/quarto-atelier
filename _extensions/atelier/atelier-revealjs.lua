@@ -215,8 +215,8 @@ local function font_declarations(scheme)
 end
 
 --- The rules of the motif of a workshop deck: the mask of the preset, and
---- its colour and opacity on the page, on the dark slides and on the section
---- slides. A light surface takes the mark at `motifs.LIGHT_OPACITY`, and a
+--- its colour and opacity on the title slide, on the section slides and on
+--- the dark section slides, after the surface that `mark_slide` paints. A light surface takes the mark at `motifs.LIGHT_OPACITY`, and a
 --- dark one the ink, or the chrome mark on a section slide.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
@@ -227,8 +227,8 @@ local function motif_rules(scheme, tokens, dark)
   local lines = { ROOT_SCOPE .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
   local surfaces = {
     { scope = ROOT_SCOPE, surface = tokens.bg, light = 'accent-mark', dark = 'accent-ink' },
-    { scope = DARK_SCOPE, surface = dark.bg, light = 'accent-mark', dark = 'accent-ink' },
     { scope = '.reveal .slides section.' .. SECTION_CLASS, surface = tokens['navbar-bg'], light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
+    { scope = DARK_SCOPE .. '.' .. SECTION_CLASS, surface = dark['navbar-bg'], light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
   }
   for _, entry in ipairs(surfaces) do
     local is_dark = palette.tone(entry.surface) == 'dark'
