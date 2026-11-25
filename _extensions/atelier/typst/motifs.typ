@@ -36,7 +36,8 @@
         curve.move((x, y - r)),
         curve.cubic((x + k, y - r), (x + r, y - k), (x + r, y)),
         curve.line((x, y)),
-        curve.close(),
+        // A smooth close would bow the straight edge out of the disc.
+        curve.close(mode: "straight"),
       ))
     } else {
       let r = shape.r * unit
