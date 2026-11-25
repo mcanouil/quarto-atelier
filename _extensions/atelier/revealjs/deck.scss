@@ -276,9 +276,10 @@ $code-block-font-size: 0.6em !default;
   text-align: center;
 }
 
-// The colour stays at a lower specificity than the row rules, so the rules
-// of the section slides and of the dark slides win over it.
-.reveal .footer {
+// The colour wins over the `.has-dark-background` colour of Quarto, which
+// has the same weight and comes first, and stays under the weight of the
+// section slide rule, so section slides keep their colour.
+.reveal .footer.footer {
   color: var(--atelier-muted);
   font-family: var(--atelier-font-base, var(--r-main-font));
 }
