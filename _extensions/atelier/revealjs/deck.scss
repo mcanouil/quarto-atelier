@@ -543,7 +543,8 @@ $code-block-font-size: 0.6em !default;
 // CLOSING
 // ===========================================================================
 // The last slide of a workshop deck: a thank-you, the links, the licence and
-// the CRediT table of the authors.
+// the CRediT table of the authors, which has a slide of its own in a deck
+// with no closing.
 
 .reveal .slides section.atelier-closing .atelier-closing-links ul {
   margin-left: 0;
@@ -556,11 +557,11 @@ $code-block-font-size: 0.6em !default;
   color: var(--atelier-muted);
 }
 
-.reveal .slides section.atelier-closing .atelier-credit {
+.reveal .slides .atelier-credit {
   font-size: 0.5em;
 }
 
-.reveal .slides section.atelier-closing .atelier-credit table {
+.reveal .slides .atelier-credit table {
   margin: 0;
 }
 

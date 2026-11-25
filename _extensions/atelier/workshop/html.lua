@@ -66,11 +66,15 @@ function M.publish(meta, model)
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
     )
-    -- The motif of the preset, which `html/workshop.scss` draws in the title block.
-    quarto.doc.include_text(
-      'in-header',
-      '<style>:root { --atelier-motif: ' .. motifs.mask(motifs.name(palette.preset('light'))) .. '; }</style>'
-    )
+    -- The motif of the preset, which `html/workshop.scss` draws in the title
+    -- block. A brand can set a preset for each scheme, so the dark page takes
+    -- the motif of its own preset.
+    local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
+    local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
+    if dark ~= light then
+      style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
+    end
+    quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
     local photos = {}
     for _, speaker in ipairs(core.speakers(meta, model)) do
       if speaker.photo ~= nil then
@@ -238,26 +242,26 @@ function M.credit_section(credit, labels)
 end
 
 --- Finish a workshop page after its blocks: the CRediT table, then the
---- closing, at the end of the page.
+--- closing, at the end of the page that sets `extensions.atelier.closing`.
+--- The pages of a course share their authors, so only the page that closes
+--- the workshop shows the table.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
-  local credit = core.credit(doc.meta, model)
   local closing = core.closing(doc.meta, model)
-  if credit == nil and closing == nil then
+  if closing == nil then
     return nil
   end
+  local credit = core.credit(doc.meta, model)
   if credit ~= nil then
     doc.blocks:insert(M.credit_section(credit, model.labels))
   end
-  if closing ~= nil then
-    local blocks = pandoc.Blocks({
-      pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
-    })
-    blocks:extend(core.closing_parts(closing))
-    doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
-  end
+  local blocks = pandoc.Blocks({
+    pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
+  })
+  blocks:extend(core.closing_parts(closing))
+  doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
   return doc
 end
 

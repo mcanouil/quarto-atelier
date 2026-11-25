@@ -212,16 +212,24 @@ local function references(doc)
   return cites, refs
 end
 
---- Finish a workshop deck after its blocks: a references slide when the
---- deck cites the bibliography and has no `#refs` div, then the closing
---- slide, with the links, the licence and the CRediT table.
+--- Finish a workshop deck after its blocks. With a closing: a references
+--- slide when the deck cites the bibliography and has no `#refs` div, then
+--- the closing slide, with the links, the licence and the CRediT table.
+--- Without a closing, the CRediT table has a slide of its own.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
   local closing = core.closing(doc.meta, model)
-  if closing == nil then
+  local credit = core.credit(doc.meta, model)
+  if closing == nil and credit == nil then
     return nil
+  end
+  local table_blocks = credit and pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' }))
+  if closing == nil then
+    doc.blocks:insert(pandoc.Header(2, pandoc.Inlines(model.labels['credit-title']), pandoc.Attr('atelier-credit-slide', { 'unnumbered' })))
+    doc.blocks:insert(table_blocks)
+    return doc
   end
   local cites, refs = references(doc)
   if cites and not refs then
@@ -232,12 +240,9 @@ function M.finish(doc, model)
   end
   doc.blocks:insert(pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing', { 'atelier-closing', 'unnumbered' })))
   doc.blocks:extend(core.closing_parts(closing))
-  local credit = core.credit(doc.meta, model)
-  if credit ~= nil then
-    doc.blocks:insert(pandoc.Div({
-      pandoc.Para({ pandoc.Strong(pandoc.Inlines(model.labels['credit-title'])) }),
-      core.credit_table(credit, model.labels),
-    }, pandoc.Attr('', { 'atelier-credit' })))
+  if table_blocks ~= nil then
+    table_blocks.content:insert(1, pandoc.Para({ pandoc.Strong(pandoc.Inlines(model.labels['credit-title'])) }))
+    doc.blocks:insert(table_blocks)
   end
   return doc
 end
