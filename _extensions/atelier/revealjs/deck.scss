@@ -506,6 +506,40 @@ $code-block-font-size: 0.6em !default;
 }
 
 // ===========================================================================
+// MOTIF
+// ===========================================================================
+// In workshop mode, the title slide and the section slides have the motif of
+// the preset in their top right corner. `atelier-revealjs.lua` marks these
+// slides and writes the mask and its colour, from the palette, as custom
+// properties. The motif only decorates: a pseudo-element with no text, which
+// forced colours remove.
+
+.reveal .slides section[data-atelier-motif]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  background-color: var(--atelier-motif-paint);
+  opacity: var(--atelier-motif-opacity);
+  mask-image: var(--atelier-motif);
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.reveal .slides section.atelier-section[data-atelier-motif]::after {
+  width: 45%;
+}
+
+@media (forced-colors: active) {
+  .reveal .slides section[data-atelier-motif]::after {
+    display: none;
+  }
+}
+
+// ===========================================================================
 // CLOSING
 // ===========================================================================
 // The last slide of a workshop deck: a thank-you, the links, the licence and

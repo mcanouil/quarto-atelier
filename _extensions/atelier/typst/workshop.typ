@@ -150,12 +150,14 @@
 }
 
 // Answer the CRediT table: the contribution of each author to each role,
-// under its heading. The first column names the role.
+// under a heading of its own level, as the solutions have. The first column
+// names the role.
 // - title: the heading.
 // - head: the header row, the role label then the author names.
 // - rows: one array for each role, the role then the degree for each author.
 #let atelier-ws-credit(title, head, rows) = {
-  heading(level: 2, numbering: none, outlined: false, title)
+  heading(level: 1, numbering: none, title)
+  atelier-chapter-end()
   set text(size: 0.9em)
   table(
     columns: (1fr,) + (auto,) * (head.len() - 1),

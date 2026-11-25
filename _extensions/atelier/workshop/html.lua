@@ -10,7 +10,8 @@
 --- durations of every page in that sidebar, and the photos of the speakers,
 --- which `html/scripts/title-block.html` puts in the title block. A workshop
 --- page also gets the
---- `atelier-workshop` class on `<html>`, and a workshop page that no listed
+--- `atelier-workshop` class on `<html>` and the motif of its preset, and a
+--- workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
 --- The blocks of `workshop/core.lua` become the head line and body of each
 --- block, objective checkboxes, a `<details>` solution, and a terminal code
@@ -18,6 +19,8 @@
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
+local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
+local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -62,6 +65,11 @@ function M.publish(meta, model)
     quarto.doc.include_text(
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
+    )
+    -- The motif of the preset, which `html/workshop.scss` draws in the title block.
+    quarto.doc.include_text(
+      'in-header',
+      '<style>:root { --atelier-motif: ' .. motifs.mask(motifs.name(palette.preset('light'))) .. '; }</style>'
     )
     local photos = {}
     for _, speaker in ipairs(core.speakers(meta, model)) do

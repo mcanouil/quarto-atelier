@@ -139,8 +139,9 @@
 
 // Answer the title and the links of the closing.
 // - data: the closing, see atelier-closing-data.
-#let atelier-closing-head(data) = {
-  heading(level: 2, numbering: none, outlined: false, data.title)
+// - level: level of the heading.
+#let atelier-closing-head(data, level: 1) = {
+  heading(level: level, numbering: none, outlined: false, data.title)
   if data.links.len() > 0 {
     list(..data.links)
   }
@@ -172,7 +173,7 @@
   atelier-surface("closing")
   v(1fr)
   atelier-rule(30%)
-  if data != none { atelier-closing-head(data) }
+  if data != none { atelier-closing-head(data, level: 2) }
   let contacts = atelier-people.authors.filter(it => it.email != "" or it.orcid != "")
   if contacts.len() > 0 {
     part(atelier-labels.at("closing-contact"), stack(spacing: 0.6em, ..contacts.map(it => {

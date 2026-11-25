@@ -6,7 +6,8 @@
 --- @brief Give the Typst partials the data of the document.
 --- @description Quarto compiles no Sass for Typst, so this filter reads the
 --- colours from `palette.lua` and writes them, with the fonts of the preset,
---- the labels, the five report switches and the authors, into the
+--- the labels, the five report switches, the authors and the workshop
+--- motif of `motifs.lua`, into the
 --- `atelier-typst-data` metadata. The `typst/tokens.typ` partial writes that
 --- value in front of the template, so every partial can read it.
 --- The filter also marks each callout with its type and appearance, ends
@@ -17,6 +18,7 @@ local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
+local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 
 --- Name that prefixes each warning.
 --- @type string
@@ -253,6 +255,26 @@ local function authors_code(meta)
   return typst_dict({ authors = typst_array(authors), affiliations = typst_array(affiliations) })
 end
 
+--- The corner motif of a workshop handout, as a Typst dictionary of its
+--- shapes, colour and opacity factor, or `none` outside workshop mode. On a
+--- light page the motif takes the accent mark at 85% of its opacities, and on
+--- a dark page the accent ink.
+--- @param meta table
+--- @param preset string
+--- @param tokens table<string, table>
+--- @return string
+local function motif_code(meta, preset, tokens)
+  if core.read_mode(meta, quarto.doc.input_file or '', true) ~= core.MODE_WORKSHOP then
+    return 'none'
+  end
+  local dark = palette.tone(tokens.bg) == 'dark'
+  return typst_dict({
+    shapes = motifs.typst(motifs.name(preset)),
+    paint = typst_colour(tokens[dark and 'accent-ink' or 'accent-mark'], tokens.bg),
+    factor = dark and '100%' or '85%',
+  })
+end
+
 --- Write the document data into `atelier-typst-data`.
 --- @param meta table
 --- @return table
@@ -275,6 +297,7 @@ local function publish(meta)
     '#let atelier-labels = ' .. labels_code(),
     '#let atelier-switches = ' .. switches_code(options),
     '#let atelier-people = ' .. authors_code(meta),
+    '#let atelier-motif-data = ' .. motif_code(meta, preset, tokens),
   }
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })
   return meta
