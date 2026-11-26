@@ -320,9 +320,46 @@ html.print-pdf:root {
 }
 
 .reveal .footer .atelier-slot-logo {
+  display: flex;
+  align-items: center;
   grid-column: 3;
   justify-self: end;
   margin-right: var(--atelier-row-edge);
+}
+
+// THE LOGO
+// The title slide shows the logo above the title, and the other slides show
+// it at the right end of the bottom row. Each place holds the light and the
+// dark image; `atelier-revealjs.lua` writes the rules that show the dark one
+// on dark surfaces. Quarto's own logo stays in the page, hidden, so Quarto
+// keeps the `has-logo` class that puts the slide number at the top.
+// Remove when: never.
+.reveal.reveal .slide-logo {
+  display: none;
+}
+
+.reveal .atelier-logo-dark {
+  display: none;
+}
+
+.reveal .footer .atelier-slot-logo img {
+  width: auto;
+  height: var(--atelier-hit);
+  margin: 0;
+}
+
+.reveal .slides section .atelier-title-logo {
+  margin-block-end: 0.6em;
+  line-height: 0;
+
+  img {
+    width: auto;
+    max-width: 50%;
+    height: 1.6em;
+    margin: 0;
+    object-fit: contain;
+    object-position: left center;
+  }
 }
 
 // Without a logo, Quarto puts the slide number in the bottom-right corner.

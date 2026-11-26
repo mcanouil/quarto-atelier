@@ -20,6 +20,7 @@
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
+local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 
 --- The fallback family of each font role.
 --- @type table<string, string>
@@ -279,14 +280,41 @@ local function left_buttons(meta)
   return count
 end
 
+--- The rules that show the dark image of the logo on dark surfaces: every
+--- slide of a dark deck, or else a `.dark` slide and, when its background
+--- is dark, a section slide. In a dark deck, light section slides keep the
+--- light image.
+--- @param page_dark boolean True when the deck is dark
+--- @param section_dark boolean True when the section slides are dark
+--- @return string[]
+local function logo_rules(page_dark, section_dark)
+  local show = function(scope, shown, hidden)
+    return {
+      scope .. ' .reveal .atelier-logo-' .. hidden .. ' { display: none; }',
+      scope .. ' .reveal .atelier-logo-' .. shown .. ' { display: block; }',
+    }
+  end
+  if not page_dark then
+    return show(':is(.' .. DARK_STATE .. (section_dark and (', .' .. SECTION_STATE) or '') .. ')', 'dark', 'light')
+  end
+  local rules = show(':root', 'dark', 'light')
+  if not section_dark then
+    -- A light chrome keeps the section slides light in a dark deck.
+    for _, rule in ipairs(show('.' .. SECTION_STATE, 'light', 'dark')) do
+      rules[#rules + 1] = rule
+    end
+  end
+  return rules
+end
+
 --- The style element of the deck.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
---- @param workshop boolean True in workshop mode, which adds the motif
+--- @param state { workshop: boolean, logo: table|nil, section_dark: boolean } The deck state
 --- @param buttons integer The number of buttons at the left of the bottom row
 --- @return string
-local function deck_style(scheme, tokens, dark, workshop, buttons)
+local function deck_style(scheme, tokens, dark, state, buttons)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
   lines[#lines + 1] = '  --atelier-row-buttons: ' .. buttons .. ';'
   for _, line in ipairs(token_declarations(tokens)) do
@@ -307,10 +335,21 @@ local function deck_style(scheme, tokens, dark, workshop, buttons)
   for _, rule in ipairs(scheme_highlighting(DARK_SCOPE, 'dark', dark)) do
     lines[#lines + 1] = rule
   end
-  if workshop then
+  if state.workshop then
     for _, line in ipairs(motif_rules(scheme, tokens, dark)) do
       lines[#lines + 1] = line
     end
+  end
+  if state.logo ~= nil then
+    for _, line in ipairs(logo_rules(palette.tone(tokens.bg) == 'dark', state.section_dark)) do
+      lines[#lines + 1] = line
+    end
+    -- The logo takes the bottom-right corner, so the slide number goes to the
+    -- top-right corner, as Quarto does with `has-logo`. Quarto adds that class
+    -- only when it draws its own logo, which it does not for every logo that
+    -- Atelier draws, so the rule keys on the logo of Atelier.
+    lines[#lines + 1] = ':root:root .reveal.reveal .slide-number { top: 8px; right: 8px; bottom: auto; height: auto; padding: 5px; }'
+    lines[#lines + 1] = ':root:root .reveal.reveal :is(.slide-number, .slide-number a) { line-height: normal; }'
   end
   lines[#lines + 1] = '</style>'
   return table.concat(lines, '\n')
@@ -340,7 +379,12 @@ local function publish(meta)
   deck.dark_bg = palette.hex(dark.bg, dark.bg)
   deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
-  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop, left_buttons(meta)))
+  deck.logo = logo.resolve(meta)
+  if deck.logo ~= nil then
+    deck.logo_html = logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark')
+    meta['atelier-logo-html'] = pandoc.RawInline('html', deck.logo_html)
+  end
+  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck, left_buttons(meta)))
   if meta.chalkboard then
     quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
   end
@@ -417,6 +461,18 @@ local function mark_slide(header)
   return nil
 end
 
+--- Answer the light and the dark image of the logo, for the logo slot of the
+--- footer, or nothing when the deck has no logo. The images are raw HTML:
+--- Pandoc writes a `data-src` for a deck image, which Reveal.js loads only
+--- inside a slide, and the footer is outside the slides.
+--- @return pandoc.Inlines
+local function logo_images()
+  if deck.logo == nil then
+    return pandoc.Inlines({})
+  end
+  return pandoc.Inlines({ pandoc.RawInline('html', deck.logo_html) })
+end
+
 --- Fill the slots of the footer that Quarto adds to the deck. The footer of
 --- the author goes in the centre slot, the title of the deck in the left one,
 --- and the logo slot stays at the right. The slots sit in one row inside the
@@ -424,7 +480,10 @@ end
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 local function fill_footer(div)
-  if not div.classes:includes('footer-default') then
+  -- The footer of one slide replaces the footer of the deck on that slide.
+  -- With a logo, it takes the same row, so the logo stays on that slide.
+  local own_footer = div.classes:includes('footer') and deck.logo ~= nil
+  if not div.classes:includes('footer-default') and not own_footer then
     return nil
   end
   local own = pandoc.utils.blocks_to_inlines(div.content)
@@ -445,7 +504,7 @@ local function fill_footer(div)
       pandoc.Plain({
         slot('left', text(pandoc.Inlines(deck.title))),
         slot('centre', text(own)),
-        slot('logo', {}),
+        slot('logo', logo_images()),
       }),
       pandoc.Attr('', { 'atelier-footer-row' })
     ),
