@@ -2,8 +2,8 @@
 // The data of the document, as `atelier-typst.lua` writes it: the preset,
 // the colour tokens of `palette.lua` for the scheme, the highlighting colours,
 // the fonts of the preset, the labels, the five report switches, the
-// authors, the workshop motif and the logo. No colour value is written in a partial; every colour comes from
-// here.
+// authors, the workshop motif and the logo.
+// No colour value is written in a partial; every colour comes from here.
 //
 // @license MIT
 // @copyright 2026 Mickaël Canouil
