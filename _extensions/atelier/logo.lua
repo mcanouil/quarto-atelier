@@ -6,7 +6,7 @@
 --- @brief Find the logo of a document, for every Atelier format.
 --- @description A logo has a light image, a dark image and an alt text. The
 --- logo of a document comes from the `logo` of the front matter, or else
---- from the `medium` or `small` logo of the brand. The logo of a website is
+--- from the `medium`, `small` or `large` logo of the brand. The logo of a website is
 --- the logo of its navbar or of its sidebar, with `logo-alt`. A source with
 --- one image gives that image for light and dark surfaces.
 
@@ -83,13 +83,13 @@ local function from_source(value, alt)
   }
 end
 
---- Answer the logo of the brand, `medium` first, then `small`.
+--- Answer the logo of the brand, `medium` first, then `small`, then `large`.
 --- @return table|nil
 local function from_brand()
   if quarto.brand == nil or quarto.brand.get_logo == nil then
     return nil
   end
-  for _, size in ipairs({ 'medium', 'small' }) do
+  for _, size in ipairs({ 'medium', 'small', 'large' }) do
     local light = quarto.brand.get_logo('light', size)
     local dark = quarto.brand.get_logo('dark', size)
     if light ~= nil or dark ~= nil then

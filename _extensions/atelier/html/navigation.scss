@@ -1294,13 +1294,18 @@ body:not(.glightbox-mobile) div.gslide-description :is(.gslide-title, .gslide-de
 // hides the other image with `!important`, so these rules need it too.
 // Remove when: never.
 @mixin atelier-chrome-logo($shown, $hidden) {
-  body:is(.quarto-light, .quarto-dark) :is(.navbar, #quarto-sidebar) img:is(.navbar-logo, .sidebar-logo) {
-    &.#{$shown} {
-      display: inline !important;
-    }
+  body:is(.quarto-light, .quarto-dark) :is(.navbar, #quarto-sidebar) img:is(.navbar-logo, .sidebar-logo).#{$hidden} {
+    display: none !important;
+  }
 
-    &.#{$hidden} {
-      display: none !important;
+  body:is(.quarto-light, .quarto-dark) .navbar img.navbar-logo.#{$shown} {
+    display: inline !important;
+  }
+
+  // Quarto hides the sidebar logo below the lg breakpoint (`d-none d-lg-inline`).
+  @include media-breakpoint-up(lg) {
+    body:is(.quarto-light, .quarto-dark) #quarto-sidebar img.sidebar-logo.#{$shown} {
+      display: inline !important;
     }
   }
 }

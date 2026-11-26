@@ -1826,5 +1826,7 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
     width: auto;
     max-width: min(16rem, 60%);
     height: 3rem;
+    object-fit: contain;
+    object-position: left center;
   }
 }
