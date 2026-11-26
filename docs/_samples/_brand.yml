@@ -1,0 +1,11 @@
+logo:
+  images:
+    atelier-light:
+      path: logo-light.svg
+      alt: Atelier
+    atelier-dark:
+      path: logo-dark.svg
+      alt: Atelier
+  medium:
+    light: atelier-light
+    dark: atelier-dark

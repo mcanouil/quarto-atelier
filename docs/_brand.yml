@@ -15,3 +15,14 @@ color:
   primary:
     light: teal
     dark: teal-dark
+logo:
+  images:
+    atelier-light:
+      path: assets/icons/logo-light.svg
+      alt: Atelier
+    atelier-dark:
+      path: assets/icons/logo-dark.svg
+      alt: Atelier
+  medium:
+    light: atelier-light
+    dark: atelier-dark

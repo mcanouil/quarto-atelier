@@ -6,8 +6,8 @@
 --- @brief Give the Typst partials the data of the document.
 --- @description Quarto compiles no Sass for Typst, so this filter reads the
 --- colours from `palette.lua` and writes them, with the fonts of the preset,
---- the labels, the five report switches, the authors and the workshop
---- motif of `motifs.lua`, into the
+--- the labels, the five report switches, the authors, the workshop motif
+--- of `motifs.lua` and the logo of `logo.lua`, into the
 --- `atelier-typst-data` metadata. The `typst/tokens.typ` partial writes that
 --- value in front of the template, so every partial can read it.
 --- The filter also marks each callout with its type and appearance, ends
@@ -19,6 +19,7 @@ local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/loggin
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
+local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 
 --- Name that prefixes each warning.
 --- @type string
@@ -262,17 +263,31 @@ end
 --- @param model table The mode and the `extensions.atelier` options
 --- @param preset string
 --- @param tokens table<string, table>
+--- @param dark boolean True when the page is dark
 --- @return string
-local function motif_code(model, preset, tokens)
+local function motif_code(model, preset, tokens, dark)
   if model.mode ~= core.MODE_WORKSHOP then
     return 'none'
   end
-  local dark = palette.tone(tokens.bg) == 'dark'
   return typst_dict({
     shapes = motifs.typst(motifs.name(preset)),
     paint = typst_colour(tokens[dark and 'accent-ink' or 'accent-mark'], tokens.bg),
     factor = dark and '100%' or string.format('%g%%', motifs.LIGHT_OPACITY * 100),
   })
+end
+
+--- Answer the logo of the document as Typst: its image for the tone of the
+--- page, with the alt text (`none` when there is none), or `none`.
+--- @param meta table
+--- @param dark boolean True when the page is dark
+--- @return string
+local function logo_code(meta, dark)
+  local resolved = logo.resolve(meta)
+  if resolved == nil then
+    return 'none'
+  end
+  local image = dark and resolved.dark or resolved.light
+  return typst_dict({ path = typst_string(image.path), alt = image.alt ~= '' and typst_string(image.alt) or 'none' })
 end
 
 --- Write the document data into `atelier-typst-data`.
@@ -286,6 +301,7 @@ local function publish(meta)
   local preset = palette.preset(painted)
   local tokens = palette.tokens(scheme)
   local styles = palette.highlighting(preset, painted)
+  local dark = palette.tone(tokens.bg) == 'dark'
   local terminal_styles = palette.highlighting(preset, 'dark')
   local lines = {
     '#let atelier-preset = ' .. typst_string(preset),
@@ -298,7 +314,8 @@ local function publish(meta)
     '#let atelier-labels = ' .. labels_code(),
     '#let atelier-switches = ' .. switches_code(options),
     '#let atelier-people = ' .. authors_code(meta, model),
-    '#let atelier-motif-data = ' .. motif_code(model, preset, tokens),
+    '#let atelier-motif-data = ' .. motif_code(model, preset, tokens, dark),
+    '#let atelier-logo = ' .. logo_code(meta, dark),
   }
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })
   return meta

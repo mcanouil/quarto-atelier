@@ -337,6 +337,7 @@ Keep your options under `extensions:`: both copies read them.
 | `extensions.atelier.closing` | `true`, or a map with `title`, `links`, and `licence`. Set it on the last page of a workshop only. See [Closing](workshop.qmd#closing). |
 | `extensions.atelier.solutions` | `end` (the default), `inline`, or `hide`. Where a PDF puts the solutions. See [Workshop handouts](formats.qmd#workshop-handouts). |
 | `extensions.atelier.cover`, `toc-page`, `chapter-dividers`, `chapter-contents`, `closing-page` | Report switches of `atelier-typst`, each `false` by default. See [Report switches](formats.qmd#report-switches). |
+| `logo`                 | A path, or a map with `light`, `dark`, and `alt`. The name of a brand logo, such as `medium` or a key of `logo.images`, gives that brand logo. `false` gives no logo. Otherwise, it comes before the brand logo. An HTML document outside a website shows it above the title. In a website, the navbar or the sidebar logo shows instead. A PDF shows it above the title and in the page footer, and a deck above the title of the title slide and at the end of the bottom row, each with the dark image on a dark surface. A logo with no `alt` is decorative. |
 | `canonical-url: false` | Drops the canonical link. Set it on a page served from more than one URL, like `404.qmd`. |
 
 : Front matter keys the project type reads. {.striped .hover tbl-colwidths="[24,76]"}

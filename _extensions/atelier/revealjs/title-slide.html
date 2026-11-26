@@ -1,4 +1,7 @@
 <section id="$idprefix$title-slide"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$ class="quarto-title-block atelier-title-slide$if(atelier-motif)$ atelier-motif$endif$">
+$if(atelier-logo-html)$
+  <div class="atelier-title-logo">$atelier-logo-html$</div>
+$endif$
   <h1 class="title">$title$</h1>
 $if(subtitle)$
   <p class="subtitle">$subtitle$</p>

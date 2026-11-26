@@ -52,7 +52,7 @@ The `terminal` preset is dark in both schemes.
 One document type serves every page.
 By default, the PDF has a compact layout:
 
-- A title block with the title, the subtitle, the authors, the date, and the logo of the brand.
+- A title block with the title, the subtitle, the authors, the date, and the logo.
 - The table of contents, if `toc` is on.
 - Numbered sections.
 
@@ -60,6 +60,24 @@ By default, the PDF has a compact layout:
 
 The defaults are an A4 page, margins of 20 mm and 25 mm, and PDF/UA-1, so the PDF is tagged for assistive technology.
 Typst reads the fonts from the `fonts` folder of the extension.
+
+### Page frame
+
+Each page of the PDF has a header and a footer, which Atelier fills from the front matter.
+The header shows the document title on the left and the current chapter on the right.
+The footer shows three items on one line, and the page number below them:
+
+- On the left, the first affiliation of the first author.
+- In the centre, the `copyright` and the `license`.
+- On the right, the logo.
+
+An item with no value in the front matter leaves its place empty.
+The logo comes from `logo` in the front matter, or else from the brand.
+On a dark page, the PDF uses the dark image of the logo.
+
+The first page has no header.
+A cover, a divider and the closing page have no header.
+Their footer shows only the copyright and the licence, where the first line of the footer sits.
 
 ### Report switches
 
@@ -147,6 +165,8 @@ It shows the slide number as "n/total" and a progress bar.
 - The menu button, the chalkboard buttons, and the footer share one row at the bottom of each slide.
 - The footer shows the title of the document on the left and your `footer` text in the centre.
   The slide number is at the right end of that row, or in the top-right corner when the deck has a logo.
+- With a logo, the title slide shows it above the title, and the other slides show it at the right end of that row.
+  A dark slide shows the dark image of the logo.
 - The title slide shows only your `footer` text in that row, with no slide number.
   A section slide shows no slide number.
 
