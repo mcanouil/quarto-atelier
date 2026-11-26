@@ -4,7 +4,7 @@
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 --- @brief Write the workshop parts of a Reveal.js deck.
---- @description The title slide gets the speakers, each with the photo of
+--- @description The title slide gets the authors, each with the photo of
 --- the native author key `photo`, and in workshop mode the session duration
 --- and the workshop labels. The blocks of `workshop/core.lua` become blocks
 --- with a head line, as in HTML. A deck has no interaction for the

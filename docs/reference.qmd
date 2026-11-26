@@ -333,7 +333,6 @@ Keep your options under `extensions:`: both copies read them.
 | `subtitle`             | Used for the description tags when `description` is absent.                               |
 | `description-meta`     | Used as written, in preference to both. |
 | `extensions.atelier.duration` | The `duration` of a workshop page: `25 min`, `1 h`, `1 h 30 min`, or a number of minutes. See [Modules and durations](workshop.qmd#modules-and-durations). |
-| `extensions.atelier.speakers` | A map from the `id` or the name of an author to `{photo, alt}` or to a photo path. See [Speakers](workshop.qmd#speakers). |
 | `extensions.atelier.closing` | `true`, or a map with `title`, `text` or `file`, `links`, `copyright`, and `licence`. `copyright` and `licence` accept only `true` or `false`. Set it on the last page of a workshop only. See [Closing](workshop.qmd#closing). |
 | `extensions.atelier.answers` | `end` (the default), `inline`, or `hide`. Where a PDF puts the answers. See [Answers in a PDF](formats.qmd#answers-in-a-pdf). |
 | `extensions.atelier.cover`, `toc-page`, `chapter-dividers`, `chapter-contents`, `closing-page` | Report switches of `atelier-typst`, each `false` by default. See [Report switches](formats.qmd#report-switches). |

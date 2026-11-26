@@ -390,34 +390,45 @@ Select a picture to see it larger.
 These features work in both modes, except the motif, which shows in workshop mode only.
 Each one works on the web page, in the PDF, and in the deck.
 
-### Speakers
+### Authors
 
-Each author in the `author` list of a page is a speaker.
-The title block of a page, the PDF, and the title slide of a deck show the name, the degrees, and the affiliation.
-Quarto's `author` list cannot hold a photo, so `extensions.atelier.speakers` adds it.
-It is a map from the `id` of an author, or the name of an author, to the photo.
+The title block of a page, the PDF, and the title slide of a deck show each author of the `author` list in the same way, in both modes.
+Atelier reads only the native Quarto author keys.
+
+| Field | What it shows |
+| --- | --- |
+| `name` | The name, linked when `url` is set. |
+| `photo`, `photo-alt` | A round photo before the name. |
+| `degrees` | The degrees after the name, muted and in italics. |
+| `orcid` | An ORCID badge after the name, linked to the profile. |
+| `email` | The address as visible text, linked with `mailto:`. |
+| `affiliations` | The affiliations under the author, with no superscript numbers. |
+| `attributes` | The words Corresponding author, Equal contribution, and Deceased after the name, for `corresponding`, `equal-contributor`, and `deceased` set to `true`. |
+| `note` | The note as visible text with the author. |
+
+The title slide of a deck leaves out the note, the DOI, the keywords, and the abstract.
 
 ```{.yaml filename="workshop/setup/index.qmd"}
 author:
-  - id: ana
-    name: Ana Diaz
+  - name: Ana Diaz
+    photo: ana.png
+    photo-alt: "Ana Diaz, smiling, in front of a window"
+    degrees:
+      - PhD
     affiliations:
       - name: Example University
-extensions:
-  atelier:
-    speakers:
-      ana:
-        photo: ana.png
-        alt: "Ana Diaz, smiling, in front of a window"
 ```
 
-A value can be the path of the photo alone, for example `ana: ana.png`.
-The path is relative to the document.
+The `photo` path is relative to the document.
+A path that starts with `/` is relative to the project root, so an author list in `_quarto.yml` works on nested pages.
 The photo can be an SVG, PNG, JPG, GIF, or WebP file.
-If you write no `alt`, the photo is decorative, because the name is next to it.
-If a key matches no author, or the file is missing, Atelier logs a warning and shows no photo.
+If you write no `photo-alt`, the photo is decorative, because the name is next to it.
+If the file is missing or has the wrong type, Atelier logs a warning that names the file and shows no photo.
 
-These pictures show a speaker with a photo in each format.
+`extensions.atelier.speakers` no longer exists.
+Move each photo to the `photo` key of its author.
+
+These pictures show an author with a photo in each format.
 
 ::: {layout-ncol=3}
 
