@@ -227,10 +227,12 @@ end
 --- @return { mode: string, duration: integer|nil, labels: table<string, string>, options: table, source: string } The model
 function M.page(meta)
   local source = quarto.doc.input_file or ''
+  local mode = M.read_mode(meta, source)
   return {
     options = M.read_options(meta),
-    mode = M.read_mode(meta, source),
-    duration = M.read_duration(meta, source),
+    mode = mode,
+    -- The page duration is workshop metadata, so a page in another mode has none.
+    duration = mode == M.MODE_WORKSHOP and M.read_duration(meta, source) or nil,
     labels = M.resolve_labels(),
     source = source,
   }
@@ -357,7 +359,7 @@ function M.photo_uri(path)
   return 'data:' .. media .. ';base64,' .. quarto.base64.encode(content)
 end
 
---- Read the speakers of a workshop page: each author of Quarto's `author`
+--- Read the speakers of a page: each author of Quarto's `author`
 --- list, with the photo of `extensions.atelier.speakers`, a map from the
 --- author `id`, else the author name, to `photo` and `alt`, or to the photo
 --- path alone. A key that names
@@ -365,11 +367,8 @@ end
 --- is next to it.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers, empty outside workshop mode: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
+--- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
 function M.speakers(meta, model)
-  if model.mode ~= M.MODE_WORKSHOP then
-    return {}
-  end
   local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
   local used = {}
   local speakers = {}
@@ -430,11 +429,8 @@ local DEGREES = { lead = true, equal = true, supporting = true }
 --- contributed, or an empty string when the author has not that role.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil outside workshop mode or when no author has a role
+--- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil when no author has a role
 function M.credit(meta, model)
-  if model.mode ~= M.MODE_WORKSHOP then
-    return nil
-  end
   local authors, people = {}, {}
   for _, author in ipairs(meta['by-author'] or {}) do
     local name = M.author_name(author)
@@ -623,10 +619,10 @@ end
 --- `copyright: false` and `licence: false` hides its line.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil outside workshop mode or when unset
+--- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil when unset
 function M.closing(meta, model)
   local value = model.options.closing
-  if model.mode ~= M.MODE_WORKSHOP or value == nil or value == false then
+  if value == nil or value == false then
     return nil
   end
   local options = type(value) == 'table' and value or {}

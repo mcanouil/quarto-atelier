@@ -49,6 +49,17 @@ function M.publish(meta, model)
     labels = model.labels,
   }
   local changed = nil
+  local photos = {}
+  for _, speaker in ipairs(core.speakers(meta, model)) do
+    if speaker.photo ~= nil then
+      -- A file, not a data URI: the pages of a course share it in the cache.
+      quarto.doc.add_resource(speaker.photo)
+      photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
+    end
+  end
+  if #photos > 0 then
+    data.speakers = photos
+  end
   if model.mode == core.MODE_WORKSHOP then
     data.duration = model.duration
     local course = core.course(model)
@@ -75,17 +86,6 @@ function M.publish(meta, model)
       style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
     end
     quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
-    local photos = {}
-    for _, speaker in ipairs(core.speakers(meta, model)) do
-      if speaker.photo ~= nil then
-        -- A file, not a data URI: the pages of a course share it in the cache.
-        quarto.doc.add_resource(speaker.photo)
-        photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
-      end
-    end
-    if #photos > 0 then
-      data.speakers = photos
-    end
     core.apply_title_labels(meta, model.labels)
     changed = meta
   end
@@ -214,14 +214,11 @@ local function head_block(div, kind, model)
   )
 end
 
---- Turn the workshop divs into blocks, in workshop mode only.
+--- Turn the workshop divs into blocks.
 --- @param div pandoc.Div The div
 --- @param model table The page model
 --- @return pandoc.Div|nil The block, or nil to keep the div
 function M.div(div, model)
-  if model.mode ~= core.MODE_WORKSHOP then
-    return nil
-  end
   if div.classes:includes('objectives') then
     return objectives_block(div, model)
   end
