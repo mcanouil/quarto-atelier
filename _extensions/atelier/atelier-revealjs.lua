@@ -21,7 +21,6 @@ local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', 
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
-local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 
 --- The fallback family of each font role.
 --- @type table<string, string>
@@ -281,36 +280,31 @@ local function left_buttons(meta)
   return count
 end
 
---- The style element of the deck.
---- @param scheme string The scheme of the deck
---- @param tokens table<string, table> The tokens of the deck
---- @param dark table<string, table> The tokens of the dark slides
---- @param workshop boolean True in workshop mode, which adds the motif
---- @param buttons integer The number of buttons at the left of the bottom row
---- @return string
 --- The rules that show the dark image of the logo on dark surfaces: every
---- slide of a dark deck, a `.dark` slide, and a section slide when its
---- background is dark.
+--- slide of a dark deck, or else a `.dark` slide and, when its background
+--- is dark, a section slide.
 --- @param page_dark boolean True when the deck is dark
---- @param section_dark boolean True when the section slides are dark
 --- @param section_dark boolean True when the section slides are dark
 --- @return string[]
 local function logo_rules(page_dark, section_dark)
-  local scopes = { '.' .. DARK_STATE }
-  if section_dark then
-    scopes[#scopes + 1] = '.' .. SECTION_STATE
+  local scope = ':root'
+  if not page_dark then
+    scope = ':is(.' .. DARK_STATE .. (section_dark and (', .' .. SECTION_STATE) or '') .. ')'
   end
-  if page_dark then
-    scopes = { ':root' }
-  end
-  local scope = ':is(' .. table.concat(scopes, ', ') .. ')'
   return {
     scope .. ' .reveal .atelier-logo-light { display: none; }',
     scope .. ' .reveal .atelier-logo-dark { display: block; }',
   }
 end
 
-local function deck_style(scheme, tokens, dark, workshop, buttons, section_dark)
+--- The style element of the deck.
+--- @param scheme string The scheme of the deck
+--- @param tokens table<string, table> The tokens of the deck
+--- @param dark table<string, table> The tokens of the dark slides
+--- @param state { workshop: boolean, logo: table|nil, section_dark: boolean } The deck state
+--- @param buttons integer The number of buttons at the left of the bottom row
+--- @return string
+local function deck_style(scheme, tokens, dark, state, buttons)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
   lines[#lines + 1] = '  --atelier-row-buttons: ' .. buttons .. ';'
   for _, line in ipairs(token_declarations(tokens)) do
@@ -331,13 +325,15 @@ local function deck_style(scheme, tokens, dark, workshop, buttons, section_dark)
   for _, rule in ipairs(scheme_highlighting(DARK_SCOPE, 'dark', dark)) do
     lines[#lines + 1] = rule
   end
-  if workshop then
+  if state.workshop then
     for _, line in ipairs(motif_rules(scheme, tokens, dark)) do
       lines[#lines + 1] = line
     end
   end
-  for _, line in ipairs(logo_rules(palette.tone(tokens.bg) == 'dark', section_dark)) do
-    lines[#lines + 1] = line
+  if state.logo ~= nil then
+    for _, line in ipairs(logo_rules(palette.tone(tokens.bg) == 'dark', state.section_dark)) do
+      lines[#lines + 1] = line
+    end
   end
   lines[#lines + 1] = '</style>'
   return table.concat(lines, '\n')
@@ -369,13 +365,9 @@ local function publish(meta)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
   deck.logo = logo.resolve(meta)
   if deck.logo ~= nil then
-    meta['atelier-logo'] = {
-      light = deck.logo.light.path,
-      dark = deck.logo.dark.path,
-      alt = deck.logo.light.alt,
-    }
+    meta['atelier-logo-html'] = pandoc.RawInline('html', logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark'))
   end
-  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop, left_buttons(meta), deck.section_dark))
+  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck, left_buttons(meta)))
   if meta.chalkboard then
     quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
   end
@@ -461,15 +453,7 @@ local function logo_images()
   if deck.logo == nil then
     return pandoc.Inlines({})
   end
-  local image = function(entry, class)
-    return pandoc.RawInline('html', string.format(
-      '<img class="%s" src="%s" alt="%s">',
-      class,
-      str.escape_attribute(entry.path),
-      str.escape_attribute(entry.alt)
-    ))
-  end
-  return pandoc.Inlines({ image(deck.logo.light, 'atelier-logo-light'), image(deck.logo.dark, 'atelier-logo-dark') })
+  return pandoc.Inlines({ pandoc.RawInline('html', logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark')) })
 end
 
 --- Fill the slots of the footer that Quarto adds to the deck. The footer of

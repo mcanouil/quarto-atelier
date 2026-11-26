@@ -24,6 +24,7 @@ local function load_relative(path)
 end
 
 local meta_mod = load_relative('_vendor/quarto-lua-modules/metadata.lua')
+local str = load_relative('_vendor/quarto-lua-modules/string.lua')
 
 local M = {}
 
@@ -159,6 +160,24 @@ end
 --- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
 function M.resolve(meta)
   return from_source(meta.logo, nil) or from_brand()
+end
+
+--- Answer the light and the dark image of a logo as HTML, each with its
+--- alt text and its class.
+--- @param resolved table The logo of `M.resolve`
+--- @param light_class string The class of the light image
+--- @param dark_class string The class of the dark image
+--- @return string
+function M.images_html(resolved, light_class, dark_class)
+  local image = function(entry, class)
+    return string.format(
+      '<img class="%s" src="%s" alt="%s">',
+      class,
+      str.escape_attribute(entry.path),
+      str.escape_attribute(entry.alt)
+    )
+  end
+  return image(resolved.light, light_class) .. image(resolved.dark, dark_class)
 end
 
 return M

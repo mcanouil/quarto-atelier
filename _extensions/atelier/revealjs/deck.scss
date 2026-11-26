@@ -320,6 +320,8 @@ html.print-pdf:root {
 }
 
 .reveal .footer .atelier-slot-logo {
+  display: flex;
+  align-items: center;
   grid-column: 3;
   justify-self: end;
   margin-right: var(--atelier-row-edge);
@@ -338,11 +340,6 @@ html.print-pdf:root {
 
 .reveal .atelier-logo-dark {
   display: none;
-}
-
-.reveal .footer .atelier-slot-logo:has(img) {
-  display: flex;
-  align-items: center;
 }
 
 .reveal .footer .atelier-slot-logo img {
