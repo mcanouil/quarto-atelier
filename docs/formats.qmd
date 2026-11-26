@@ -144,7 +144,11 @@ It shows the slide number as "n/total" and a progress bar.
 - The title slide shows the title, the subtitle, the authors, and the date.
 - Each level-1 heading makes a section slide, painted with the chrome colours of the site.
 - A slide with the class `.dark` uses the dark colours.
-- The footer has three slots: the title of the document on the left, your `footer` text in the centre, and the slide number on the right.
+- The menu button, the chalkboard buttons, and the footer share one row at the bottom of each slide.
+- The footer shows the title of the document on the left and your `footer` text in the centre.
+  The slide number is at the right end of that row, or in the top-right corner when the deck has a logo.
+- The title slide shows only your `footer` text in that row, with no slide number.
+  A section slide shows no slide number.
 
 ::: {layout-ncol=2}
 ![Title slide](assets/gallery/formats-slide-title.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="The title slide of a deck: the title, the subtitle, the author, and the date on a pale page."}
@@ -157,7 +161,6 @@ It shows the slide number as "n/total" and a progress bar.
 :::
 
 The deck is light, or dark if you set `brand-mode: dark`.
-
 
 ![A content slide in a deck with brand-mode dark.](assets/gallery/formats-deck-dark.png){.lightbox group="revealjs-slides" width="1280" height="720" loading="lazy" fig-alt="A content slide on a dark navy page with a heading and three bullet points in light text."}
 A reader cannot switch the colour scheme of a deck.

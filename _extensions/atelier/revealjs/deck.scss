@@ -148,17 +148,34 @@ $code-block-font-size: 0.6em !default;
 }
 
 .reveal .controls,
-.reveal .slide-menu-button a {
+.reveal .slide-menu-button a,
+.reveal .slide-chalkboard-buttons {
   color: var(--atelier-accent-text);
 }
 
-// Quarto bakes the Sass link colour into the menu icon. The deck colours are
-// custom properties, so the icon is drawn again as a mask in the colour of
-// its link.
+// Quarto bakes the Sass link colour into the menu and chalkboard icons, and
+// each icon fills a different part of its box. The icons are drawn again as
+// masks in the colour of their button, each glyph filling its 16px box with
+// the same line weight: three lines for the menu, and the Bootstrap `easel2`
+// and `brush` glyphs for the chalkboard.
 // Remove when: never.
-.reveal .slide-menu-button .fa-bars::before {
+.reveal.reveal :is(.slide-menu-button .fa-bars, .slide-chalkboard-buttons :is(.fa-easel2, .fa-brush))::before {
+  display: block;
+  width: var(--atelier-icon);
+  height: var(--atelier-icon);
   background: currentcolor;
-  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg>') center / contain no-repeat;
+}
+
+.reveal.reveal .slide-menu-button .fa-bars::before {
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M1.5 3.25h13M1.5 8h13M1.5 12.75h13" stroke="black" stroke-width="1.1" stroke-linecap="round" fill="none"/></svg>') center / contain no-repeat;
+}
+
+.reveal.reveal .slide-chalkboard-buttons .fa-easel2::before {
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0a.5.5 0 0 1 .447.276L8.81 1h4.69A1.5 1.5 0 0 1 15 2.5V11h.5a.5.5 0 0 1 0 1h-2.86l.845 3.379a.5.5 0 0 1-.97.242L12.11 14H3.89l-.405 1.621a.5.5 0 0 1-.97-.242L3.36 12H.5a.5.5 0 0 1 0-1H1V2.5A1.5 1.5 0 0 1 2.5 1h4.691l.362-.724A.5.5 0 0 1 8 0ZM2 11h12V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5V11Zm9.61 1H4.39l-.25 1h7.72l-.25-1Z"/></svg>') center / contain no-repeat;
+}
+
+.reveal.reveal .slide-chalkboard-buttons .fa-brush::before {
+  mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896.126.007.243.025.348.048.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04zM4.705 11.912a1.23 1.23 0 0 0-.419-.1c-.246-.013-.573.05-.879.479-.197.275-.355.532-.5.777l-.105.177c-.106.181-.213.362-.32.528a3.39 3.39 0 0 1-.76.861c.69.112 1.736.111 2.657-.12.559-.139.843-.569.993-1.06a3.122 3.122 0 0 0 .126-.75l-.793-.792zm1.44.026c.12-.04.277-.1.458-.183a5.068 5.068 0 0 0 1.535-1.1c1.9-1.996 4.412-5.57 6.052-8.631-2.59 1.927-5.566 4.66-7.302 6.792-.442.543-.795 1.243-1.042 1.826-.121.288-.214.54-.275.72v.001l.575.575zm-4.973 3.04.007-.005a.031.031 0 0 1-.007.004zm3.582-3.043.002.001h-.002z"/></svg>') center / contain no-repeat;
 }
 
 .reveal .slide-number,
@@ -168,32 +185,183 @@ $code-block-font-size: 0.6em !default;
   font-family: var(--atelier-font-base, var(--r-main-font));
 }
 
-.reveal .footer.atelier-footer {
+// THE BOTTOM ROW
+// The menu button, the chalkboard buttons and the footer sit in one row for
+// the whole deck: each item is a box of the row height at the same bottom,
+// so all items have the same centre line. `atelier-revealjs.lua` writes
+// `--atelier-row-buttons`, the number of buttons that the format options
+// turn on, and the title slot starts after them.
+// The plugin stylesheets of Quarto load after the theme, so the rules of the
+// row repeat `.reveal` to win over them.
+// Remove when: never.
+:root {
+  --atelier-row-height: 40px;
+  --atelier-row-bottom: 12px;
+  --atelier-row-edge: 12px;
+  --atelier-hit: 32px;
+  --atelier-icon: 22px;
+  --atelier-row-gap: 4px;
+  --atelier-row-left: calc(var(--atelier-row-edge) + var(--atelier-row-buttons, 1) * (var(--atelier-hit) + var(--atelier-row-gap)) + 12px);
+}
+
+// A PDF export hides the buttons, so the title slot starts at the edge.
+html.print-pdf:root {
+  --atelier-row-buttons: 0;
+}
+
+@media screen and (max-width: 800px) {
+  :root {
+    --atelier-row-height: 32px;
+    --atelier-row-bottom: 10px;
+    --atelier-row-edge: 10px;
+    --atelier-hit: 26px;
+    --atelier-icon: 18px;
+  }
+}
+
+.reveal.reveal :is(.slide-menu-button, .slide-chalkboard-buttons) {
+  position: fixed;
+  bottom: var(--atelier-row-bottom);
+  left: var(--atelier-row-edge);
   display: flex;
-  gap: 1.5em;
-  left: 56px;
-  right: 120px;
-  bottom: 12px;
-  justify-content: space-between;
+  align-items: center;
+  gap: var(--atelier-row-gap);
+  height: var(--atelier-row-height);
+  margin: 0;
+  line-height: 0;
+}
+
+.reveal.reveal .slide-chalkboard-buttons.slide-menu-offset {
+  left: calc(var(--atelier-row-edge) + var(--atelier-hit) + var(--atelier-row-gap));
+}
+
+.reveal.reveal .slide-menu-button a,
+.reveal.reveal .slide-chalkboard-buttons > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--atelier-hit);
+  height: var(--atelier-hit);
+  margin: 0;
+}
+
+// Quarto sets `display` inline on the footer, to show the footer of the deck
+// or the footer of a slide. The row inside the footer of the deck holds the
+// layout, so that toggle works. The footer of a slide takes the same row,
+// centred.
+.reveal.reveal > .footer {
+  left: 0;
+  right: 0;
+  bottom: var(--atelier-row-bottom);
+  width: auto;
+  height: var(--atelier-row-height);
+  margin: 0;
+  pointer-events: none;
+}
+
+.reveal.reveal > .footer:not(.atelier-footer) {
+  line-height: var(--atelier-row-height);
+  text-align: center;
+}
+
+// The colour wins over the `.has-dark-background` colour of Quarto, which
+// has the same weight and comes first, and stays under the weight of the
+// section slide rule, so section slides keep their colour.
+.reveal .footer.footer {
   color: var(--atelier-muted);
   font-family: var(--atelier-font-base, var(--r-main-font));
+}
+
+// The footer spans the row, so only its links take clicks.
+.reveal .footer a {
+  pointer-events: auto;
+}
+
+// The side columns of the row are at least as wide as the left buttons, so
+// the centre slot stays at the centre and never runs into them. On a narrow
+// screen, the title slot can have no room left, and it does not show.
+.reveal .footer .atelier-footer-row {
+  display: grid;
+  grid-template-columns: minmax(var(--atelier-row-left), 1fr) auto minmax(var(--atelier-row-left), 1fr);
+  align-items: center;
+  column-gap: 24px;
+  height: 100%;
+  line-height: 1.2;
   text-align: left;
 }
 
-.reveal .footer.atelier-footer p {
-  display: contents;
+.reveal .footer .atelier-slot-left {
+  grid-column: 1;
+  box-sizing: border-box;
+  min-width: 0;
+  padding-left: var(--atelier-row-left);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .reveal .footer .atelier-slot-centre {
-  flex: 1;
+  grid-column: 2;
+  min-width: 0;
+  overflow: hidden;
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// The text of a slot takes hover, so the title of a cut text shows, but the
+// rest of the row lets clicks through.
+.reveal .footer .atelier-slot-text {
+  pointer-events: auto;
 }
 
 .reveal .footer .atelier-slot-centre:empty {
   visibility: hidden;
 }
 
-.atelier-section-state .reveal :is(.footer, .slide-number, .slide-number a, .controls, .slide-menu-button a) {
+.reveal .footer .atelier-slot-logo {
+  grid-column: 3;
+  justify-self: end;
+  margin-right: var(--atelier-row-edge);
+}
+
+// Without a logo, Quarto puts the slide number in the bottom-right corner.
+// It sits on the row there, on the same centre line. With a logo, Quarto
+// moves it to the top-right corner, and it stays there.
+// Remove when: never.
+// Reveal.js sets `display` inline on the slide number, so the line height
+// centres the text in the row.
+.reveal.reveal:not(.has-logo) .slide-number {
+  right: var(--atelier-row-edge);
+  bottom: var(--atelier-row-bottom);
+  height: var(--atelier-row-height);
+  padding: 0;
+}
+
+.reveal.reveal:not(.has-logo) :is(.slide-number, .slide-number a) {
+  line-height: var(--atelier-row-height);
+}
+
+// The arrows of the bottom-right layout sit above the row, so the logo slot
+// keeps the corner. The arrows of the edges layout do not move.
+// Remove when: never.
+.reveal.reveal .controls[data-controls-layout="bottom-right"] {
+  right: var(--atelier-row-edge);
+  bottom: calc(var(--atelier-row-bottom) + var(--atelier-row-height) + var(--atelier-row-gap));
+}
+
+// The title slide shows only the centre slot of the footer. The title slide
+// and the section slides show no slide number. `visibility: hidden` keeps
+// the place of each item, so the row does not move from slide to slide, and
+// it takes the hidden buttons out of the tab order. `atelier-revealjs.lua`
+// gives these slides their `data-state`.
+// Remove when: never.
+.atelier-title-state .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-logo),
+.atelier-no-number-state .reveal .slide-number {
+  visibility: hidden;
+}
+
+.atelier-section-state .reveal :is(.footer, .slide-number, .slide-number a, .controls, .slide-menu-button a, .slide-chalkboard-buttons) {
   color: var(--atelier-navbar-muted);
 }
 

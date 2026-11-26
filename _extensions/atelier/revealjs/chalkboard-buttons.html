@@ -1,0 +1,38 @@
+<script id="atelier-chalkboard-buttons" type="text/javascript">
+	/**
+	 * @license MIT
+	 * @copyright 2026 Mickaël Canouil
+	 * @author Mickaël Canouil
+	 */
+	// Quarto makes each chalkboard button a `span` with an `onclick` handler, so
+	// the keyboard cannot reach it and a screen reader does not announce it as
+	// a button. This script gives each one a role, a name from its title, a
+	// place in the tab order, and the Enter and Space keys.
+	// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15428
+	// Remove when: the minimum Quarto version includes the fix.
+	(() => {
+		const patch = () => {
+			document.querySelectorAll(".reveal .slide-chalkboard-buttons > span:not([role])").forEach((span) => {
+				span.setAttribute("role", "button");
+				span.setAttribute("tabindex", "0");
+				if (span.title) span.setAttribute("aria-label", span.title);
+				span.addEventListener("keydown", (event) => {
+					if (event.key !== "Enter" && event.key !== " ") return;
+					if (event.ctrlKey || event.altKey || event.metaKey) return;
+					// Reveal.js reads Space as "next slide" on the document. A held key
+					// repeats, and only its first press clicks.
+					event.preventDefault();
+					event.stopPropagation();
+					if (!event.repeat) span.click();
+				});
+			});
+		};
+		const start = () => {
+			if (!window.Reveal) return;
+			if (Reveal.isReady()) patch();
+			else Reveal.on("ready", patch);
+		};
+		if (document.readyState === "complete") start();
+		else window.addEventListener("load", start);
+	})();
+</script>

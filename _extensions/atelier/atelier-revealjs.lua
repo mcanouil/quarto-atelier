@@ -14,8 +14,8 @@
 --- The rules of `revealjs/deck.scss` read these properties.
 --- The filter gives each level-1 heading the section slide class, each
 --- `.dark` slide its background, the title slide its class, and the footer
---- its slots: the title on the left, the footer of the author in the centre,
---- and the slide number of Reveal.js on the right.
+--- one row of slots: the title on the left, the footer of the author in the
+--- centre, and the logo slot on the right.
 
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
@@ -64,7 +64,7 @@ local DARK_SCOPE = '.reveal .slides section.dark'
 --- The frame around the deck on a dark slide: Reveal.js puts the
 --- `data-state` of the current slide on the viewport.
 --- @type string
-local DARK_FRAME_SCOPE = '.atelier-dark-state .reveal > :is(.footer, .slide-number, .controls, .progress, .slide-menu-button)'
+local DARK_FRAME_SCOPE = '.atelier-dark-state .reveal > :is(.footer, .slide-number, .controls, .progress, .slide-menu-button, .slide-chalkboard-buttons)'
 
 --- The `data-state` of a dark slide and of a section slide.
 --- @type string
@@ -72,6 +72,15 @@ local DARK_STATE = 'atelier-dark-state'
 
 --- @type string
 local SECTION_STATE = 'atelier-section-state'
+
+--- The `data-state` of the title slide and of the section slides, which
+--- hide part of the bottom row: the title slide keeps only the centre slot
+--- of the footer, and both show no slide number.
+--- @type string
+local TITLE_STATE = 'atelier-title-state'
+
+--- @type string
+local NO_NUMBER_STATE = 'atelier-no-number-state'
 
 --- The class of a slide in the dark scheme.
 --- @type string
@@ -248,14 +257,38 @@ local function motif_rules(scheme, tokens, dark)
   return lines
 end
 
+--- Answer true when an option is off, or is a map whose `key` is false.
+--- @param value any
+--- @param key string
+--- @return boolean
+local function turned_off(value, key)
+  return value == false or (type(value) == 'table' and value[key] == false)
+end
+
+--- The number of buttons at the left of the bottom row. Quarto draws the
+--- menu button unless `menu` or `menu.openButton` is false, and the two
+--- chalkboard buttons when `chalkboard` is set and `chalkboard.buttons` is
+--- not false.
+--- @param meta table
+--- @return integer
+local function left_buttons(meta)
+  local count = turned_off(meta.menu, 'openButton') and 0 or 1
+  if meta.chalkboard and not turned_off(meta.chalkboard, 'buttons') then
+    count = count + 2
+  end
+  return count
+end
+
 --- The style element of the deck.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
 --- @param workshop boolean True in workshop mode, which adds the motif
+--- @param buttons integer The number of buttons at the left of the bottom row
 --- @return string
-local function deck_style(scheme, tokens, dark, workshop)
+local function deck_style(scheme, tokens, dark, workshop, buttons)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
+  lines[#lines + 1] = '  --atelier-row-buttons: ' .. buttons .. ';'
   for _, line in ipairs(token_declarations(tokens)) do
     lines[#lines + 1] = line
   end
@@ -293,10 +326,10 @@ end
 --- @type table
 local deck = {}
 
---- Add the deck style and read the deck state. A workshop deck marks its
---- title slide for the motif.
+--- Add the deck style and read the deck state. Give the title slide its
+--- state, and in a workshop deck mark it for the motif.
 --- @param meta table
---- @return table|nil The changed metadata of a workshop deck, or nil
+--- @return table The metadata, with the state of the title slide
 local function publish(meta)
   local scheme = palette.document_scheme(meta)
   local tokens = palette.tokens(scheme)
@@ -307,13 +340,19 @@ local function publish(meta)
   deck.dark_bg = palette.hex(dark.bg, dark.bg)
   deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
-  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop))
+  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop, left_buttons(meta)))
+  if meta.chalkboard then
+    quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
+  end
+  local attributes = meta['title-slide-attributes'] or {}
+  local states = attributes['data-state'] and pandoc.utils.stringify(attributes['data-state']) or ''
+  attributes['data-state'] = (states == '' and TITLE_STATE) or (states .. ' ' .. TITLE_STATE)
+  meta['title-slide-attributes'] = attributes
   if deck.workshop then
     -- `revealjs/title-slide.html` adds the motif class to the title slide.
     meta['atelier-motif'] = true
-    return meta
   end
-  return nil
+  return meta
 end
 
 --- Add a class to an attribute set once.
@@ -359,6 +398,7 @@ local function mark_slide(header)
   if header.level == 1 then
     add_class(header.attr, SECTION_CLASS)
     add_state(header.attr, dark and DARK_STATE or SECTION_STATE)
+    add_state(header.attr, NO_NUMBER_STATE)
     if deck.workshop then
       add_class(header.attr, MOTIF_CLASS)
     end
@@ -378,8 +418,9 @@ local function mark_slide(header)
 end
 
 --- Fill the slots of the footer that Quarto adds to the deck. The footer of
---- the author goes in the centre slot, the title of the deck in the left one.
---- The slide number of Reveal.js sits in the right corner.
+--- the author goes in the centre slot, the title of the deck in the left one,
+--- and the logo slot stays at the right. The slots sit in one row inside the
+--- footer, so Quarto can still show or hide the footer itself.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 local function fill_footer(div)
@@ -387,11 +428,27 @@ local function fill_footer(div)
     return nil
   end
   local own = pandoc.utils.blocks_to_inlines(div.content)
+  local slot = function(name, content)
+    return pandoc.Span(content, pandoc.Attr('', { 'atelier-slot', 'atelier-slot-' .. name }))
+  end
+  -- A slot can cut its text, so the text sits in a span that takes hover and
+  -- carries the full text as its title.
+  local text = function(content)
+    if #content == 0 then
+      return {}
+    end
+    local plain = pandoc.utils.stringify(content)
+    return { pandoc.Span(content, pandoc.Attr('', { 'atelier-slot-text' }, { title = plain })) }
+  end
   div.content = pandoc.Blocks({
-    pandoc.Plain({
-      pandoc.Span(pandoc.Inlines(deck.title), pandoc.Attr('', { 'atelier-slot', 'atelier-slot-left' })),
-      pandoc.Span(own, pandoc.Attr('', { 'atelier-slot', 'atelier-slot-centre' })),
-    }),
+    pandoc.Div(
+      pandoc.Plain({
+        slot('left', text(pandoc.Inlines(deck.title))),
+        slot('centre', text(own)),
+        slot('logo', {}),
+      }),
+      pandoc.Attr('', { 'atelier-footer-row' })
+    ),
   })
   add_class(div.attr, 'atelier-footer')
   return div
