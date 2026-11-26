@@ -135,15 +135,19 @@ function M.site_logos()
   if website == nil then
     return logos
   end
+  -- A navbar or a sidebar can be `false`, which has no logo.
   local add = function(source)
-    local found = source and from_source(source.logo, text(source['logo-alt']))
+    if type(source) ~= 'table' then
+      return
+    end
+    local found = from_source(source.logo, text(source['logo-alt']))
     if found ~= nil then
       logos[#logos + 1] = found
     end
   end
   add(website.navbar)
   local sidebars = website.sidebar
-  if sidebars ~= nil and sidebars.logo == nil and #sidebars > 0 then
+  if type(sidebars) == 'table' and sidebars.logo == nil and #sidebars > 0 then
     for _, sidebar in ipairs(sidebars) do
       add(sidebar)
     end
