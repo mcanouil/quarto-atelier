@@ -1813,7 +1813,8 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
 // ===========================================================================
 // A standalone document puts its logo above the title, at the left of the
 // title block, clear of the workshop motif in the top right corner.
-// `html/title-block.html` draws both images, and the colour scheme shows one.
+// `atelier-html-logo.lua` writes both images, `html/scripts/title-block.html`
+// moves them above the title, and the colour scheme shows one.
 // Remove when: never.
 .atelier-title-logo {
   width: fit-content;

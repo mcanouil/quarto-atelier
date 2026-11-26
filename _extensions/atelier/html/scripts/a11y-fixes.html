@@ -5,7 +5,8 @@
 	 * @author Mickaël Canouil
 	 */
 	document.addEventListener("DOMContentLoaded", () => {
-		const labels = (window.atelierOptions || {}).labels || {};
+		const options = window.atelierOptions || {};
+		const labels = options.labels || {};
 
 		// Logo link: Quarto emits <a class="navbar-brand"> with an inner <img alt>,
 		// but the accessible name is lost when the image is styled away.
@@ -28,7 +29,9 @@
 
 		// Logo images: with a light and a dark image, Quarto writes `alt=""` on
 		// both and drops `logo-alt`. Each image gets the alt text of the logo.
-		const logoAlt = (window.atelierOptions || {})["logo-alt"];
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15165
+		// Remove when: the minimum Quarto version includes the fix.
+		const logoAlt = options["logo-alt"];
 		if (logoAlt) {
 			document.querySelectorAll('img.navbar-logo[alt=""], img.sidebar-logo[alt=""]').forEach((img) => {
 				img.setAttribute("alt", logoAlt);

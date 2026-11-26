@@ -5,10 +5,25 @@
 --- @author Mickaël Canouil
 --- @brief Find the logo of a document, for every Atelier format.
 --- @description A logo has a light image, a dark image and an alt text. The
---- logo comes from the first source that has one: the `logo` of the front
---- matter, then, in a website, the logo of the navbar or of the sidebar with
---- `logo-alt`, then the `medium` or `small` logo of the brand. A source with
+--- logo of a document comes from the `logo` of the front matter, or else
+--- from the `medium` or `small` logo of the brand. The logo of a website is
+--- the logo of its navbar or of its sidebar, with `logo-alt`. A source with
 --- one image gives that image for light and dark surfaces.
+
+--- Load a module from a path relative to this file, so the module works for
+--- a filter in any folder.
+--- @param path string The path of the module, from the folder of this file
+--- @return table
+local function load_relative(path)
+  local name = path:gsub('%.lua$', '')
+  if not (debug and debug.getinfo) then
+    return require(name)
+  end
+  local dir = debug.getinfo(1, 'S').source:sub(2):match('(.*[/\\])') or ''
+  return require(dir .. name)
+end
+
+local meta_mod = load_relative('_vendor/quarto-lua-modules/metadata.lua')
 
 local M = {}
 
@@ -87,57 +102,34 @@ local function from_brand()
   return nil
 end
 
---- Answer the `website` map of the project configuration: `_quarto.yml`,
---- then the file of each active profile, the later file winning per key of
---- the navbar and of the sidebar. A filter does not get `website` in the
---- document metadata, so this reads the files.
+--- The `website` map of the project, read once per render: false when the
+--- document is not in a website.
+--- @type table|false|nil
+local website_cache
+
+--- Answer the `website` map of the project. A filter does not get `website`
+--- in the document metadata, so it comes from the project metadata that
+--- Quarto writes for the render, merged with the profiles.
 --- @return table|nil
 local function project_website()
-  local project = quarto.project
-  if project == nil or project.directory == nil then
-    return nil
+  if website_cache == nil then
+    local project = meta_mod.get_project_metadata()
+    website_cache = project ~= nil and project.website or false
   end
-  local files = { '_quarto.yml' }
-  for _, profile in ipairs(project.profile or {}) do
-    files[#files + 1] = '_quarto-' .. profile .. '.yml'
-  end
-  local website
-  for _, name in ipairs(files) do
-    local handle = io.open(pandoc.path.join({ project.directory, name }), 'r')
-    if handle ~= nil then
-      local yaml = handle:read('a')
-      handle:close()
-      local config = pandoc.read('---\n' .. yaml .. '\n...\n', 'markdown').meta
-      if config.website ~= nil then
-        website = website or {}
-        for _, part in ipairs({ 'navbar', 'sidebar' }) do
-          if config.website[part] ~= nil then
-            website[part] = website[part] or {}
-            for key, value in pairs(config.website[part]) do
-              website[part][key] = value
-            end
-          end
-        end
-      end
-    end
-  end
-  return website
+  return website_cache or nil
 end
 
---- Answer true when the document belongs to a website: the project files
---- have a `website` map.
---- @param meta table The document metadata
+--- Answer true when the document belongs to a website.
 --- @return boolean
-function M.in_website(meta)
-  return meta.website ~= nil or project_website() ~= nil
+function M.in_website()
+  return project_website() ~= nil
 end
 
 --- Answer the logo of the navbar, or else of the sidebar, of a website,
 --- with its `logo-alt`.
---- @param meta table The document metadata
 --- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
-function M.site(meta)
-  local website = meta.website or project_website()
+function M.site()
+  local website = project_website()
   if website == nil then
     return nil
   end
@@ -160,22 +152,12 @@ function M.site(meta)
   return from_source(sidebars and sidebars.logo, sidebars and text(sidebars['logo-alt']))
 end
 
---- Answer the logo of the document.
+--- Answer the logo of the document: the front-matter `logo`, or else the
+--- logo of the brand.
 --- @param meta table The document metadata
---- @param options { website: boolean }|nil `website` is true for a page in a website
 --- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
-function M.resolve(meta, options)
-  local found = from_source(meta.logo, nil)
-  if found ~= nil then
-    return found
-  end
-  if options ~= nil and options.website then
-    found = M.site(meta)
-    if found ~= nil then
-      return found
-    end
-  end
-  return from_brand()
+function M.resolve(meta)
+  return from_source(meta.logo, nil) or from_brand()
 end
 
 --- Write the logo into the metadata as `atelier-logo`, a map with the

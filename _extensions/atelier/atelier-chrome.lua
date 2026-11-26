@@ -143,7 +143,7 @@ local function publish_options(meta)
   -- on both images. The options carry `logo-alt` for `a11y-fixes.html`.
   -- Upstream: https://github.com/quarto-dev/quarto-cli/issues/15165
   -- Remove when: the minimum Quarto version includes the fix.
-  local site_logo = logo.site(meta)
+  local site_logo = logo.site()
   if site_logo ~= nil and site_logo.light.alt ~= '' then
     options['logo-alt'] = site_logo.light.alt
   end

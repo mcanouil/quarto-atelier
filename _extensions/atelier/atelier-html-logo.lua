@@ -12,27 +12,21 @@
 --- logo, and this filter does nothing.
 
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
-
---- Escape a text for an HTML attribute.
---- @param value string
---- @return string
-local function attribute(value)
-  return (value:gsub('&', '&amp;'):gsub('"', '&quot;'):gsub('<', '&lt;'):gsub('>', '&gt;'))
-end
+local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 
 --- Write the logo of a standalone HTML document at the start of the body.
 --- @param meta table
 --- @return nil
 local function publish(meta)
-  if not quarto.doc.is_format('html') or logo.in_website(meta) then
+  if not quarto.doc.is_format('html') or logo.in_website() then
     return nil
   end
-  local resolved = logo.resolve(meta, { website = false })
+  local resolved = logo.resolve(meta)
   if resolved == nil then
     return nil
   end
   local image = function(entry, class)
-    return string.format('<img src="%s" alt="%s" class="%s">', attribute(entry.path), attribute(entry.alt), class)
+    return string.format('<img src="%s" alt="%s" class="%s">', str.escape_attribute(entry.path), str.escape_attribute(entry.alt), class)
   end
   quarto.doc.include_text('before-body', table.concat({
     '<div class="atelier-title-logo" hidden>',
