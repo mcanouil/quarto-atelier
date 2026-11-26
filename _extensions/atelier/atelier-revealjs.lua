@@ -20,6 +20,8 @@
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
+local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
+local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 
 --- The fallback family of each font role.
 --- @type table<string, string>
@@ -286,7 +288,29 @@ end
 --- @param workshop boolean True in workshop mode, which adds the motif
 --- @param buttons integer The number of buttons at the left of the bottom row
 --- @return string
-local function deck_style(scheme, tokens, dark, workshop, buttons)
+--- The rules that show the dark image of the logo on dark surfaces: every
+--- slide of a dark deck, a `.dark` slide, and a section slide when its
+--- background is dark.
+--- @param page_dark boolean True when the deck is dark
+--- @param section_dark boolean True when the section slides are dark
+--- @param section_dark boolean True when the section slides are dark
+--- @return string[]
+local function logo_rules(page_dark, section_dark)
+  local scopes = { '.' .. DARK_STATE }
+  if section_dark then
+    scopes[#scopes + 1] = '.' .. SECTION_STATE
+  end
+  if page_dark then
+    scopes = { ':root' }
+  end
+  local scope = ':is(' .. table.concat(scopes, ', ') .. ')'
+  return {
+    scope .. ' .reveal .atelier-logo-light { display: none; }',
+    scope .. ' .reveal .atelier-logo-dark { display: block; }',
+  }
+end
+
+local function deck_style(scheme, tokens, dark, workshop, buttons, section_dark)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
   lines[#lines + 1] = '  --atelier-row-buttons: ' .. buttons .. ';'
   for _, line in ipairs(token_declarations(tokens)) do
@@ -311,6 +335,9 @@ local function deck_style(scheme, tokens, dark, workshop, buttons)
     for _, line in ipairs(motif_rules(scheme, tokens, dark)) do
       lines[#lines + 1] = line
     end
+  end
+  for _, line in ipairs(logo_rules(palette.tone(tokens.bg) == 'dark', section_dark)) do
+    lines[#lines + 1] = line
   end
   lines[#lines + 1] = '</style>'
   return table.concat(lines, '\n')
@@ -340,7 +367,15 @@ local function publish(meta)
   deck.dark_bg = palette.hex(dark.bg, dark.bg)
   deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
-  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop, left_buttons(meta)))
+  deck.logo = logo.resolve(meta)
+  if deck.logo ~= nil then
+    meta['atelier-logo'] = {
+      light = deck.logo.light.path,
+      dark = deck.logo.dark.path,
+      alt = deck.logo.light.alt,
+    }
+  end
+  quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck.workshop, left_buttons(meta), deck.section_dark))
   if meta.chalkboard then
     quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
   end
@@ -417,6 +452,26 @@ local function mark_slide(header)
   return nil
 end
 
+--- Answer the light and the dark image of the logo, for the logo slot of the
+--- footer, or nothing when the deck has no logo. The images are raw HTML:
+--- Pandoc writes a `data-src` for a deck image, which Reveal.js loads only
+--- inside a slide, and the footer is outside the slides.
+--- @return pandoc.Inlines
+local function logo_images()
+  if deck.logo == nil then
+    return pandoc.Inlines({})
+  end
+  local image = function(entry, class)
+    return pandoc.RawInline('html', string.format(
+      '<img class="%s" src="%s" alt="%s">',
+      class,
+      str.escape_attribute(entry.path),
+      str.escape_attribute(entry.alt)
+    ))
+  end
+  return pandoc.Inlines({ image(deck.logo.light, 'atelier-logo-light'), image(deck.logo.dark, 'atelier-logo-dark') })
+end
+
 --- Fill the slots of the footer that Quarto adds to the deck. The footer of
 --- the author goes in the centre slot, the title of the deck in the left one,
 --- and the logo slot stays at the right. The slots sit in one row inside the
@@ -445,7 +500,7 @@ local function fill_footer(div)
       pandoc.Plain({
         slot('left', text(pandoc.Inlines(deck.title))),
         slot('centre', text(own)),
-        slot('logo', {}),
+        slot('logo', logo_images()),
       }),
       pandoc.Attr('', { 'atelier-footer-row' })
     ),

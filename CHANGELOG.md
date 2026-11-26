@@ -31,6 +31,7 @@
 - feat: Each PDF page shows a header with the title and the chapter, and a footer with the affiliation, the copyright and licence, the logo, and the page number.
 - feat: The PDF takes its logo from the front matter or the brand, and uses the dark image on a dark page.
 - fix: A PDF logo with no alt text is decorative, so the PDF/UA-1 build no longer stops on it.
+- feat: A deck shows its logo above the title of the title slide and at the right end of the bottom row, with the dark image on dark slides.
 
 ## 0.15.3 (2026-11-23)
 

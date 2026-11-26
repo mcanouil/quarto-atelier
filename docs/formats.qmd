@@ -165,6 +165,8 @@ It shows the slide number as "n/total" and a progress bar.
 - The menu button, the chalkboard buttons, and the footer share one row at the bottom of each slide.
 - The footer shows the title of the document on the left and your `footer` text in the centre.
   The slide number is at the right end of that row, or in the top-right corner when the deck has a logo.
+- With a logo, the title slide shows it above the title, and the other slides show it at the right end of that row.
+  A dark slide shows the dark image of the logo.
 - The title slide shows only your `footer` text in that row, with no slide number.
   A section slide shows no slide number.
 
