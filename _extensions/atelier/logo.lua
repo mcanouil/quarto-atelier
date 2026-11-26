@@ -158,8 +158,8 @@ end
 
 --- Answer the logo of the document: the front-matter `logo`, or else the
 --- logo of the brand. As in Quarto, `logo: false` means no logo, and a
---- `logo` that names a brand logo (`small`, `medium`, `large`) gives that
---- brand logo.
+--- `logo` that names a brand logo (a size such as `medium`, or a key of
+--- `logo.images`) gives that brand logo, before it counts as a path.
 --- @param meta table The document metadata
 --- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
 function M.resolve(meta)
@@ -167,8 +167,11 @@ function M.resolve(meta)
     return nil
   end
   local name = meta.logo ~= nil and pandoc.utils.type(meta.logo) ~= 'table' and text(meta.logo)
-  if name == 'small' or name == 'medium' or name == 'large' then
-    return from_brand({ name })
+  if name then
+    local named = from_brand({ name })
+    if named ~= nil then
+      return named
+    end
   end
   return from_source(meta.logo, nil) or from_brand()
 end

@@ -344,6 +344,12 @@ local function deck_style(scheme, tokens, dark, state, buttons)
     for _, line in ipairs(logo_rules(palette.tone(tokens.bg) == 'dark', state.section_dark)) do
       lines[#lines + 1] = line
     end
+    -- The logo takes the bottom-right corner, so the slide number goes to the
+    -- top-right corner, as Quarto does with `has-logo`. Quarto adds that class
+    -- only when it draws its own logo, which it does not for every logo that
+    -- Atelier draws, so the rule keys on the logo of Atelier.
+    lines[#lines + 1] = ':root:root .reveal.reveal .slide-number { top: 8px; right: 8px; bottom: auto; height: auto; padding: 5px; }'
+    lines[#lines + 1] = ':root:root .reveal.reveal :is(.slide-number, .slide-number a) { line-height: normal; }'
   end
   lines[#lines + 1] = '</style>'
   return table.concat(lines, '\n')
