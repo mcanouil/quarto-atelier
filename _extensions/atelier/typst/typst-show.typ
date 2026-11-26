@@ -13,6 +13,8 @@
     subtitle: $if(subtitle)$[$subtitle$]$else$none$endif$,
     // The empty block stops a date such as "24. November 2026" from becoming a list item.
     date: $if(date)$[#[]$date$]$else$none$endif$,
+    date-modified: $if(date-modified)$[#[]$date-modified$]$else$none$endif$,
+    doi: $if(doi)$"$doi$"$else$none$endif$,
     duration: $if(atelier-duration)$[$atelier-duration$]$else$none$endif$,
     abstract: $if(abstract)$[$abstract$]$else$none$endif$,
     licence: $if(license.text)$[$license.text$]$elseif(license.type)$[$license.type$]$elseif(license)$[$license$]$else$none$endif$,
@@ -34,6 +36,9 @@
     labels: (
       authors: [$labels.authors$],
       published: [$labels.published$],
+      modified: [$labels.modified$],
+      doi: [$labels.doi$],
+      keywords: [$labels.keywords$],
       abstract: [$labels.abstract$],
     ),
     logo: atelier-logo,

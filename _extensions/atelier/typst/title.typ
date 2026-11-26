@@ -28,10 +28,10 @@
   ))
 }
 
-// Answer the round photo of a speaker. A photo with no alternative text is
+// Answer the round photo of an author. A photo with no alternative text is
 // decorative, because the name is next to it, so it is an artefact.
 // - author: dictionary with photo and alt.
-#let atelier-speaker-photo(author) = {
+#let atelier-author-photo(author) = {
   let photo = box(
     width: 1.8em,
     height: 1.8em,
@@ -43,46 +43,79 @@
   if author.alt == none { pdf.artifact(photo) } else { photo }
 }
 
-// Answer the line of one author: the photo of a speaker, the name, the
-// degrees, the affiliation numbers, a mark for the corresponding author, and
-// the ORCID badge.
-// - author: dictionary with name, degrees, affiliations, orcid, email,
-//   corresponding, photo and alt.
-#let atelier-author-line(author) = {
-  let parts = (
-    if author.photo != none { atelier-speaker-photo(author) },
-    text(weight: "bold", author.name),
-    if author.degrees.len() > 0 { text(size: 0.8em, fill: atelier-colour("muted"), author.degrees.join(", ")) },
-    if author.affiliations.len() > 0 { super(author.affiliations.map(str).join(",")) },
-    if author.corresponding { super[\*] },
-    if author.orcid != "" { atelier-orcid-badge(author.orcid) },
-  )
-  parts.filter(part => part != none).join(h(0.25em))
-}
-
-// Answer the numbered affiliation lines.
-// - affiliations: array of affiliation names.
-#let atelier-affiliation-lines(affiliations) = (
-  affiliations.enumerate(start: 1).map(((number, name)) => [#super(str(number)) #name]).join(linebreak())
+// Answer a label as the small uppercase heading of a group of the title
+// block. The label is in sentence case in the language file.
+// - label: the label.
+#let atelier-kicker(label) = text(
+  size: 0.75em,
+  weight: "bold",
+  tracking: 0.08em,
+  fill: atelier-colour("muted"),
+  upper(label),
 )
 
-// Answer the legend of the corresponding author, or none.
-// - authors: array of author dictionaries.
-#let atelier-author-legend(authors) = {
-  let corresponding = authors.filter(author => author.corresponding)
-  if corresponding.len() == 0 { return none }
-  let emails = corresponding.map(author => author.email).filter(email => email != "")
-  let address = if emails.len() > 0 { [: #emails.map(email => link("mailto:" + email, email)).join(", ")] }
-  [\* #atelier-labels.at("author-corresponding")#address]
+// Answer one author: the photo, the name (a link when there is a url), the
+// degrees, the ORCID badge and identifier, the email, the visible text of the
+// attributes, one line for each affiliation, and the note.
+// - author: dictionary with name, url, photo, alt, degrees, orcid, email,
+//   affiliations, attributes and note.
+#let atelier-author(author) = {
+  let muted(content) = text(size: 0.85em, fill: atelier-colour("muted"), content)
+  let name = text(weight: "bold", if author.url != none { link(author.url, author.name) } else { author.name })
+  let head = {
+    if author.photo != none {
+      atelier-author-photo(author)
+      h(0.4em)
+    }
+    name
+    if author.degrees.len() > 0 {
+      [, ]
+      text(size: 0.85em, style: "italic", fill: atelier-colour("muted"), author.degrees.join(", "))
+    }
+    if author.orcid != "" {
+      h(0.4em)
+      atelier-orcid-badge(author.orcid)
+      h(0.2em)
+      muted(author.orcid)
+    }
+  }
+  let lines = (
+    head,
+    if author.email != "" { muted(link("mailto:" + author.email, author.email)) },
+    if author.attributes.len() > 0 { muted(author.attributes.join(", ")) },
+    ..author.affiliations.map(muted),
+    if author.note != none { muted(author.note) },
+  )
+  stack(spacing: 0.3em, ..lines.filter(line => line != none))
 }
 
-// Answer a label and its value as one line of the title block, such as
-// "Instructors" and the names, in the muted colour.
+// Answer the keywords as chips, with the label above them.
+// - keywords: array of strings.
+// - label: the label.
+#let atelier-keywords(keywords, label) = {
+  if keywords.len() == 0 { return none }
+  block(below: 1em, {
+    atelier-kicker(label)
+    linebreak()
+    keywords
+      .map(keyword => box(
+        inset: (x: 0.5em, y: 0.3em),
+        outset: (y: 0.1em),
+        radius: atelier-radius,
+        stroke: atelier-frame-width + atelier-colour("border"),
+        keyword,
+      ))
+      .join(h(0.4em))
+  })
+}
+
+// Answer a label and its value as one group of the title block, such as
+// "Instructors" and the names.
 // - label: the label, or none.
 // - value: the value.
 #let atelier-meta-line(label, value) = {
   if label != none and label != [] {
-    text(size: 0.75em, weight: "bold", tracking: 0.08em, fill: atelier-colour("muted"), upper(label))
+    atelier-kicker(label)
     linebreak()
   }
   value
@@ -92,7 +125,6 @@
 // - meta: the document, see atelier-document().
 // - title-size: size of the title.
 #let atelier-title-block(meta, title-size: 2em) = {
-  let muted(content) = text(size: 0.85em, fill: atelier-colour("muted"), content)
   let headings(content) = if meta.fonts.headings != none { text(font: meta.fonts.headings, content) } else { content }
   // A logo with no alt text only decorates, so it is an artefact.
   if meta.logo != none {
@@ -102,24 +134,31 @@
   if meta.title != none {
     block(below: 0.5em, text(size: title-size, weight: "bold", fill: atelier-colour("heading"), headings(meta.title)))
   }
-  block(below: 0.9em, pdf.artifact(line(length: 30%, stroke: 2pt + atelier-colour("accent-mark"))))
+  // The gap follows the title size, so the rule clears the descenders.
+  block(
+    above: title-size * 0.45,
+    below: 0.9em,
+    pdf.artifact(line(length: 30%, stroke: 2pt + atelier-colour("accent-mark"))),
+  )
   if meta.subtitle != none {
     block(below: 1.2em, text(size: 1.2em, fill: atelier-colour("muted"), headings(meta.subtitle)))
   }
   let people = atelier-people
   if people.authors.len() > 0 {
-    block(below: 0.8em, atelier-meta-line(meta.labels.authors, stack(spacing: 0.45em, ..people.authors.map(atelier-author-line))))
-    if people.affiliations.len() > 0 {
-      block(below: 0.4em, muted(atelier-affiliation-lines(people.affiliations)))
-    }
-    let legend = atelier-author-legend(people.authors)
-    if legend != none {
-      block(below: 0.8em, muted(legend))
-    }
+    block(
+      below: 0.8em,
+      atelier-meta-line(meta.labels.authors, stack(spacing: 0.9em, ..people.authors.map(atelier-author))),
+    )
   }
   let dates = ()
   if meta.date != none {
     dates.push(atelier-meta-line(meta.labels.published, meta.date))
+  }
+  if meta.date-modified != none {
+    dates.push(atelier-meta-line(meta.labels.modified, meta.date-modified))
+  }
+  if meta.doi != none {
+    dates.push(atelier-meta-line(meta.labels.doi, link("https://doi.org/" + meta.doi, meta.doi)))
   }
   if meta.duration != none {
     dates.push(atelier-meta-line(atelier-labels.at("duration"), meta.duration))
@@ -129,23 +168,25 @@
   }
 }
 
-// Answer the abstract: a tinted outline with its title.
+// Answer the abstract, a tinted outline with its title, and the keywords.
 // - meta: the document, see atelier-document().
 #let atelier-abstract(meta) = {
-  if meta.abstract == none { return }
-  block(
-    width: 100%,
-    above: 1.2em,
-    below: 1.5em,
-    inset: 1em,
-    radius: atelier-radius,
-    stroke: atelier-frame-width + atelier-colour("border"),
-    {
-      text(size: 0.76em, weight: "bold", tracking: 0.06em, fill: atelier-colour("accent-text"), upper(meta.labels.abstract))
-      parbreak()
-      meta.abstract
-    },
-  )
+  if meta.abstract != none {
+    block(
+      width: 100%,
+      above: 1.2em,
+      below: 1.5em,
+      inset: 1em,
+      radius: atelier-radius,
+      stroke: atelier-frame-width + atelier-colour("border"),
+      {
+        text(size: 0.76em, weight: "bold", tracking: 0.06em, fill: atelier-colour("accent-text"), upper(meta.labels.abstract))
+        parbreak()
+        meta.abstract
+      },
+    )
+  }
+  atelier-keywords(meta.keywords, meta.labels.keywords)
 }
 
 // Answer the cover page: the title block in the lower half of a page of its

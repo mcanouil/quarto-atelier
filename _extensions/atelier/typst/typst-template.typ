@@ -25,10 +25,10 @@ $workshop.typ()$
 // body and the closing page, after the five report switches. Code has no
 // ligatures and no contextual alternates, so it reads as typed.
 // - meta: dictionary of the document: title, subtitle, date, duration,
-//   abstract, licence, copyright, keywords, lang, region, fontsize,
+//   date-modified, doi, abstract, licence, copyright, keywords, lang, region, fontsize,
 //   linestretch, toc, toc-title, toc-depth, numbering, fonts (base,
 //   headings, monospace, each an array or none), labels (authors,
-//   published, abstract) and logo.
+//   published, modified, doi, keywords, abstract) and logo.
 // - body: the content of the document.
 #let atelier-document(meta, body) = {
   let fonts = meta.fonts
@@ -55,7 +55,7 @@ $workshop.typ()$
   // first author, and the rights join the copyright and the licence.
   let first-author = atelier-people.authors.at(0, default: none)
   let organisation = if first-author != none and first-author.affiliations.len() > 0 {
-    atelier-people.affiliations.at(first-author.affiliations.first() - 1)
+    first-author.affiliations.first()
   }
   let rights = (meta.copyright, meta.licence).filter(it => it != none)
   show: atelier-page.with(
