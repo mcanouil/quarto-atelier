@@ -40,8 +40,8 @@ local LABELS = {
   'author-orcid',
   'author-corresponding',
   'duration',
-  'solution-page',
-  'solutions-title',
+  'answer-page',
+  'answers-title',
 }
 
 --- The report switches under `extensions.atelier`, each `false` by default.

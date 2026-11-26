@@ -162,7 +162,7 @@ function M.proof(proof, model)
   end
   local title = proof.div.attributes.title or pandoc.utils.stringify(proof.name or '')
   if title == '' then
-    title = language_text('solution-title')
+    title = language_text('answer-title')
   end
   local result = block(solution.div, 'solution', nil, title, nil, solution.div.content)
   -- Quarto moves the identifier of the div to the `Proof` node.

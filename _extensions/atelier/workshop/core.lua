@@ -1112,14 +1112,6 @@ function M.block(div, kind, model)
   }
 end
 
---- Tell whether a `Proof` node is a solution: Quarto's `Proof` of type
---- `Solution`, from a `.solution` div or a `sol-` identifier.
---- @param proof table The `Proof` node
---- @return boolean
-function M.is_solution(proof)
-  return pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
-end
-
 --- Tell whether a `Proof` node is a workshop solution, which the workshop
 --- hides. Quarto turns a `.solution` div into a `Proof` node of type
 --- `Solution` before the `pre-quarto` filters run, and removes the class.
@@ -1131,7 +1123,7 @@ function M.is_workshop_solution(proof)
   if (proof.identifier or ''):find('^sol%-') then
     return false
   end
-  return M.is_solution(proof)
+  return pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
 end
 
 --- Read a solution from the `Proof` node that Quarto makes of a `.solution`
