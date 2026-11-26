@@ -31,12 +31,15 @@
 		// both and drops `logo-alt`. Each image gets the alt text of the logo.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15165
 		// Remove when: the minimum Quarto version includes the fix.
-		const logoAlt = options["logo-alt"];
-		if (logoAlt) {
-			document.querySelectorAll('img.navbar-logo[alt=""], img.sidebar-logo[alt=""]').forEach((img) => {
-				img.setAttribute("alt", logoAlt);
-			});
-		}
+		// A site can have a navbar logo and a logo for each sidebar, so each image
+		// takes the alt text of the logo whose path its `src` ends with.
+		const bare = (path) => path.replace(/^(\.{1,2}\/|\/)+/, "");
+		const logos = options.logos || [];
+		document.querySelectorAll('img.navbar-logo[alt=""], img.sidebar-logo[alt=""]').forEach((img) => {
+			const src = bare(img.getAttribute("src") || "");
+			const logo = logos.find((entry) => [entry.light, entry.dark].some((path) => src.endsWith(bare(path))));
+			if (logo) img.setAttribute("alt", logo.alt);
+		});
 
 		// Author email link: Quarto emits <a class="quarto-title-author-email"> around an
 		// icon only, so the link has no accessible name. Use the address as the name.

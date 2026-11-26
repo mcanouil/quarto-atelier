@@ -125,31 +125,32 @@ function M.in_website()
   return project_website() ~= nil
 end
 
---- Answer the logo of the navbar, or else of the sidebar, of a website,
---- with its `logo-alt`.
---- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
-function M.site()
+--- Answer every logo of a website: the logo of the navbar, then the logo
+--- of each sidebar (`website.sidebar` is one sidebar or a list), each with
+--- its `logo-alt`. Paths are as the project metadata gives them.
+--- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }[]
+function M.site_logos()
   local website = project_website()
+  local logos = {}
   if website == nil then
-    return nil
+    return logos
   end
-  local navbar = website.navbar
-  local found = from_source(navbar and navbar.logo, navbar and text(navbar['logo-alt']))
-  if found ~= nil then
-    return found
+  local add = function(source)
+    local found = source and from_source(source.logo, text(source['logo-alt']))
+    if found ~= nil then
+      logos[#logos + 1] = found
+    end
   end
-  -- `website.sidebar` is one sidebar or a list of sidebars.
+  add(website.navbar)
   local sidebars = website.sidebar
   if sidebars ~= nil and sidebars.logo == nil and #sidebars > 0 then
     for _, sidebar in ipairs(sidebars) do
-      found = from_source(sidebar.logo, text(sidebar['logo-alt']))
-      if found ~= nil then
-        return found
-      end
+      add(sidebar)
     end
-    return nil
+  else
+    add(sidebars)
   end
-  return from_source(sidebars and sidebars.logo, sidebars and text(sidebars['logo-alt']))
+  return logos
 end
 
 --- Answer the logo of the document: the front-matter `logo`, or else the
@@ -158,23 +159,6 @@ end
 --- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
 function M.resolve(meta)
   return from_source(meta.logo, nil) or from_brand()
-end
-
---- Write the logo into the metadata as `atelier-logo`, a map with the
---- `light` and `dark` paths and the `alt` text, for the templates.
---- @param meta table The document metadata
---- @param resolved table|nil The logo of `M.resolve`
---- @return table The metadata
-function M.publish(meta, resolved)
-  if resolved == nil then
-    return meta
-  end
-  meta['atelier-logo'] = {
-    light = resolved.light.path,
-    dark = resolved.dark.path,
-    alt = resolved.light.alt,
-  }
-  return meta
 end
 
 return M

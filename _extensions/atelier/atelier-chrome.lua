@@ -140,12 +140,18 @@ local function publish_options(meta)
   add_fonts()
   local options = { labels = resolve_labels(), version = read_version(meta) }
   -- With a light and a dark logo, Quarto drops `logo-alt` and writes `alt=""`
-  -- on both images. The options carry `logo-alt` for `a11y-fixes.html`.
+  -- on both images. The options carry each logo with its `logo-alt` for
+  -- `a11y-fixes.html`.
   -- Upstream: https://github.com/quarto-dev/quarto-cli/issues/15165
   -- Remove when: the minimum Quarto version includes the fix.
-  local site_logo = logo.site()
-  if site_logo ~= nil and site_logo.light.alt ~= '' then
-    options['logo-alt'] = site_logo.light.alt
+  local logos = {}
+  for _, found in ipairs(logo.site_logos()) do
+    if found.light.alt ~= '' then
+      logos[#logos + 1] = { light = found.light.path, dark = found.dark.path, alt = found.light.alt }
+    end
+  end
+  if #logos > 0 then
+    options.logos = logos
   end
   local json = quarto.json.encode(options):gsub('</', '<\\/')
   quarto.doc.include_text(
