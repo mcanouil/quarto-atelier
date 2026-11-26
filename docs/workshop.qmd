@@ -427,14 +427,17 @@ These pictures show a speaker with a photo in each format.
 
 ### Closing
 
-`extensions.atelier.closing` ends a page, a handout, or a deck with a thank-you, links, and a licence.
+`extensions.atelier.closing` ends a page, a handout, or a deck with a thank-you, your own text, links, the copyright, and the licence.
 Set it to `true`, or to a map with these keys:
 
-| Key       | Effect                                                                 |
-| --------- | ---------------------------------------------------------------------- |
-| `title`   | The heading. The default is "Thank you".                               |
-| `links`   | A list of links, for example the contact page of the workshop.         |
-| `licence` | The licence text. The default is the Quarto `license` of the page.     |
+| Key         | Effect                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------- |
+| `title`     | The heading. The default is "Thank you".                                                     |
+| `text`      | Markdown text that shows after the heading.                                                  |
+| `file`      | The path of a Markdown file, from the folder of the page. A path that starts with `/` is an absolute path. Its text shows after the heading. |
+| `links`     | A list of links, for example the contact page of the workshop.                               |
+| `copyright` | `false` hides the copyright line. The default is `true`.                                     |
+| `licence`   | `false` hides the licence line. The default is `true`.                                       |
 
 : Keys of `extensions.atelier.closing`. {.striped .hover tbl-colwidths="[20,80]"}
 
@@ -442,10 +445,23 @@ Set it to `true`, or to a map with these keys:
 extensions:
   atelier:
     closing:
+      text: "Send us your questions before the next session."
       links:
         - "[Ask a question](https://github.com/owner/project/discussions)"
+copyright:
+  holder: "Riverlab"
+  year: 2026
 license: "CC BY 4.0"
 ```
+
+The closing shows its parts in this order: the heading, the text, the links, the copyright, and the licence.
+The copyright line comes from the Quarto `copyright`: a text, its `statement`, or "© `year` `holder`".
+The licence line comes from the Quarto `license`: a text, its `text`, or its `type`.
+The PDF footer shows the copyright and the licence on every page, also when the closing hides them.
+
+Set `text` or `file`, not both.
+The build stops when you set both, when the file does not exist, or when `copyright` or `licence` is not `true` or `false`.
+Quarto shortcodes in `text` and in the file do not expand.
 
 Put `closing` in the front matter of the one page that ends the workshop.
 Do not set it in `_quarto.yml`.

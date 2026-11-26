@@ -32,6 +32,7 @@
 - feat: The PDF takes its logo from the front matter or the brand, and uses the dark image on a dark page. (#157)
 - fix: A PDF logo with no alt text is decorative, so the PDF/UA-1 build no longer stops on it. (#157)
 - feat: A deck shows its logo above the title of the title slide and at the right end of the bottom row, with the dark image on dark slides. (#159)
+- feat: The closing takes your own text or file, and shows the copyright and the licence of the document, each of which you can hide.
 
 ## 0.15.3 (2026-11-23)
 

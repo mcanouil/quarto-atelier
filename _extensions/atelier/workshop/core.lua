@@ -307,10 +307,11 @@ function M.author_name(author)
   return text_of(author.name.literal or author.name)
 end
 
---- Resolve a photo path against the folder of the document.
+--- Resolve a path against the folder of the document, such as the photo of
+--- a speaker or the file of the closing. An absolute path stays as it is.
 --- @param path string The path, relative to the document
 --- @return string
-local function photo_file(path)
+local function document_file(path)
   if path:sub(1, 1) ~= '/' and quarto.doc.input_file then
     return pandoc.path.join({ pandoc.path.directory(quarto.doc.input_file), path })
   end
@@ -332,7 +333,7 @@ local function photo_ok(path, key)
     )
     return false
   end
-  local file = io.open(photo_file(path), 'rb')
+  local file = io.open(document_file(path), 'rb')
   if file == nil then
     log.log_warning(
       EXTENSION_NAME,
@@ -349,7 +350,7 @@ end
 --- @param path string The path of a photo that `M.speakers` checked
 --- @return string The data URI
 function M.photo_uri(path)
-  local file = assert(io.open(photo_file(path), 'rb'))
+  local file = assert(io.open(document_file(path), 'rb'))
   local content = file:read('a')
   file:close()
   local media = PHOTO_TYPES[path:match('%.([^./\\]+)$'):lower()]
@@ -518,12 +519,111 @@ local function to_inlines(value)
   return pandoc.Inlines(text_of(value))
 end
 
+--- Stop the build with an error about a key of `extensions.atelier.closing`.
+--- Quarto replaces the global `error` with a function that only logs, so the
+--- build stops with `os.exit`.
+--- @param message string The message
+local function closing_error(message)
+  log.log_error(EXTENSION_NAME, 'extensions.atelier.closing: ' .. message)
+  os.exit(1)
+end
+
+--- Read an on and off switch of the closing: `true` when it is not set.
+--- @param options table The closing options
+--- @param key string The key
+--- @param source string The Quarto key that gives the text
+--- @return boolean
+local function closing_switch(options, key, source)
+  local value = options[key]
+  if value == nil then
+    return true
+  end
+  if type(value) ~= 'boolean' then
+    closing_error('`' .. key .. '` accepts only true or false. The text comes from the Quarto `' .. source .. '`.')
+  end
+  return value
+end
+
+--- Answer a metadata value as inlines, or nil when it is empty.
+--- @param value any The value
+--- @return pandoc.Inlines|nil
+local function inlines_or_nil(value)
+  return text_of(value) ~= '' and to_inlines(value) or nil
+end
+
+--- Answer the copyright of the document: the `copyright` string, its
+--- `statement`, or "© year holder".
+--- @param value any The Quarto `copyright`
+--- @return pandoc.Inlines|nil
+local function copyright_text(value)
+  if pandoc.utils.type(value) ~= 'table' then
+    return inlines_or_nil(value)
+  end
+  if value.statement ~= nil then
+    return inlines_or_nil(value.statement)
+  end
+  if value.holder == nil then
+    return nil
+  end
+  local inlines = pandoc.Inlines({ pandoc.Str('©'), pandoc.Space() })
+  if text_of(value.year) ~= '' then
+    inlines:extend(to_inlines(value.year))
+    inlines:insert(pandoc.Space())
+  end
+  inlines:extend(to_inlines(value.holder))
+  return inlines
+end
+
+--- Answer the licence of the document: the `license` string, its `text`, or
+--- its `type`, as `typst/typst-show.typ` reads it for the PDF frame.
+--- @param value any The Quarto `license`
+--- @return pandoc.Inlines|nil
+local function licence_text(value)
+  if pandoc.utils.type(value) == 'table' then
+    value = value.text or value.type
+  end
+  return inlines_or_nil(value)
+end
+
+--- Answer the content of the closing: the Markdown of `text`, or of the file
+--- at `file`, relative to the folder of the document.
+--- @param options table The closing options
+--- @return pandoc.Blocks|nil
+local function closing_content(options)
+  if options.text ~= nil and options.file ~= nil then
+    closing_error('`text` and `file` are both set. Set one of them.')
+  end
+  if options.text ~= nil then
+    -- Pandoc reads a metadata string as Markdown already.
+    local kind = pandoc.utils.type(options.text)
+    if kind == 'Blocks' then
+      return options.text
+    elseif kind == 'Inlines' then
+      return pandoc.Blocks({ pandoc.Para(options.text) })
+    end
+    return pandoc.read(text_of(options.text), 'markdown').blocks
+  end
+  if options.file == nil then
+    return nil
+  end
+  local path = document_file(text_of(options.file))
+  local handle = io.open(path, 'r')
+  if handle == nil then
+    closing_error('the file of `file` does not exist: ' .. path .. '.')
+  end
+  local markdown = handle:read('a')
+  handle:close()
+  return pandoc.read(markdown, 'markdown').blocks
+end
+
 --- Read the closing of a workshop page from `extensions.atelier.closing`:
---- `true`, or a map with `title`, `links` and `licence`. The title is the
---- closing label by default, and the licence is the Quarto `license`.
+--- `true`, or a map with `title`, `text` or `file`, `links`, `copyright` and
+--- `licence`. The title is the closing label by default. The copyright and
+--- the licence are the Quarto `copyright` and `license`, and each of
+--- `copyright: false` and `licence: false` hides its line.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { title: pandoc.Inlines, links: pandoc.Inlines[], licence: pandoc.Inlines|nil }|nil The closing, or nil outside workshop mode or when unset
+--- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil outside workshop mode or when unset
 function M.closing(meta, model)
   local value = model.options.closing
   if model.mode ~= M.MODE_WORKSHOP or value == nil or value == false then
@@ -532,27 +632,30 @@ function M.closing(meta, model)
   local options = type(value) == 'table' and value or {}
   local closing = {
     title = options.title and to_inlines(options.title) or pandoc.Inlines(model.labels['closing-thanks']),
+    content = closing_content(options),
     links = {},
   }
   for _, link in ipairs(options.links or {}) do
     closing.links[#closing.links + 1] = to_inlines(link)
   end
-  local licence = options.licence
-  if licence == nil and meta.license ~= nil then
-    licence = pandoc.utils.type(meta.license) == 'table' and meta.license.text or meta.license
+  if closing_switch(options, 'copyright', 'copyright') then
+    closing.copyright = copyright_text(meta.copyright)
   end
-  if licence ~= nil and text_of(licence) ~= '' then
-    closing.licence = to_inlines(licence)
+  if closing_switch(options, 'licence', 'license') then
+    closing.licence = licence_text(meta.license)
   end
   return closing
 end
 
---- Build the parts of the closing: the links as a list and the licence, each
---- in a div of its own class.
+--- Build the parts of the closing after its heading: the content, the links
+--- as a list, the copyright and the licence, each in a div of its own class.
 --- @param closing table The closing of `M.closing`
 --- @return pandoc.Blocks
 function M.closing_parts(closing)
   local blocks = pandoc.Blocks({})
+  if closing.content ~= nil then
+    blocks:insert(pandoc.Div(closing.content, pandoc.Attr('', { 'atelier-closing-content' })))
+  end
   if #closing.links > 0 then
     local items = {}
     for _, link in ipairs(closing.links) do
@@ -560,8 +663,10 @@ function M.closing_parts(closing)
     end
     blocks:insert(pandoc.Div({ pandoc.BulletList(items) }, pandoc.Attr('', { 'atelier-closing-links' })))
   end
-  if closing.licence ~= nil then
-    blocks:insert(pandoc.Div({ pandoc.Para(closing.licence) }, pandoc.Attr('', { 'atelier-closing-licence' })))
+  for _, part in ipairs({ 'copyright', 'licence' }) do
+    if closing[part] ~= nil then
+      blocks:insert(pandoc.Div({ pandoc.Para(closing[part]) }, pandoc.Attr('', { 'atelier-closing-' .. part })))
+    end
   end
   return blocks
 end
