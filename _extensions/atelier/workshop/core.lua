@@ -369,6 +369,10 @@ end
 --- @param model table The page model
 --- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
 function M.speakers(meta, model)
+  -- A page with no author cannot use the map, so it stays silent about its keys.
+  if #(meta['by-author'] or {}) == 0 then
+    return {}
+  end
   local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
   local used = {}
   local speakers = {}

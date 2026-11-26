@@ -244,7 +244,7 @@ end
 --- Turn the workshop divs into blocks.
 --- @param div pandoc.Div The div
 --- @param model table The page model
---- @return pandoc.Div|nil The block, or nil to keep the div
+--- @return pandoc.Div|pandoc.Blocks|nil The block, or nil to keep the div
 function M.div(div, model)
   local answer = core.answer(div, model)
   if answer ~= nil then
