@@ -51,7 +51,19 @@ $workshop.typ()$
   atelier-document-fonts.update(fonts)
   show: atelier-elements
   show heading.where(level: 1): it => atelier-chapter(it, switches)
-  show: atelier-page.with(meta.title)
+  // The frame of each page: the organisation is the first affiliation of the
+  // first author, and the rights join the copyright and the licence.
+  let first-author = atelier-people.authors.at(0, default: none)
+  let organisation = if first-author != none and first-author.affiliations.len() > 0 {
+    atelier-people.affiliations.at(first-author.affiliations.first() - 1)
+  }
+  let rights = (meta.copyright, meta.licence).filter(it => it != none)
+  show: atelier-page.with(
+    meta.title,
+    logo: meta.logo,
+    organisation: organisation,
+    rights: if rights.len() > 0 { rights.join[ · ] },
+  )
   if switches.at("cover") {
     atelier-cover(meta)
     atelier-abstract(meta)

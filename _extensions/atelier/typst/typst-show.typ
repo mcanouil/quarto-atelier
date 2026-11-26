@@ -16,7 +16,7 @@
     duration: $if(atelier-duration)$[$atelier-duration$]$else$none$endif$,
     abstract: $if(abstract)$[$abstract$]$else$none$endif$,
     licence: $if(license.text)$[$license.text$]$elseif(license)$[$license$]$else$none$endif$,
-    copyright: $if(copyright.holder)$[© $if(copyright.year)$$copyright.year$ $endif$$copyright.holder$]$elseif(copyright)$[$copyright$]$else$none$endif$,
+    copyright: $if(copyright.statement)$[$copyright.statement$]$elseif(copyright.holder)$[© $if(copyright.year)$$copyright.year$ $endif$$copyright.holder$]$elseif(copyright)$[$copyright$]$else$none$endif$,
     keywords: ($for(keywords)$"$keywords/nowrap$",$endfor$),
     lang: "$if(lang)$$lang$$else$en$endif$",
     region: $if(region)$"$region$"$else$none$endif$,

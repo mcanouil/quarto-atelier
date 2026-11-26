@@ -52,7 +52,7 @@ The `terminal` preset is dark in both schemes.
 One document type serves every page.
 By default, the PDF has a compact layout:
 
-- A title block with the title, the subtitle, the authors, the date, and the logo of the brand.
+- A title block with the title, the subtitle, the authors, the date, and the logo.
 - The table of contents, if `toc` is on.
 - Numbered sections.
 
@@ -60,6 +60,24 @@ By default, the PDF has a compact layout:
 
 The defaults are an A4 page, margins of 20 mm and 25 mm, and PDF/UA-1, so the PDF is tagged for assistive technology.
 Typst reads the fonts from the `fonts` folder of the extension.
+
+### Page frame
+
+Each page of the PDF has a header and a footer, which Atelier fills from the front matter.
+The header shows the document title on the left and the current chapter on the right.
+The footer shows three items on one line, and the page number below them:
+
+- On the left, the first affiliation of the first author.
+- In the centre, the `copyright` and the `license`.
+- On the right, the logo.
+
+An item with no value in the front matter leaves its place empty.
+The logo comes from `logo` in the front matter, or else from the brand.
+On a dark page, the PDF uses the dark image of the logo.
+
+The first page has no header.
+A cover, a divider and the closing page have no header and no footer.
+On these pages, the copyright and the licence show in the place of the footer.
 
 ### Report switches
 
