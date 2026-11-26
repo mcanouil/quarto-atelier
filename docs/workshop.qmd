@@ -434,7 +434,7 @@ Set it to `true`, or to a map with these keys:
 | ----------- | -------------------------------------------------------------------------------------------- |
 | `title`     | The heading. The default is "Thank you".                                                     |
 | `text`      | Markdown text that shows after the heading.                                                  |
-| `file`      | The path of a Markdown file, from the folder of the page. Its text shows after the heading.  |
+| `file`      | The path of a Markdown file, from the folder of the page. A path that starts with `/` is an absolute path. Its text shows after the heading. |
 | `links`     | A list of links, for example the contact page of the workshop.                               |
 | `copyright` | `false` hides the copyright line. The default is `true`.                                     |
 | `licence`   | `false` hides the licence line. The default is `true`.                                       |

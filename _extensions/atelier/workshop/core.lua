@@ -524,7 +524,7 @@ end
 --- build stops with `os.exit`.
 --- @param message string The message
 local function closing_error(message)
-  log.log_error('atelier', 'extensions.atelier.closing: ' .. message)
+  log.log_error(EXTENSION_NAME, 'extensions.atelier.closing: ' .. message)
   os.exit(1)
 end
 
@@ -589,6 +589,13 @@ local function closing_content(options)
     closing_error('`text` and `file` are both set. Set one of them.')
   end
   if options.text ~= nil then
+    -- Pandoc reads a metadata string as Markdown already.
+    local kind = pandoc.utils.type(options.text)
+    if kind == 'Blocks' then
+      return options.text
+    elseif kind == 'Inlines' then
+      return pandoc.Blocks({ pandoc.Para(options.text) })
+    end
     return pandoc.read(text_of(options.text), 'markdown').blocks
   end
   if options.file == nil then
