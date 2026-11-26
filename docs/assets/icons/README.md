@@ -34,9 +34,14 @@ Writing the `.ico` straight from the transparent render makes ImageMagick store 
 | File                   | Size    | Purpose                                                    |
 | ---------------------- | ------- | ---------------------------------------------------------- |
 | `icon.svg`             | vector  | `extensions.atelier.icon`, and the source for the rest     |
+| `logo-light.svg`       | vector  | `logo` of `_brand.yml`, light surfaces: ink and teal       |
+| `logo-dark.svg`        | vector  | `logo` of `_brand.yml`, dark surfaces: ink-dark and teal-dark |
 | `../../favicon.ico`    | 32x32   | `website.favicon`, for clients that ignore the SVG         |
 | `apple-touch-icon.png` | 180x180 | `extensions.atelier.apple-touch-icon`, opaque, 10% padding |
 | `icon-192.png`         | 192x192 | `../../site.webmanifest`                                    |
 | `icon-512.png`         | 512x512 | `../../site.webmanifest`                                    |
+
+The two logo files copy the shapes of `icon.svg` with fixed colours and no `prefers-color-scheme` rule, because Atelier picks the light or the dark logo after the surface: a dark slide or a dark PDF page in a light document still needs the dark one.
+`../../_samples/` holds copies of both logo files, because Typst reads no file outside the folder of the samples.
 
 There is no maskable icon: this is a documentation site, not an installable application.
