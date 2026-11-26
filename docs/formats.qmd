@@ -76,8 +76,8 @@ The logo comes from `logo` in the front matter, or else from the brand.
 On a dark page, the PDF uses the dark image of the logo.
 
 The first page has no header.
-A cover, a divider and the closing page have no header and no footer.
-On these pages, the copyright and the licence show in the place of the footer.
+A cover, a divider and the closing page have no header.
+Their footer shows only the copyright and the licence, where the first line of the footer sits.
 
 ### Report switches
 

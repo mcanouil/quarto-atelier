@@ -6,8 +6,8 @@
 --- @brief Give the Typst partials the data of the document.
 --- @description Quarto compiles no Sass for Typst, so this filter reads the
 --- colours from `palette.lua` and writes them, with the fonts of the preset,
---- the labels, the five report switches, the authors and the workshop
---- motif of `motifs.lua`, into the
+--- the labels, the five report switches, the authors, the workshop motif
+--- of `motifs.lua` and the logo of `logo.lua`, into the
 --- `atelier-typst-data` metadata. The `typst/tokens.typ` partial writes that
 --- value in front of the template, so every partial can read it.
 --- The filter also marks each callout with its type and appearance, ends
