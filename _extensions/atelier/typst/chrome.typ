@@ -62,9 +62,13 @@
 // one line, the organisation, the rights and the logo, and the page number
 // below. A cover, a divider and the closing page have no header and no
 // footer, but the rights show where the first line of the footer sits. The
-// header and the footer only decorate, so they are artefacts.
+// header and the footer only decorate, so they are artefacts. PDF/UA-1
+// forbids a link in an artefact, so a link in their text shows as its text.
 #let atelier-page(title, body, logo: none, organisation: none, rights: none) = {
-  let furniture(content) = text(size: 8pt, fill: atelier-colour("muted"), content)
+  let furniture(content) = {
+    show link: it => it.body
+    text(size: 8pt, fill: atelier-colour("muted"), content)
+  }
   let kind() = atelier-surface-at(here().page())
   let framed() = kind() in (none, "contents")
   let mark = if logo != none { image(logo.path, height: 9pt, alt: logo.alt) }

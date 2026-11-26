@@ -565,8 +565,13 @@ local function copyright_text(value)
   if value.holder == nil then
     return nil
   end
-  local year = text_of(value.year)
-  return pandoc.Inlines('© ' .. (year ~= '' and year .. ' ' or '') .. text_of(value.holder))
+  local inlines = pandoc.Inlines({ pandoc.Str('©'), pandoc.Space() })
+  if text_of(value.year) ~= '' then
+    inlines:extend(to_inlines(value.year))
+    inlines:insert(pandoc.Space())
+  end
+  inlines:extend(to_inlines(value.holder))
+  return inlines
 end
 
 --- Answer the licence of the document: the `license` string, its `text`, or
