@@ -183,7 +183,8 @@ The default title is "By the end of this module, you can".
 ```
 
 The `title` and `duration` attributes are optional.
-With no `duration` attribute, the block shows the duration of the page.
+In workshop mode, a block with no `duration` attribute shows the duration of the page.
+In documentation mode, the page has no duration, so give the block its own `duration` attribute.
 The [Set up](demos/workshop-sidebar/workshop/setup/index.html#goals) page of the demo shows this block.
 
 ### Exercise

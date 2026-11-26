@@ -59,13 +59,12 @@ local function declare_group(meta)
   meta.extensions.veil.groups = groups
 end
 
---- Declare the group of the answers and set the speakers of the title
---- slide. In workshop mode, also set the workshop labels and the duration.
+--- Set the speakers of the title slide. In workshop mode, also set the
+--- workshop labels and the duration.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
 --- @return table The changed metadata
 function M.publish(meta, model)
-  declare_group(meta)
   local speakers = pandoc.List({})
   for _, speaker in ipairs(core.speakers(meta, model)) do
     speakers:insert({
@@ -132,6 +131,7 @@ end
 --- @param model table The page model
 --- @return pandoc.Div
 local function answer_block(answer, model)
+  model.answers_used = true
   local result = block(answer.div, 'answer', nil, answer.title or language_text('answer-title'), nil, answer.blocks)
   if not result.classes:includes('veil') then
     result.classes:insert('veil')
@@ -204,7 +204,8 @@ local function references(doc)
   return cites, refs
 end
 
---- Finish a workshop deck after its blocks. With a closing: a references
+--- Finish a deck after its blocks: declare the group of the answers when the
+--- deck has answers. With a closing: a references
 --- slide when the deck cites the bibliography and has no `#refs` div, then
 --- the closing slide, with the parts of `core.closing_parts` and the CRediT table.
 --- Without a closing, the CRediT table has a slide of its own.
@@ -212,10 +213,15 @@ end
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
+  -- Only a deck with answers declares their group, so Veil does not warn
+  -- about a declared group that no element uses.
+  if model.answers_used then
+    declare_group(doc.meta)
+  end
   local closing = core.closing(doc.meta, model)
   local credit = core.credit(doc.meta, model)
   if closing == nil and credit == nil then
-    return nil
+    return model.answers_used and doc or nil
   end
   local table_blocks = credit and pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' }))
   if closing == nil then

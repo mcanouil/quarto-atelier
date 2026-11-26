@@ -5,10 +5,10 @@
 --- @author Mickaël Canouil
 --- @brief Write the workshop data and blocks of an HTML page.
 --- @description Writes one JSON block into the head of each HTML page. It
---- holds the mode, the project offset, the translated labels, and, in
---- workshop mode, the page duration, the sidebar that lists the page, and the
---- durations of every page in that sidebar, and the photos of the speakers,
---- which `html/scripts/title-block.html` puts in the title block. A workshop
+--- holds the mode, the project offset, the translated labels, the photos of
+--- the speakers, which `html/scripts/title-block.html` puts in the title
+--- block, and, in workshop mode, the page duration, the sidebar that lists
+--- the page, and the durations of every page in that sidebar. A workshop
 --- page also gets the
 --- `atelier-workshop` class on `<html>` and the motif of its preset, and a
 --- workshop page that no listed
