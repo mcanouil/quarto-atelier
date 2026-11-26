@@ -148,6 +148,7 @@ contributes:
         - bundled/mobile-toc.lua
         - bundled/collapse-output.lua
         - bundled/remember.lua
+        - atelier-html-logo.lua
       # Each embedded extension keeps its own defaults, set per site under
       # `extensions:`, with these exceptions. gitlink shows its repository
       # widget, and the common options keep it from rewriting prose. remember offers no resume on the home page and the 404 page; Quarto

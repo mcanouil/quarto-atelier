@@ -32,6 +32,19 @@
 		});
 	})();
 	(function () {
+		// A standalone document writes its logo before the content, hidden,
+		// because Quarto picks one of several title block partials. The logo
+		// moves above the title, in whichever title block the page has. Without
+		// JavaScript the logo stays hidden.
+		var logo = document.querySelector(".atelier-title-logo[hidden]");
+		var title = document.querySelector("#title-block-header .quarto-title");
+		if (!logo || !title) {
+			return;
+		}
+		title.prepend(logo);
+		logo.hidden = false;
+	})();
+	(function () {
 		// Quarto writes the keywords as one comma-separated paragraph by design.
 		// The chip design needs one element for each keyword, so the paragraph is
 		// split here. Without JavaScript the paragraph stays as Quarto wrote it.
