@@ -230,7 +230,8 @@ Write this in `notes.qmd`.
 
 Quarto has its own `.solution` block, and Atelier does not change it.
 Use `.solution` when you want a Quarto cross-reference, such as `@sol-notes`.
-A `.solution` div needs an `id` that starts with `sol-`, or no `id`. Quarto stops the render on a solution with a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
+A `.solution` div needs an `id` that starts with `sol-`, or no `id`.
+Quarto stops the render on a solution with a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
 Quarto reads every div with an `id` that starts with `sol-` as a Quarto solution, also a div with the class `answer`.
 For this reason, an `.answer` with such an `id` stays a Quarto solution, and Atelier logs a warning.
 Give an answer no `id`, or an `id` with a different prefix.

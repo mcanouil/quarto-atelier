@@ -131,12 +131,12 @@ end
 --- @param model table The page model
 --- @return pandoc.Div
 local function answer_block(answer, model)
-  model.answers_used = true
   local result = block(answer.div, 'answer', nil, answer.title or language_text('answer-title'), nil, answer.blocks)
   if not result.classes:includes('veil') then
     result.classes:insert('veil')
     if result.attributes.group == nil then
       result.attributes.group = GROUP
+      model.answers_used = true
     end
   end
   return result

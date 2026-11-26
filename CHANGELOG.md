@@ -35,6 +35,7 @@
 - feat: The closing takes your own text or file, and shows the copyright and the licence of the document, each of which you can hide.
 - feat: The workshop blocks, the speakers, the closing and the CRediT table work in documentation mode too. Workshop mode now sets the workshop labels, the page duration and the course chrome.
 - feat: The solution block is now `.answer`, with `extensions.atelier.answers` and the veil group `answers`. `.solution` is Quarto's own block again, in every mode.
+- feat: The language keys `atelier-solution-summary`, `atelier-solution-title`, `atelier-solution-page` and `atelier-solutions-title` are now `atelier-answer-summary`, `atelier-answer-title`, `atelier-answer-page` and `atelier-answers-title`. Rename them where you override them.
 
 ## 0.15.3 (2026-11-23)
 
