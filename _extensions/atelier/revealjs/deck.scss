@@ -434,40 +434,104 @@ html.print-pdf:root {
   justify-content: flex-start;
 }
 
-// In workshop mode, the speakers replace the author list: a round photo, when
-// the speaker has one, next to the name, the degrees and the affiliation.
-.reveal .slides section.atelier-title-slide .atelier-speakers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em 1.5em;
-  margin-top: 0.8em;
-}
+// The author block is the same in every mode: a round photo, when the author
+// has one, next to the name, the degrees and the ORCID badge, then the
+// attributes, the email and the affiliations under it.
+.reveal .slides section.atelier-title-slide {
+  .atelier-meta-group {
+    margin-top: 0.7em;
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-}
+  .quarto-title-meta-heading {
+    font-size: 0.4em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--atelier-muted);
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker-photo {
-  flex: none;
-  width: 2.2em;
-  height: 2.2em;
-  margin: 0;
-  border-radius: 50%;
-  object-fit: cover;
-}
+  .atelier-authors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12em, 1fr));
+    gap: 0.5em 1.5em;
+    margin: 0.2em 0 0;
+    padding: 0;
+    list-style: none;
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker-text {
-  margin: 0;
-  font-size: 0.6em;
-  line-height: 1.3;
-  color: var(--atelier-muted);
-}
+  .atelier-author {
+    margin: 0;
+    font-size: 0.6em;
+    line-height: 1.3;
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker-name {
-  font-weight: 700;
-  color: var(--atelier-fg);
+  .atelier-author p {
+    margin: 0;
+  }
+
+  p.author {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.1em 0.3em;
+    font-weight: 700;
+    color: var(--atelier-fg);
+  }
+
+  .atelier-author-photo {
+    flex: none;
+    width: 2.2em;
+    height: 2.2em;
+    margin: 0 0.3em 0 0;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .atelier-author-degrees {
+    font-weight: 400;
+    font-style: italic;
+    color: var(--atelier-muted);
+  }
+
+  .atelier-author-orcid {
+    display: inline-flex;
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .atelier-author-orcid svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .atelier-orcid-disc {
+    fill: var(--atelier-accent-text);
+  }
+
+  .atelier-orcid-glyph {
+    fill: var(--atelier-bg);
+  }
+
+  .atelier-author-attributes,
+  .atelier-author-email,
+  p.affiliation {
+    color: var(--atelier-muted);
+  }
+
+  .atelier-title-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2em;
+  }
+
+  .atelier-title-dates .atelier-meta-group {
+    margin-top: 0.5em;
+  }
+
+  .atelier-title-dates p {
+    margin: 0;
+    font-size: 0.6em;
+  }
 }
 
 .reveal .slides section.atelier-section {

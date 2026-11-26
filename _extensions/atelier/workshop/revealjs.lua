@@ -59,25 +59,15 @@ local function declare_group(meta)
   meta.extensions.veil.groups = groups
 end
 
---- Set the speakers of the title slide. In workshop mode, also set the
---- workshop labels and the duration.
+--- Set the authors of the title slide in every mode. In workshop mode, also
+--- set the workshop labels and the duration.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
 --- @return table The changed metadata
 function M.publish(meta, model)
-  local speakers = pandoc.List({})
-  for _, author in ipairs(core.authors(meta, model.labels)) do
-    local affiliation = author.affiliations[1]
-    speakers:insert({
-      name = pandoc.MetaString(author.name),
-      degrees = #author.degrees > 0 and pandoc.MetaString(table.concat(author.degrees, ', ')) or nil,
-      affiliation = affiliation and pandoc.MetaString(affiliation.name) or nil,
-      photo = author.photo and pandoc.MetaString(core.photo_uri(author.photo)) or nil,
-      alt = pandoc.MetaString(author.photo_alt),
-    })
-  end
-  if #speakers > 0 then
-    meta['atelier-speakers'] = speakers
+  local authors = core.authors(meta, model.labels)
+  if #authors > 0 then
+    meta['atelier-authors'] = core.authors_meta(authors, model.labels, core.photo_uri)
   end
   if model.mode ~= core.MODE_WORKSHOP then
     return meta
