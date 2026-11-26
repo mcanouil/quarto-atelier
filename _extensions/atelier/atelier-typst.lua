@@ -19,6 +19,7 @@ local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/loggin
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
+local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 
 --- Name that prefixes each warning.
 --- @type string
@@ -275,6 +276,20 @@ local function motif_code(model, preset, tokens)
   })
 end
 
+--- Answer the logo of the document as Typst: its image for the tone of the
+--- page, with the alt text, or `none`.
+--- @param meta table
+--- @param tokens table<string, table>
+--- @return string
+local function logo_code(meta, tokens)
+  local resolved = logo.resolve(meta)
+  if resolved == nil then
+    return 'none'
+  end
+  local image = palette.tone(tokens.bg) == 'dark' and resolved.dark or resolved.light
+  return typst_dict({ path = typst_string(image.path), alt = typst_string(image.alt) })
+end
+
 --- Write the document data into `atelier-typst-data`.
 --- @param meta table
 --- @return table
@@ -299,6 +314,7 @@ local function publish(meta)
     '#let atelier-switches = ' .. switches_code(options),
     '#let atelier-people = ' .. authors_code(meta, model),
     '#let atelier-motif-data = ' .. motif_code(model, preset, tokens),
+    '#let atelier-logo = ' .. logo_code(meta, tokens),
   }
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })
   return meta

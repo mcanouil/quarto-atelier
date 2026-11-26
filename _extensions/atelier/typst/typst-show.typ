@@ -36,7 +36,7 @@
       published: [$labels.published$],
       abstract: [$labels.abstract$],
     ),
-    logo: brand-logo.at("medium", default: brand-logo.at("small", default: none)),
+    logo: atelier-logo,
   ),
   doc,
 )
