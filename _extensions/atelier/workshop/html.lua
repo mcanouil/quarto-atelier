@@ -14,7 +14,7 @@
 --- workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
 --- The blocks of `workshop/core.lua` become the head line and body of each
---- block, objective checkboxes, a `<details>` solution, and a terminal code
+--- block, objective checkboxes, a `<details>` answer, and a terminal code
 --- block for the code-blocks script.
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))

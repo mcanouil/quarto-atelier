@@ -6,7 +6,7 @@
 --- @brief The format-neutral part of the workshop mode.
 --- @description Reads the page model (mode, duration, labels), the course
 --- model (the sidebar that lists the page and the durations of its pages),
---- and the workshop blocks (objectives, exercise, solution, terminal). Each
+--- and the workshop blocks (objectives, exercise, answer, terminal). Each
 --- reader returns plain data, and the writer of each format turns that data
 --- into its output. This module writes no output.
 
@@ -1110,40 +1110,6 @@ function M.block(div, kind, model)
     time = attribute_duration(div, kind, model.labels),
     blocks = div.content,
   }
-end
-
---- Tell whether a `Proof` node is a workshop solution, which the workshop
---- hides. Quarto turns a `.solution` div into a `Proof` node of type
---- `Solution` before the `pre-quarto` filters run, and removes the class.
---- A solution with a `sol-` identifier is a cross-reference target and stays
---- shown.
---- @param proof table The `Proof` node
---- @return boolean True when the node is a workshop solution
-function M.is_workshop_solution(proof)
-  if (proof.identifier or ''):find('^sol%-') then
-    return false
-  end
-  return pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
-end
-
---- Read a solution from the `Proof` node that Quarto makes of a `.solution`
---- div, in workshop mode only. Quarto removes the class, so the node keeps
---- the div in `div`.
---- The title is the `title` attribute, else the name that Quarto took from
---- the `name` attribute or a leading heading, else the label.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return { title: string, identifier: string, div: pandoc.Div }|nil The solution, or nil when the node is not a workshop solution
-function M.solution(proof, model)
-  if model.mode ~= M.MODE_WORKSHOP or not M.is_workshop_solution(proof) then
-    return nil
-  end
-  local title = proof.div.attributes.title
-  if title == nil then
-    local name = pandoc.utils.stringify(proof.name or '')
-    title = name ~= '' and name or model.labels['answer-summary']
-  end
-  return { title = title, identifier = proof.identifier or '', div = proof.div }
 end
 
 --- Read an answer block: a div with the class `answer`, in every mode.
