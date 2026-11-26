@@ -417,7 +417,6 @@ language:
 | `atelier-credit-supporting`      | `Supporting`                         | `Appui`                                     |
 | `atelier-credit-contributed`     | `Contributed`                        | `A contribué`                               |
 | `atelier-closing-thanks`         | `Thank you`                          | `Merci`                                     |
-| `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
 | `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
 | `atelier-workshop-author-single` | `Instructor`                         | `Formateur·rice`                            |
 | `atelier-workshop-author-plural` | `Instructors`                        | `Formateur·rice·s`                          |
@@ -442,6 +441,7 @@ language:
 | `atelier-author-orcid`           | `ORCID`                              | `ORCID`                                     |
 | `atelier-author-corresponding`   | `Corresponding author`               | `Auteur correspondant`                      |
 | `atelier-duration`               | `Duration`                           | `Durée`                                     |
+| `atelier-answer-summary`         | `Show the answer`                    | `Afficher la réponse`                       |
 | `atelier-solution-title`         | `Solution`                           | `Solution`                                  |
 | `atelier-solution-page`          | `Solution: page {page}`              | `Solution : page {page}`                    |
 | `atelier-solutions-title`        | `Solutions`                          | `Solutions`                                 |
