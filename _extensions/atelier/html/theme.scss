@@ -1807,3 +1807,23 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
     transform: rotate(var(--atelier-embed-art-tilt, -1.25deg));
   }
 }
+
+// ===========================================================================
+// TITLE LOGO
+// ===========================================================================
+// A standalone document puts its logo above the title, at the left of the
+// title block, clear of the workshop motif in the top right corner.
+// `html/title-block.html` draws both images, and the colour scheme shows one.
+// Remove when: never.
+.atelier-title-logo {
+  width: fit-content;
+  margin-block-end: 1rem;
+  line-height: 0;
+
+  img {
+    display: block;
+    width: auto;
+    max-width: min(16rem, 60%);
+    height: 3rem;
+  }
+}

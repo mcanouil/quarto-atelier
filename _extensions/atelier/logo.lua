@@ -124,6 +124,14 @@ local function project_website()
   return website
 end
 
+--- Answer true when the document belongs to a website: the project files
+--- have a `website` map.
+--- @param meta table The document metadata
+--- @return boolean
+function M.in_website(meta)
+  return meta.website ~= nil or project_website() ~= nil
+end
+
 --- Answer the logo of the navbar, or else of the sidebar, of a website,
 --- with its `logo-alt`.
 --- @param meta table The document metadata
