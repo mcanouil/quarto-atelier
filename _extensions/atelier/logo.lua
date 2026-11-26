@@ -87,6 +87,71 @@ local function from_brand()
   return nil
 end
 
+--- Answer the `website` map of the project configuration: `_quarto.yml`,
+--- then the file of each active profile, the later file winning per key of
+--- the navbar and of the sidebar. A filter does not get `website` in the
+--- document metadata, so this reads the files.
+--- @return table|nil
+local function project_website()
+  local project = quarto.project
+  if project == nil or project.directory == nil then
+    return nil
+  end
+  local files = { '_quarto.yml' }
+  for _, profile in ipairs(project.profile or {}) do
+    files[#files + 1] = '_quarto-' .. profile .. '.yml'
+  end
+  local website
+  for _, name in ipairs(files) do
+    local handle = io.open(pandoc.path.join({ project.directory, name }), 'r')
+    if handle ~= nil then
+      local yaml = handle:read('a')
+      handle:close()
+      local config = pandoc.read('---\n' .. yaml .. '\n...\n', 'markdown').meta
+      if config.website ~= nil then
+        website = website or {}
+        for _, part in ipairs({ 'navbar', 'sidebar' }) do
+          if config.website[part] ~= nil then
+            website[part] = website[part] or {}
+            for key, value in pairs(config.website[part]) do
+              website[part][key] = value
+            end
+          end
+        end
+      end
+    end
+  end
+  return website
+end
+
+--- Answer the logo of the navbar, or else of the sidebar, of a website,
+--- with its `logo-alt`.
+--- @param meta table The document metadata
+--- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
+function M.site(meta)
+  local website = meta.website or project_website()
+  if website == nil then
+    return nil
+  end
+  local navbar = website.navbar
+  local found = from_source(navbar and navbar.logo, navbar and text(navbar['logo-alt']))
+  if found ~= nil then
+    return found
+  end
+  -- `website.sidebar` is one sidebar or a list of sidebars.
+  local sidebars = website.sidebar
+  if sidebars ~= nil and sidebars.logo == nil and #sidebars > 0 then
+    for _, sidebar in ipairs(sidebars) do
+      found = from_source(sidebar.logo, text(sidebar['logo-alt']))
+      if found ~= nil then
+        return found
+      end
+    end
+    return nil
+  end
+  return from_source(sidebars and sidebars.logo, sidebars and text(sidebars['logo-alt']))
+end
+
 --- Answer the logo of the document.
 --- @param meta table The document metadata
 --- @param options { website: boolean }|nil `website` is true for a page in a website
@@ -96,12 +161,8 @@ function M.resolve(meta, options)
   if found ~= nil then
     return found
   end
-  if options ~= nil and options.website and meta.website ~= nil then
-    local navbar = meta.website.navbar
-    local sidebar = meta.website.sidebar
-    local alt = navbar and text(navbar['logo-alt'])
-    found = from_source(navbar and navbar.logo, alt)
-      or from_source(sidebar and sidebar.logo, sidebar and text(sidebar['logo-alt']) or alt)
+  if options ~= nil and options.website then
+    found = M.site(meta)
     if found ~= nil then
       return found
     end

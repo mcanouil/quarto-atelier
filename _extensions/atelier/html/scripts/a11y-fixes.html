@@ -26,6 +26,15 @@
 				if (logoName) a.setAttribute("aria-label", logoName);
 			});
 
+		// Logo images: with a light and a dark image, Quarto writes `alt=""` on
+		// both and drops `logo-alt`. Each image gets the alt text of the logo.
+		const logoAlt = (window.atelierOptions || {})["logo-alt"];
+		if (logoAlt) {
+			document.querySelectorAll('img.navbar-logo[alt=""], img.sidebar-logo[alt=""]').forEach((img) => {
+				img.setAttribute("alt", logoAlt);
+			});
+		}
+
 		// Author email link: Quarto emits <a class="quarto-title-author-email"> around an
 		// icon only, so the link has no accessible name. Use the address as the name.
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15166

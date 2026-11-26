@@ -12,6 +12,7 @@
 
 --- Load modules
 local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
+local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 
 --- Keys of the labels, without the `atelier-` prefix, in output order.
 --- The text comes from the `language` files.
@@ -138,6 +139,14 @@ local function publish_options(meta)
   -- The preset is a Sass default, which Lua cannot read, so every page ships the fonts. The browser downloads a face only when a stylesheet names it.
   add_fonts()
   local options = { labels = resolve_labels(), version = read_version(meta) }
+  -- With a light and a dark logo, Quarto drops `logo-alt` and writes `alt=""`
+  -- on both images. The options carry `logo-alt` for `a11y-fixes.html`.
+  -- Upstream: https://github.com/quarto-dev/quarto-cli/issues/15165
+  -- Remove when: the minimum Quarto version includes the fix.
+  local site_logo = logo.site(meta)
+  if site_logo ~= nil and site_logo.light.alt ~= '' then
+    options['logo-alt'] = site_logo.light.alt
+  end
   local json = quarto.json.encode(options):gsub('</', '<\\/')
   quarto.doc.include_text(
     'in-header',

@@ -1284,3 +1284,29 @@ body:not(.glightbox-mobile) div.gslide-description :is(.gslide-title, .gslide-de
   max-height: 90vh !important;
   object-fit: contain;
 }
+
+// ===========================================================================
+// LOGO IMAGE OF THE CHROME
+// ===========================================================================
+// Quarto shows the light or the dark logo image after the colour scheme of
+// the page. With `$atelier-chrome: dark` or `light`, the chrome keeps one
+// tone in both schemes, so the logo shows the image of that tone. Quarto
+// hides the other image with `!important`, so these rules need it too.
+// Remove when: never.
+@mixin atelier-chrome-logo($shown, $hidden) {
+  body:is(.quarto-light, .quarto-dark) :is(.navbar, #quarto-sidebar) img:is(.navbar-logo, .sidebar-logo) {
+    &.#{$shown} {
+      display: inline !important;
+    }
+
+    &.#{$hidden} {
+      display: none !important;
+    }
+  }
+}
+
+@if $atelier-chrome == dark {
+  @include atelier-chrome-logo(dark-content, light-content);
+} @else if $atelier-chrome == light {
+  @include atelier-chrome-logo(light-content, dark-content);
+}
