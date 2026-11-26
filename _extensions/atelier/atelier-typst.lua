@@ -277,7 +277,7 @@ local function motif_code(model, preset, tokens, dark)
 end
 
 --- Answer the logo of the document as Typst: its image for the tone of the
---- page, with the alt text, or `none`.
+--- page, with the alt text (`none` when there is none), or `none`.
 --- @param meta table
 --- @param dark boolean True when the page is dark
 --- @return string
@@ -287,7 +287,7 @@ local function logo_code(meta, dark)
     return 'none'
   end
   local image = dark and resolved.dark or resolved.light
-  return typst_dict({ path = typst_string(image.path), alt = typst_string(image.alt) })
+  return typst_dict({ path = typst_string(image.path), alt = image.alt ~= '' and typst_string(image.alt) or 'none' })
 end
 
 --- Write the document data into `atelier-typst-data`.
