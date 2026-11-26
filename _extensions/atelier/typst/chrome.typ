@@ -1,7 +1,8 @@
 // Atelier - Typst page chrome
-// The page set-up: the page colour, the header with the current chapter, the
-// footer with the page number, and the surfaces, pages that a mark gives
-// their own header and footer, such as the cover or a chapter divider.
+// The page set-up: the page colour, the header with the title and the
+// current chapter, the footer with the organisation, the rights, the logo and
+// the page number, and the surfaces, pages that a mark gives their own
+// header and footer, such as the cover or a chapter divider.
 //
 // @license MIT
 // @copyright 2026 Mickaël Canouil
@@ -24,7 +25,7 @@
 #let atelier-slots(left: none, centre: none, right: none) = grid(
   columns: (1fr, auto, 1fr),
   column-gutter: 1em,
-  align: (std.left, std.center, std.right),
+  align: (std.left + horizon, std.center + horizon, std.right + horizon),
   left, centre, right,
 )
 
@@ -49,9 +50,7 @@
 }
 
 // Set up the pages of a document: the page colour, and the header and
-// footer of each page, after its surface. The header has the document title
-// and the current chapter; the footer has the page number. A cover and a
-// divider have neither; a closing page has the footer only.
+// footer of each page, after its surface.
 // - title: the document title, or none.
 // - body: the content of the document.
 // - logo: the logo, a dictionary with `path` and `alt`, or none.
@@ -69,6 +68,9 @@
   let kind() = atelier-surface-at(here().page())
   let framed() = kind() in (none, "contents")
   let mark = if logo != none { image(logo.path, height: 9pt, alt: logo.alt) }
+  let first-line = if organisation != none or rights != none or mark != none {
+    atelier-slots(left: organisation, centre: rights, right: mark)
+  }
   set page(
     fill: atelier-colour("bg"),
     // The workshop motif sits in the top right corner of the first page,
@@ -90,17 +92,10 @@
       }
     },
     footer: context {
-      let first-line = grid(
-        columns: (1fr, auto, 1fr),
-        column-gutter: 1em,
-        align: (left + horizon, center + horizon, right + horizon),
-        organisation, rights, mark,
-      )
       if framed() {
-        let has-line = organisation != none or rights != none or mark != none
         pdf.artifact(furniture(stack(
           spacing: 7pt,
-          ..if has-line { (first-line,) },
+          ..if first-line != none { (first-line,) },
           align(center, atelier-page-number()),
         )))
       } else if rights != none {

@@ -263,12 +263,12 @@ end
 --- @param model table The mode and the `extensions.atelier` options
 --- @param preset string
 --- @param tokens table<string, table>
+--- @param dark boolean True when the page is dark
 --- @return string
-local function motif_code(model, preset, tokens)
+local function motif_code(model, preset, tokens, dark)
   if model.mode ~= core.MODE_WORKSHOP then
     return 'none'
   end
-  local dark = palette.tone(tokens.bg) == 'dark'
   return typst_dict({
     shapes = motifs.typst(motifs.name(preset)),
     paint = typst_colour(tokens[dark and 'accent-ink' or 'accent-mark'], tokens.bg),
@@ -279,14 +279,14 @@ end
 --- Answer the logo of the document as Typst: its image for the tone of the
 --- page, with the alt text, or `none`.
 --- @param meta table
---- @param tokens table<string, table>
+--- @param dark boolean True when the page is dark
 --- @return string
-local function logo_code(meta, tokens)
+local function logo_code(meta, dark)
   local resolved = logo.resolve(meta)
   if resolved == nil then
     return 'none'
   end
-  local image = palette.tone(tokens.bg) == 'dark' and resolved.dark or resolved.light
+  local image = dark and resolved.dark or resolved.light
   return typst_dict({ path = typst_string(image.path), alt = typst_string(image.alt) })
 end
 
@@ -301,6 +301,7 @@ local function publish(meta)
   local preset = palette.preset(painted)
   local tokens = palette.tokens(scheme)
   local styles = palette.highlighting(preset, painted)
+  local dark = palette.tone(tokens.bg) == 'dark'
   local terminal_styles = palette.highlighting(preset, 'dark')
   local lines = {
     '#let atelier-preset = ' .. typst_string(preset),
@@ -313,8 +314,8 @@ local function publish(meta)
     '#let atelier-labels = ' .. labels_code(),
     '#let atelier-switches = ' .. switches_code(options),
     '#let atelier-people = ' .. authors_code(meta, model),
-    '#let atelier-motif-data = ' .. motif_code(model, preset, tokens),
-    '#let atelier-logo = ' .. logo_code(meta, tokens),
+    '#let atelier-motif-data = ' .. motif_code(model, preset, tokens, dark),
+    '#let atelier-logo = ' .. logo_code(meta, dark),
   }
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })
   return meta
