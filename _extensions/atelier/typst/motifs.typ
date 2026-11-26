@@ -11,8 +11,9 @@
 // The control distance of a cubic Bézier curve that draws a quarter circle.
 #let atelier-quarter-control = 0.5523
 
-// Answer a corner motif in one colour, placed in its page corner so that it
-// bleeds to both edges, and tagged as an artefact.
+// Answer a corner motif in one colour, its square placed flush in the page
+// corner, and tagged as an artefact. The motif sets the space between its
+// shapes and the edges.
 // - shapes: array of shapes, each with kind (`rect`, `quarter` or `circle`),
 //   x, y, size or r, and opacity.
 // - corner: page corner, for example top + right; the drawing is mirrored for the others.

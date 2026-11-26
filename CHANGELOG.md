@@ -25,6 +25,7 @@
 - fix: The menu, the chalkboard buttons and the footer of a deck share one row with one centre line, and the two footer slots no longer run together. (#154)
 - fix: The keyboard reaches the chalkboard buttons of a deck, and screen readers announce them as buttons. (#154)
 - feat: The title slide of a deck shows only your `footer` text at the bottom, and the title and section slides show no slide number. (#154)
+- fix: The dots motif of the terminal preset keeps the same space from the edges of its corner as between its dots, on the page, the slide and the title block. (#155)
 
 ## 0.15.3 (2026-11-23)
 
