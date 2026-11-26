@@ -307,10 +307,11 @@ function M.author_name(author)
   return text_of(author.name.literal or author.name)
 end
 
---- Resolve a photo path against the folder of the document.
+--- Resolve a path against the folder of the document, such as the photo of
+--- a speaker or the file of the closing. An absolute path stays as it is.
 --- @param path string The path, relative to the document
 --- @return string
-local function photo_file(path)
+local function document_file(path)
   if path:sub(1, 1) ~= '/' and quarto.doc.input_file then
     return pandoc.path.join({ pandoc.path.directory(quarto.doc.input_file), path })
   end
@@ -332,7 +333,7 @@ local function photo_ok(path, key)
     )
     return false
   end
-  local file = io.open(photo_file(path), 'rb')
+  local file = io.open(document_file(path), 'rb')
   if file == nil then
     log.log_warning(
       EXTENSION_NAME,
@@ -349,7 +350,7 @@ end
 --- @param path string The path of a photo that `M.speakers` checked
 --- @return string The data URI
 function M.photo_uri(path)
-  local file = assert(io.open(photo_file(path), 'rb'))
+  local file = assert(io.open(document_file(path), 'rb'))
   local content = file:read('a')
   file:close()
   local media = PHOTO_TYPES[path:match('%.([^./\\]+)$'):lower()]
@@ -543,39 +544,40 @@ local function closing_switch(options, key, source)
   return value
 end
 
+--- Answer a metadata value as inlines, or nil when it is empty.
+--- @param value any The value
+--- @return pandoc.Inlines|nil
+local function inlines_or_nil(value)
+  return text_of(value) ~= '' and to_inlines(value) or nil
+end
+
 --- Answer the copyright of the document: the `copyright` string, its
 --- `statement`, or "© year holder".
 --- @param value any The Quarto `copyright`
 --- @return pandoc.Inlines|nil
 local function copyright_text(value)
-  if value == nil then
+  if pandoc.utils.type(value) ~= 'table' then
+    return inlines_or_nil(value)
+  end
+  if value.statement ~= nil then
+    return inlines_or_nil(value.statement)
+  end
+  if value.holder == nil then
     return nil
   end
-  if pandoc.utils.type(value) == 'table' then
-    if value.statement ~= nil then
-      return to_inlines(value.statement)
-    end
-    if value.holder == nil then
-      return nil
-    end
-    local year = text_of(value.year)
-    return pandoc.Inlines('© ' .. (year ~= '' and year .. ' ' or '') .. text_of(value.holder))
-  end
-  return text_of(value) ~= '' and to_inlines(value) or nil
+  local year = text_of(value.year)
+  return pandoc.Inlines('© ' .. (year ~= '' and year .. ' ' or '') .. text_of(value.holder))
 end
 
 --- Answer the licence of the document: the `license` string, its `text`, or
---- its `type`.
+--- its `type`, as `typst/typst-show.typ` reads it for the PDF frame.
 --- @param value any The Quarto `license`
 --- @return pandoc.Inlines|nil
 local function licence_text(value)
-  if value == nil then
-    return nil
-  end
   if pandoc.utils.type(value) == 'table' then
     value = value.text or value.type
   end
-  return text_of(value) ~= '' and to_inlines(value) or nil
+  return inlines_or_nil(value)
 end
 
 --- Answer the content of the closing: the Markdown of `text`, or of the file
@@ -592,7 +594,7 @@ local function closing_content(options)
   if options.file == nil then
     return nil
   end
-  local path = pandoc.path.join({ pandoc.path.directory(quarto.doc.input_file or ''), text_of(options.file) })
+  local path = document_file(text_of(options.file))
   local handle = io.open(path, 'r')
   if handle == nil then
     closing_error('the file of `file` does not exist: ' .. path .. '.')

@@ -150,9 +150,9 @@
   }
 }
 
-// Answer the copyright and the licence of the closing, one on each line,
-// or none.
-// - data: the closing, see atelier-closing-data.
+// Answer the copyright and the licence, one on each line, or none.
+// - data: the closing, see atelier-closing-data, or the document, see
+//   atelier-document(). Each has the fields copyright and licence.
 #let atelier-closing-rights(data) = {
   let lines = (data.copyright, data.licence).filter(it => it != none)
   if lines.len() > 0 { lines.join(linebreak()) }
