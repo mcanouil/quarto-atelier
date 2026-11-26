@@ -514,7 +514,7 @@ function M.authors_meta(authors, labels, photo_src)
       item['photo-alt'] = escaped(author.photo_alt)
     end
     if author.orcid then
-      item.orcid = pandoc.MetaString(author.orcid)
+      item.orcid = escaped(author.orcid)
       item['orcid-label'] = escaped((labels['author-orcid-profile']:gsub('{name}', function()
         return author.name
       end)))
