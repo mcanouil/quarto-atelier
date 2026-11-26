@@ -28,6 +28,9 @@
 - fix: The dots motif of the terminal preset keeps the same space from the edges of its corner as between its dots, on the page, the slide and the title block. (#155)
 - feat: A standalone HTML document shows its logo above the title, from the front matter or the brand.
 - fix: Both images of a light and dark navbar or sidebar logo get the `logo-alt` text, and a chrome that keeps one tone shows the logo image of that tone.
+- feat: Each PDF page shows a header with the title and the chapter, and a footer with the affiliation, the copyright and licence, the logo, and the page number.
+- feat: The PDF takes its logo from the front matter or the brand, and uses the dark image on a dark page.
+- fix: A PDF logo with no alt text is decorative, so the PDF/UA-1 build no longer stops on it.
 
 ## 0.15.3 (2026-11-23)
 

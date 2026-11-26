@@ -1,5 +1,5 @@
 // Atelier - Typst title block
-// The authors and the title block of the first page: brand logo, title,
+// The authors and the title block of the first page: logo, title,
 // subtitle, authors with their affiliations, the date and duration lines,
 // and the abstract. The cover page shows the same block on a page of its own.
 //
@@ -94,9 +94,10 @@
 #let atelier-title-block(meta, title-size: 2em) = {
   let muted(content) = text(size: 0.85em, fill: atelier-colour("muted"), content)
   let headings(content) = if meta.fonts.headings != none { text(font: meta.fonts.headings, content) } else { content }
-  let logo = meta.at("logo", default: none)
-  if logo != none {
-    block(below: 1.2em, image(logo.path, height: 2.2em, alt: logo.at("alt", default: none)))
+  // A logo with no alt text only decorates, so it is an artefact.
+  if meta.logo != none {
+    let mark = image(meta.logo.path, height: 2.2em, alt: meta.logo.alt)
+    block(below: 1.2em, if meta.logo.alt == none { pdf.artifact(mark) } else { mark })
   }
   if meta.title != none {
     block(below: 0.5em, text(size: title-size, weight: "bold", fill: atelier-colour("heading"), headings(meta.title)))
@@ -148,7 +149,8 @@
 }
 
 // Answer the cover page: the title block in the lower half of a page of its
-// own, with no header and no footer.
+// own, with no header and no page number. The footer shows the copyright and
+// licence line only.
 // - meta: the document, see atelier-document().
 #let atelier-cover(meta) = {
   atelier-surface("cover")

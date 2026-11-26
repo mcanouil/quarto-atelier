@@ -1,7 +1,8 @@
 // Atelier - Typst page chrome
-// The page set-up: the page colour, the header with the current chapter, the
-// footer with the page number, and the surfaces, pages that a mark gives
-// their own header and footer, such as the cover or a chapter divider.
+// The page set-up: the page colour, the header with the title and the
+// current chapter, the footer with the organisation, the rights, the logo and
+// the page number, and the surfaces, pages that a mark gives their own
+// header and footer, such as the cover or a chapter divider.
 //
 // @license MIT
 // @copyright 2026 Mickaël Canouil
@@ -24,7 +25,7 @@
 #let atelier-slots(left: none, centre: none, right: none) = grid(
   columns: (1fr, auto, 1fr),
   column-gutter: 1em,
-  align: (std.left, std.center, std.right),
+  align: (std.left + horizon, std.center + horizon, std.right + horizon),
   left, centre, right,
 )
 
@@ -49,14 +50,27 @@
 }
 
 // Set up the pages of a document: the page colour, and the header and
-// footer of each page, after its surface. The header has the document title
-// and the current chapter; the footer has the page number. A cover and a
-// divider have neither; a closing page has the footer only.
+// footer of each page, after its surface.
 // - title: the document title, or none.
 // - body: the content of the document.
-#let atelier-page(title, body) = {
+// - logo: the logo, a dictionary with `path` and `alt`, or none.
+// - organisation: the organisation, or none.
+// - rights: the copyright and the licence, or none.
+//
+// The header has the title and the chapter, on the pages after the first,
+// on ordinary pages and on the "In this chapter" pages. The footer has, on
+// one line, the organisation, the rights and the logo, and the page number
+// below. A cover, a divider and the closing page have no header and no
+// footer, but the rights show where the first line of the footer sits. The
+// header and the footer only decorate, so they are artefacts.
+#let atelier-page(title, body, logo: none, organisation: none, rights: none) = {
   let furniture(content) = text(size: 8pt, fill: atelier-colour("muted"), content)
   let kind() = atelier-surface-at(here().page())
+  let framed() = kind() in (none, "contents")
+  let mark = if logo != none { image(logo.path, height: 9pt, alt: logo.alt) }
+  let first-line = if organisation != none or rights != none or mark != none {
+    atelier-slots(left: organisation, centre: rights, right: mark)
+  }
   set page(
     fill: atelier-colour("bg"),
     // The workshop motif sits in the top right corner of the first page,
@@ -68,18 +82,24 @@
       }
     },
     header: context {
-      if kind() == none and here().page() > 1 {
-        block(
+      if framed() and here().page() > 1 {
+        pdf.artifact(block(
           width: 100%,
           inset: (bottom: 3pt),
           stroke: (bottom: 0.5pt + atelier-colour("border")),
           furniture(atelier-slots(left: title, right: atelier-chapter-title())),
-        )
+        ))
       }
     },
     footer: context {
-      if kind() not in ("cover", "divider") {
-        furniture(atelier-slots(right: atelier-page-number()))
+      if framed() {
+        pdf.artifact(furniture(stack(
+          spacing: 7pt,
+          ..if first-line != none { (first-line,) },
+          align(center, atelier-page-number()),
+        )))
+      } else if rights != none {
+        pdf.artifact(furniture(align(center, rights)))
       }
     },
   )
