@@ -40,7 +40,7 @@ end
 --- title-block labels of a workshop page.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
---- @return table The changed metadata
+--- @return table|nil The changed metadata, or nil when the page changes none
 function M.publish(meta, model)
   objectives = {}
   local data = {
@@ -56,8 +56,9 @@ function M.publish(meta, model)
       return path
     end)
   end
-  local changed = meta
+  local changed = #authors > 0 and meta or nil
   if model.mode == core.MODE_WORKSHOP then
+    changed = meta
     data.duration = model.duration
     local course = core.course(model)
     if course.listed then

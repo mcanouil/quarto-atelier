@@ -192,16 +192,6 @@ local function labels_code()
   return typst_dict(entries)
 end
 
---- The plain text of a metadata value, or an empty string.
---- @param value any
---- @return string
-local function text_of(value)
-  if value == nil then
-    return ''
-  end
-  return str.stringify(value)
-end
-
 --- The authors of the document as a Typst dictionary: each author with the
 --- fields of `core.authors`, the affiliation names under the author, and the
 --- visible text of the author attributes.
