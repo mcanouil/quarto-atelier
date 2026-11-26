@@ -430,10 +430,6 @@ html.print-pdf:root {
   color: var(--atelier-muted);
 }
 
-.reveal .slides section.atelier-title-slide .quarto-title-authors {
-  justify-content: flex-start;
-}
-
 // The author block is the same in every mode: a round photo, when the author
 // has one, next to the name, the degrees and the ORCID badge, then the
 // attributes, the email and the affiliations under it.

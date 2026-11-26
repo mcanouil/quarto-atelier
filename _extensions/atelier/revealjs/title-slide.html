@@ -31,16 +31,24 @@ $endif$
 
 $if(date)$
 <div class="atelier-title-dates">
+$elseif(date-modified)$
+<div class="atelier-title-dates">
+$endif$
+$if(date)$
   <div class="atelier-meta-group" role="group" aria-labelledby="atelier-meta-published">
     <div class="quarto-title-meta-heading" id="atelier-meta-published">$labels.published$</div>
     <p class="date">$date$</p>
   </div>
+$endif$
 $if(date-modified)$
   <div class="atelier-meta-group" role="group" aria-labelledby="atelier-meta-modified">
     <div class="quarto-title-meta-heading" id="atelier-meta-modified">$labels.modified$</div>
     <p class="date-modified">$date-modified$</p>
   </div>
 $endif$
+$if(date)$
+</div>
+$elseif(date-modified)$
 </div>
 $endif$
 $if(atelier-duration)$

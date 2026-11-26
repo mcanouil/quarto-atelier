@@ -472,6 +472,26 @@ function M.authors(meta, labels)
   return authors
 end
 
+--- Text for a template that puts it in an attribute. Pandoc escapes `&` and
+--- `<` in inlines but not `"`, so each `"` becomes a raw entity and the value
+--- cannot end the attribute.
+--- @param text string
+--- @return pandoc.MetaInlines
+local function escaped(text)
+  local inlines = pandoc.List({})
+  local first = true
+  for piece in (text .. '"'):gmatch('(.-)"') do
+    if not first then
+      inlines:insert(pandoc.RawInline('html', '&quot;'))
+    end
+    first = false
+    if piece ~= '' then
+      inlines:insert(pandoc.Str(piece))
+    end
+  end
+  return pandoc.MetaInlines(inlines)
+end
+
 --- Write the authors as metadata for a template partial: one map for each
 --- author, with no key for an absent field, so `$if(...)$` works.
 --- @param authors Author[] The authors of `M.authors`
@@ -484,18 +504,18 @@ function M.authors_meta(authors, labels, photo_src)
     local item = {
       index = pandoc.MetaString(tostring(author.index)),
       name = pandoc.MetaString(author.name),
-      url = author.url and pandoc.MetaString(author.url) or nil,
+      url = author.url and escaped(author.url) or nil,
       degrees = #author.degrees > 0 and pandoc.MetaString(table.concat(author.degrees, ', ')) or nil,
-      email = author.email and pandoc.MetaString(author.email) or nil,
+      email = author.email and escaped(author.email) or nil,
       note = author.note and pandoc.MetaString(author.note) or nil,
     }
     if author.photo then
-      item.photo = pandoc.MetaString(photo_src(author.photo))
-      item['photo-alt'] = pandoc.MetaString(author.photo_alt)
+      item.photo = escaped(photo_src(author.photo))
+      item['photo-alt'] = escaped(author.photo_alt)
     end
     if author.orcid then
       item.orcid = pandoc.MetaString(author.orcid)
-      item['orcid-label'] = pandoc.MetaString((labels['author-orcid-profile']:gsub('{name}', function()
+      item['orcid-label'] = escaped((labels['author-orcid-profile']:gsub('{name}', function()
         return author.name
       end)))
     end
@@ -504,7 +524,7 @@ function M.authors_meta(authors, labels, photo_src)
       for _, affiliation in ipairs(author.affiliations) do
         affiliations:insert({
           name = pandoc.MetaString(affiliation.name),
-          url = affiliation.url and pandoc.MetaString(affiliation.url) or nil,
+          url = affiliation.url and escaped(affiliation.url) or nil,
         })
       end
       item.affiliations = affiliations

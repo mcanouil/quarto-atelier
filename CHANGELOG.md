@@ -32,7 +32,7 @@
 - fix: A PDF logo with no alt text is decorative, so the PDF/UA-1 build no longer stops on it. (#157)
 - feat: A deck shows its logo above the title of the title slide and at the right end of the bottom row, with the dark image on dark slides. (#159)
 - feat: The closing takes your own text or file, and shows the copyright and the licence of the document, each of which you can hide.
-- feat: The workshop blocks, the speakers, the closing and the CRediT table work in documentation mode too. Workshop mode now sets the workshop labels, the page duration and the course chrome.
+- feat: The workshop blocks, the author block, the closing and the CRediT table work in documentation mode too. Workshop mode now sets the workshop labels, the page duration and the course chrome.
 - feat: The solution block is now `.answer`, with `extensions.atelier.answers` and the veil group `answers`. `.solution` is Quarto's own block again, in every mode.
 - feat: The language keys `atelier-solution-summary`, `atelier-solution-title`, `atelier-solution-page` and `atelier-solutions-title` are now `atelier-answer-summary`, `atelier-answer-title`, `atelier-answer-page` and `atelier-answers-title`. Rename them where you override them.
 - feat: The title block shows the same author details in HTML, the PDF and the deck: photo, degrees, ORCID, email, affiliations under each author, and visible text for corresponding, equal contribution and deceased.

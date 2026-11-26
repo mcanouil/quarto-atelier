@@ -46,7 +46,7 @@
 // Answer a label as the small uppercase heading of a group of the title
 // block. The label is in sentence case in the language file.
 // - label: the label.
-#let atelier-kicker(label) = text(
+#let atelier-title-kicker(label) = text(
   size: 0.75em,
   weight: "bold",
   tracking: 0.08em,
@@ -95,7 +95,7 @@
 #let atelier-keywords(keywords, label) = {
   if keywords.len() == 0 { return none }
   block(below: 1em, {
-    atelier-kicker(label)
+    atelier-title-kicker(label)
     linebreak()
     keywords
       .map(keyword => box(
@@ -115,7 +115,7 @@
 // - value: the value.
 #let atelier-meta-line(label, value) = {
   if label != none and label != [] {
-    atelier-kicker(label)
+    atelier-title-kicker(label)
     linebreak()
   }
   value
