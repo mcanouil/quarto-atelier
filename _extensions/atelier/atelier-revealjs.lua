@@ -381,7 +381,8 @@ local function publish(meta)
   deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
   deck.logo = logo.resolve(meta)
   if deck.logo ~= nil then
-    meta['atelier-logo-html'] = pandoc.RawInline('html', logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark'))
+    deck.logo_html = logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark')
+    meta['atelier-logo-html'] = pandoc.RawInline('html', deck.logo_html)
   end
   quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck, left_buttons(meta)))
   if meta.chalkboard then
@@ -469,7 +470,7 @@ local function logo_images()
   if deck.logo == nil then
     return pandoc.Inlines({})
   end
-  return pandoc.Inlines({ pandoc.RawInline('html', logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark')) })
+  return pandoc.Inlines({ pandoc.RawInline('html', deck.logo_html) })
 end
 
 --- Fill the slots of the footer that Quarto adds to the deck. The footer of
@@ -479,7 +480,10 @@ end
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 local function fill_footer(div)
-  if not div.classes:includes('footer-default') then
+  -- The footer of one slide replaces the footer of the deck on that slide.
+  -- With a logo, it takes the same row, so the logo stays on that slide.
+  local own_footer = div.classes:includes('footer') and deck.logo ~= nil
+  if not div.classes:includes('footer-default') and not own_footer then
     return nil
   end
   local own = pandoc.utils.blocks_to_inlines(div.content)
