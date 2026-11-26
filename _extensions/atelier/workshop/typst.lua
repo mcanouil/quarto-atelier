@@ -262,28 +262,46 @@ end
 
 --- The Typst code that stores the closing in the state `atelier-closing-data`,
 --- which the closing section or the closing page shows: the title, the
---- links and the licence, each as content.
+--- content, the links, the copyright and the licence, each as content or
+--- `none`.
 --- @param closing table The closing of `core.closing`
---- @return pandoc.Plain
+--- @return pandoc.Blocks
 local function closing_update(closing)
-  local inlines = pandoc.Inlines({ pandoc.RawInline('typst', '#atelier-closing-data.update((title: [') })
-  inlines:extend(closing.title)
-  inlines:insert(pandoc.RawInline('typst', '], links: ('))
-  for _, link in ipairs(closing.links) do
-    inlines:insert(pandoc.RawInline('typst', '['))
-    inlines:extend(link)
-    inlines:insert(pandoc.RawInline('typst', '], '))
+  local raw = function(code) return pandoc.RawInline('typst', code) end
+  local optional = function(inlines, value)
+    if value == nil then
+      inlines:insert(raw('none'))
+      return
+    end
+    inlines:insert(raw('['))
+    inlines:extend(value)
+    inlines:insert(raw(']'))
   end
-  inlines:insert(pandoc.RawInline('typst', '), licence: '))
-  if closing.licence ~= nil then
-    inlines:insert(pandoc.RawInline('typst', '['))
-    inlines:extend(closing.licence)
-    inlines:insert(pandoc.RawInline('typst', ']'))
+  local head = pandoc.Inlines({ raw('#atelier-closing-data.update((title: [') })
+  head:extend(closing.title)
+  head:insert(raw('], content: '))
+  local blocks = pandoc.Blocks({})
+  if closing.content == nil then
+    head:insert(raw('none'))
+    blocks:insert(pandoc.Plain(head))
   else
-    inlines:insert(pandoc.RawInline('typst', 'none'))
+    head:insert(raw('['))
+    blocks:insert(pandoc.Plain(head))
+    blocks:extend(closing.content)
   end
-  inlines:insert(pandoc.RawInline('typst', '))'))
-  return pandoc.Plain(inlines)
+  local tail = pandoc.Inlines({ raw((closing.content ~= nil and ']' or '') .. ', links: (') })
+  for _, link in ipairs(closing.links) do
+    tail:insert(raw('['))
+    tail:extend(link)
+    tail:insert(raw('], '))
+  end
+  tail:insert(raw('), copyright: '))
+  optional(tail, closing.copyright)
+  tail:insert(raw(', licence: '))
+  optional(tail, closing.licence)
+  tail:insert(raw('))'))
+  blocks:insert(pandoc.Plain(tail))
+  return blocks
 end
 
 --- Finish the handout after its blocks: write the solutions collected for
@@ -316,7 +334,7 @@ function M.finish(doc, model)
     doc.blocks:insert(pandoc.RawBlock('typst', credit_call(credit, model.labels)))
   end
   if closing ~= nil then
-    doc.blocks:insert(closing_update(closing))
+    doc.blocks:extend(closing_update(closing))
   end
   if page.count == 0 then
     return doc

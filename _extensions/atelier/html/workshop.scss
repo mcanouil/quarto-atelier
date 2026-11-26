@@ -585,8 +585,13 @@ html.atelier-workshop #title-block-header {
     list-style: none;
   }
 
+  .atelier-closing-copyright,
   .atelier-closing-licence {
     color: var(--atelier-muted);
+  }
+
+  .atelier-closing-copyright p {
+    margin-bottom: 0;
   }
 }
 

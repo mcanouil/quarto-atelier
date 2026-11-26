@@ -753,9 +753,9 @@ html.print-pdf:root {
 // ===========================================================================
 // CLOSING
 // ===========================================================================
-// The last slide of a workshop deck: a thank-you, the links, the licence and
-// the CRediT table of the authors, which has a slide of its own in a deck
-// with no closing.
+// The last slide of a workshop deck: a thank-you, your text, the links, the
+// copyright, the licence and the CRediT table of the authors. A deck with no
+// closing shows the CRediT table on a slide of its own.
 
 .reveal .slides section.atelier-closing .atelier-closing-links ul {
   margin-left: 0;
@@ -763,9 +763,14 @@ html.print-pdf:root {
   font-size: 0.8em;
 }
 
+.reveal .slides section.atelier-closing .atelier-closing-copyright,
 .reveal .slides section.atelier-closing .atelier-closing-licence {
   font-size: 0.6em;
   color: var(--atelier-muted);
+}
+
+.reveal .slides section.atelier-closing .atelier-closing-copyright p {
+  margin-bottom: 0;
 }
 
 .reveal .slides .atelier-credit {

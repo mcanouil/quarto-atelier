@@ -214,7 +214,7 @@ end
 
 --- Finish a workshop deck after its blocks. With a closing: a references
 --- slide when the deck cites the bibliography and has no `#refs` div, then
---- the closing slide, with the links, the licence and the CRediT table.
+--- the closing slide, with the parts of `core.closing_parts` and the CRediT table.
 --- Without a closing, the CRediT table has a slide of its own.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model

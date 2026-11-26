@@ -134,17 +134,28 @@
 }
 
 // The closing of a workshop handout, from `extensions.atelier.closing`: a
-// dictionary of title, links and licence, or none.
+// dictionary of title, content, links, copyright and licence, or none.
 #let atelier-closing-data = state("atelier-closing-data", none)
 
-// Answer the title and the links of the closing.
+// Answer the title, the content and the links of the closing.
 // - data: the closing, see atelier-closing-data.
 // - level: level of the heading.
 #let atelier-closing-head(data, level: 1) = {
   heading(level: level, numbering: none, outlined: false, data.title)
+  if data.content != none {
+    data.content
+  }
   if data.links.len() > 0 {
     list(..data.links)
   }
+}
+
+// Answer the copyright and the licence of the closing, one on each line,
+// or none.
+// - data: the closing, see atelier-closing-data.
+#let atelier-closing-rights(data) = {
+  let lines = (data.copyright, data.licence).filter(it => it != none)
+  if lines.len() > 0 { lines.join(linebreak()) }
 }
 
 // Answer the closing section at the end of a workshop handout, when the
@@ -155,13 +166,14 @@
   block(above: 2em, {
     atelier-rule(30%)
     atelier-closing-head(data)
-    if data.licence != none { block(above: 1em, text(fill: atelier-colour("muted"), data.licence)) }
+    let rights = atelier-closing-rights(data)
+    if rights != none { block(above: 1em, text(fill: atelier-colour("muted"), rights)) }
   })
 }
 
 // Answer the closing page: the closing of a workshop handout, the contact of
-// each author, the licence and the colophon. The licence of the closing wins
-// over the licence of the document.
+// each author, the copyright and the licence, and the colophon. With a
+// closing, its switches decide which of the copyright and the licence show.
 // - meta: the document, see atelier-document().
 #let atelier-closing-page(meta) = context {
   let part(label, content) = block(above: 1.6em, {
@@ -183,9 +195,9 @@
       parts.join(h(0.8em))
     })))
   }
-  let licence = if data != none and data.licence != none { data.licence } else { meta.licence }
-  if licence != none or meta.copyright != none {
-    part(atelier-labels.at("closing-licence"), (meta.copyright, licence).filter(it => it != none).join(linebreak()))
+  let rights = atelier-closing-rights(if data != none { data } else { meta })
+  if rights != none {
+    part(atelier-labels.at("closing-licence"), rights)
   }
   let families = (meta.fonts.base, meta.fonts.headings, meta.fonts.monospace)
     .filter(it => it != none)
