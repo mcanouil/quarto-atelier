@@ -6,7 +6,7 @@
 --- @brief The format-neutral part of the workshop mode.
 --- @description Reads the page model (mode, duration, labels), the course
 --- model (the sidebar that lists the page and the durations of its pages),
---- and the workshop blocks (objectives, exercise, solution, terminal). Each
+--- and the workshop blocks (objectives, exercise, answer, terminal). Each
 --- reader returns plain data, and the writer of each format turns that data
 --- into its output. This module writes no output.
 
@@ -68,7 +68,7 @@ local LABELS = {
   'credit-supporting',
   'credit-contributed',
   'closing-thanks',
-  'solution-summary',
+  'answer-summary',
   'terminal',
   'workshop-author-single',
   'workshop-author-plural',
@@ -227,10 +227,12 @@ end
 --- @return { mode: string, duration: integer|nil, labels: table<string, string>, options: table, source: string } The model
 function M.page(meta)
   local source = quarto.doc.input_file or ''
+  local mode = M.read_mode(meta, source)
   return {
     options = M.read_options(meta),
-    mode = M.read_mode(meta, source),
-    duration = M.read_duration(meta, source),
+    mode = mode,
+    -- The page duration is workshop metadata, so a page in another mode has none.
+    duration = mode == M.MODE_WORKSHOP and M.read_duration(meta, source) or nil,
     labels = M.resolve_labels(),
     source = source,
   }
@@ -357,7 +359,7 @@ function M.photo_uri(path)
   return 'data:' .. media .. ';base64,' .. quarto.base64.encode(content)
 end
 
---- Read the speakers of a workshop page: each author of Quarto's `author`
+--- Read the speakers of a page: each author of Quarto's `author`
 --- list, with the photo of `extensions.atelier.speakers`, a map from the
 --- author `id`, else the author name, to `photo` and `alt`, or to the photo
 --- path alone. A key that names
@@ -365,9 +367,10 @@ end
 --- is next to it.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers, empty outside workshop mode: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
+--- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
 function M.speakers(meta, model)
-  if model.mode ~= M.MODE_WORKSHOP then
+  -- A page with no author cannot use the map, so it stays silent about its keys.
+  if #(meta['by-author'] or {}) == 0 then
     return {}
   end
   local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
@@ -430,11 +433,8 @@ local DEGREES = { lead = true, equal = true, supporting = true }
 --- contributed, or an empty string when the author has not that role.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil outside workshop mode or when no author has a role
+--- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil when no author has a role
 function M.credit(meta, model)
-  if model.mode ~= M.MODE_WORKSHOP then
-    return nil
-  end
   local authors, people = {}, {}
   for _, author in ipairs(meta['by-author'] or {}) do
     local name = M.author_name(author)
@@ -623,10 +623,10 @@ end
 --- `copyright: false` and `licence: false` hides its line.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil outside workshop mode or when unset
+--- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil when unset
 function M.closing(meta, model)
   local value = model.options.closing
-  if model.mode ~= M.MODE_WORKSHOP or value == nil or value == false then
+  if value == nil or value == false then
     return nil
   end
   local options = type(value) == 'table' and value or {}
@@ -1116,46 +1116,57 @@ function M.block(div, kind, model)
   }
 end
 
---- Tell whether a `Proof` node is a solution: Quarto's `Proof` of type
---- `Solution`, from a `.solution` div or a `sol-` identifier.
---- @param proof table The `Proof` node
---- @return boolean
-function M.is_solution(proof)
-  return pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
-end
-
---- Tell whether a `Proof` node is a workshop solution, which the workshop
---- hides. Quarto turns a `.solution` div into a `Proof` node of type
---- `Solution` before the `pre-quarto` filters run, and removes the class.
---- A solution with a `sol-` identifier is a cross-reference target and stays
---- shown.
---- @param proof table The `Proof` node
---- @return boolean True when the node is a workshop solution
-function M.is_workshop_solution(proof)
-  if (proof.identifier or ''):find('^sol%-') then
-    return false
-  end
-  return M.is_solution(proof)
-end
-
---- Read a solution from the `Proof` node that Quarto makes of a `.solution`
---- div, in workshop mode only. Quarto removes the class, so the node keeps
---- the div in `div`.
---- The title is the `title` attribute, else the name that Quarto took from
---- the `name` attribute or a leading heading, else the label.
---- @param proof table The `Proof` node
+--- Read an answer block: a div with the class `answer`, in every mode.
+--- The title is the `title` attribute, else the `name` attribute, else the
+--- text of a leading heading, which then leaves the body, else nil, and each
+--- writer gives its own label. The `name` attribute leaves the div.
+--- @param div pandoc.Div The div
 --- @param model table The page model
---- @return { title: string, identifier: string, div: pandoc.Div }|nil The solution, or nil when the node is not a workshop solution
-function M.solution(proof, model)
-  if model.mode ~= M.MODE_WORKSHOP or not M.is_workshop_solution(proof) then
+--- @return { title: string|nil, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks }|nil The answer, or nil when the div is not an answer
+function M.answer(div, model)
+  if not div.classes:includes('answer') then
     return nil
   end
-  local title = proof.div.attributes.title
-  if title == nil then
-    local name = pandoc.utils.stringify(proof.name or '')
-    title = name ~= '' and name or model.labels['solution-summary']
+  local blocks = div.content
+  local title = div.attributes.title or div.attributes.name
+  div.attributes.name = nil
+  if title == nil and #blocks > 0 and blocks[1].t == 'Header' then
+    title = pandoc.utils.stringify(blocks[1])
+    blocks = pandoc.Blocks({ table.unpack(blocks, 2) })
   end
-  return { title = title, identifier = proof.identifier or '', div = proof.div }
+  return {
+    title = not str.is_empty(title) and title or nil,
+    identifier = div.identifier or '',
+    div = div,
+    blocks = blocks,
+  }
+end
+
+--- Leave an answer with a `sol-` identifier to Quarto. Quarto turns every
+--- div with a `sol-` identifier into its own solution before Atelier sees
+--- it, so the div stays a Quarto solution: this drops the `answer` class, so
+--- the block pass leaves the div alone, and warns once so the author learns
+--- why. It must run in a pass before the block pass, while the slot of the
+--- node is still a div. The pass visits each node once, so each warns once.
+--- @param proof table The `Proof` node
+--- @return table|nil The node without the `answer` class, or nil to keep it
+function M.release_answer_id(proof)
+  local identifier = proof.identifier or ''
+  local div = proof.div
+  if pandoc.utils.type(div) ~= 'Block' or div.t ~= 'Div' or not div.classes:includes('answer') or not identifier:find('^sol%-') then
+    return nil
+  end
+  div.classes = div.classes:filter(function(class)
+    return class ~= 'answer'
+  end)
+  proof.div = div
+  log.log_warning(
+    EXTENSION_NAME,
+    "The answer block with the id '" .. identifier .. "' in " .. (quarto.doc.input_file or '') ..
+    ' is a Quarto solution, because Quarto reads every div with a sol- id as one. ' ..
+    'Remove the id to make it an answer, or use .solution for a Quarto cross-reference.'
+  )
+  return proof
 end
 
 --- Pandoc can highlight a language when it names the language on the `code`

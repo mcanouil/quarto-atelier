@@ -5,16 +5,16 @@
 --- @author Mickaël Canouil
 --- @brief Write the workshop data and blocks of an HTML page.
 --- @description Writes one JSON block into the head of each HTML page. It
---- holds the mode, the project offset, the translated labels, and, in
---- workshop mode, the page duration, the sidebar that lists the page, and the
---- durations of every page in that sidebar, and the photos of the speakers,
---- which `html/scripts/title-block.html` puts in the title block. A workshop
+--- holds the mode, the project offset, the translated labels, the photos of
+--- the speakers, which `html/scripts/title-block.html` puts in the title
+--- block, and, in workshop mode, the page duration, the sidebar that lists
+--- the page, and the durations of every page in that sidebar. A workshop
 --- page also gets the
 --- `atelier-workshop` class on `<html>` and the motif of its preset, and a
 --- workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
 --- The blocks of `workshop/core.lua` become the head line and body of each
---- block, objective checkboxes, a `<details>` solution, and a terminal code
+--- block, objective checkboxes, a `<details>` answer, and a terminal code
 --- block for the code-blocks script.
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
@@ -49,6 +49,17 @@ function M.publish(meta, model)
     labels = model.labels,
   }
   local changed = nil
+  local photos = {}
+  for _, speaker in ipairs(core.speakers(meta, model)) do
+    if speaker.photo ~= nil then
+      -- A file, not a data URI: the pages of a course share it in the cache.
+      quarto.doc.add_resource(speaker.photo)
+      photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
+    end
+  end
+  if #photos > 0 then
+    data.speakers = photos
+  end
   if model.mode == core.MODE_WORKSHOP then
     data.duration = model.duration
     local course = core.course(model)
@@ -75,17 +86,6 @@ function M.publish(meta, model)
       style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
     end
     quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
-    local photos = {}
-    for _, speaker in ipairs(core.speakers(meta, model)) do
-      if speaker.photo ~= nil then
-        -- A file, not a data URI: the pages of a course share it in the cache.
-        quarto.doc.add_resource(speaker.photo)
-        photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
-      end
-    end
-    if #photos > 0 then
-      data.speakers = photos
-    end
     core.apply_title_labels(meta, model.labels)
     changed = meta
   end
@@ -214,13 +214,41 @@ local function head_block(div, kind, model)
   )
 end
 
---- Turn the workshop divs into blocks, in workshop mode only.
+--- Turn an answer into the closed disclosure. When the div has other classes
+--- or attributes, a div that carries them wraps the disclosure, so that a
+--- filter that runs later still finds them, for example Veil with
+--- `.veil group="..."`.
+--- @param answer { title: string|nil, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks } The answer of `core.answer`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Blocks The disclosure
+local function answer_block(answer, labels)
+  local identifier = answer.identifier
+  local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
+  local disclosure = pandoc.Blocks({
+    pandoc.RawBlock('html', '<details class="atelier-answer"' .. id .. '>'),
+    pandoc.Plain({
+      pandoc.RawInline('html', '<summary>'),
+      pandoc.Str(answer.title or labels['answer-summary']),
+      pandoc.RawInline('html', '</summary>'),
+    }),
+    M.block_body(answer.blocks),
+    pandoc.RawBlock('html', '</details>'),
+  })
+  local classes, attributes = core.other_attr(answer.div, 'answer')
+  if #classes == 0 and #attributes == 0 then
+    return disclosure
+  end
+  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, attributes)) })
+end
+
+--- Turn the workshop divs into blocks.
 --- @param div pandoc.Div The div
 --- @param model table The page model
---- @return pandoc.Div|nil The block, or nil to keep the div
+--- @return pandoc.Div|pandoc.Blocks|nil The block, or nil to keep the div
 function M.div(div, model)
-  if model.mode ~= core.MODE_WORKSHOP then
-    return nil
+  local answer = core.answer(div, model)
+  if answer ~= nil then
+    return answer_block(answer, model.labels)
   end
   if div.classes:includes('objectives') then
     return objectives_block(div, model)
@@ -265,37 +293,6 @@ function M.finish(doc, model)
   blocks:extend(core.closing_parts(closing))
   doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
   return doc
-end
-
---- Turn a solution into the closed disclosure. When the div has other classes
---- or attributes, a div that carries them wraps the disclosure, so that a
---- filter that runs later still finds them, for example Veil with
---- `.veil group="..."`.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return pandoc.Blocks|nil The disclosure, or nil to keep the node
-function M.proof(proof, model)
-  local solution = core.solution(proof, model)
-  if solution == nil then
-    return nil
-  end
-  local identifier = solution.identifier
-  local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
-  local disclosure = pandoc.Blocks({
-    pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
-    pandoc.Plain({
-      pandoc.RawInline('html', '<summary>'),
-      pandoc.Str(solution.title),
-      pandoc.RawInline('html', '</summary>'),
-    }),
-    M.block_body(solution.div.content),
-    pandoc.RawBlock('html', '</details>'),
-  })
-  local classes, attributes = core.other_attr(solution.div, 'solution')
-  if #classes == 0 and #attributes == 0 then
-    return disclosure
-  end
-  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, attributes)) })
 end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.

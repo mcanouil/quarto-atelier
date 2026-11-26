@@ -4,15 +4,16 @@
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 --- @brief Write the workshop parts of a Reveal.js deck.
---- @description In workshop mode, the title slide gets the session duration
---- and the speakers, each with the photo of `extensions.atelier.speakers`,
---- and the blocks of `workshop/core.lua` become blocks with a head line, as
---- in HTML. A deck has no interaction for the objectives, so each objective
---- has a box glyph in place of a checkbox. A solution is a block too, in the
---- Veil group `solutions`, which this writer declares hidden, so the reader
---- shows the solutions with the Veil controls. A solution with its own
---- `.veil` class or `group` keeps them, and a deck that declares the group
---- keeps its own declaration. This writer runs before Veil, in the same
+--- @description The title slide gets the speakers, each with the photo of
+--- `extensions.atelier.speakers`, and in workshop mode the session duration
+--- and the workshop labels. The blocks of `workshop/core.lua` become blocks
+--- with a head line, as in HTML. A deck has no interaction for the
+--- objectives, so each objective has a box glyph in place of a checkbox. An
+--- answer is a block too, in the Veil group `answers`, which this writer
+--- declares hidden, so the reader shows the answers with the Veil controls.
+--- An answer with its own `.veil` class or `group` keeps them, and a deck
+--- that declares the group keeps its own declaration. Quarto's own solutions
+--- stay as Quarto writes them. This writer runs before Veil, in the same
 --- stage, so Veil finds the class. A `.terminal` code block becomes a
 --- terminal in both modes, with its `$` prompts in the text.
 
@@ -21,9 +22,9 @@ local html = require(quarto.utils.resolve_path('workshop/html.lua'):gsub('%.lua$
 
 local M = {}
 
---- The Veil group of the workshop solutions.
+--- The Veil group of the answers.
 --- @type string
-local GROUP = 'solutions'
+local GROUP = 'answers'
 
 --- The box glyph before each objective. It is decoration.
 --- @type string
@@ -37,7 +38,7 @@ local function language_text(key)
   return type(value) == 'string' and value or ''
 end
 
---- Declare the group of the solutions, hidden, unless the deck declares it.
+--- Declare the group of the answers, hidden, unless the deck declares it.
 --- Veil reads `extensions.veil.groups`.
 --- @param meta table The document metadata
 local function declare_group(meta)
@@ -49,7 +50,7 @@ local function declare_group(meta)
       return
     end
   end
-  local label = language_text('solutions-title')
+  local label = language_text('answers-title')
   groups:insert({
     name = pandoc.MetaString(GROUP),
     shown = false,
@@ -58,16 +59,12 @@ local function declare_group(meta)
   meta.extensions.veil.groups = groups
 end
 
---- Set the duration of a workshop deck for the title slide, and declare the
---- group of the solutions.
+--- Set the speakers of the title slide. In workshop mode, also set the
+--- workshop labels and the duration.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
---- @return table|nil The changed metadata of a workshop deck, or nil
+--- @return table The changed metadata
 function M.publish(meta, model)
-  if model.mode ~= core.MODE_WORKSHOP then
-    return nil
-  end
-  declare_group(meta)
   local speakers = pandoc.List({})
   for _, speaker in ipairs(core.speakers(meta, model)) do
     speakers:insert({
@@ -80,6 +77,9 @@ function M.publish(meta, model)
   end
   if #speakers > 0 then
     meta['atelier-speakers'] = speakers
+  end
+  if model.mode ~= core.MODE_WORKSHOP then
+    return meta
   end
   core.apply_title_labels(meta, model.labels)
   if model.duration ~= nil then
@@ -123,14 +123,34 @@ local function objective_list(list)
   return pandoc.BulletList(items)
 end
 
---- Turn the objectives div and the divs of `core.BLOCKS` into blocks, in
---- workshop mode only.
+--- Turn an answer into a block in the Veil group `answers`, so Veil hides
+--- it until the reader shows the group. An answer with its own `.veil` class
+--- keeps its group.
+--- The head line shows the own title of the answer, else "Answer".
+--- @param answer table The answer of `core.answer`
+--- @param model table The page model
+--- @return pandoc.Div
+local function answer_block(answer, model)
+  local result = block(answer.div, 'answer', nil, answer.title or language_text('answer-title'), nil, answer.blocks)
+  if not result.classes:includes('veil') then
+    result.classes:insert('veil')
+    if result.attributes.group == nil then
+      result.attributes.group = GROUP
+      model.answers_used = true
+    end
+  end
+  return result
+end
+
+--- Turn the objectives div, the answer div and the divs of `core.BLOCKS`
+--- into blocks.
 --- @param div pandoc.Div The div
 --- @param model table The page model
 --- @return pandoc.Div|nil
 function M.div(div, model)
-  if model.mode ~= core.MODE_WORKSHOP then
-    return nil
+  local answer = core.answer(div, model)
+  if answer ~= nil then
+    return answer_block(answer, model)
   end
   if div.classes:includes('objectives') then
     local read = core.objectives(div, model)
@@ -146,34 +166,6 @@ function M.div(div, model)
     return block(div, kind, core.BLOCKS[kind], read.title, read.time, read.blocks)
   end
   return nil
-end
-
---- Turn a workshop solution into a block in the Veil group `solutions`, so
---- Veil hides it until the reader shows the group. A solution with its own
---- `.veil` class keeps its group. A solution with a `sol-` identifier is a
---- cross-reference target: Quarto writes it, and it stays shown, as in HTML.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return pandoc.Div|nil
-function M.proof(proof, model)
-  local solution = core.solution(proof, model)
-  if solution == nil then
-    return nil
-  end
-  local title = proof.div.attributes.title or pandoc.utils.stringify(proof.name or '')
-  if title == '' then
-    title = language_text('solution-title')
-  end
-  local result = block(solution.div, 'solution', nil, title, nil, solution.div.content)
-  -- Quarto moves the identifier of the div to the `Proof` node.
-  result.identifier = solution.identifier
-  if not result.classes:includes('veil') then
-    result.classes:insert('veil')
-    if result.attributes.group == nil then
-      result.attributes.group = GROUP
-    end
-  end
-  return result
 end
 
 --- The prefixes of Quarto cross-reference identifiers. A citation with
@@ -212,7 +204,8 @@ local function references(doc)
   return cites, refs
 end
 
---- Finish a workshop deck after its blocks. With a closing: a references
+--- Finish a deck after its blocks: declare the group of the answers when the
+--- deck has answers. With a closing: a references
 --- slide when the deck cites the bibliography and has no `#refs` div, then
 --- the closing slide, with the parts of `core.closing_parts` and the CRediT table.
 --- Without a closing, the CRediT table has a slide of its own.
@@ -220,10 +213,15 @@ end
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
+  -- Only a deck with answers declares their group, so Veil does not warn
+  -- about a declared group that no element uses.
+  if model.answers_used then
+    declare_group(doc.meta)
+  end
   local closing = core.closing(doc.meta, model)
   local credit = core.credit(doc.meta, model)
   if closing == nil and credit == nil then
-    return nil
+    return model.answers_used and doc or nil
   end
   local table_blocks = credit and pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' }))
   if closing == nil then

@@ -165,8 +165,7 @@ It has no timer.
 ## Workshop blocks
 
 The workshop blocks are divs with a class.
-They apply in workshop mode only.
-In documentation mode, Atelier does not change these divs.
+They work in both modes, on a documentation page as on a workshop page.
 
 ### Objectives
 
@@ -184,7 +183,8 @@ The default title is "By the end of this module, you can".
 ```
 
 The `title` and `duration` attributes are optional.
-With no `duration` attribute, the block shows the duration of the page.
+In workshop mode, a block with no `duration` attribute shows the duration of the page.
+In documentation mode, the page has no duration, so give the block its own `duration` attribute.
 The [Set up](demos/workshop-sidebar/workshop/setup/index.html#goals) page of the demo shows this block.
 
 ### Exercise
@@ -203,35 +203,39 @@ Give the file a title and one paragraph of text.
 
 The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows this block.
 
-### Solution
+### Answer
 
-A `.solution` div becomes a disclosure that is closed at first.
-The reader opens it to see the solution.
+An `.answer` div becomes a disclosure that is closed at first.
+The reader opens it to see the answer.
 The summary text comes from the `title` attribute.
 If there is no `title`, it comes from the `name` attribute or from a heading at the start of the div.
-The default summary is "Show the solution".
+The default summary is "Show the answer".
 
-In a PDF, `extensions.atelier.solutions` places the solutions: `end`, `inline`, or `hide`.
-See [Workshop handouts](formats.qmd#workshop-handouts).
-In a Reveal.js deck in workshop mode, each solution goes into the veil group `solutions`.
-The solutions are hidden when the deck opens.
-The reader can show or hide all the solutions of the deck with the veil controls.
-A solution with its own `.veil` class or its own `group` attribute keeps them.
-Atelier declares the group `solutions` with the label "Solutions", hidden at first.
-To change the label or the start state, declare `solutions` under `extensions.veil.groups`, and Atelier keeps your declaration.
+In a PDF, `extensions.atelier.answers` places the answers: `end`, `inline`, or `hide`.
+See [Answers in a PDF](formats.qmd#answers-in-a-pdf).
+In a Reveal.js deck, each answer goes into the veil group `answers`.
+The answers are hidden when the deck opens.
+The reader can show or hide all the answers of the deck with the veil controls.
+An answer with its own `.veil` class or its own `group` attribute keeps them.
+Atelier declares the group `answers` with the label "Answers", hidden at first.
+To change the label or the start state, declare `answers` under `extensions.veil.groups`, and Atelier keeps your declaration.
 
 ```markdown
-::: {.solution title="Solution"}
+::: {.answer title="Answer"}
 
 Write this in `notes.qmd`.
 
 :::
 ```
 
-Give a solution no `id`.
-A solution with an `id` that starts with `sol-` stays a Quarto cross-reference target, and Atelier does not change it.
-Quarto stops the render on a solution with an `id` that has a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
-The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows a solution after the exercise.
+Quarto has its own `.solution` block, and Atelier does not change it.
+Use `.solution` when you want a Quarto cross-reference, such as `@sol-notes`.
+A `.solution` div needs an `id` that starts with `sol-`, or no `id`.
+Quarto stops the render on a solution with a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
+Quarto reads every div with an `id` that starts with `sol-` as a Quarto solution, also a div with the class `answer`.
+For this reason, an `.answer` with such an `id` stays a Quarto solution, and Atelier logs a warning.
+Give an answer no `id`, or an `id` with a different prefix.
+The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows an answer after the exercise.
 
 ### Terminal
 
@@ -301,12 +305,12 @@ The [Typst and Reveal.js formats](formats.qmd) page tells how to make the PDF an
 Some blocks change with the format:
 
 - Objectives show a list with a box in the PDF and the deck, and the reader cannot tick it.
-- A solution is a disclosure on the web page, a hidden veil group in the deck, and a placed block in the PDF, as `extensions.atelier.solutions` says.
+- An answer is a disclosure on the web page, a hidden veil group in the deck, and a placed block in the PDF, as `extensions.atelier.answers` says.
 - A terminal block keeps its prompt and its code window in each format.
 
 These pictures show each block in the three formats, in the light colour scheme.
 The HTML picture shows the block only, the PDF picture shows the block on its page, and the Reveal.js picture shows its slide.
-The PDF puts the solution at the end, as `solutions: end` says.
+The PDF puts the answer at the end, as `answers: end` says.
 Select a picture to see it larger.
 
 **Objectives**
@@ -333,7 +337,7 @@ Select a picture to see it larger.
 
 :::
 
-**Solution**
+**Answer**
 
 ::: {layout-ncol=3}
 
@@ -383,7 +387,7 @@ Select a picture to see it larger.
 
 ## Workshop extras
 
-These features are for workshop mode.
+These features work in both modes, except the motif, which shows in workshop mode only.
 Each one works on the web page, in the PDF, and in the deck.
 
 ### Speakers

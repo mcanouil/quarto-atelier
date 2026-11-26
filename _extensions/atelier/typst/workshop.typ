@@ -1,6 +1,6 @@
 // Atelier - Typst workshop blocks
 // The blocks of a workshop handout, as `workshop/typst.lua` writes them:
-// prerequisites, objectives, checkpoints, exercises and solutions, each a box with a head line that
+// prerequisites, objectives, checkpoints, exercises and answers, each a box with a head line that
 // holds an icon, the title and the duration. The icons and the list boxes
 // only decorate, so they are artefacts: the title names the block.
 //
@@ -59,7 +59,7 @@
 }
 
 // Answer a workshop block: a box with a head line and a body.
-// - kind: `prerequisites`, `objectives`, `checkpoint`, `exercise` or `solution`.
+// - kind: `prerequisites`, `objectives`, `checkpoint`, `exercise` or `answer`.
 // - title: title of the block.
 // - time: duration text, or none.
 // - body: content of the block.
@@ -69,16 +69,16 @@
     objectives: atelier-colour("accent-soft"),
     checkpoint: none,
     exercise: atelier-colour("workshop-bar-bg"),
-    solution: none,
+    answer: none,
   ).at(kind)
   let head-ink = (
     prerequisites: atelier-colour("fg"),
     objectives: atelier-colour("accent-ink"),
     checkpoint: atelier-colour("callout-tip-ink"),
     exercise: atelier-colour("workshop-bar-fg"),
-    solution: atelier-colour("accent-ink"),
+    answer: atelier-colour("accent-ink"),
   ).at(kind)
-  let solution = kind == "solution"
+  let answer = kind == "answer"
   block(
     width: 100%,
     above: 1em,
@@ -88,9 +88,9 @@
     radius: atelier-ws-radius,
     stroke: {
       let edge = (
-        paint: atelier-colour(if solution { "control-border" } else { "border" }),
+        paint: atelier-colour(if answer { "control-border" } else { "border" }),
         thickness: 0.75pt,
-        dash: if solution { "dashed" } else { none },
+        dash: if answer { "dashed" } else { none },
       )
       if kind == "checkpoint" {
         (rest: edge, left: 3pt + atelier-colour("callout-tip-border"))
@@ -107,7 +107,7 @@
           columns: (auto, 1fr, auto),
           column-gutter: 0.6em,
           align: horizon,
-          if not solution { atelier-ws-icon(kind, head-ink) },
+          if not answer { atelier-ws-icon(kind, head-ink) },
           title,
           if time != none { atelier-ws-time(time, head-ink) },
         )),
@@ -135,22 +135,22 @@
   body
 }
 
-// Answer the link from an exercise to its solution at the end:
-// "Solution: page n".
-// - target: label of the solution heading.
-#let atelier-ws-solution-link(target) = context {
+// Answer the link from an exercise to its answer at the end:
+// "Answer: page n".
+// - target: label of the answer heading.
+#let atelier-ws-answer-link(target) = context {
   let number = counter(page).at(target).first()
-  block(above: 0.8em, link(target, atelier-labels.at("solution-page").replace("{page}", str(number))))
+  block(above: 0.8em, link(target, atelier-labels.at("answer-page").replace("{page}", str(number))))
 }
 
-// Answer the heading of the solutions at the end of a handout, on a new page.
-#let atelier-ws-solutions-heading() = {
+// Answer the heading of the answers at the end of a handout, on a new page.
+#let atelier-ws-answers-heading() = {
   pagebreak(weak: true)
-  heading(level: 1, atelier-labels.at("solutions-title"))
+  heading(level: 1, atelier-labels.at("answers-title"))
 }
 
 // Answer the CRediT table: the contribution of each author to each role,
-// under a heading of its own level, as the solutions have. The first column
+// under a heading of its own level, as the answers have. The first column
 // names the role.
 // - title: the heading.
 // - head: the header row, the role label then the author names.

@@ -309,8 +309,8 @@ A button at the bottom left of the page opens the Veil panel, and the `u` key al
 In the panel, each group has a switch that shows or hides its content.
 A group that you do not declare starts shown.
 To set the order, the labels, the levels, or the start state of the groups, declare them under `extensions.veil.groups`.
-In workshop mode, the solutions of a Reveal.js deck are in the group `solutions`, which Atelier declares hidden.
-A deck that declares `solutions` itself keeps its own declaration.
+The answers of a Reveal.js deck are in the group `answers`, which Atelier declares hidden.
+A deck that declares `answers` itself keeps its own declaration.
 The [Veil documentation](https://m.canouil.dev/quarto-veil/) lists all of the options.
 
 ### Upgrade from separate copies
@@ -335,7 +335,7 @@ Keep your options under `extensions:`: both copies read them.
 | `extensions.atelier.duration` | The `duration` of a workshop page: `25 min`, `1 h`, `1 h 30 min`, or a number of minutes. See [Modules and durations](workshop.qmd#modules-and-durations). |
 | `extensions.atelier.speakers` | A map from the `id` or the name of an author to `{photo, alt}` or to a photo path. See [Speakers](workshop.qmd#speakers). |
 | `extensions.atelier.closing` | `true`, or a map with `title`, `text` or `file`, `links`, `copyright`, and `licence`. `copyright` and `licence` accept only `true` or `false`. Set it on the last page of a workshop only. See [Closing](workshop.qmd#closing). |
-| `extensions.atelier.solutions` | `end` (the default), `inline`, or `hide`. Where a PDF puts the solutions. See [Workshop handouts](formats.qmd#workshop-handouts). |
+| `extensions.atelier.answers` | `end` (the default), `inline`, or `hide`. Where a PDF puts the answers. See [Answers in a PDF](formats.qmd#answers-in-a-pdf). |
 | `extensions.atelier.cover`, `toc-page`, `chapter-dividers`, `chapter-contents`, `closing-page` | Report switches of `atelier-typst`, each `false` by default. See [Report switches](formats.qmd#report-switches). |
 | `logo`                 | A path, or a map with `light`, `dark`, and `alt`. The name of a brand logo, such as `medium` or a key of `logo.images`, gives that brand logo. `false` gives no logo. Otherwise, it comes before the brand logo. An HTML document outside a website shows it above the title. In a website, the navbar or the sidebar logo shows instead. A PDF shows it above the title and in the page footer, and a deck above the title of the title slide and at the end of the bottom row, each with the dark image on a dark surface. A logo with no `alt` is decorative. |
 | `canonical-url: false` | Drops the canonical link. Set it on a page served from more than one URL, like `404.qmd`. |
@@ -417,7 +417,6 @@ language:
 | `atelier-credit-supporting`      | `Supporting`                         | `Appui`                                     |
 | `atelier-credit-contributed`     | `Contributed`                        | `A contribué`                               |
 | `atelier-closing-thanks`         | `Thank you`                          | `Merci`                                     |
-| `atelier-solution-summary`       | `Show the solution`                  | `Afficher la solution`                      |
 | `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
 | `atelier-workshop-author-single` | `Instructor`                         | `Formateur·rice`                            |
 | `atelier-workshop-author-plural` | `Instructors`                        | `Formateur·rice·s`                          |
@@ -442,9 +441,10 @@ language:
 | `atelier-author-orcid`           | `ORCID`                              | `ORCID`                                     |
 | `atelier-author-corresponding`   | `Corresponding author`               | `Auteur correspondant`                      |
 | `atelier-duration`               | `Duration`                           | `Durée`                                     |
-| `atelier-solution-title`         | `Solution`                           | `Solution`                                  |
-| `atelier-solution-page`          | `Solution: page {page}`              | `Solution : page {page}`                    |
-| `atelier-solutions-title`        | `Solutions`                          | `Solutions`                                 |
+| `atelier-answer-summary`         | `Show the answer`                    | `Afficher la réponse`                       |
+| `atelier-answer-title`           | `Answer`                             | `Réponse`                                   |
+| `atelier-answer-page`            | `Answer: page {page}`                | `Réponse : page {page}`                     |
+| `atelier-answers-title`          | `Answers`                            | `Réponses`                                  |
 
 : The `language` keys of Atelier and their text in English and in French. {.striped .hover tbl-colwidths="[34,33,33]"}
 

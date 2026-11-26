@@ -40,8 +40,8 @@ local LABELS = {
   'author-orcid',
   'author-corresponding',
   'duration',
-  'solution-page',
-  'solutions-title',
+  'answer-page',
+  'answers-title',
 }
 
 --- The report switches under `extensions.atelier`, each `false` by default.
@@ -204,8 +204,8 @@ local function text_of(value)
 end
 
 --- The authors of the document, with their affiliations as numbers into the
---- list of affiliations, and, in workshop mode, the photo of each speaker
---- from `extensions.atelier.speakers`, as a Typst dictionary.
+--- list of affiliations, and the photo of each speaker from
+--- `extensions.atelier.speakers`, as a Typst dictionary.
 --- @param meta table
 --- @param model table The mode and the `extensions.atelier` options
 --- @return string

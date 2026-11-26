@@ -596,11 +596,11 @@ html.print-pdf:root {
 // ===========================================================================
 // WORKSHOP BLOCKS
 // ===========================================================================
-// Prerequisites, objectives, checkpoints, exercises and solutions are blocks
+// Prerequisites, objectives, checkpoints, exercises and answers are blocks
 // with a hairline border and a head line, as in `html/workshop.scss`. A deck has no interaction for the
 // objectives, so each one has a box glyph.
 
-.reveal .slides :is(.atelier-prerequisites, .atelier-objectives, .atelier-checkpoint, .atelier-exercise, .atelier-solution) {
+.reveal .slides :is(.atelier-prerequisites, .atelier-objectives, .atelier-checkpoint, .atelier-exercise, .atelier-answer) {
   margin: var(--r-block-margin) 0;
   overflow: hidden;
   border: 1px solid var(--atelier-border);
@@ -701,12 +701,12 @@ html.print-pdf:root {
   color: var(--atelier-callout-tip-ink);
 }
 
-.reveal .slides .atelier-solution {
+.reveal .slides .atelier-answer {
   border-style: dashed;
   border-color: var(--atelier-control-border);
 }
 
-.reveal .slides .atelier-solution > .atelier-block-head {
+.reveal .slides .atelier-answer > .atelier-block-head {
   color: var(--atelier-accent-ink);
 }
 

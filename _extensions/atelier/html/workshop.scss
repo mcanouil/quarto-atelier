@@ -599,15 +599,15 @@ html.atelier-workshop #title-block-header {
 // ===========================================================================
 // W1 TO W3 BLOCKS
 // ===========================================================================
-// Prerequisites, objectives, checkpoints, exercises, and solutions are blocks
+// Prerequisites, objectives, checkpoints, exercises, and answers are blocks
 // with a hairline border and a large radius. The Lua filter writes them in
-// workshop mode only.
+// both modes.
 
 .atelier-prerequisites,
 .atelier-objectives,
 .atelier-checkpoint,
 .atelier-exercise,
-.atelier-solution {
+.atelier-answer {
   margin: 1rem 0;
   overflow: hidden;
   border: 1px solid var(--atelier-border);
@@ -738,7 +738,7 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
   }
 }
 
-.atelier-solution {
+.atelier-answer {
   border-style: dashed;
   border-color: var(--atelier-control-border);
 
