@@ -67,9 +67,6 @@ return {
     Div = function(div)
       return writer and writer.div(div, model)
     end,
-    Proof = function(proof)
-      return writer and writer.proof(proof, model)
-    end,
     CodeBlock = function(block)
       return writer and writer.code_block(block, model)
     end,

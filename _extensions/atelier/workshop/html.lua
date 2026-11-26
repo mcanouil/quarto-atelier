@@ -218,32 +218,27 @@ end
 --- or attributes, a div that carries them wraps the disclosure, so that a
 --- filter that runs later still finds them, for example Veil with
 --- `.veil group="..."`.
---- @param answer { title: string, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks } The answer of `core.answer`
+--- @param answer { title: string|nil, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks } The answer of `core.answer`
+--- @param labels table<string, string> The resolved labels
 --- @return pandoc.Blocks The disclosure
-local function answer_block(answer)
+local function answer_block(answer, labels)
   local identifier = answer.identifier
   local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
   local disclosure = pandoc.Blocks({
     pandoc.RawBlock('html', '<details class="atelier-answer"' .. id .. '>'),
     pandoc.Plain({
       pandoc.RawInline('html', '<summary>'),
-      pandoc.Str(answer.title),
+      pandoc.Str(answer.title or labels['answer-summary']),
       pandoc.RawInline('html', '</summary>'),
     }),
     M.block_body(answer.blocks),
     pandoc.RawBlock('html', '</details>'),
   })
   local classes, attributes = core.other_attr(answer.div, 'answer')
-  local kept = {}
-  for _, pair in ipairs(attributes) do
-    if pair[1] ~= 'name' then
-      kept[#kept + 1] = pair
-    end
-  end
-  if #classes == 0 and #kept == 0 then
+  if #classes == 0 and #attributes == 0 then
     return disclosure
   end
-  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, kept)) })
+  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, attributes)) })
 end
 
 --- Turn the workshop divs into blocks.
@@ -253,7 +248,7 @@ end
 function M.div(div, model)
   local answer = core.answer(div, model)
   if answer ~= nil then
-    return answer_block(answer)
+    return answer_block(answer, model.labels)
   end
   if div.classes:includes('objectives') then
     return objectives_block(div, model)
@@ -298,14 +293,6 @@ function M.finish(doc, model)
   blocks:extend(core.closing_parts(closing))
   doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
   return doc
-end
-
---- Leave Quarto's own solutions as Quarto writes them.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return nil
-function M.proof(proof, model)
-  return nil
 end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.

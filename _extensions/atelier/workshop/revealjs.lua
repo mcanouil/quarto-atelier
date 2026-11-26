@@ -132,12 +132,7 @@ end
 --- @param model table The page model
 --- @return pandoc.Div
 local function answer_block(answer, model)
-  local title = answer.title
-  if title == model.labels['answer-summary'] then
-    title = language_text('answer-title')
-  end
-  local result = block(answer.div, 'answer', nil, title, nil, answer.blocks)
-  result.attributes.name = nil
+  local result = block(answer.div, 'answer', nil, answer.title or language_text('answer-title'), nil, answer.blocks)
   if not result.classes:includes('veil') then
     result.classes:insert('veil')
     if result.attributes.group == nil then
@@ -170,14 +165,6 @@ function M.div(div, model)
     local read = core.block(div, kind, model)
     return block(div, kind, core.BLOCKS[kind], read.title, read.time, read.blocks)
   end
-  return nil
-end
-
---- Leave Quarto's own solutions as Quarto writes them.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return nil
-function M.proof(proof, model)
   return nil
 end
 

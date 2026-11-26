@@ -121,11 +121,8 @@ local function answer_blocks(answer, model)
   local page = model.answers
   page.count = page.count + 1
   local number = page.count
-  local own = answer.div.attributes.title or answer.div.attributes.name
   local title = answer_name(number)
-  if own ~= nil and own ~= '' then
-    title = title .. ': ' .. own
-  elseif answer.title ~= model.labels['answer-summary'] then
+  if answer.title then
     title = title .. ': ' .. answer.title
   end
   local target = '<' .. (answer.identifier ~= '' and answer.identifier or ('atelier-answer-' .. number)) .. '>'
@@ -165,14 +162,6 @@ function M.div(div, model)
     local block = core.block(div, kind, model)
     return wrap(block_call(kind, block.title, block.time), block.blocks)
   end
-  return nil
-end
-
---- Leave Quarto's own solutions as Quarto writes them.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return nil
-function M.proof(proof, model)
   return nil
 end
 

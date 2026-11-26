@@ -1114,39 +1114,36 @@ end
 
 --- Read an answer block: a div with the class `answer`, in every mode.
 --- The title is the `title` attribute, else the `name` attribute, else the
---- text of a leading heading, which then leaves the body, else the label.
+--- text of a leading heading, which then leaves the body, else nil, and each
+--- writer gives its own label. The `name` attribute leaves the div.
 --- @param div pandoc.Div The div
 --- @param model table The page model
---- @return { title: string, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks }|nil The answer, or nil when the div is not an answer
+--- @return { title: string|nil, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks }|nil The answer, or nil when the div is not an answer
 function M.answer(div, model)
   if not div.classes:includes('answer') then
     return nil
   end
   local blocks = div.content
   local title = div.attributes.title or div.attributes.name
+  div.attributes.name = nil
   if title == nil and #blocks > 0 and blocks[1].t == 'Header' then
     title = pandoc.utils.stringify(blocks[1])
     blocks = pandoc.Blocks({ table.unpack(blocks, 2) })
   end
   return {
-    title = (title ~= nil and title ~= '') and title or model.labels['answer-summary'],
+    title = not str.is_empty(title) and title or nil,
     identifier = div.identifier or '',
     div = div,
     blocks = blocks,
   }
 end
 
---- The identifiers of the answers with a `sol-` identifier that a warning
---- already named, so each one logs once.
---- @type table<string, boolean>
-local warned_answers = {}
-
 --- Leave an answer with a `sol-` identifier to Quarto. Quarto turns every
 --- div with a `sol-` identifier into its own solution before Atelier sees
 --- it, so the div stays a Quarto solution: this drops the `answer` class, so
 --- the block pass leaves the div alone, and warns once so the author learns
 --- why. It must run in a pass before the block pass, while the slot of the
---- node is still a div.
+--- node is still a div. The pass visits each node once, so each warns once.
 --- @param proof table The `Proof` node
 --- @return table|nil The node without the `answer` class, or nil to keep it
 function M.release_answer_id(proof)
@@ -1159,10 +1156,6 @@ function M.release_answer_id(proof)
     return class ~= 'answer'
   end)
   proof.div = div
-  if warned_answers[identifier] then
-    return proof
-  end
-  warned_answers[identifier] = true
   log.log_warning(
     EXTENSION_NAME,
     "The answer block with the id '" .. identifier .. "' in " .. (quarto.doc.input_file or '') ..
