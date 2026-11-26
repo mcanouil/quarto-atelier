@@ -32,12 +32,14 @@
 		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15165
 		// Remove when: the minimum Quarto version includes the fix.
 		// A site can have a navbar logo and a logo for each sidebar, so each image
-		// takes the alt text of the logo whose path its `src` ends with.
+		// takes the alt text of the logo whose path its `src` ends with, at a
+		// folder boundary.
 		const bare = (path) => path.replace(/^(\.{1,2}\/|\/)+/, "");
 		const logos = options.logos || [];
 		document.querySelectorAll('img.navbar-logo[alt=""], img.sidebar-logo[alt=""]').forEach((img) => {
 			const src = bare(img.getAttribute("src") || "");
-			const logo = logos.find((entry) => [entry.light, entry.dark].some((path) => src.endsWith(bare(path))));
+			const matches = (path) => src === bare(path) || src.endsWith("/" + bare(path));
+			const logo = logos.find((entry) => [entry.light, entry.dark].some(matches));
 			if (logo) img.setAttribute("alt", logo.alt);
 		});
 
