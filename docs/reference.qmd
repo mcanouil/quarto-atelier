@@ -440,6 +440,9 @@ language:
 | `atelier-colophon-fonts`         | `Fonts`                              | `Polices`                                   |
 | `atelier-author-orcid`           | `ORCID`                              | `ORCID`                                     |
 | `atelier-author-corresponding`   | `Corresponding author`               | `Auteur correspondant`                      |
+| `atelier-author-equal`           | `Equal contribution`                 | `Contribution égale`                        |
+| `atelier-author-deceased`        | `Deceased`                           | `Décédé`                                    |
+| `atelier-author-orcid-profile`   | `ORCID profile for {name}`           | `Profil ORCID de {name}`                    |
 | `atelier-duration`               | `Duration`                           | `Durée`                                     |
 | `atelier-answer-summary`         | `Show the answer`                    | `Afficher la réponse`                       |
 | `atelier-answer-title`           | `Answer`                             | `Réponse`                                   |

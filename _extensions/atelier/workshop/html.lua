@@ -5,9 +5,8 @@
 --- @author Mickaël Canouil
 --- @brief Write the workshop data and blocks of an HTML page.
 --- @description Writes one JSON block into the head of each HTML page. It
---- holds the mode, the project offset, the translated labels, the photos of
---- the speakers, which `html/scripts/title-block.html` puts in the title
---- block, and, in workshop mode, the page duration, the sidebar that lists
+--- holds the mode, the project offset, the translated labels, and, in
+--- workshop mode, the page duration, the sidebar that lists
 --- the page, and the durations of every page in that sidebar. A workshop
 --- page also gets the
 --- `atelier-workshop` class on `<html>` and the motif of its preset, and a
@@ -36,11 +35,12 @@ local function encode(data)
   return (quarto.json.encode(data):gsub('</', '<\\/'))
 end
 
---- Add the workshop data block to the head, and the title-block labels of a
---- workshop page.
+--- Add the workshop data block to the head, the authors that
+--- `html/title-metadata.html` writes in the title block, and the
+--- title-block labels of a workshop page.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
---- @return table|nil The changed metadata of a workshop page, or nil
+--- @return table The changed metadata
 function M.publish(meta, model)
   objectives = {}
   local data = {
@@ -48,18 +48,15 @@ function M.publish(meta, model)
     offset = quarto.project.offset or '',
     labels = model.labels,
   }
-  local changed = nil
-  local photos = {}
-  for _, speaker in ipairs(core.speakers(meta, model)) do
-    if speaker.photo ~= nil then
-      -- A file, not a data URI: the pages of a course share it in the cache.
-      quarto.doc.add_resource(speaker.photo)
-      photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
-    end
+  local authors = core.authors(meta, model.labels)
+  if #authors > 0 then
+    -- A file, not a data URI: the pages of a course share it in the cache.
+    meta['atelier-authors'] = core.authors_meta(authors, model.labels, function(path)
+      quarto.doc.add_resource(path)
+      return path
+    end)
   end
-  if #photos > 0 then
-    data.speakers = photos
-  end
+  local changed = meta
   if model.mode == core.MODE_WORKSHOP then
     data.duration = model.duration
     local course = core.course(model)
@@ -87,7 +84,6 @@ function M.publish(meta, model)
     end
     quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
     core.apply_title_labels(meta, model.labels)
-    changed = meta
   end
   quarto.doc.include_text(
     'in-header',

@@ -282,10 +282,6 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     opacity: 1;
   }
 
-  .quarto-title-author-email {
-    opacity: 1;
-  }
-
   .quarto-title-meta-heading {
     margin-bottom: 0.2rem;
   }
@@ -294,23 +290,25 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     margin: 0;
   }
 
-  // Authors on the left, affiliations on the right, one author on each row.
+  // One item for each author, with its details and affiliations under the
+  // name. The items sit side by side while they fit.
   .quarto-title-meta-author {
-    display: grid;
-    grid-template-columns: minmax(12rem, max-content) minmax(0, 1fr);
-    column-gap: 2rem;
-    row-gap: 0.45rem;
     margin-top: 1.1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--atelier-border);
+  }
 
-    @media (max-width: 639.98px) {
-      grid-template-columns: 1fr;
+  .atelier-authors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: 0.9rem 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 
-      .quarto-title-meta-heading:nth-child(2) {
-        display: none;
-      }
-    }
+  .atelier-author p {
+    margin: 0;
   }
 
   p.author {
@@ -321,36 +319,58 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     font-weight: 650;
   }
 
+  .atelier-author-photo {
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .atelier-author-degrees {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--atelier-muted);
+  }
+
+  .atelier-author-attributes,
+  .atelier-author-note,
   p.affiliation {
     color: var(--atelier-muted);
   }
 
-  .quarto-title-author-email,
-  .quarto-title-author-orcid {
+  .atelier-author-attributes,
+  .atelier-author-email,
+  .atelier-author-note {
+    font-size: 0.92rem;
+  }
+
+  .atelier-author-orcid {
     display: inline-grid;
     place-items: center;
     width: 24px;
     height: 24px;
     border-radius: var(--bs-border-radius-sm);
-    color: var(--atelier-muted);
+    // The flex row centres the badge on the line box, which sits a little
+    // below the middle of the capitals of the name.
+    translate: 0 -0.04em;
 
     &:hover {
       background: var(--atelier-surface-strong);
     }
 
-    // Quarto and Bootstrap Icons nudge the icons to sit on a text baseline.
-    // The grid centres them, so the nudges put them off centre.
-    img,
-    .bi {
+    svg {
       width: 15px;
       height: 15px;
-      margin: 0;
-      font-size: 15px;
-      line-height: 1;
     }
 
-    .bi::before {
-      vertical-align: top;
+    .atelier-orcid-disc {
+      fill: var(--atelier-accent-text);
+    }
+
+    .atelier-orcid-glyph {
+      fill: var(--atelier-bg);
     }
   }
 
@@ -443,8 +463,9 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
       margin: 0;
     }
 
-    p {
+    .atelier-keywords {
       display: contents;
+      list-style: none;
     }
 
     .atelier-keyword {

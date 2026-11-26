@@ -5,7 +5,7 @@
 --- @author Mickaël Canouil
 --- @brief Write the workshop parts of a Reveal.js deck.
 --- @description The title slide gets the speakers, each with the photo of
---- `extensions.atelier.speakers`, and in workshop mode the session duration
+--- the native author key `photo`, and in workshop mode the session duration
 --- and the workshop labels. The blocks of `workshop/core.lua` become blocks
 --- with a head line, as in HTML. A deck has no interaction for the
 --- objectives, so each objective has a box glyph in place of a checkbox. An
@@ -66,13 +66,14 @@ end
 --- @return table The changed metadata
 function M.publish(meta, model)
   local speakers = pandoc.List({})
-  for _, speaker in ipairs(core.speakers(meta, model)) do
+  for _, author in ipairs(core.authors(meta, model.labels)) do
+    local affiliation = author.affiliations[1]
     speakers:insert({
-      name = pandoc.MetaString(speaker.name),
-      degrees = #speaker.degrees > 0 and pandoc.MetaString(table.concat(speaker.degrees, ', ')) or nil,
-      affiliation = speaker.affiliation and pandoc.MetaString(speaker.affiliation) or nil,
-      photo = speaker.photo and pandoc.MetaString(core.photo_uri(speaker.photo)) or nil,
-      alt = pandoc.MetaString(speaker.alt),
+      name = pandoc.MetaString(author.name),
+      degrees = #author.degrees > 0 and pandoc.MetaString(table.concat(author.degrees, ', ')) or nil,
+      affiliation = affiliation and pandoc.MetaString(affiliation.name) or nil,
+      photo = author.photo and pandoc.MetaString(core.photo_uri(author.photo)) or nil,
+      alt = pandoc.MetaString(author.photo_alt),
     })
   end
   if #speakers > 0 then

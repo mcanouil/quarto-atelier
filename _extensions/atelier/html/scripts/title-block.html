@@ -5,33 +5,6 @@
 -->
 <script id="atelier-title-block" type="text/javascript">
 	(function () {
-		// The workshop data holds the photo of each speaker
-		// that has one. Quarto's title block has no place for a photo, so each
-		// photo goes in front of the name of its author. Without JavaScript the
-		// title block stays as Quarto wrote it, with the names only.
-		var data = document.getElementById("atelier-workshop");
-		var speakers = data ? JSON.parse(data.textContent).speakers || [] : [];
-		var names = document.querySelectorAll(
-			"#title-block-header .quarto-title-meta-contents > p",
-		);
-		speakers.forEach(function (speaker) {
-			// The line starts with the name, then the degrees after a comma, or
-			// the contact links after a space, so "Ann" does not match "Anna".
-			var line = Array.prototype.find.call(names, function (name) {
-				var text = name.textContent.trim();
-				return text === speaker.name || (text.indexOf(speaker.name) === 0 && /^[,\s]/.test(text.slice(speaker.name.length)));
-			});
-			if (!line) {
-				return;
-			}
-			var photo = document.createElement("img");
-			photo.className = "atelier-speaker-photo";
-			photo.src = speaker.photo;
-			photo.alt = speaker.alt;
-			line.prepend(photo);
-		});
-	})();
-	(function () {
 		// A standalone document writes its logo before the content, hidden,
 		// because Quarto picks one of several title block partials. The logo
 		// moves above the title, in whichever title block the page has. Without
@@ -43,31 +16,5 @@
 		}
 		title.prepend(logo);
 		logo.hidden = false;
-	})();
-	(function () {
-		// Quarto writes the keywords as one comma-separated paragraph by design.
-		// The chip design needs one element for each keyword, so the paragraph is
-		// split here. Without JavaScript the paragraph stays as Quarto wrote it.
-		// The split is on each comma, so a keyword that holds a comma becomes two
-		// chips.
-		var paragraph = document.querySelector("#title-block-header .keywords > p");
-		if (!paragraph) {
-			return;
-		}
-		var keywords = paragraph.textContent
-			.split(",")
-			.map(function (keyword) {
-				return keyword.trim();
-			})
-			.filter(Boolean);
-		paragraph.replaceChildren.apply(
-			paragraph,
-			keywords.map(function (keyword) {
-				var chip = document.createElement("span");
-				chip.className = "atelier-keyword";
-				chip.textContent = keyword;
-				return chip;
-			}),
-		);
 	})();
 </script>

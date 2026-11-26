@@ -204,16 +204,15 @@ local function text_of(value)
 end
 
 --- The authors of the document, with their affiliations as numbers into the
---- list of affiliations, and the photo of each speaker from
---- `extensions.atelier.speakers`, as a Typst dictionary.
+--- list of affiliations, and the photo of each author from the native
+--- author key `photo`, as a Typst dictionary.
 --- @param meta table
---- @param model table The mode and the `extensions.atelier` options
 --- @return string
-local function authors_code(meta, model)
+local function authors_code(meta)
   local photos = {}
-  for _, speaker in ipairs(core.speakers(meta, model)) do
-    if speaker.photo ~= nil then
-      photos[speaker.index] = speaker
+  for _, author in ipairs(core.authors(meta, core.resolve_labels())) do
+    if author.photo ~= nil then
+      photos[author.index] = author
     end
   end
   local affiliations = {}
@@ -249,7 +248,7 @@ local function authors_code(meta, model)
         email = typst_string(text_of(author.email)),
         corresponding = attributes.corresponding == true and 'true' or 'false',
         photo = photos[index] and typst_string(photos[index].photo) or 'none',
-        alt = photos[index] and photos[index].alt ~= '' and typst_string(photos[index].alt) or 'none',
+        alt = photos[index] and photos[index].photo_alt ~= '' and typst_string(photos[index].photo_alt) or 'none',
       })
     end
   end
@@ -313,7 +312,7 @@ local function publish(meta)
     '#let atelier-preset-fonts = ' .. fonts_code(preset),
     '#let atelier-labels = ' .. labels_code(),
     '#let atelier-switches = ' .. switches_code(options),
-    '#let atelier-people = ' .. authors_code(meta, model),
+    '#let atelier-people = ' .. authors_code(meta),
     '#let atelier-motif-data = ' .. motif_code(model, preset, tokens, dark),
     '#let atelier-logo = ' .. logo_code(meta, dark),
   }

@@ -95,6 +95,10 @@ contributes:
         - bundled/portable-links.lua
     html:
       respect-user-color-scheme: true
+      # The title block writes the authors of `workshop/core.lua`, with their
+      # photos and details, and the keywords as chips, with no script.
+      template-partials:
+        - html/title-metadata.html
       # Quarto builds the canonical link from `website.site-url`, giving a
       # directory index the URL of its directory. Set `canonical-url: false`
       # on a page served from more than one URL, such as `404.qmd`.

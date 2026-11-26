@@ -74,6 +74,10 @@ local LABELS = {
   'workshop-author-plural',
   'workshop-published',
   'workshop-modified',
+  'author-corresponding',
+  'author-equal',
+  'author-deceased',
+  'author-orcid-profile',
 }
 
 -- ============================================================================
@@ -275,10 +279,10 @@ function M.apply_title_labels(meta, labels)
 end
 
 -- ============================================================================
--- SPEAKERS
+-- AUTHORS
 -- ============================================================================
 
---- The media types of the photo files that a speaker can have, by extension.
+--- The media types of the photo files that an author can have, by extension.
 --- @type table<string, string>
 local PHOTO_TYPES = {
   svg = 'image/svg+xml',
@@ -310,7 +314,7 @@ function M.author_name(author)
 end
 
 --- Resolve a path against the folder of the document, such as the photo of
---- a speaker or the file of the closing. An absolute path stays as it is.
+--- an author or the file of the closing. An absolute path stays as it is.
 --- @param path string The path, relative to the document
 --- @return string
 local function document_file(path)
@@ -320,18 +324,36 @@ local function document_file(path)
   return path
 end
 
---- Check the photo file of a speaker. A file that does not exist, or that is
+--- Resolve the `photo` key of an author to a path relative to the folder of
+--- the document. A value that starts with `/` is relative to the project
+--- root, as other Quarto site paths are, so a project-level author list works
+--- on nested pages; any other value is relative to the document.
+--- @param value string The value of the `photo` key
+--- @return string The path, relative to the folder of the document
+local function photo_path(value)
+  if value:sub(1, 1) ~= '/' or quarto.doc.input_file == nil then
+    return value
+  end
+  local root = quarto.project.directory or pandoc.path.directory(quarto.doc.input_file)
+  local file = pandoc.path.join({ root, value:sub(2) })
+  -- `unsafe` lets the answer start with `../`, for a page below the root.
+  return pandoc.path.make_relative(file, pandoc.path.directory(quarto.doc.input_file), true)
+end
+
+--- Check the photo file of an author. A file that does not exist, or that is
 --- not an image type that a browser shows, logs a warning.
 --- @param path string The path, relative to the document
---- @param key string The key of the speaker, for the warning
+--- @param value string The value of the `photo` key, for the warning
+--- @param name string The name of the author, for the warning
 --- @return boolean True when the photo can be shown
-local function photo_ok(path, key)
-  local subject = 'extensions.atelier.speakers.' .. key .. '.photo'
+local function photo_ok(path, value, name)
+  local subject = "The photo '" .. value .. "' of the author " .. name .. ' in ' ..
+    (quarto.doc.input_file or '')
   if PHOTO_TYPES[(path:match('%.([^./\\]+)$') or ''):lower()] == nil then
     log.log_warning(
       EXTENSION_NAME,
-      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
-      ' is not an svg, png, jpg, gif or webp file, so the speaker has no photo.'
+      subject .. ' is not an svg, png, jpg, gif or webp file, so the author has no photo. ' ..
+      'Set the author key photo to an image file.'
     )
     return false
   end
@@ -339,8 +361,8 @@ local function photo_ok(path, key)
   if file == nil then
     log.log_warning(
       EXTENSION_NAME,
-      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
-      ' does not exist, so the speaker has no photo. Correct the path, relative to the document.'
+      subject .. ' does not exist, so the author has no photo. ' ..
+      'Correct the author key photo: a path relative to the document, or to the project root when it starts with /.'
     )
     return false
   end
@@ -348,8 +370,8 @@ local function photo_ok(path, key)
   return true
 end
 
---- Read the photo of a speaker as a data URI, so the page carries it.
---- @param path string The path of a photo that `M.speakers` checked
+--- Read the photo of an author as a data URI, so the page carries it.
+--- @param path string The path of a photo that `M.authors` checked
 --- @return string The data URI
 function M.photo_uri(path)
   local file = assert(io.open(document_file(path), 'rb'))
@@ -359,63 +381,140 @@ function M.photo_uri(path)
   return 'data:' .. media .. ';base64,' .. quarto.base64.encode(content)
 end
 
---- Read the speakers of a page: each author of Quarto's `author`
---- list, with the photo of `extensions.atelier.speakers`, a map from the
---- author `id`, else the author name, to `photo` and `alt`, or to the photo
---- path alone. A key that names
---- no author logs a warning. A photo with no `alt` is decorative, as the name
---- is next to it.
+--- The author attributes that show as text, in order, with their label keys.
+--- @type { key: string, label: string }[]
+local AUTHOR_ATTRIBUTES = {
+  { key = 'corresponding', label = 'author-corresponding' },
+  { key = 'equal-contributor', label = 'author-equal' },
+  { key = 'deceased', label = 'author-deceased' },
+}
+
+--- Tell whether a metadata value is true.
+--- @param value any
+--- @return boolean
+local function is_true(value)
+  return value == true or text_of(value) == 'true'
+end
+
+--- @class Author
+--- @field index integer The position of the author in `by-author`
+--- @field name string
+--- @field url string|nil
+--- @field photo string|nil The checked path, relative to the folder of the document
+--- @field photo_alt string The alt text of the photo, empty when it is decorative
+--- @field degrees string[]
+--- @field orcid string|nil
+--- @field email string|nil
+--- @field affiliations { name: string, url: string|nil }[]
+--- @field attributes string[] The visible labels of the author attributes
+--- @field note string|nil
+
+--- Read one value of an author as text, or nil when it is empty.
+--- @param value any
+--- @return string|nil
+local function optional_text(value)
+  local text = text_of(value)
+  return text ~= '' and text or nil
+end
+
+--- Read the authors of a page: each named author of Quarto's `by-author`,
+--- in order, with the native keys `photo` and `photo-alt`. A photo with no
+--- `photo-alt` is decorative, because the name is next to it.
 --- @param meta table The document metadata
---- @param model table The page model
---- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
-function M.speakers(meta, model)
-  -- A page with no author cannot use the map, so it stays silent about its keys.
-  if #(meta['by-author'] or {}) == 0 then
-    return {}
-  end
-  local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
-  local used = {}
-  local speakers = {}
+--- @param labels table<string, string> The resolved Atelier labels
+--- @return Author[] The authors
+function M.authors(meta, labels)
+  local authors = {}
   for index, author in ipairs(meta['by-author'] or {}) do
     local name = M.author_name(author)
     if name ~= '' then
-      local id = text_of(author.id)
-      local key = (id ~= '' and photos[id] ~= nil) and id or name
-      local entry = photos[key]
-      local speaker = { index = index, name = name, degrees = {}, alt = '' }
+      local extra = author.metadata or {}
+      local entry = {
+        index = index,
+        name = name,
+        url = optional_text(author.url),
+        photo_alt = '',
+        degrees = {},
+        orcid = optional_text(author.orcid),
+        email = optional_text(author.email),
+        affiliations = {},
+        attributes = {},
+        note = author.note and optional_text(author.note.text or author.note) or nil,
+      }
+      local value = text_of(extra.photo)
+      if value ~= '' then
+        local path = photo_path(value)
+        if photo_ok(path, value, name) then
+          entry.photo = path
+          entry.photo_alt = text_of(extra['photo-alt'])
+        end
+      end
       for _, degree in ipairs(author.degrees or {}) do
-        speaker.degrees[#speaker.degrees + 1] = text_of(degree)
+        entry.degrees[#entry.degrees + 1] = text_of(degree)
       end
-      local affiliation = (author.affiliations or {})[1]
-      if affiliation ~= nil and text_of(affiliation.name) ~= '' then
-        speaker.affiliation = text_of(affiliation.name)
-      end
-      if entry ~= nil then
-        used[key] = true
-        -- A bare value is the photo path, with no alt text.
-        if pandoc.utils.type(entry) ~= 'table' then
-          entry = { photo = entry }
-        end
-        local photo = text_of(entry.photo)
-        if photo ~= '' and photo_ok(photo, key) then
-          speaker.photo = photo
-          speaker.alt = text_of(entry.alt)
+      for _, affiliation in ipairs(author.affiliations or {}) do
+        local affiliation_name = text_of(affiliation.name)
+        if affiliation_name ~= '' then
+          entry.affiliations[#entry.affiliations + 1] = {
+            name = affiliation_name,
+            url = optional_text(affiliation.url),
+          }
         end
       end
-      speakers[#speakers + 1] = speaker
+      for _, attribute in ipairs(AUTHOR_ATTRIBUTES) do
+        if is_true((author.attributes or {})[attribute.key]) then
+          entry.attributes[#entry.attributes + 1] = labels[attribute.label]
+        end
+      end
+      authors[#authors + 1] = entry
     end
   end
-  for key in pairs(photos) do
-    if not used[key] then
-      log.log_warning(
-        EXTENSION_NAME,
-        "extensions.atelier.speakers has '" .. key .. "' in " .. (quarto.doc.input_file or '') ..
-        ', which is the id or the name of no author, so its photo is not shown. ' ..
-        'Use the id or the name of an author of the author list.'
-      )
+  return authors
+end
+
+--- Write the authors as metadata for a template partial: one map for each
+--- author, with no key for an absent field, so `$if(...)$` works.
+--- @param authors Author[] The authors of `M.authors`
+--- @param labels table<string, string> The resolved Atelier labels
+--- @param photo_src fun(path: string): string Answers the `src` of a checked photo
+--- @return pandoc.List The metadata list
+function M.authors_meta(authors, labels, photo_src)
+  local list = pandoc.List({})
+  for _, author in ipairs(authors) do
+    local item = {
+      index = pandoc.MetaString(tostring(author.index)),
+      name = pandoc.MetaString(author.name),
+      url = author.url and pandoc.MetaString(author.url) or nil,
+      degrees = #author.degrees > 0 and pandoc.MetaString(table.concat(author.degrees, ', ')) or nil,
+      email = author.email and pandoc.MetaString(author.email) or nil,
+      note = author.note and pandoc.MetaString(author.note) or nil,
+    }
+    if author.photo then
+      item.photo = pandoc.MetaString(photo_src(author.photo))
+      item['photo-alt'] = pandoc.MetaString(author.photo_alt)
     end
+    if author.orcid then
+      item.orcid = pandoc.MetaString(author.orcid)
+      item['orcid-label'] = pandoc.MetaString((labels['author-orcid-profile']:gsub('{name}', function()
+        return author.name
+      end)))
+    end
+    if #author.affiliations > 0 then
+      local affiliations = pandoc.List({})
+      for _, affiliation in ipairs(author.affiliations) do
+        affiliations:insert({
+          name = pandoc.MetaString(affiliation.name),
+          url = affiliation.url and pandoc.MetaString(affiliation.url) or nil,
+        })
+      end
+      item.affiliations = affiliations
+    end
+    if #author.attributes > 0 then
+      item.attributes = pandoc.List(author.attributes):map(pandoc.MetaString)
+    end
+    list:insert(item)
   end
-  return speakers
+  return list
 end
 
 -- ============================================================================
