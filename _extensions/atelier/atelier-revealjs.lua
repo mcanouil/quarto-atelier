@@ -282,19 +282,29 @@ end
 
 --- The rules that show the dark image of the logo on dark surfaces: every
 --- slide of a dark deck, or else a `.dark` slide and, when its background
---- is dark, a section slide.
+--- is dark, a section slide. In a dark deck, light section slides keep the
+--- light image.
 --- @param page_dark boolean True when the deck is dark
 --- @param section_dark boolean True when the section slides are dark
 --- @return string[]
 local function logo_rules(page_dark, section_dark)
-  local scope = ':root'
-  if not page_dark then
-    scope = ':is(.' .. DARK_STATE .. (section_dark and (', .' .. SECTION_STATE) or '') .. ')'
+  local show = function(scope, shown, hidden)
+    return {
+      scope .. ' .reveal .atelier-logo-' .. hidden .. ' { display: none; }',
+      scope .. ' .reveal .atelier-logo-' .. shown .. ' { display: block; }',
+    }
   end
-  return {
-    scope .. ' .reveal .atelier-logo-light { display: none; }',
-    scope .. ' .reveal .atelier-logo-dark { display: block; }',
-  }
+  if not page_dark then
+    return show(':is(.' .. DARK_STATE .. (section_dark and (', .' .. SECTION_STATE) or '') .. ')', 'dark', 'light')
+  end
+  local rules = show(':root', 'dark', 'light')
+  if not section_dark then
+    -- A light chrome keeps the section slides light in a dark deck.
+    for _, rule in ipairs(show('.' .. SECTION_STATE, 'light', 'dark')) do
+      rules[#rules + 1] = rule
+    end
+  end
+  return rules
 end
 
 --- The style element of the deck.

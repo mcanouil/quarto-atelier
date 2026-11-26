@@ -84,13 +84,15 @@ local function from_source(value, alt)
   }
 end
 
---- Answer the logo of the brand, `medium` first, then `small`, then `large`.
+--- Answer the logo of the brand, from the first of the sizes that it has:
+--- `medium`, then `small`, then `large` by default.
+--- @param sizes string[]|nil The sizes to try, in order
 --- @return table|nil
-local function from_brand()
+local function from_brand(sizes)
   if quarto.brand == nil or quarto.brand.get_logo == nil then
     return nil
   end
-  for _, size in ipairs({ 'medium', 'small', 'large' }) do
+  for _, size in ipairs(sizes or { 'medium', 'small', 'large' }) do
     local light = quarto.brand.get_logo('light', size)
     local dark = quarto.brand.get_logo('dark', size)
     if light ~= nil or dark ~= nil then
@@ -155,10 +157,19 @@ function M.site_logos()
 end
 
 --- Answer the logo of the document: the front-matter `logo`, or else the
---- logo of the brand.
+--- logo of the brand. As in Quarto, `logo: false` means no logo, and a
+--- `logo` that names a brand logo (`small`, `medium`, `large`) gives that
+--- brand logo.
 --- @param meta table The document metadata
 --- @return { light: { path: string, alt: string }, dark: { path: string, alt: string } }|nil
 function M.resolve(meta)
+  if meta.logo == false then
+    return nil
+  end
+  local name = meta.logo ~= nil and pandoc.utils.type(meta.logo) ~= 'table' and text(meta.logo)
+  if name == 'small' or name == 'medium' or name == 'large' then
+    return from_brand({ name })
+  end
   return from_source(meta.logo, nil) or from_brand()
 end
 
