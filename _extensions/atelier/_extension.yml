@@ -204,6 +204,8 @@ contributes:
       font-paths: fonts
       pdf-standard: ua-1
       filters:
+        - path: atelier-typst-tabset.lua
+          at: pre-ast
         - atelier-typst.lua
         - path: bundled/typst-extras.lua
           at: post-quarto

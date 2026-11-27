@@ -11,9 +11,8 @@
 --- `atelier-typst-data` metadata. The `typst/tokens.typ` partial writes that
 --- value in front of the template, so every partial can read it.
 --- The filter also marks each callout with its type and appearance, ends
---- the page of each level-1 heading, marks each `.part` heading, writes
---- inline code with the Atelier code colours, and writes each tabset as
---- headings.
+--- the page of each level-1 heading, marks each `.part` heading, and writes
+--- inline code with the Atelier code colours.
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
@@ -380,22 +379,7 @@ local function inline_code(code)
 end
 
 
---- Write a tabset as one heading per tab, at the level of the tab headings in
---- the source, with the content of the tab under it. Quarto has no Typst
---- rendering for a tabset: its fallback warns, and caps the headings at level 4.
---- @param tabset table The Quarto tabset node
---- The tabset keeps its identifier and classes on a Div around the headings.
---- @return pandoc.Div
-local function flatten_tabset(tabset)
-  local blocks = pandoc.Blocks({})
-  for _, tab in ipairs(tabset.tabs) do
-    blocks:insert(pandoc.Header(tabset.level, quarto.utils.as_inlines(tab.title)))
-    blocks:extend(quarto.utils.as_blocks(tab.content))
-  end
-  return pandoc.Div(blocks, tabset.attr)
-end
-
 return {
   { Meta = publish },
-  { Callout = mark_callout, Header = mark_chapter, Code = inline_code, Tabset = flatten_tabset },
+  { Callout = mark_callout, Header = mark_chapter, Code = inline_code },
 }

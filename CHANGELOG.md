@@ -33,7 +33,7 @@
 - fix: A PDF logo with no alt text is decorative, so the PDF/UA-1 build no longer stops on it. (#157)
 - feat: A deck shows its logo above the title of the title slide and at the right end of the bottom row, with the dark image on dark slides. (#159)
 - feat: The closing takes your own text or file, and shows the copyright and the licence of the document, each of which you can hide.
-- fix: A tabset in a PDF is one heading per tab, at the level of the tab headings, with the tab content under it, and the render no longer warns that it cannot recognise the format. (#166)
+- fix: A tabset in a PDF becomes one heading per tab, just below the heading before the tabset, with the tab content under it, and the render no longer warns that it cannot recognise the format. (#166)
 
 ## 0.15.3 (2026-11-23)
 
