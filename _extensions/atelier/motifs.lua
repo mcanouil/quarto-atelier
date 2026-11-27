@@ -18,6 +18,13 @@ local M = {}
 --- @type number
 M.LIGHT_OPACITY = 0.85
 
+--- The size of the motif, as a fraction of the width of its surface. `title`
+--- is for the title surfaces (the title slide and the first page of the PDF),
+--- `large` for the section slides and the chapter dividers. HTML keeps its own
+--- `clamp()` in `html/workshop.scss`, as a page has no fixed width.
+--- @type { title: number, large: number }
+M.RATIO = { title = 0.21, large = 0.45 }
+
 --- The motif of each preset.
 --- @type table<string, string>
 local PRESET_MOTIFS = {

@@ -19,7 +19,6 @@
 
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
-local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 local icons = require(quarto.utils.resolve_path('icons.lua'):gsub('%.lua$', ''))
 
@@ -97,7 +96,7 @@ local DARK_BACKGROUND_CLASS = 'has-dark-background'
 --- @type string
 local SECTION_CLASS = 'atelier-section'
 
---- The class of a slide that shows the motif, in workshop mode: the title
+--- The class of a slide that shows the motif: the title
 --- slide and the section slides. Reveal.js copies the classes of a slide to
 --- its background, which covers the window and moves with the slide, and
 --- which the PDF export draws on each page, so the motif sits on it.
@@ -227,8 +226,8 @@ local function font_declarations(scheme)
   return lines
 end
 
---- The rules of the motif of a workshop deck: the mask of the preset, and
---- its colour and opacity on the title slide, on the section slides and on
+--- The rules of the motif of a deck: the mask of the preset, its size on the
+--- title slide and on the section slides, and its colour and opacity on the title slide, on the section slides and on
 --- the dark section slides, after the surface that `mark_slide` paints. A
 --- light surface takes the mark at `motifs.LIGHT_OPACITY`, and a dark one the
 --- ink, or the chrome mark on a section slide. The motif sits on the slide
@@ -241,7 +240,15 @@ end
 local function motif_rules(scheme, tokens, dark)
   local preset = palette.preset(palette.painted_scheme(scheme))
   local background = '.reveal .slide-background.' .. MOTIF_CLASS
-  local lines = { background .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
+  local lines = {
+    background .. ' {',
+    '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';',
+    '  --atelier-motif-size: ' .. string.format('%g', motifs.RATIO.title) .. ';',
+    '}',
+    background .. '.' .. SECTION_CLASS .. ' {',
+    '  --atelier-motif-size: ' .. string.format('%g', motifs.RATIO.large) .. ';',
+    '}',
+  }
   local surfaces = {
     { scope = background, palette = tokens, surface = 'bg', light = 'accent-mark', dark = 'accent-ink' },
     { scope = background .. '.' .. SECTION_CLASS, palette = tokens, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
@@ -313,7 +320,7 @@ end
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
---- @param state { workshop: boolean, logo: table|nil, section_dark: boolean } The deck state
+--- @param state { logo: table|nil, section_dark: boolean } The deck state
 --- @param buttons integer The number of buttons at the left of the bottom row
 --- @return string
 local function deck_style(scheme, tokens, dark, state, buttons)
@@ -343,10 +350,8 @@ local function deck_style(scheme, tokens, dark, state, buttons)
   for _, rule in ipairs(scheme_highlighting(DARK_SCOPE, 'dark', dark)) do
     lines[#lines + 1] = rule
   end
-  if state.workshop then
-    for _, line in ipairs(motif_rules(scheme, tokens, dark)) do
-      lines[#lines + 1] = line
-    end
+  for _, line in ipairs(motif_rules(scheme, tokens, dark)) do
+    lines[#lines + 1] = line
   end
   if state.logo ~= nil then
     for _, line in ipairs(logo_rules(palette.tone(tokens.bg) == 'dark', state.section_dark)) do
@@ -374,7 +379,7 @@ end
 local deck = {}
 
 --- Add the deck style and read the deck state. Give the title slide its
---- state, and in a workshop deck mark it for the motif.
+--- state, and mark it for the motif.
 --- @param meta table
 --- @return table The metadata, with the state of the title slide
 local function publish(meta)
@@ -386,7 +391,6 @@ local function publish(meta)
   deck.section_dark = palette.tone(tokens['navbar-bg']) == 'dark'
   deck.dark_bg = palette.hex(dark.bg, dark.bg)
   deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
-  deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
   deck.logo = logo.resolve(meta)
   if deck.logo ~= nil then
     deck.logo_html = logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark')
@@ -404,10 +408,8 @@ local function publish(meta)
   local states = attributes['data-state'] and pandoc.utils.stringify(attributes['data-state']) or ''
   attributes['data-state'] = (states == '' and TITLE_STATE) or (states .. ' ' .. TITLE_STATE)
   meta['title-slide-attributes'] = attributes
-  if deck.workshop then
-    -- `revealjs/title-slide.html` adds the motif class to the title slide.
-    meta['atelier-motif'] = true
-  end
+  -- `revealjs/title-slide.html` adds the motif class to the title slide.
+  meta['atelier-motif'] = true
   return meta
 end
 
@@ -455,9 +457,7 @@ local function mark_slide(header)
     add_class(header.attr, SECTION_CLASS)
     add_state(header.attr, dark and DARK_STATE or SECTION_STATE)
     add_state(header.attr, NO_NUMBER_STATE)
-    if deck.workshop then
-      add_class(header.attr, MOTIF_CLASS)
-    end
+    add_class(header.attr, MOTIF_CLASS)
     set_background(header.attr, dark and deck.dark_section_bg or deck.section_bg)
     if dark or deck.section_dark then
       add_class(header.attr, DARK_BACKGROUND_CLASS)

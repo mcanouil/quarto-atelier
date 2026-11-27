@@ -77,12 +77,13 @@
   }
   set page(
     fill: atelier-colour("bg"),
-    // The workshop motif sits in the top right corner of the first page,
-    // with the title block or the cover.
+    // The motif sits in the top right corner of the first page, with the
+    // title block or the cover, and of a chapter divider, which is larger.
     background: context {
       let motif = atelier-motif-data
-      if motif != none and here().page() == 1 {
-        atelier-motif(motif.shapes, top + right, 45mm, motif.paint, factor: motif.factor)
+      let ratio = if kind() == "divider" { motif.ratio.large } else if here().page() == 1 { motif.ratio.title }
+      if ratio != none {
+        atelier-motif(motif.shapes, top + right, ratio * page.width, motif.paint, factor: motif.factor)
       }
     },
     header: context {

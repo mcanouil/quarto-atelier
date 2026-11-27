@@ -227,21 +227,17 @@ local function authors_code(meta)
   return typst_dict({ authors = typst_array(authors) })
 end
 
---- The corner motif of a workshop handout, as a Typst dictionary of its
---- shapes, colour and opacity factor, or `none` outside workshop mode. On a
---- light page the motif takes the accent mark at 85% of its opacities, and on
---- a dark page the accent ink.
---- @param model table The mode and the `extensions.atelier` options
+--- The corner motif, as a Typst dictionary of its shapes, colour, opacity
+--- factor and size ratios. On a light page the motif takes the accent mark at
+--- 85% of its opacities, and on a dark page the accent ink.
 --- @param preset string
 --- @param tokens table<string, table>
 --- @param dark boolean True when the page is dark
 --- @return string
-local function motif_code(model, preset, tokens, dark)
-  if model.mode ~= core.MODE_WORKSHOP then
-    return 'none'
-  end
+local function motif_code(preset, tokens, dark)
   return typst_dict({
     shapes = motifs.typst(motifs.name(preset)),
+    ratio = typst_dict({ title = string.format('%g', motifs.RATIO.title), large = string.format('%g', motifs.RATIO.large) }),
     paint = typst_colour(tokens[dark and 'accent-ink' or 'accent-mark'], tokens.bg),
     factor = dark and '100%' or string.format('%g%%', motifs.LIGHT_OPACITY * 100),
   })
@@ -308,7 +304,7 @@ local function publish(meta)
     '#let atelier-labels = ' .. labels_code(),
     '#let atelier-switches = ' .. switches_code(options),
     '#let atelier-people = ' .. authors_code(meta),
-    '#let atelier-motif-data = ' .. motif_code(model, preset, tokens, dark),
+    '#let atelier-motif-data = ' .. motif_code(preset, tokens, dark),
     '#let atelier-logo = ' .. logo_code(meta, dark),
     '#let atelier-geometry = ' .. geometry_code(preset),
     '#let atelier-icons = ' .. icons.typst(),

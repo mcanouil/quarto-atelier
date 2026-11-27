@@ -70,6 +70,15 @@ end
 function M.publish(meta, model)
   objectives = {}
   publish_geometry()
+  -- The motif of the preset, which `html/workshop.scss` draws in the title
+  -- block. A brand can set a preset for each scheme, so the dark page takes
+  -- the motif of its own preset.
+  local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
+  local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
+  if dark ~= light then
+    style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
+  end
+  quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
   local data = {
     mode = model.mode,
     offset = quarto.project.offset or '',
@@ -102,15 +111,6 @@ function M.publish(meta, model)
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
     )
-    -- The motif of the preset, which `html/workshop.scss` draws in the title
-    -- block. A brand can set a preset for each scheme, so the dark page takes
-    -- the motif of its own preset.
-    local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
-    local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
-    if dark ~= light then
-      style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
-    end
-    quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
     core.apply_title_labels(meta, model.labels)
   end
   quarto.doc.include_text(

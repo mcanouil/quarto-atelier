@@ -757,24 +757,23 @@ html.print-pdf:root {
 // ===========================================================================
 // MOTIF
 // ===========================================================================
-// In workshop mode, the title slide and the section slides have the motif of
-// the preset in the top right corner of the window. Reveal.js scales the
-// slide to fit the window, centres it, and centres the content of a slide,
-// so a corner of the slide is not a corner of the window. Reveal.js copies
-// the classes of a slide to its background, which covers the window, moves
-// with the slide, and fills each page of the PDF export, so the motif sits
-// on the background of each slide with the class `atelier-motif`, at the
-// size of the slide: 30% of its width, 45% on a section slide.
-// `atelier-revealjs.lua` adds the class and writes the mask and its colour,
-// from the palette. The motif only decorates: a pseudo-element with no text,
-// which forced colours remove.
+// The title slide and the section slides have the motif of the preset in
+// the top right corner of the window. Reveal.js scales the slide to fit the
+// window, centres it, and centres the content of a slide, so a corner of the
+// slide is not a corner of the window. Reveal.js copies the classes of a
+// slide to its background, which covers the window, moves with the slide, and
+// fills each page of the PDF export, so the motif sits on the background of
+// each slide with the class `atelier-motif`, at the size of the slide, from
+// `motifs.RATIO`. `atelier-revealjs.lua` adds the class and writes the mask,
+// its colour and its size. The motif only decorates: a pseudo-element with
+// no text, which forced colours remove.
 
 .reveal .slide-background.atelier-motif::after {
   content: "";
   position: absolute;
   top: 0;
   right: 0;
-  width: calc(var(--slide-width, 1280px) * var(--atelier-motif-size, 0.3) * var(--slide-scale, 1));
+  width: calc(var(--slide-width, 1280px) * var(--atelier-motif-size) * var(--slide-scale, 1));
   aspect-ratio: 1;
   pointer-events: none;
   background-color: var(--atelier-motif-paint);
@@ -782,10 +781,6 @@ html.print-pdf:root {
   mask-image: var(--atelier-motif);
   mask-repeat: no-repeat;
   mask-size: contain;
-}
-
-.reveal .slide-background.atelier-motif.atelier-section {
-  --atelier-motif-size: 0.45;
 }
 
 @media (forced-colors: active) {
