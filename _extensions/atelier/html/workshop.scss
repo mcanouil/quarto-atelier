@@ -524,18 +524,20 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 // `motifs.LIGHT_OPACITY`, on a light page, and the accent ink on a dark one.
 // It only decorates: a pseudo-element with no text, which forced colours
 // remove.
+// The motif floats, and `shape-outside` takes its mask as the float shape,
+// so the lines of the title block wrap around the shapes and nothing moves
+// down. The float can reach below the title block, and the first lines of
+// the page wrap around it too.
 
 #title-block-header {
-  position: relative;
-
   &::before {
     content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
+    float: right;
     width: clamp(4.5rem, 14vw, 9rem);
     aspect-ratio: 1;
     pointer-events: none;
+    shape-outside: var(--atelier-motif);
+    shape-margin: 0.75rem;
     mask-image: var(--atelier-motif);
     mask-repeat: no-repeat;
     mask-size: contain;
@@ -551,6 +553,13 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
       display: none;
     }
   }
+}
+
+// A block with a border runs under a float, as only its lines wrap. A heading
+// or a rule with its own block formatting context sits beside the motif, so
+// its rule stays clear of it. Callouts and tables have one already.
+main :is(h1, h2, h3, h4, h5, h6, hr) {
+  display: flow-root;
 }
 
 // ===========================================================================
