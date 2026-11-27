@@ -69,37 +69,38 @@ end
 local in_order
 
 --- Move the headings of a tabset under the heading before it, and remove
---- the tabset class. The content is walked here, so a nested tabset goes
---- under its own tab, and the heading before the tabset stays the parent of
---- the next tabset of the same section.
+--- the tabset class, also from a tabset with no tab heading, so Quarto never
+--- falls back to its own rendering. The content is walked here, so a nested
+--- tabset goes under its own tab, and the heading before the tabset stays
+--- the parent of the next tabset of the same section.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
+--- @return boolean|nil False, so the walk does not enter the tabset again
 local function flatten_tabset(div)
   if not is_tabset(div) then
     return nil
   end
   local first = div.content:find_if(function(block) return block.t == 'Header' end)
-  if first == nil then
-    return nil
+  if first ~= nil then
+    local tab_level = first.level
+    local top_level = has_level_one and 1 or 2
+    local new_tab_level = math.max(parent_level + 1, top_level)
+    local min_content_level = nil
+    each_own_heading(div.content, function(header)
+      if header.level ~= tab_level then
+        min_content_level = math.min(min_content_level or header.level, header.level)
+      end
+    end)
+    local content_shift = min_content_level and (new_tab_level + 1 - min_content_level) or 0
+    div.content = each_own_heading(div.content, function(header)
+      if header.level == tab_level then
+        header.level = new_tab_level
+      else
+        header.level = header.level + content_shift
+      end
+      return header
+    end)
   end
-  local tab_level = first.level
-  local top_level = has_level_one and 1 or 2
-  local new_tab_level = math.max(parent_level + 1, top_level)
-  local min_content_level = nil
-  each_own_heading(div.content, function(header)
-    if header.level ~= tab_level then
-      min_content_level = math.min(min_content_level or header.level, header.level)
-    end
-  end)
-  local content_shift = min_content_level and (new_tab_level + 1 - min_content_level) or 0
-  div.content = each_own_heading(div.content, function(header)
-    if header.level == tab_level then
-      header.level = new_tab_level
-    else
-      header.level = header.level + content_shift
-    end
-    return header
-  end)
   local outer_level = parent_level
   div.content = div.content:walk(in_order)
   parent_level = outer_level

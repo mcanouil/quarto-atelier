@@ -79,6 +79,15 @@ The first page has no header.
 A cover, a divider and the closing page have no header.
 Their footer shows only the copyright and the licence, where the first line of the footer sits.
 
+### Tabsets
+
+A PDF cannot show tabs, so each tab of a tabset becomes a heading, with the content of the tab under it.
+The tab headings go one level below the heading before the tabset, whatever their level in the source.
+The headings inside a tab go one level below the tab heading.
+
+If a tabset has no heading before it, its tabs go at the top level of the PDF.
+In a document with level-1 headings, these tabs are chapters, so each one gets the chapter features of the report switches.
+
 ### Report switches
 
 Five switches under `extensions.atelier` turn on the parts of a long report.
