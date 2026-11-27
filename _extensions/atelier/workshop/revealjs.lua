@@ -206,6 +206,22 @@ local function end_heading(level, id, title)
   return pandoc.Header(level, pandoc.Inlines(title), pandoc.Attr(id, { 'unnumbered' }))
 end
 
+--- Build the funding block: the statements and the awards.
+--- @param funding table The funding of `core.funding`
+--- @param model table The page model
+--- @return pandoc.Div
+local function funding_div(funding, model)
+  return pandoc.Div(core.funding_blocks(funding, model.labels), pandoc.Attr('', { 'atelier-funding' }))
+end
+
+--- Build the CRediT block: the table.
+--- @param credit table The table of `core.credit`
+--- @param model table The page model
+--- @return pandoc.Div
+local function credit_div(credit, model)
+  return pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' }))
+end
+
 --- Build the funding part: its heading, then the statements and the awards.
 --- @param funding table The funding of `core.funding`
 --- @param model table The page model
@@ -213,7 +229,7 @@ end
 --- @return pandoc.Blocks
 local function funding_part(funding, model, level)
   local blocks = pandoc.Blocks({ end_heading(level, 'atelier-funding-title', model.labels['funding-title']) })
-  blocks:insert(pandoc.Div(core.funding_blocks(funding, model.labels), pandoc.Attr('', { 'atelier-funding' })))
+  blocks:insert(funding_div(funding, model))
   return blocks
 end
 
@@ -224,7 +240,7 @@ end
 --- @return pandoc.Blocks
 local function credit_part(credit, model, level)
   local blocks = pandoc.Blocks({ end_heading(level, 'atelier-credit-title', model.labels['credit-title']) })
-  blocks:insert(pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' })))
+  blocks:insert(credit_div(credit, model))
   return blocks
 end
 
@@ -264,14 +280,12 @@ function M.finish(doc, model)
     local first = funding ~= nil and 'funding' or 'credit'
     doc.blocks:insert(end_heading(2, 'atelier-end-slide', model.labels[first .. '-title']))
     if funding ~= nil then
-      doc.blocks:insert(pandoc.Div(core.funding_blocks(funding, model.labels), pandoc.Attr('', { 'atelier-funding' })))
+      doc.blocks:insert(funding_div(funding, model))
     end
-    if credit ~= nil then
-      if funding ~= nil then
-        doc.blocks:extend(credit_part(credit, model, 3))
-      else
-        doc.blocks:insert(pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' })))
-      end
+    if credit ~= nil and funding ~= nil then
+      doc.blocks:extend(credit_part(credit, model, 3))
+    elseif credit ~= nil then
+      doc.blocks:insert(credit_div(credit, model))
     end
     references_slide()
     return doc
