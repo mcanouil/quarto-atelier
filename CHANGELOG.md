@@ -49,6 +49,7 @@
 - feat: The deck bottom row shows the copyright and the licence, keeps the slide number in the row with a logo, and puts every item on one centre line.
 - fix: The callout label sits on the centre of its icon.
 - fix: The closed accessibility menu of a deck no longer casts a shadow on the right edge of the slide.
+- fix: A tabset in a PDF becomes one heading per tab, just below the heading before the tabset, with the tab content under it, and the render no longer warns that it cannot recognise the format. (#166)
 
 ## 0.15.3 (2026-11-23)
 
