@@ -195,11 +195,47 @@ local function references(doc)
   return cites, refs
 end
 
+--- Make the heading of a part of the end matter. The deck has `slide-level: 2`,
+--- so a part on the closing slide has an `h3`, and a part on a slide of its
+--- own has an `h2` slide title.
+--- @param level integer The heading level
+--- @param id string The heading identifier
+--- @param title string The resolved title
+--- @return pandoc.Header
+local function end_heading(level, id, title)
+  return pandoc.Header(level, pandoc.Inlines(title), pandoc.Attr(id, { 'unnumbered' }))
+end
+
+--- Build the funding part: its heading, then the statements and the awards.
+--- @param funding table The funding of `core.funding`
+--- @param model table The page model
+--- @param level integer The heading level
+--- @return pandoc.Blocks
+local function funding_part(funding, model, level)
+  local blocks = pandoc.Blocks({ end_heading(level, 'atelier-funding-title', model.labels['funding-title']) })
+  blocks:insert(pandoc.Div(core.funding_blocks(funding, model.labels), pandoc.Attr('', { 'atelier-funding' })))
+  return blocks
+end
+
+--- Build the CRediT part: its heading, then the table.
+--- @param credit table The table of `core.credit`
+--- @param model table The page model
+--- @param level integer The heading level
+--- @return pandoc.Blocks
+local function credit_part(credit, model, level)
+  local blocks = pandoc.Blocks({ end_heading(level, 'atelier-credit-title', model.labels['credit-title']) })
+  blocks:insert(pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' })))
+  return blocks
+end
+
 --- Finish a deck after its blocks: declare the group of the answers when the
---- deck has answers. With a closing: a references
---- slide when the deck cites the bibliography and has no `#refs` div, then
---- the closing slide, with the parts of `core.closing_parts` and the CRediT table.
---- Without a closing, the CRediT table has a slide of its own.
+--- deck has answers, then add the end slides.
+--- With a closing: a references slide when the deck cites the bibliography and
+--- has no `#refs` div, then the closing slide with the closing parts, the
+--- funding and the CRediT table, so the closing is the last slide.
+--- Without a closing: one end slide (`#atelier-end-slide`) for the funding and
+--- the CRediT table, then the references slide. A deck with no closing, no
+--- funding and no roles gets no slide from Atelier.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
@@ -211,27 +247,43 @@ function M.finish(doc, model)
   end
   local closing = core.closing(doc.meta, model)
   local credit = core.credit(doc.meta, model)
-  if closing == nil and credit == nil then
+  local funding = core.funding(doc.meta)
+  if closing == nil and credit == nil and funding == nil then
     return model.answers_used and doc or nil
   end
-  local table_blocks = credit and pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' }))
+  local cites, refs = references(doc)
+  local function references_slide()
+    if cites and not refs then
+      local title = (quarto.doc.language or {})['section-title-references']
+      doc.blocks:insert(pandoc.Header(2, pandoc.Inlines(type(title) == 'string' and title or ''),
+        pandoc.Attr('atelier-references', { 'unnumbered' })))
+      doc.blocks:insert(pandoc.Div({}, pandoc.Attr('refs')))
+    end
+  end
   if closing == nil then
-    doc.blocks:insert(pandoc.Header(2, pandoc.Inlines(model.labels['credit-title']), pandoc.Attr('atelier-credit-slide', { 'unnumbered' })))
-    doc.blocks:insert(table_blocks)
+    local first = funding ~= nil and 'funding' or 'credit'
+    doc.blocks:insert(end_heading(2, 'atelier-end-slide', model.labels[first .. '-title']))
+    if funding ~= nil then
+      doc.blocks:insert(pandoc.Div(core.funding_blocks(funding, model.labels), pandoc.Attr('', { 'atelier-funding' })))
+    end
+    if credit ~= nil then
+      if funding ~= nil then
+        doc.blocks:extend(credit_part(credit, model, 3))
+      else
+        doc.blocks:insert(pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' })))
+      end
+    end
+    references_slide()
     return doc
   end
-  local cites, refs = references(doc)
-  if cites and not refs then
-    local title = (quarto.doc.language or {})['section-title-references']
-    doc.blocks:insert(pandoc.Header(2, pandoc.Inlines(type(title) == 'string' and title or ''),
-      pandoc.Attr('atelier-references', { 'unnumbered' })))
-    doc.blocks:insert(pandoc.Div({}, pandoc.Attr('refs')))
-  end
+  references_slide()
   doc.blocks:insert(pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing', { 'atelier-closing', 'unnumbered' })))
   doc.blocks:extend(core.closing_parts(closing))
-  if table_blocks ~= nil then
-    table_blocks.content:insert(1, pandoc.Para({ pandoc.Strong(pandoc.Inlines(model.labels['credit-title'])) }))
-    doc.blocks:insert(table_blocks)
+  if funding ~= nil then
+    doc.blocks:extend(funding_part(funding, model, 3))
+  end
+  if credit ~= nil then
+    doc.blocks:extend(credit_part(credit, model, 3))
   end
   return doc
 end
