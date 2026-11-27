@@ -857,6 +857,25 @@ html.print-pdf:root {
   color: var(--atelier-terminal-muted);
 }
 
+// Three grey dots before the label, as in the other formats. The dots are
+// background paint on an empty box, so they have no text for assistive
+// technology.
+.reveal .slides .code-with-filename:has(pre.atelier-terminal) .code-with-filename-file {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+
+  &::before {
+    content: "";
+    flex: none;
+    width: 2.8em;
+    height: 0.7em;
+    background-image: radial-gradient(circle at 50% 50%, var(--atelier-terminal-dot) 0 0.35em, transparent 0.36em);
+    background-size: 1.05em 100%;
+    background-repeat: repeat-x;
+  }
+}
+
 .reveal .slides div.sourceCode:has(> pre.atelier-terminal),
 .reveal .slides pre.atelier-terminal {
   border-color: var(--atelier-terminal-border);
