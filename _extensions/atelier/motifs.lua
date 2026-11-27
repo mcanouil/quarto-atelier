@@ -18,6 +18,13 @@ local M = {}
 --- @type number
 M.LIGHT_OPACITY = 0.85
 
+--- The size of the motif, as a fraction of the width of its surface. `title`
+--- is for the title surfaces (the title slide and the first page of the PDF),
+--- `large` for the section slides and the chapter dividers. HTML keeps its own
+--- `clamp()` in `html/workshop.scss`, as a page has no fixed width.
+--- @type { title: number, large: number }
+M.RATIO = { title = 0.21, large = 0.45 }
+
 --- The motif of each preset.
 --- @type table<string, string>
 local PRESET_MOTIFS = {
@@ -126,7 +133,7 @@ end
 --- @param name string A motif name of `M.name`
 --- @return string
 local function svg(name)
-  local parts = { '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" data-motif="' .. name .. '">' }
+  local parts = { '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMaxYMin slice" data-motif="' .. name .. '">' }
   for _, shape in ipairs(M.shapes(name)) do
     local opacity = ' fill-opacity="' .. number(shape.opacity) .. '"/>'
     if shape.kind == 'rect' then
@@ -144,7 +151,9 @@ local function svg(name)
   return table.concat(parts)
 end
 
---- Answer the CSS value that draws a motif as a mask.
+--- Answer the CSS value that draws a motif as a mask. In a box that is lower
+--- than it is wide, the motif keeps its width and its top right corner, and
+--- loses its bottom: the deck float ends at the bottom of the slide content.
 --- @param name string A motif name of `M.name`
 --- @return string Such as `url("data:image/svg+xml,...")`
 function M.mask(name)

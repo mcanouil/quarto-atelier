@@ -5,23 +5,22 @@
 - feat: Run the embedded extensions in Typst and Reveal.js as well as HTML, so the `iconify` shortcode no longer fails in Typst. (#145)
 - feat: Embed the cascade, codefrag, tabset, a11y, typst-render, typst-extras and portable-links extensions. (#145)
 - fix: A `body-bg` brand default that is a Sass expression, such as `$gray-100`, no longer goes into the `theme-color` tags. (#146)
-- feat: The solutions of a Reveal.js deck in workshop mode go into the veil group `solutions`, so the reader can hide or show them. (#147)
+- feat: The answers of a Reveal.js deck go into the veil group `answers`, so the reader can hide or show them. (#147)
 - fix: A floating sidebar now keeps the same gap as the table of contents card, under the header, under the title banner and above the footer, so its rounded corners stay visible. (#149)
 - feat: Add the `atelier-typst` format, one PDF document type with the colours, fonts and highlighting of the site, tagged for PDF/UA-1. (#148)
 - feat: Turn on a cover, a contents page, chapter dividers, chapter contents and a closing page with five Typst switches under `extensions.atelier`. (#148)
-- feat: In workshop mode, a Typst handout shows the workshop blocks and puts the solutions at the end, inline, or nowhere, with `extensions.atelier.solutions`. (#148)
+- feat: A Typst handout shows the workshop blocks and puts the answers at the end, inline, or nowhere, with `extensions.atelier.answers`. (#148)
 - feat: Add the `atelier-revealjs` format, a 1280x720 deck with the colours, fonts and highlighting of the site, light or dark with `brand-mode: dark`. (#150)
 - feat: A deck turns each level-1 heading into a section slide, gives slides with the `.dark` class the dark colours, and puts the title and the slide number in its footer. (#150)
-- feat: In workshop mode, a deck shows the workshop blocks and the session duration, and its solutions start hidden in the veil group `solutions`, which Atelier now declares. (#150)
+- feat: A deck shows the workshop blocks, and its answers start hidden in the veil group `answers`, which Atelier declares. In workshop mode, it also shows the session duration. (#150)
 - feat: Add the `.prerequisites` and `.checkpoint` workshop blocks, with a label, an icon and an optional duration, in HTML, Typst and Reveal.js. (#151)
-- feat: In workshop mode, the title block or title slide shows each author as a speaker, with a photo from `extensions.atelier.speakers`. (#151)
-- feat: In workshop mode, `extensions.atelier.closing` ends the page, the handout or the deck with a thank-you, links and the licence, and a deck that cites sources gets a references slide before it. (#151)
-- feat: In workshop mode, a CRediT table shows the contribution roles of the authors, from the `roles` field of `author`, at the end of a handout or a deck and on the page that sets the closing. (#151)
-- feat: In workshop mode, the title block, the title slide and the section slides show the motif of the preset: steps, quadrants or dots. (#151)
+- feat: `extensions.atelier.closing` ends the page, the handout or the deck with a thank-you, links and the licence, and a deck that cites sources gets a references slide before it. (#151)
+- feat: A CRediT table shows the contribution roles of the authors, from the `roles` field of `author`, at the end of a handout or a deck and on the page that sets the closing. (#151)
+- feat: The title block, the title slide and the section slides show the motif of the preset: steps, quadrants or dots. (#151)
 - fix: The entries of a bibliography that Quarto marks as a list keep their list item role, so screen readers announce the list again. (#151)
 - fix: A Typst page no longer logs the offset-headings warning about the heading shift of Quarto.
 - feat: The workshop and documentation templates offer the PDF and the slide deck on their home page, with the link change of the PDF and the deck off until you set `website.site-url`.
-- docs: Add a page on the `atelier-typst` and `atelier-revealjs` formats, and document the prerequisites, checkpoint, speakers, closing, CRediT table and motifs of workshop mode.
+- docs: Add a page on the `atelier-typst` and `atelier-revealjs` formats, and document the prerequisites, checkpoint, author block, closing, CRediT table and motifs.
 - fix: The menu, the chalkboard buttons and the footer of a deck share one row with one centre line, and the two footer slots no longer run together. (#154)
 - fix: The keyboard reaches the chalkboard buttons of a deck, and screen readers announce them as buttons. (#154)
 - feat: The title slide of a deck shows only your `footer` text at the bottom, and the title and section slides show no slide number. (#154)
@@ -33,6 +32,23 @@
 - fix: A PDF logo with no alt text is decorative, so the PDF/UA-1 build no longer stops on it. (#157)
 - feat: A deck shows its logo above the title of the title slide and at the right end of the bottom row, with the dark image on dark slides. (#159)
 - feat: The closing takes your own text or file, and shows the copyright and the licence of the document, each of which you can hide.
+- feat: The workshop blocks, the author block, the closing and the CRediT table work in documentation mode too. Workshop mode now sets the workshop labels, the page duration and the course chrome.
+- feat: The solution block is now `.answer`, with `extensions.atelier.answers` and the veil group `answers`. `.solution` is Quarto's own block again, in every mode.
+- feat: The language keys `atelier-solution-summary`, `atelier-solution-title`, `atelier-solution-page` and `atelier-solutions-title` are now `atelier-answer-summary`, `atelier-answer-title`, `atelier-answer-page` and `atelier-answers-title`. Rename them where you override them.
+- feat: The title block shows the same author details in HTML, the PDF and the deck: photo, degrees, ORCID, email, affiliations under each author, and visible text for corresponding, equal contribution and deceased.
+- feat: Author photos use the native author keys `photo` and `photo-alt`, and `extensions.atelier.speakers` is removed.
+- fix: The accent rule under the PDF title no longer touches the title text.
+- feat: The end matter has one order in HTML and the PDF: closing, funding, CRediT, references, licence and copyright, then citation. The deck keeps its closing slide last, with the references slide before it.
+- feat: Atelier shows the native Quarto `funding` key in every format.
+- feat: The PDF shows the citation of the document after the references when `citation` is set.
+- feat: Text wraps around the shape of the motif in HTML and the deck, and the PDF title keeps clear of it.
+- feat: The block icons, the block corners and the checkpoint bar are the same in HTML, the PDF and the deck.
+- feat: The terminal block shows the prompt colour, the muted output and grey title dots in the PDF and the deck too.
+- feat: The terminal preset decoration shows in the PDF and the deck too, and `atelier-terminal-decoration: false` turns it off everywhere.
+- feat: The HTML title logo shows without JavaScript.
+- feat: The deck bottom row shows the copyright and the licence, keeps the slide number in the row with a logo, and puts every item on one centre line.
+- fix: The callout label sits on the centre of its icon.
+- fix: The closed accessibility menu of a deck no longer casts a shadow on the right edge of the slide.
 - fix: A tabset in a PDF becomes one heading per tab, just below the heading before the tabset, with the tab content under it, and the render no longer warns that it cannot recognise the format. (#166)
 
 ## 0.15.3 (2026-11-23)

@@ -201,7 +201,9 @@ $code-block-font-size: 0.6em !default;
   --atelier-hit: 32px;
   --atelier-icon: 22px;
   --atelier-row-gap: 4px;
+  --atelier-end-gap: 16px;
   --atelier-row-left: calc(var(--atelier-row-edge) + var(--atelier-row-buttons, 1) * (var(--atelier-hit) + var(--atelier-row-gap)) + 12px);
+  --atelier-row-side: max(var(--atelier-row-left), var(--atelier-end-min, 0px));
 }
 
 // A PDF export hides the buttons, so the title slot starts at the edge.
@@ -279,10 +281,14 @@ html.print-pdf:root {
 
 // The side columns of the row are at least as wide as the left buttons, so
 // the centre slot stays at the centre and never runs into them. On a narrow
-// screen, the title slot can have no room left, and it does not show.
+// screen, the title slot can have no room left, and it does not show. The
+// centre slot takes at most half of the row, so the end slot keeps room for
+// the copyright and the licence. `revealjs/bottom-row.html` writes
+// `--atelier-end-min`, the width of the slide number and the logo, so the
+// side columns are at least that wide too.
 .reveal .footer .atelier-footer-row {
   display: grid;
-  grid-template-columns: minmax(var(--atelier-row-left), 1fr) auto minmax(var(--atelier-row-left), 1fr);
+  grid-template-columns: minmax(var(--atelier-row-side), 1fr) fit-content(50%) minmax(var(--atelier-row-side), 1fr);
   align-items: center;
   column-gap: 24px;
   height: 100%;
@@ -319,20 +325,72 @@ html.print-pdf:root {
   visibility: hidden;
 }
 
-.reveal .footer .atelier-slot-logo {
+// The end slot holds the copyright and the licence, the place of the slide
+// number and the logo. The copyright and the licence give way first: they
+// are cut with an ellipsis, and their span carries the full text as its
+// title.
+.reveal .footer .atelier-slot-end {
   display: flex;
   align-items: center;
   grid-column: 3;
-  justify-self: end;
+  justify-content: flex-end;
+  gap: var(--atelier-end-gap);
+  min-width: 0;
   margin-right: var(--atelier-row-edge);
+}
+
+.reveal .footer .atelier-slot-rights {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reveal .footer .atelier-slot-number {
+  flex: none;
+  width: var(--atelier-number-width, 2ch);
+}
+
+.reveal .footer .atelier-slot-number[hidden] {
+  display: none;
+}
+
+.reveal .footer .atelier-slot-logo {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+// The title slide shows the copyright and the licence after the footer, in
+// the centre slot, and the other slides show them in the end slot.
+.reveal .footer .atelier-title-rights {
+  display: none;
+}
+
+// THE CENTRE LINE OF THE TEXT
+// A line box centres the whole height of the font, not its capitals, so
+// text sits a little off the centre line of the icons and the logo. Each text
+// item trims its box to the cap height and the baseline, and the row centres
+// that box. The same padding above and below keeps the centre, and leaves
+// room for accents and descenders in a slot that cuts its text. Figures stay
+// on the baseline and at the cap height, also in a font whose default
+// figures are old-style.
+// Remove when: never.
+.reveal :is(.footer, .slide-number) {
+  font-variant-numeric: lining-nums;
+}
+
+.reveal .footer :is(.atelier-slot-left, .atelier-slot-centre, .atelier-slot-rights) {
+  padding-block: 0.3em;
+  text-box: trim-both cap alphabetic;
 }
 
 // THE LOGO
 // The title slide shows the logo above the title, and the other slides show
 // it at the right end of the bottom row. Each place holds the light and the
 // dark image; `atelier-revealjs.lua` writes the rules that show the dark one
-// on dark surfaces. Quarto's own logo stays in the page, hidden, so Quarto
-// keeps the `has-logo` class that puts the slide number at the top.
+// on dark surfaces. Quarto's own logo stays in the page, hidden.
 // Remove when: never.
 .reveal.reveal .slide-logo {
   display: none;
@@ -342,10 +400,15 @@ html.print-pdf:root {
   display: none;
 }
 
+// A wide logo takes at most a quarter of the window, so the row keeps room
+// for the footer text. The image keeps its shape inside that width.
 .reveal .footer .atelier-slot-logo img {
   width: auto;
+  max-width: 25vw;
   height: var(--atelier-hit);
   margin: 0;
+  object-fit: contain;
+  object-position: right center;
 }
 
 .reveal .slides section .atelier-title-logo {
@@ -362,21 +425,34 @@ html.print-pdf:root {
   }
 }
 
-// Without a logo, Quarto puts the slide number in the bottom-right corner.
-// It sits on the row there, on the same centre line. With a logo, Quarto
-// moves it to the top-right corner, and it stays there.
+// THE SLIDE NUMBER
+// The slide number sits in the bottom row, between the copyright and licence
+// and the logo, also when the deck has a logo: `revealjs/bottom-row.html`
+// writes `--atelier-number-right`, the place that the end slot keeps for it.
+// The rule wins over the `.reveal.has-logo .slide-number` rule of Quarto,
+// which loads later and moves the number to the top-right corner. The link
+// of the number is a flex box of the row height, and its text is trimmed as
+// the text of the footer is.
+// Reveal.js sets `display` inline on the slide number.
 // Remove when: never.
-// Reveal.js sets `display` inline on the slide number, so the line height
-// centres the text in the row.
-.reveal.reveal:not(.has-logo) .slide-number {
-  right: var(--atelier-row-edge);
+.reveal.reveal.reveal .slide-number {
+  top: auto;
+  right: var(--atelier-number-right, var(--atelier-row-edge));
   bottom: var(--atelier-row-bottom);
   height: var(--atelier-row-height);
   padding: 0;
+  line-height: normal;
 }
 
-.reveal.reveal:not(.has-logo) :is(.slide-number, .slide-number a) {
-  line-height: var(--atelier-row-height);
+.reveal.reveal .slide-number a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  line-height: normal;
+}
+
+.reveal.reveal .slide-number a > * {
+  text-box: trim-both cap alphabetic;
 }
 
 // The arrows of the bottom-right layout sit above the row, so the logo slot
@@ -393,9 +469,33 @@ html.print-pdf:root {
 // it takes the hidden buttons out of the tab order. `atelier-revealjs.lua`
 // gives these slides their `data-state`.
 // Remove when: never.
-.atelier-title-state .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-logo),
+.atelier-title-state .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-end),
 .atelier-no-number-state .reveal .slide-number {
   visibility: hidden;
+}
+
+// On the title slide, the centre slot shows the footer, then the copyright
+// and the licence, on one line. The side slots are hidden, so the centre slot
+// takes the width that they leave. When the text does not fit, the line wraps
+// to two lines, and the row grows up from its bottom, so no text is cut.
+.atelier-title-state .reveal .footer .atelier-title-rights {
+  display: inline;
+}
+
+.atelier-title-state .reveal.reveal > .footer {
+  height: auto;
+  min-height: var(--atelier-row-height);
+}
+
+.atelier-title-state .reveal .footer .atelier-footer-row {
+  grid-template-columns: var(--atelier-row-left) 1fr var(--atelier-row-left);
+  min-height: var(--atelier-row-height);
+}
+
+.atelier-title-state .reveal .footer .atelier-slot-centre {
+  overflow: visible;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .atelier-section-state .reveal :is(.footer, .slide-number, .slide-number a, .controls, .slide-menu-button a, .slide-chalkboard-buttons) {
@@ -430,44 +530,104 @@ html.print-pdf:root {
   color: var(--atelier-muted);
 }
 
-.reveal .slides section.atelier-title-slide .quarto-title-authors {
-  justify-content: flex-start;
-}
+// The author block is the same in every mode: a round photo, when the author
+// has one, next to the name, the degrees and the ORCID badge, then the
+// attributes, the email and the affiliations under it.
+.reveal .slides section.atelier-title-slide {
+  .atelier-meta-group {
+    margin-top: 0.7em;
+  }
 
-// In workshop mode, the speakers replace the author list: a round photo, when
-// the speaker has one, next to the name, the degrees and the affiliation.
-.reveal .slides section.atelier-title-slide .atelier-speakers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em 1.5em;
-  margin-top: 0.8em;
-}
+  .quarto-title-meta-heading {
+    font-size: 0.4em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--atelier-muted);
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-}
+  .atelier-authors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12em, 1fr));
+    gap: 0.5em 1.5em;
+    margin: 0.2em 0 0;
+    padding: 0;
+    list-style: none;
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker-photo {
-  flex: none;
-  width: 2.2em;
-  height: 2.2em;
-  margin: 0;
-  border-radius: 50%;
-  object-fit: cover;
-}
+  .atelier-author {
+    margin: 0;
+    font-size: 0.6em;
+    line-height: 1.3;
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker-text {
-  margin: 0;
-  font-size: 0.6em;
-  line-height: 1.3;
-  color: var(--atelier-muted);
-}
+  .atelier-author p {
+    margin: 0;
+  }
 
-.reveal .slides section.atelier-title-slide .atelier-speaker-name {
-  font-weight: 700;
-  color: var(--atelier-fg);
+  p.author {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.1em 0.3em;
+    font-weight: 700;
+    color: var(--atelier-fg);
+  }
+
+  .atelier-author-photo {
+    flex: none;
+    width: 2.2em;
+    height: 2.2em;
+    margin: 0 0.3em 0 0;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .atelier-author-degrees {
+    font-weight: 400;
+    font-style: italic;
+    color: var(--atelier-muted);
+  }
+
+  .atelier-author-orcid {
+    display: inline-flex;
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .atelier-author-orcid svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .atelier-orcid-disc {
+    fill: var(--atelier-accent-text);
+  }
+
+  .atelier-orcid-glyph {
+    fill: var(--atelier-bg);
+  }
+
+  .atelier-author-attributes,
+  .atelier-author-email,
+  p.affiliation {
+    color: var(--atelier-muted);
+  }
+
+  .atelier-title-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2em;
+  }
+
+  .atelier-title-dates .atelier-meta-group {
+    margin-top: 0.5em;
+  }
+
+  .atelier-title-dates p {
+    margin: 0;
+    font-size: 0.6em;
+  }
 }
 
 .reveal .slides section.atelier-section {
@@ -596,15 +756,15 @@ html.print-pdf:root {
 // ===========================================================================
 // WORKSHOP BLOCKS
 // ===========================================================================
-// Prerequisites, objectives, checkpoints, exercises and solutions are blocks
+// Prerequisites, objectives, checkpoints, exercises and answers are blocks
 // with a hairline border and a head line, as in `html/workshop.scss`. A deck has no interaction for the
 // objectives, so each one has a box glyph.
 
-.reveal .slides :is(.atelier-prerequisites, .atelier-objectives, .atelier-checkpoint, .atelier-exercise, .atelier-solution) {
+.reveal .slides :is(.atelier-prerequisites, .atelier-objectives, .atelier-checkpoint, .atelier-exercise, .atelier-answer) {
   margin: var(--r-block-margin) 0;
   overflow: hidden;
   border: 1px solid var(--atelier-border);
-  border-radius: 12px;
+  border-radius: var(--atelier-block-radius);
   font-size: 0.8em;
 }
 
@@ -617,9 +777,9 @@ html.print-pdf:root {
   font-weight: 650;
 }
 
-// A deck loads no Bootstrap Icons font, so the two icons of the HTML block
-// heads are masks in the colour of the head. The paths are Bootstrap Icons
-// 1.11.3 (MIT): `bullseye`, `pencil-square`, `list-check` and `flag`.
+// A deck loads no Bootstrap Icons font, so the icons of the HTML block heads
+// are masks in the colour of the head. `atelier-revealjs.lua` writes the
+// mask of each icon from `icons.lua`.
 .reveal .slides .atelier-block-head .bi {
   flex: none;
   width: 1em;
@@ -628,22 +788,6 @@ html.print-pdf:root {
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: contain;
-}
-
-.reveal .slides .atelier-block-head .bi-bullseye {
-  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="M8 13A5 5 0 1 1 8 3a5 5 0 0 1 0 10m0 1A6 6 0 1 0 8 2a6 6 0 0 0 0 12"/><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/><path d="M9.5 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/></svg>');
-}
-
-.reveal .slides .atelier-block-head .bi-pencil-square {
-  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/></svg>');
-}
-
-.reveal .slides .atelier-block-head .bi-list-check {
-  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0m0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0m0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/></svg>');
-}
-
-.reveal .slides .atelier-block-head .bi-flag {
-  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12 12 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A20 20 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a20 20 0 0 0 1.349-.476l.019-.007.004-.002h.001M14 1.221c-.22.078-.48.167-.766.255-.81.252-1.872.523-2.734.523-.886 0-1.592-.286-2.203-.534l-.008-.003C7.662 1.21 7.139 1 6.5 1c-.669 0-1.606.229-2.415.478A21 21 0 0 0 3 1.845v6.433c.22-.078.48-.167.766-.255C4.576 7.77 5.638 7.5 6.5 7.5c.847 0 1.548.28 2.158.525l.028.01C9.32 8.29 9.86 8.5 10.5 8.5c.668 0 1.606-.229 2.415-.478A21 21 0 0 0 14 7.655V1.222z"/></svg>');
 }
 
 .reveal .slides .atelier-block-time {
@@ -694,43 +838,42 @@ html.print-pdf:root {
 }
 
 .reveal .slides .atelier-checkpoint {
-  border-left: 4px solid var(--atelier-callout-tip-border);
+  border-left: var(--atelier-checkpoint-bar) solid var(--atelier-callout-tip-border);
 }
 
 .reveal .slides .atelier-checkpoint > .atelier-block-head {
   color: var(--atelier-callout-tip-ink);
 }
 
-.reveal .slides .atelier-solution {
+.reveal .slides .atelier-answer {
   border-style: dashed;
   border-color: var(--atelier-control-border);
 }
 
-.reveal .slides .atelier-solution > .atelier-block-head {
+.reveal .slides .atelier-answer > .atelier-block-head {
   color: var(--atelier-accent-ink);
 }
 
 // ===========================================================================
 // MOTIF
 // ===========================================================================
-// In workshop mode, the title slide and the section slides have the motif of
-// the preset in the top right corner of the window. Reveal.js scales the
-// slide to fit the window, centres it, and centres the content of a slide,
-// so a corner of the slide is not a corner of the window. Reveal.js copies
-// the classes of a slide to its background, which covers the window, moves
-// with the slide, and fills each page of the PDF export, so the motif sits
-// on the background of each slide with the class `atelier-motif`, at the
-// size of the slide: 30% of its width, 45% on a section slide.
-// `atelier-revealjs.lua` adds the class and writes the mask and its colour,
-// from the palette. The motif only decorates: a pseudo-element with no text,
-// which forced colours remove.
+// The title slide and the section slides have the motif of the preset in
+// the top right corner of the window. Reveal.js scales the slide to fit the
+// window, centres it, and centres the content of a slide, so a corner of the
+// slide is not a corner of the window. Reveal.js copies the classes of a
+// slide to its background, which covers the window, moves with the slide, and
+// fills each page of the PDF export, so the motif sits on the background of
+// each slide with the class `atelier-motif`, at the size of the slide, from
+// `motifs.RATIO`. `atelier-revealjs.lua` adds the class and writes the mask,
+// its colour and its size. The motif only decorates: a pseudo-element with
+// no text, which forced colours remove.
 
 .reveal .slide-background.atelier-motif::after {
   content: "";
   position: absolute;
   top: 0;
   right: 0;
-  width: calc(var(--slide-width, 1280px) * var(--atelier-motif-size, 0.3) * var(--slide-scale, 1));
+  width: calc(var(--slide-width, 1280px) * var(--atelier-motif-size) * var(--slide-scale, 1));
   aspect-ratio: 1;
   pointer-events: none;
   background-color: var(--atelier-motif-paint);
@@ -740,14 +883,30 @@ html.print-pdf:root {
   mask-size: contain;
 }
 
-.reveal .slide-background.atelier-motif.atelier-section {
-  --atelier-motif-size: 0.45;
-}
-
 @media (forced-colors: active) {
   .reveal .slide-background.atelier-motif::after {
     display: none;
   }
+}
+
+// The slide keeps its text clear of the motif with an empty float of the
+// same size, whose `shape-outside` is the motif mask, so the lines wrap
+// around the shapes. `revealjs/motif-guard.html` moves the float to the top
+// right corner of the window, where the background paints the motif, and
+// cuts its bottom margin at the end of the content. The slide clips the part
+// of the float below its content, so Reveal.js centres the content, not the
+// float.
+
+.reveal .slides section.atelier-motif::before {
+  content: "";
+  float: right;
+  width: calc(var(--slide-width, 1280px) * var(--atelier-motif-size));
+  height: calc(var(--slide-width, 1280px) * var(--atelier-motif-size) + var(--atelier-motif-cut, 0px));
+  margin-top: calc(-1 * var(--atelier-slide-top, 0px));
+  margin-right: calc(-1 * var(--atelier-slide-right, 0px));
+  pointer-events: none;
+  shape-outside: var(--atelier-motif);
+  shape-margin: 16px;
 }
 
 // ===========================================================================
@@ -777,6 +936,16 @@ html.print-pdf:root {
   font-size: 0.5em;
 }
 
+.reveal .slides .atelier-funding {
+  font-size: 0.6em;
+}
+
+.reveal .slides section.atelier-closing h3,
+.reveal .slides section#atelier-end-slide h3 {
+  margin-top: 0.6em;
+  font-size: 0.7em;
+}
+
 .reveal .slides .atelier-credit table {
   margin: 0;
 }
@@ -801,6 +970,25 @@ html.print-pdf:root {
 
 .reveal .slides .code-with-filename:has(pre.atelier-terminal) .code-with-filename-file pre {
   color: var(--atelier-terminal-muted);
+}
+
+// Three grey dots before the label, as in the other formats. The dots are
+// background paint on an empty box, so they have no text for assistive
+// technology.
+.reveal .slides .code-with-filename:has(pre.atelier-terminal) .code-with-filename-file {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+
+  &::before {
+    content: "";
+    flex: none;
+    width: 2.8em;
+    height: 0.7em;
+    background-image: radial-gradient(circle at 50% 50%, var(--atelier-terminal-dot) 0 0.35em, transparent 0.36em);
+    background-size: 1.05em 100%;
+    background-repeat: repeat-x;
+  }
 }
 
 .reveal .slides div.sourceCode:has(> pre.atelier-terminal),

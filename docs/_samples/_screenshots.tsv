@@ -20,10 +20,10 @@ formats-typst-part	samples/report-full.typ	typst	3	light
 formats-typst-chapter-divider	samples/report-full.typ	typst	4	light
 formats-typst-chapter-contents	samples/report-full.typ	typst	5	light
 formats-typst-closing	samples/report-full.typ	typst	10	light
-formats-solutions-end	samples/solutions-end.typ	typst	1	light
-formats-solutions-end-solution	samples/solutions-end.typ	typst	2	light
-formats-solutions-inline	samples/solutions-inline.typ	typst	1	light
-formats-solutions-hide	samples/solutions-hide.typ	typst	1	light
+formats-solutions-end	samples/answers-end.typ	typst	1	light
+formats-solutions-end-solution	samples/answers-end.typ	typst	2	light
+formats-solutions-inline	samples/answers-inline.typ	typst	1	light
+formats-solutions-hide	samples/answers-hide.typ	typst	1	light
 formats-slide-section	samples/slides.html	revealjs	#/1	light
 formats-slide-content	samples/slides.html	revealjs	#/1/1	light
 formats-slide-dark	samples/slides.html	revealjs	#/1/2	light
@@ -34,7 +34,7 @@ workshop-objectives-revealjs	samples/blocks-slides.html	revealjs	#/1	light
 workshop-exercise-html	samples/blocks.html	html	.atelier-exercise	light
 workshop-exercise-typst	samples/blocks.typ	typst	3+trim	light
 workshop-exercise-revealjs	samples/blocks-slides.html	revealjs	#/2	light
-workshop-solution-html	samples/blocks.html	html	details.atelier-solution	light
+workshop-solution-html	samples/blocks.html	html	details.atelier-answer	light
 workshop-solution-typst	samples/blocks.typ	typst	8+trim	light
 workshop-solution-revealjs	samples/blocks-slides.html	revealjs	#/3	light
 workshop-terminal-html	samples/blocks.html	html	.code-with-filename:has(.atelier-terminal)	light

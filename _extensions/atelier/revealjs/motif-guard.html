@@ -1,0 +1,80 @@
+<script id="atelier-motif-guard" type="text/javascript">
+	/**
+	 * @license MIT
+	 * @copyright 2026 Mickaël Canouil
+	 * @author Mickaël Canouil
+	 */
+	// The background of a slide paints the motif in the top right corner of the
+	// window, and the float of `revealjs/deck.scss` keeps the text clear of it.
+	// Reveal.js scales the slide and centres it, so this script moves the float
+	// to that corner: `--atelier-slide-top` and `--atelier-slide-right` are the
+	// distances from the corner to the content box of the slide, in slide
+	// pixels. `--atelier-motif-cut` ends the float at the bottom of the
+	// content, so the height of the float does not change the centring. The
+	// script then centres the slide again, as Reveal.js does, because the
+	// content can wrap to more lines around the float.
+	(() => {
+		const SELECTOR = "section.atelier-motif";
+		const ROUNDS = 3;
+
+		const contentBottom = (slide) => {
+			let bottom = 0;
+			for (const child of slide.children) {
+				const style = getComputedStyle(child);
+				if (style.position === "absolute" || style.position === "fixed" || style.display === "none") continue;
+				bottom = Math.max(bottom, child.offsetTop + child.offsetHeight + parseFloat(style.marginBottom));
+			}
+			return bottom;
+		};
+
+		const centre = (slide, height) => {
+			const centred = Reveal.getConfig().center || slide.classList.contains("center");
+			if (!centred) return;
+			slide.style.top = `${Math.max((height - slide.scrollHeight) / 2, 0)}px`;
+		};
+
+		const place = (slide, height) => {
+			const layer = slide.slideBackgroundElement;
+			if (!layer || slide.offsetWidth === 0) return;
+			for (let round = 0; round < ROUNDS; round += 1) {
+				const box = slide.getBoundingClientRect();
+				const corner = layer.getBoundingClientRect();
+				const scale = box.width / slide.offsetWidth;
+				const style = getComputedStyle(slide);
+				const top = (box.top - corner.top) / scale + parseFloat(style.paddingTop);
+				const right = (corner.right - box.right) / scale + parseFloat(style.paddingRight);
+				slide.style.setProperty("--atelier-slide-top", `${top}px`);
+				slide.style.setProperty("--atelier-slide-right", `${right}px`);
+				slide.style.setProperty("--atelier-motif-cut", "0px");
+				const size = parseFloat(getComputedStyle(slide, "::before").width);
+				const floatBottom = parseFloat(style.paddingTop) - top + size;
+				const cut = Math.min(contentBottom(slide) - floatBottom, 0);
+				slide.style.setProperty("--atelier-motif-cut", `${cut}px`);
+				const before = slide.style.top;
+				centre(slide, height);
+				if (slide.style.top === before) break;
+			}
+		};
+
+		const guard = () => {
+			const height = Reveal.getComputedSlideSize().height;
+			document.querySelectorAll(`.reveal .slides ${SELECTOR}`).forEach((slide) => place(slide, height));
+		};
+
+		const start = () => {
+			if (!window.Reveal) return;
+			const run = () => {
+				guard();
+				Reveal.on("slidechanged", guard);
+				Reveal.on("resize", guard);
+				Reveal.on("pdf-ready", guard);
+				window.addEventListener("resize", () => requestAnimationFrame(guard));
+				document.fonts.ready.then(guard);
+			};
+			if (Reveal.isReady()) run();
+			else Reveal.on("ready", run);
+		};
+		if (document.readyState === "complete") start();
+		else window.addEventListener("load", start);
+	})();
+</script>

@@ -99,13 +99,13 @@
 #let atelier-chapter(it, switches) = {
   if not it.outlined { return it }
   let dividers = switches.at("chapter-dividers")
-  if not dividers and not switches.at("chapter-contents") { return it }
+  if not dividers and not switches.at("chapter-contents") { return atelier-terminal-chapter(it) }
   pagebreak(weak: true)
-  if not dividers { return it }
+  if not dividers { return atelier-terminal-chapter(it) }
   atelier-surface("divider")
   v(28%)
-  context block(below: 0.8em, atelier-kicker(atelier-chapter-label(it, atelier-part-next.get())))
-  block(text(size: 2.4em, weight: "bold", fill: atelier-colour("heading"), it.body))
+  context block(below: 0.8em, atelier-motif-guard(atelier-kicker(atelier-chapter-label(it, atelier-part-next.get()))))
+  block(atelier-motif-guard(text(size: 2.4em, weight: "bold", fill: atelier-colour("heading"), it.body)))
 }
 
 // End the page that a level-1 heading starts: the rule of a divider page,
@@ -158,11 +158,12 @@
   if lines.len() > 0 { lines.join(linebreak()) }
 }
 
-// Answer the closing section at the end of a workshop handout, when the
-// handout has a closing and no closing page.
+// Answer the closing section of a workshop handout, where the filter calls it
+// at the end of the body, before the funding, when the handout has a closing
+// and no closing page.
 #let atelier-closing-section() = context {
   let data = atelier-closing-data.final()
-  if data == none { return }
+  if data == none or atelier-switches.at("closing-page") { return }
   block(above: 2em, {
     atelier-rule(30%)
     atelier-closing-head(data)

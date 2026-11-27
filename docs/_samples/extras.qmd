@@ -9,6 +9,8 @@ format:
 author:
   - id: ana
     name: Ana Diaz
+    photo: speaker.svg
+    photo-alt: "A drawn portrait of Ana Diaz"
     affiliations:
       - name: Example University
     roles:
@@ -16,10 +18,6 @@ author:
 extensions:
   atelier:
     mode: workshop
-    speakers:
-      ana:
-        photo: speaker.svg
-        alt: "A drawn portrait of Ana Diaz"
     closing:
       links:
         - "[Ask a question](https://github.com/owner/project/discussions)"

@@ -518,24 +518,26 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
 // ===========================================================================
 // MOTIF
 // ===========================================================================
-// The title block of a workshop page has the motif of the preset in its top
-// right corner. `workshop/html.lua` writes the shapes as the mask
+// The title block of a page has the motif of the preset in its top
+// right corner, in every mode. `workshop/html.lua` writes the shapes as the mask
 // `--atelier-motif`. The motif is flat colour: the accent mark at 85%, as
 // `motifs.LIGHT_OPACITY`, on a light page, and the accent ink on a dark one.
 // It only decorates: a pseudo-element with no text, which forced colours
 // remove.
+// The motif floats, and `shape-outside` takes its mask as the float shape,
+// so the lines of the title block wrap around the shapes and nothing moves
+// down. The float can reach below the title block, and the first lines of
+// the page wrap around it too.
 
-html.atelier-workshop #title-block-header {
-  position: relative;
-
-  &::after {
+#title-block-header {
+  &::before {
     content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
+    float: right;
     width: clamp(4.5rem, 14vw, 9rem);
     aspect-ratio: 1;
     pointer-events: none;
+    shape-outside: var(--atelier-motif);
+    shape-margin: 0.75rem;
     mask-image: var(--atelier-motif);
     mask-repeat: no-repeat;
     mask-size: contain;
@@ -553,20 +555,11 @@ html.atelier-workshop #title-block-header {
   }
 }
 
-// ===========================================================================
-// SPEAKERS
-// ===========================================================================
-// `html/scripts/title-block.html` puts the photo of each speaker in front of
-// the name in the title block, as a round picture.
-
-#title-block-header .atelier-speaker-photo {
-  flex: none;
-  vertical-align: middle;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin-right: 0.4rem;
-  border-radius: 50%;
-  object-fit: cover;
+// A block with a border runs under a float, as only its lines wrap. A heading
+// or a rule with its own block formatting context sits beside the motif, so
+// its rule stays clear of it. Callouts and tables have one already.
+main :is(h1, h2, h3, h4, h5, h6, hr) {
+  display: flow-root;
 }
 
 // ===========================================================================
@@ -599,19 +592,20 @@ html.atelier-workshop #title-block-header {
 // ===========================================================================
 // W1 TO W3 BLOCKS
 // ===========================================================================
-// Prerequisites, objectives, checkpoints, exercises, and solutions are blocks
-// with a hairline border and a large radius. The Lua filter writes them in
-// workshop mode only.
+// Prerequisites, objectives, checkpoints, exercises, and answers are blocks
+// with a hairline border and the radius of `palette.geometry`, which
+// `workshop/html.lua` writes as custom properties. The Lua filter writes the
+// blocks in both modes.
 
 .atelier-prerequisites,
 .atelier-objectives,
 .atelier-checkpoint,
 .atelier-exercise,
-.atelier-solution {
+.atelier-answer {
   margin: 1rem 0;
   overflow: hidden;
   border: 1px solid var(--atelier-border);
-  border-radius: $border-radius-lg;
+  border-radius: var(--atelier-block-radius);
   font-size: 0.9rem;
 }
 
@@ -731,14 +725,14 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
 // A checkpoint is a stop in the work: a thick start border and a head in the
 // tip colour of the callouts, with no fill.
 .atelier-checkpoint {
-  border-left: 4px solid atelier-callout-border($callout-color-tip);
+  border-left: var(--atelier-checkpoint-bar) solid atelier-callout-border($callout-color-tip);
 
   > .atelier-block-head {
     color: atelier-callout-ink($callout-color-tip);
   }
 }
 
-.atelier-solution {
+.atelier-answer {
   border-style: dashed;
   border-color: var(--atelier-control-border);
 

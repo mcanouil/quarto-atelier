@@ -6,21 +6,23 @@
 --- @brief Write the workshop data and blocks of an HTML page.
 --- @description Writes one JSON block into the head of each HTML page. It
 --- holds the mode, the project offset, the translated labels, and, in
---- workshop mode, the page duration, the sidebar that lists the page, and the
---- durations of every page in that sidebar, and the photos of the speakers,
---- which `html/scripts/title-block.html` puts in the title block. A workshop
+--- workshop mode, the page duration, the sidebar that lists
+--- the page, and the durations of every page in that sidebar. A workshop
 --- page also gets the
 --- `atelier-workshop` class on `<html>` and the motif of its preset, and a
 --- workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
+--- Every page gets the block geometry of `palette.geometry` as custom
+--- properties, which `html/workshop.scss` reads.
 --- The blocks of `workshop/core.lua` become the head line and body of each
---- block, objective checkboxes, a `<details>` solution, and a terminal code
+--- block, objective checkboxes, a `<details>` answer, and a terminal code
 --- block for the code-blocks script.
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
+local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -36,20 +38,63 @@ local function encode(data)
   return (quarto.json.encode(data):gsub('</', '<\\/'))
 end
 
---- Add the workshop data block to the head, and the title-block labels of a
---- workshop page.
+--- The block geometry of a preset, as CSS declarations.
+--- @param preset string The preset
+--- @return string
+local function geometry_declarations(preset)
+  local geometry = palette.geometry(preset)
+  return string.format(
+    '--atelier-block-radius: %gpx; --atelier-checkpoint-bar: %gpx;',
+    geometry['block-radius'],
+    geometry['checkpoint-bar']
+  )
+end
+
+--- Write the block geometry into the head. A brand can set a preset for each
+--- scheme, so the dark page takes the geometry of its own preset.
+local function publish_geometry()
+  local light, dark = palette.preset('light'), palette.preset('dark')
+  local style = ':root { ' .. geometry_declarations(light) .. ' }'
+  if geometry_declarations(dark) ~= geometry_declarations(light) then
+    style = style .. ' body.quarto-dark { ' .. geometry_declarations(dark) .. ' }'
+  end
+  quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
+end
+
+--- Add the workshop data block to the head, the block geometry, the authors that
+--- `html/title-metadata.html` writes in the title block, and the
+--- title-block labels of a workshop page.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
---- @return table|nil The changed metadata of a workshop page, or nil
+--- @return table|nil The changed metadata, or nil when the page changes none
 function M.publish(meta, model)
   objectives = {}
+  publish_geometry()
+  -- The motif of the preset, which `html/workshop.scss` draws in the title
+  -- block. A brand can set a preset for each scheme, so the dark page takes
+  -- the motif of its own preset.
+  local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
+  local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
+  if dark ~= light then
+    style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
+  end
+  quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
   local data = {
     mode = model.mode,
     offset = quarto.project.offset or '',
     labels = model.labels,
   }
-  local changed = nil
+  local authors = core.authors(meta, model.labels)
+  if #authors > 0 then
+    -- A file, not a data URI: the pages of a course share it in the cache.
+    meta['atelier-authors'] = core.authors_meta(authors, model.labels, function(path)
+      quarto.doc.add_resource(path)
+      return path
+    end)
+  end
+  local changed = #authors > 0 and meta or nil
   if model.mode == core.MODE_WORKSHOP then
+    changed = meta
     data.duration = model.duration
     local course = core.course(model)
     if course.listed then
@@ -66,28 +111,7 @@ function M.publish(meta, model)
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
     )
-    -- The motif of the preset, which `html/workshop.scss` draws in the title
-    -- block. A brand can set a preset for each scheme, so the dark page takes
-    -- the motif of its own preset.
-    local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
-    local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
-    if dark ~= light then
-      style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
-    end
-    quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
-    local photos = {}
-    for _, speaker in ipairs(core.speakers(meta, model)) do
-      if speaker.photo ~= nil then
-        -- A file, not a data URI: the pages of a course share it in the cache.
-        quarto.doc.add_resource(speaker.photo)
-        photos[#photos + 1] = { name = speaker.name, photo = speaker.photo, alt = speaker.alt }
-      end
-    end
-    if #photos > 0 then
-      data.speakers = photos
-    end
     core.apply_title_labels(meta, model.labels)
-    changed = meta
   end
   quarto.doc.include_text(
     'in-header',
@@ -195,7 +219,7 @@ local function objectives_block(div, model)
     end
   end
   return pandoc.Div(
-    { M.block_head('bullseye', block.title, block.time), M.block_body(body) },
+    { M.block_head(core.BLOCKS.objectives, block.title, block.time), M.block_body(body) },
     M.block_attr(div, 'objectives')
   )
 end
@@ -214,13 +238,41 @@ local function head_block(div, kind, model)
   )
 end
 
---- Turn the workshop divs into blocks, in workshop mode only.
+--- Turn an answer into the closed disclosure. When the div has other classes
+--- or attributes, a div that carries them wraps the disclosure, so that a
+--- filter that runs later still finds them, for example Veil with
+--- `.veil group="..."`.
+--- @param answer { title: string|nil, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks } The answer of `core.answer`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Blocks The disclosure
+local function answer_block(answer, labels)
+  local identifier = answer.identifier
+  local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
+  local disclosure = pandoc.Blocks({
+    pandoc.RawBlock('html', '<details class="atelier-answer"' .. id .. '>'),
+    pandoc.Plain({
+      pandoc.RawInline('html', '<summary>'),
+      pandoc.Str(answer.title or labels['answer-summary']),
+      pandoc.RawInline('html', '</summary>'),
+    }),
+    M.block_body(answer.blocks),
+    pandoc.RawBlock('html', '</details>'),
+  })
+  local classes, attributes = core.other_attr(answer.div, 'answer')
+  if #classes == 0 and #attributes == 0 then
+    return disclosure
+  end
+  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, attributes)) })
+end
+
+--- Turn the workshop divs into blocks.
 --- @param div pandoc.Div The div
 --- @param model table The page model
---- @return pandoc.Div|nil The block, or nil to keep the div
+--- @return pandoc.Div|pandoc.Blocks|nil The block, or nil to keep the div
 function M.div(div, model)
-  if model.mode ~= core.MODE_WORKSHOP then
-    return nil
+  local answer = core.answer(div, model)
+  if answer ~= nil then
+    return answer_block(answer, model.labels)
   end
   if div.classes:includes('objectives') then
     return objectives_block(div, model)
@@ -232,7 +284,8 @@ function M.div(div, model)
   return nil
 end
 
---- Build the CRediT section: a heading and the table.
+--- Build the CRediT section: a heading and the table, in an `.appendix`
+--- section that Quarto moves into its appendix.
 --- @param credit table The table of `core.credit`
 --- @param labels table<string, string> The resolved labels
 --- @return pandoc.Div
@@ -240,62 +293,61 @@ function M.credit_section(credit, labels)
   return pandoc.Div({
     pandoc.Header(2, pandoc.Inlines(labels['credit-title']), pandoc.Attr('atelier-credit-title', { 'unnumbered' })),
     core.credit_table(credit, labels),
-  }, pandoc.Attr('', { 'atelier-credit' }))
+  }, pandoc.Attr('', { 'atelier-credit', 'appendix' }))
 end
 
---- Finish a workshop page after its blocks: the CRediT table, then the
---- closing, at the end of the page that sets `extensions.atelier.closing`.
---- The pages of a course share their authors, so only the page that closes
---- the workshop shows the table.
+--- Build the funding section: a heading, the statements and the awards, in
+--- an `.appendix` section that Quarto moves into its appendix.
+--- @param funding table The funding of `core.funding`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Div
+function M.funding_section(funding, labels)
+  local blocks = pandoc.Blocks({
+    pandoc.Header(2, pandoc.Inlines(labels['funding-title']), pandoc.Attr('atelier-funding-title', { 'unnumbered' })),
+  })
+  blocks:extend(core.funding_blocks(funding, labels))
+  return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-funding', 'appendix' }))
+end
+
+--- Build the closing section: the heading and the parts, with the links as
+--- a list that keeps its semantics.
+--- @param closing table The closing of `core.closing`
+--- @return pandoc.Div
+local function closing_section(closing)
+  local blocks = pandoc.Blocks({
+    pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
+  })
+  blocks:extend(core.closing_parts_html(closing))
+  return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' }))
+end
+
+--- Finish a page after its blocks: the closing at the end of the body, then
+--- the funding and the CRediT table as `.appendix` sections, which Quarto
+--- moves into its appendix before the references.
+--- The closing drops its copyright and its licence line when Quarto's
+--- appendix shows it, as Copyright or Reuse.
+--- The pages of a website or a book share their authors, so such a page shows the
+--- CRediT table only when it sets `extensions.atelier.closing`.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
-  local closing = core.closing(doc.meta, model)
-  if closing == nil then
+  local closing = core.closing(doc.meta, model, core.appendix_rights(doc.meta))
+  local funding = core.funding(doc.meta)
+  local credit = (closing ~= nil or not (logo.in_website() or core.in_book(doc.meta))) and core.credit(doc.meta, model) or nil
+  if closing == nil and funding == nil and credit == nil then
     return nil
   end
-  local credit = core.credit(doc.meta, model)
+  if closing ~= nil then
+    doc.blocks:insert(closing_section(closing))
+  end
+  if funding ~= nil then
+    doc.blocks:insert(M.funding_section(funding, model.labels))
+  end
   if credit ~= nil then
     doc.blocks:insert(M.credit_section(credit, model.labels))
   end
-  local blocks = pandoc.Blocks({
-    pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
-  })
-  blocks:extend(core.closing_parts(closing))
-  doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
   return doc
-end
-
---- Turn a solution into the closed disclosure. When the div has other classes
---- or attributes, a div that carries them wraps the disclosure, so that a
---- filter that runs later still finds them, for example Veil with
---- `.veil group="..."`.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return pandoc.Blocks|nil The disclosure, or nil to keep the node
-function M.proof(proof, model)
-  local solution = core.solution(proof, model)
-  if solution == nil then
-    return nil
-  end
-  local identifier = solution.identifier
-  local id = identifier ~= '' and (' id="' .. str.escape_attribute(identifier) .. '"') or ''
-  local disclosure = pandoc.Blocks({
-    pandoc.RawBlock('html', '<details class="atelier-solution"' .. id .. '>'),
-    pandoc.Plain({
-      pandoc.RawInline('html', '<summary>'),
-      pandoc.Str(solution.title),
-      pandoc.RawInline('html', '</summary>'),
-    }),
-    M.block_body(solution.div.content),
-    pandoc.RawBlock('html', '</details>'),
-  })
-  local classes, attributes = core.other_attr(solution.div, 'solution')
-  if #classes == 0 and #attributes == 0 then
-    return disclosure
-  end
-  return pandoc.Blocks({ pandoc.Div(disclosure, pandoc.Attr('', classes, attributes)) })
 end
 
 --- Draw a `.terminal` code block as a terminal, in both modes.
