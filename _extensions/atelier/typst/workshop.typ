@@ -159,6 +159,30 @@
   body
 }
 
+// The citation of a handout, from its `citation` key: a dictionary of
+// title, label and body, or none. The template shows it after the
+// bibliography.
+#let atelier-citation-data = state("atelier-citation-data", none)
+
+// Answer the citation section: a heading of the level of the CRediT heading,
+// the "cite as" label in the muted colour, then the formatted entry.
+// - title: the heading.
+// - label: the line before the entry.
+// - body: the entry.
+#let atelier-ws-citation(title, label, body) = {
+  heading(level: 1, numbering: none, title)
+  atelier-chapter-end()
+  block(below: 0.6em, text(fill: atelier-colour("muted"), label))
+  body
+}
+
+// Answer the citation section, where the template calls it after the
+// bibliography, when the handout has a citation.
+#let atelier-citation-section() = context {
+  let data = atelier-citation-data.final()
+  if data != none { atelier-ws-citation(data.title, data.label, data.body) }
+}
+
 // Answer the CRediT table: the contribution of each author to each role,
 // under a heading of its own level, as the answers have. The first column
 // names the role.

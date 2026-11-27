@@ -77,6 +77,7 @@ $workshop.typ()$
     if switches.at("toc-page") { pagebreak() }
   }
   body
+  atelier-citation-section()
   if switches.at("closing-page") {
     atelier-closing-page(meta)
   }
