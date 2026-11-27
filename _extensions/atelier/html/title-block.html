@@ -1,0 +1,79 @@
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<!--
+Copy of the Quarto partials `title-block.html` and `banner/title-block.html`,
+with the logo (`atelier-title-logo`, written by `atelier-html-logo.lua`) as the
+first child of `.quarto-title`. A partial cannot add to the title block of
+Quarto, and a script that moves the logo leaves the page with no logo when
+JavaScript is off. The manuscript title block is not supported.
+Upstream: none filed (no hook in the title block for extra content).
+Remove when: Quarto gives the title block a hook for extra content.
+-->
+$if(title-block-banner)$
+<header id="title-block-header" class="quarto-title-block default$if(quarto-template-params.banner-header-class)$ $quarto-template-params.banner-header-class$$endif$">
+  <div class="quarto-title-banner">
+    <div class="quarto-title column-body">
+      $if(atelier-title-logo)$<div class="atelier-title-logo">$atelier-title-logo$</div>$endif$
+      $if(title)$<h1 class="title">$title$</h1>$endif$
+      $if(subtitle)$
+      <p class="subtitle lead">$subtitle$</p>
+      $endif$
+      $if(description)$
+      <div>
+        <div class="description">
+          $description$
+        </div>
+      </div>
+      $endif$
+      $if(categories)$
+        $if(quarto-template-params.title-block-categories)$
+      <div class="quarto-categories">
+        $for(categories)$
+        <div class="quarto-category">$categories$</div>
+        $endfor$
+      </div>
+        $endif$
+      $endif$
+    </div>
+  </div>
+
+  $title-metadata.html()$
+
+</header>
+$else$
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+$if(atelier-title-logo)$<div class="atelier-title-logo">$atelier-title-logo$</div>$endif$
+$if(title)$
+<h1 class="title">$title$</h1>
+$endif$
+$if(subtitle)$
+<p class="subtitle lead">$subtitle$</p>
+$endif$
+$if(categories)$
+  $if(quarto-template-params.title-block-categories)$
+<div class="quarto-categories">
+  $for(categories)$
+  <div class="quarto-category">$categories$</div>
+  $endfor$
+</div>
+  $endif$
+$endif$
+</div>
+
+$if(hide-description)$
+$elseif(description)$
+<div>
+  <div class="description">
+    $description$
+  </div>
+</div>
+$endif$
+
+$title-metadata.html()$
+
+</header>
+$endif$
