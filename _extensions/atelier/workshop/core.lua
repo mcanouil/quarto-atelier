@@ -67,6 +67,8 @@ local LABELS = {
   'credit-equal',
   'credit-supporting',
   'credit-contributed',
+  'funding-title',
+  'funding-recipient',
   'closing-thanks',
   'answer-summary',
   'terminal',
@@ -739,11 +741,13 @@ end
 --- `true`, or a map with `title`, `text` or `file`, `links`, `copyright` and
 --- `licence`. The title is the closing label by default. The copyright and
 --- the licence are the Quarto `copyright` and `license`, and each of
---- `copyright: false` and `licence: false` hides its line.
+--- `copyright: false` and `licence: false` hides its line. A part that the
+--- format shows elsewhere, `true` in `shown`, is left out whatever its switch.
 --- @param meta table The document metadata
 --- @param model table The page model
+--- @param shown { copyright: boolean, licence: boolean }|nil The parts that the format shows elsewhere
 --- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil when unset
-function M.closing(meta, model)
+function M.closing(meta, model, shown)
   local value = model.options.closing
   if value == nil or value == false then
     return nil
@@ -757,13 +761,44 @@ function M.closing(meta, model)
   for _, link in ipairs(options.links or {}) do
     closing.links[#closing.links + 1] = to_inlines(link)
   end
-  if closing_switch(options, 'copyright', 'copyright') then
+  shown = shown or {}
+  if closing_switch(options, 'copyright', 'copyright') and not shown.copyright then
     closing.copyright = copyright_text(meta.copyright)
   end
-  if closing_switch(options, 'licence', 'license') then
+  if closing_switch(options, 'licence', 'license') and not shown.licence then
     closing.licence = licence_text(meta.license)
   end
   return closing
+end
+
+--- Answer which of the copyright and the licence Quarto shows in its HTML
+--- appendix, as Copyright and Reuse. Quarto shows no appendix in a book or
+--- with `appendix-style` `none` or `false`. It shows the copyright only as a
+--- string or a `statement`, and the licence only as a string, a list or a
+--- `text`. A filter does not get `book` in the document metadata, so it also
+--- comes from the project metadata.
+--- @param meta table The document metadata
+--- @return { copyright: boolean, licence: boolean }
+function M.appendix_rights(meta)
+  local none = { copyright = false, licence = false }
+  local style = meta['appendix-style']
+  if style == false or text_of(style) == 'none' or text_of(style) == 'false' or meta.book ~= nil then
+    return none
+  end
+  local project = meta_mod.get_project_metadata()
+  if project ~= nil and project.book ~= nil then
+    return none
+  end
+  local function shown(value, key)
+    if pandoc.utils.type(value) == 'table' then
+      value = value[key]
+    end
+    return text_of(value) ~= ''
+  end
+  return {
+    copyright = shown(meta.copyright, 'statement'),
+    licence = shown(meta.license, 'text'),
+  }
 end
 
 --- Build the parts of the closing after its heading: the content, the links
@@ -786,6 +821,115 @@ function M.closing_parts(closing)
     if closing[part] ~= nil then
       blocks:insert(pandoc.Div({ pandoc.Para(closing[part]) }, pandoc.Attr('', { 'atelier-closing-' .. part })))
     end
+  end
+  return blocks
+end
+
+-- ============================================================================
+-- FUNDING
+-- ============================================================================
+
+--- @class Award
+--- @field source pandoc.Inlines|nil The sources, joined with ', '
+--- @field id string|nil The award id
+--- @field recipients pandoc.Inlines|nil The names or institutions, joined with ', '
+
+--- @class Funding
+--- @field statements pandoc.Inlines[] One for each funding group with a statement
+--- @field awards Award[]
+
+--- Answer the text of one source or recipient as Quarto normalises it:
+--- `{ text }`, `{ name }` or `{ institution }`.
+--- @param entry table The entry
+--- @return string
+local function funder_text(entry)
+  if entry.name ~= nil then
+    return M.author_name(entry)
+  elseif entry.institution ~= nil then
+    return text_of(entry.institution.name)
+  end
+  return text_of(entry.text)
+end
+
+--- Join the texts of a list of sources or recipients with ', ', or answer
+--- nil when none has a text.
+--- @param entries table|nil The entries
+--- @return pandoc.Inlines|nil
+local function funder_list(entries)
+  local names = {}
+  for _, entry in ipairs(entries or {}) do
+    local name = funder_text(entry)
+    if name ~= '' then
+      names[#names + 1] = name
+    end
+  end
+  if #names == 0 then
+    return nil
+  end
+  return pandoc.Inlines(table.concat(names, ', '))
+end
+
+--- Read the funding of the document from the Quarto `funding` key, which
+--- Quarto normalises into a list of groups, each with a `statement` and
+--- `awards`. The `open-access` key is not shown.
+--- @param meta table The document metadata
+--- @return Funding|nil The funding, or nil when there is no statement and no award
+function M.funding(meta)
+  local funding = { statements = {}, awards = {} }
+  for _, group in ipairs(meta.funding or {}) do
+    if text_of(group.statement) ~= '' then
+      funding.statements[#funding.statements + 1] = to_inlines(group.statement)
+    end
+    for _, raw in ipairs(group.awards or {}) do
+      local id = text_of(raw.id)
+      local award = {
+        source = funder_list(raw.source),
+        id = id ~= '' and id or nil,
+        recipients = funder_list(raw.recipient),
+      }
+      if award.source ~= nil or award.id ~= nil or award.recipients ~= nil then
+        funding.awards[#funding.awards + 1] = award
+      end
+    end
+  end
+  if #funding.statements == 0 and #funding.awards == 0 then
+    return nil
+  end
+  return funding
+end
+
+--- Build the funding blocks: one paragraph for each statement, then a list
+--- with one item for each award: the source, the id in parentheses, and the
+--- recipients after the `funding-recipient` label. Each writer adds its own
+--- heading.
+--- @param funding Funding The funding of `M.funding`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Blocks
+function M.funding_blocks(funding, labels)
+  local blocks = pandoc.Blocks({})
+  for _, statement in ipairs(funding.statements) do
+    blocks:insert(pandoc.Para(statement))
+  end
+  local items = {}
+  for _, award in ipairs(funding.awards) do
+    local parts = {}
+    if award.source ~= nil then
+      parts[#parts + 1] = pandoc.utils.stringify(award.source)
+    end
+    if award.id ~= nil then
+      parts[#parts + 1] = '(' .. award.id .. ')'
+    end
+    local text = table.concat(parts, ' ')
+    if award.recipients ~= nil then
+      local recipient = labels['funding-recipient']:gsub('{names}', function()
+        return pandoc.utils.stringify(award.recipients)
+      end)
+      text = text == '' and recipient or text .. ', ' .. recipient
+    end
+    items[#items + 1] = { pandoc.Plain(pandoc.Inlines(text)) }
+  end
+  if #items > 0 then
+    blocks:insert(pandoc.BulletList(items))
   end
   return blocks
 end

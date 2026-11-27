@@ -416,6 +416,8 @@ language:
 | `atelier-credit-equal`           | `Equal`                              | `Égal`                                      |
 | `atelier-credit-supporting`      | `Supporting`                         | `Appui`                                     |
 | `atelier-credit-contributed`     | `Contributed`                        | `A contribué`                               |
+| `atelier-funding-title`          | `Funding`                            | `Financement`                               |
+| `atelier-funding-recipient`      | `awarded to {names}`                 | `attribué à {names}`                        |
 | `atelier-closing-thanks`         | `Thank you`                          | `Merci`                                     |
 | `atelier-terminal`               | `Terminal`                           | `Terminal`                                  |
 | `atelier-workshop-author-single` | `Instructor`                         | `Formateur·rice`                            |
