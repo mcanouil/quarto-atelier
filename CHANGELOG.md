@@ -50,6 +50,7 @@
 - fix: The callout label sits on the centre of its icon.
 - fix: The closed accessibility menu of a deck no longer casts a shadow on the right edge of the slide.
 - fix: A tabset in a PDF becomes one heading per tab, just below the heading before the tabset, with the tab content under it, and the render no longer warns that it cannot recognise the format. (#166)
+- fix: An image with `fig-align`, `fig-alt` and no caption keeps its alt text in a PDF, so the PDF/UA-1 build no longer stops on it. (#167)
 
 ## 0.15.3 (2026-11-23)
 

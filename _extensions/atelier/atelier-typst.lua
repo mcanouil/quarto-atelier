@@ -11,8 +11,9 @@
 --- `atelier-typst-data` metadata. The `typst/tokens.typ` partial writes that
 --- value in front of the template, so every partial can read it.
 --- The filter also marks each callout with its type and appearance, ends
---- the page of each level-1 heading, marks each `.part` heading, and writes
---- inline code with the Atelier code colours.
+--- the page of each level-1 heading, marks each `.part` heading, writes
+--- inline code with the Atelier code colours, and gives each image its
+--- `fig-alt` text as `alt`.
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
@@ -371,7 +372,30 @@ local function inline_code(code)
 end
 
 
+-- Quarto drops `fig-alt` in Typst for an image with `fig-align` and no
+-- caption, so the PDF/UA-1 compile stops on an image with no alt text. This
+-- copies `fig-alt` into `alt`, which Quarto keeps.
+-- Upstream: https://github.com/quarto-dev/quarto-cli/issues/14187
+-- Remove when: the minimum Quarto version includes the fix.
+
+--- Give an image its `fig-alt` text as `alt` when it has no `alt` of its own.
+--- @param image pandoc.Image
+--- @return pandoc.Image|nil
+local function keep_figure_alt(image)
+  local alt = image.attributes['fig-alt']
+  if alt == nil or image.attributes['alt'] ~= nil then
+    return nil
+  end
+  image.attributes['alt'] = alt
+  return image
+end
+
 return {
   { Meta = publish },
-  { Callout = mark_callout, Header = mark_chapter, Code = inline_code },
+  {
+    Callout = mark_callout,
+    Header = mark_chapter,
+    Code = inline_code,
+    Image = keep_figure_alt,
+  },
 }
