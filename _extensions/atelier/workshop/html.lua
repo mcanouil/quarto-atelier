@@ -309,23 +309,6 @@ function M.funding_section(funding, labels)
   return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-funding', 'appendix' }))
 end
 
---- Write a list of links as a `ul` with `role="list"`. The style hides the
---- bullets, and some browsers then drop the list semantics, so the role keeps
---- them. Each item stays pandoc inlines, so Quarto still resolves the links.
---- @param list pandoc.BulletList The list
---- @return pandoc.Blocks
-local function link_list(list)
-  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<ul role="list">') })
-  for _, item in ipairs(list.content) do
-    local inlines = pandoc.Inlines({ pandoc.RawInline('html', '<li>') })
-    inlines:extend(pandoc.utils.blocks_to_inlines(item))
-    inlines:insert(pandoc.RawInline('html', '</li>'))
-    blocks:insert(pandoc.Plain(inlines))
-  end
-  blocks:insert(pandoc.RawBlock('html', '</ul>'))
-  return blocks
-end
-
 --- Build the closing section: the heading and the parts, with the links as
 --- a list that keeps its semantics.
 --- @param closing table The closing of `core.closing`
@@ -334,12 +317,7 @@ local function closing_section(closing)
   local blocks = pandoc.Blocks({
     pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
   })
-  for _, part in ipairs(core.closing_parts(closing)) do
-    if part.classes:includes('atelier-closing-links') then
-      part.content = link_list(part.content[1])
-    end
-    blocks:insert(part)
-  end
+  blocks:extend(core.closing_parts_html(closing))
   return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' }))
 end
 

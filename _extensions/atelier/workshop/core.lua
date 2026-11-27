@@ -838,6 +838,37 @@ function M.closing_parts(closing)
   return blocks
 end
 
+--- Write a list of links as a `ul` with `role="list"`. The style hides the
+--- bullets, and some browsers then drop the list semantics, so the role keeps
+--- them. Each item stays pandoc inlines, so Quarto still resolves the links.
+--- @param list pandoc.BulletList The list
+--- @return pandoc.Blocks
+local function link_list(list)
+  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<ul role="list">') })
+  for _, item in ipairs(list.content) do
+    local inlines = pandoc.Inlines({ pandoc.RawInline('html', '<li>') })
+    inlines:extend(pandoc.utils.blocks_to_inlines(item))
+    inlines:insert(pandoc.RawInline('html', '</li>'))
+    blocks:insert(pandoc.Plain(inlines))
+  end
+  blocks:insert(pandoc.RawBlock('html', '</ul>'))
+  return blocks
+end
+
+--- Build the parts of the closing for HTML output (the page and the deck),
+--- with the links as a list that keeps its semantics.
+--- @param closing table The closing of `M.closing`
+--- @return pandoc.Blocks
+function M.closing_parts_html(closing)
+  local parts = M.closing_parts(closing)
+  for _, part in ipairs(parts) do
+    if part.classes:includes('atelier-closing-links') then
+      part.content = link_list(part.content[1])
+    end
+  end
+  return parts
+end
+
 -- ============================================================================
 -- FUNDING
 -- ============================================================================

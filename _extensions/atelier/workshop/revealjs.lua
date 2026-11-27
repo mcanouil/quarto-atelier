@@ -222,38 +222,6 @@ local function credit_div(credit, model)
   return pandoc.Div({ core.credit_table(credit, model.labels) }, pandoc.Attr('', { 'atelier-credit' }))
 end
 
---- Write a list of links as a `ul` with `role="list"`, as the HTML closing
---- does. The deck hides the bullets, and some browsers then drop the list
---- semantics, so the role keeps them. Each item stays pandoc inlines, so
---- Quarto still resolves the links.
---- @param list pandoc.BulletList The list
---- @return pandoc.Blocks
-local function link_list(list)
-  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<ul role="list">') })
-  for _, item in ipairs(list.content) do
-    local inlines = pandoc.Inlines({ pandoc.RawInline('html', '<li>') })
-    inlines:extend(pandoc.utils.blocks_to_inlines(item))
-    inlines:insert(pandoc.RawInline('html', '</li>'))
-    blocks:insert(pandoc.Plain(inlines))
-  end
-  blocks:insert(pandoc.RawBlock('html', '</ul>'))
-  return blocks
-end
-
---- Build the parts of the closing slide, with the links as a list that keeps
---- its semantics.
---- @param closing table The closing of `core.closing`
---- @return pandoc.Blocks
-local function closing_parts(closing)
-  local parts = core.closing_parts(closing)
-  for _, part in ipairs(parts) do
-    if part.classes:includes('atelier-closing-links') then
-      part.content = link_list(part.content[1])
-    end
-  end
-  return parts
-end
-
 --- Build the funding part: its heading, then the statements and the awards.
 --- @param funding table The funding of `core.funding`
 --- @param model table The page model
@@ -326,7 +294,7 @@ function M.finish(doc, model)
   end
   references_slide()
   doc.blocks:insert(pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing', { 'atelier-closing', 'unnumbered' })))
-  doc.blocks:extend(closing_parts(closing))
+  doc.blocks:extend(core.closing_parts_html(closing))
   if funding ~= nil then
     doc.blocks:extend(funding_part(funding, model, 3))
   end
