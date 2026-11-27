@@ -1,8 +1,13 @@
 # Atelier Extension for Quarto
 
 `atelier` is an accessible, brand-driven documentation-website project type for Quarto.
+It gives you HTML, Typst and Reveal.js output with WCAG AA colours, and a workshop mode for courses.
 
-It derives the navbar, the page footer, and a docked sidebar from one `_brand.yml`, in both colour schemes, and ships the accessibility scripts and social metadata a documentation site needs.
+It derives the navbar, the page footer and a docked sidebar from one `_brand.yml`, in both colour schemes, and ships the accessibility scripts and social metadata a documentation site needs.
+The PDF and the slide deck share the same brand, preset and title block as the site.
+
+The workshop blocks, the author block, the closing and the CRediT table work in both modes.
+Workshop mode changes the wording, the page duration and the course chrome of a site.
 
 ## Installation
 
