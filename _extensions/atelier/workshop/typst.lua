@@ -244,8 +244,9 @@ end
 
 --- Finish the handout after its blocks: write the answers collected for the
 --- end, an "Answers" heading, then one heading and the content of each
---- answer, then the CRediT table and the closing, which the template shows
---- after the body.
+--- answer, then the closing section, the funding and the CRediT table, in the
+--- order of the end matter. The bibliography follows, and a closing page, if
+--- the report has one, comes last from the template.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
@@ -253,7 +254,8 @@ function M.finish(doc, model)
   local page = model.answers
   local credit = core.credit(doc.meta, model)
   local closing = core.closing(doc.meta, model)
-  if page.count == 0 and credit == nil and closing == nil then
+  local funding = core.funding(doc.meta)
+  if page.count == 0 and credit == nil and closing == nil and funding == nil then
     return nil
   end
   if #page.collected > 0 then
@@ -267,11 +269,17 @@ function M.finish(doc, model)
       doc.blocks:extend(entry.content)
     end
   end
-  if credit ~= nil then
-    doc.blocks:insert(pandoc.RawBlock('typst', credit_call(credit, model.labels)))
-  end
   if closing ~= nil then
     doc.blocks:extend(closing_update(closing))
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-closing-section()'))
+  end
+  if funding ~= nil then
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-ws-funding(' .. typst_string(model.labels['funding-title']) .. ')['))
+    doc.blocks:extend(core.funding_blocks(funding, model.labels))
+    doc.blocks:insert(pandoc.RawBlock('typst', ']'))
+  end
+  if credit ~= nil then
+    doc.blocks:insert(pandoc.RawBlock('typst', credit_call(credit, model.labels)))
   end
   return doc
 end

@@ -149,6 +149,16 @@
   heading(level: 1, atelier-labels.at("answers-title"))
 }
 
+// Answer the funding section: a heading of the level of the CRediT heading,
+// then the statements and the awards.
+// - title: the heading.
+// - body: the content of the section.
+#let atelier-ws-funding(title, body) = {
+  heading(level: 1, numbering: none, title)
+  atelier-chapter-end()
+  body
+}
+
 // Answer the CRediT table: the contribution of each author to each role,
 // under a heading of its own level, as the answers have. The first column
 // names the role.

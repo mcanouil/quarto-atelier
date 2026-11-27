@@ -158,11 +158,12 @@
   if lines.len() > 0 { lines.join(linebreak()) }
 }
 
-// Answer the closing section at the end of a workshop handout, when the
-// handout has a closing and no closing page.
+// Answer the closing section of a workshop handout, where the filter calls it
+// at the end of the body, before the funding, when the handout has a closing
+// and no closing page.
 #let atelier-closing-section() = context {
   let data = atelier-closing-data.final()
-  if data == none { return }
+  if data == none or atelier-switches.at("closing-page") { return }
   block(above: 2em, {
     atelier-rule(30%)
     atelier-closing-head(data)

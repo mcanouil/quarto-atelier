@@ -79,7 +79,5 @@ $workshop.typ()$
   body
   if switches.at("closing-page") {
     atelier-closing-page(meta)
-  } else {
-    atelier-closing-section()
   }
 }
