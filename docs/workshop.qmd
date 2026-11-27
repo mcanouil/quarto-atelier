@@ -461,7 +461,8 @@ The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each p
 
 The end matter is what comes after the body: the closing, the funding, the CRediT table, the references, the licence and copyright, and the citation.
 It works in every mode.
-HTML, the PDF, and the deck show these parts in the same order, and each heading has the level of a top-level section.
+HTML and the PDF show these parts in one order, and each heading has the level of a top-level section.
+The deck keeps its closing slide last, so it shows the references slide before the closing slide, and the closing slide keeps the licence and copyright.
 
 | Part                  | HTML                                  | PDF                                    | Deck                                         |
 | --------------------- | ------------------------------------- | -------------------------------------- | -------------------------------------------- |
@@ -522,9 +523,9 @@ The PDF and the deck also show the CRediT table.
 
 ::: {layout-ncol=3}
 
-![The closing of a web page.](assets/gallery/workshop-closing-html.png){.lightbox group="workshop-closing" width="996" height="190" loading="lazy" fig-alt="The closing at the end of a web page: the heading Thank you, the link Ask a question, and the licence CC BY 4.0."}
+![The closing of a web page.](assets/gallery/workshop-closing-html.png){.lightbox group="workshop-closing" width="996" height="190" loading="lazy" fig-alt="The closing at the end of a web page: the heading Thank you and the link Ask a question. Quarto's appendix shows the licence below it."}
 
-![The closing of a PDF.](assets/gallery/workshop-closing-typst.png){.lightbox group="workshop-closing" width="909" height="251" loading="lazy" fig-alt="The end of a PDF: the table Author contributions (CRediT), a blue rule, the heading Thank you, the link Ask a question, and the licence CC BY 4.0."}
+![The closing of a PDF.](assets/gallery/workshop-closing-typst.png){.lightbox group="workshop-closing" width="909" height="251" loading="lazy" fig-alt="The end of a PDF: a blue rule, the heading Thank you, the link Ask a question, the licence CC BY 4.0, then the table Author contributions (CRediT)."}
 
 ![The closing slide of a deck.](assets/gallery/workshop-closing-revealjs.png){.lightbox group="workshop-closing" width="1280" height="720" loading="lazy" fig-alt="The closing slide of a deck: the heading Thank you, the link Ask a question, the licence CC BY 4.0, and a small CRediT table."}
 

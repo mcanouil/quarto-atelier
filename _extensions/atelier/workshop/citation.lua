@@ -119,7 +119,7 @@ end
 
 --- The CSL names of a name value: one name or a list of names.
 --- @param value any The value of a name key
---- @return table[]
+--- @return table[]|nil The names, or nil when no name has a text
 local function csl_names(value)
   local list = pandoc.utils.type(value) == 'List' and value or { value }
   local names = {}
@@ -129,7 +129,7 @@ local function csl_names(value)
       names[#names + 1] = name
     end
   end
-  return names
+  return #names > 0 and names or nil
 end
 
 --- A CSL date from a date map that has `date-parts`, or from an ISO date

@@ -846,7 +846,7 @@ local function funder_text(entry)
   if entry.name ~= nil then
     return M.author_name(entry)
   elseif entry.institution ~= nil then
-    return text_of(entry.institution.name)
+    return text_of(entry.institution.name or entry.institution)
   end
   return text_of(entry.text)
 end
