@@ -4,8 +4,8 @@
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 --- @brief Write the workshop parts of a Reveal.js deck.
---- @description The title slide gets the speakers, each with the photo of
---- `extensions.atelier.speakers`, and in workshop mode the session duration
+--- @description The title slide gets the authors, each with the photo of
+--- the native author key `photo`, and in workshop mode the session duration
 --- and the workshop labels. The blocks of `workshop/core.lua` become blocks
 --- with a head line, as in HTML. A deck has no interaction for the
 --- objectives, so each objective has a box glyph in place of a checkbox. An
@@ -59,24 +59,15 @@ local function declare_group(meta)
   meta.extensions.veil.groups = groups
 end
 
---- Set the speakers of the title slide. In workshop mode, also set the
---- workshop labels and the duration.
+--- Set the authors of the title slide in every mode. In workshop mode, also
+--- set the workshop labels and the duration.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
 --- @return table The changed metadata
 function M.publish(meta, model)
-  local speakers = pandoc.List({})
-  for _, speaker in ipairs(core.speakers(meta, model)) do
-    speakers:insert({
-      name = pandoc.MetaString(speaker.name),
-      degrees = #speaker.degrees > 0 and pandoc.MetaString(table.concat(speaker.degrees, ', ')) or nil,
-      affiliation = speaker.affiliation and pandoc.MetaString(speaker.affiliation) or nil,
-      photo = speaker.photo and pandoc.MetaString(core.photo_uri(speaker.photo)) or nil,
-      alt = pandoc.MetaString(speaker.alt),
-    })
-  end
-  if #speakers > 0 then
-    meta['atelier-speakers'] = speakers
+  local authors = core.authors(meta, model.labels)
+  if #authors > 0 then
+    meta['atelier-authors'] = core.authors_meta(authors, model.labels, core.photo_uri)
   end
   if model.mode ~= core.MODE_WORKSHOP then
     return meta

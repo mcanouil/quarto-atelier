@@ -38,7 +38,6 @@ local LABELS = {
   'colophon-typeset',
   'colophon-fonts',
   'author-orcid',
-  'author-corresponding',
   'duration',
   'answer-page',
   'answers-title',
@@ -193,67 +192,38 @@ local function labels_code()
   return typst_dict(entries)
 end
 
---- The plain text of a metadata value, or an empty string.
---- @param value any
---- @return string
-local function text_of(value)
-  if value == nil then
-    return ''
-  end
-  return str.stringify(value)
-end
-
---- The authors of the document, with their affiliations as numbers into the
---- list of affiliations, and the photo of each speaker from
---- `extensions.atelier.speakers`, as a Typst dictionary.
+--- The authors of the document as a Typst dictionary: each author with the
+--- fields of `core.authors`, the affiliation names under the author, and the
+--- visible text of the author attributes.
 --- @param meta table
---- @param model table The mode and the `extensions.atelier` options
 --- @return string
-local function authors_code(meta, model)
-  local photos = {}
-  for _, speaker in ipairs(core.speakers(meta, model)) do
-    if speaker.photo ~= nil then
-      photos[speaker.index] = speaker
-    end
-  end
-  local affiliations = {}
-  local numbers = {}
-  for _, affiliation in ipairs(meta['by-affiliation'] or {}) do
-    local name = text_of(affiliation.name)
-    if name ~= '' then
-      affiliations[#affiliations + 1] = typst_string(name)
-      numbers[text_of(affiliation.id)] = #affiliations
-    end
-  end
+local function authors_code(meta)
   local authors = {}
-  for index, author in ipairs(meta['by-author'] or {}) do
-    local name = core.author_name(author)
-    if name ~= '' then
-      local own = {}
-      for _, affiliation in ipairs(author.affiliations or {}) do
-        local number = numbers[text_of(affiliation.ref or affiliation.id)]
-        if number ~= nil then
-          own[#own + 1] = tostring(number)
-        end
-      end
-      local attributes = author.attributes or {}
-      local degrees = {}
-      for _, degree in ipairs(author.degrees or {}) do
-        degrees[#degrees + 1] = typst_string(text_of(degree))
-      end
-      authors[#authors + 1] = typst_dict({
-        name = typst_string(name),
-        degrees = typst_array(degrees),
-        affiliations = typst_array(own),
-        orcid = typst_string(text_of(author.orcid)),
-        email = typst_string(text_of(author.email)),
-        corresponding = attributes.corresponding == true and 'true' or 'false',
-        photo = photos[index] and typst_string(photos[index].photo) or 'none',
-        alt = photos[index] and photos[index].alt ~= '' and typst_string(photos[index].alt) or 'none',
-      })
+  for _, author in ipairs(core.authors(meta, core.resolve_labels())) do
+    local degrees, affiliations, attributes = {}, {}, {}
+    for _, degree in ipairs(author.degrees) do
+      degrees[#degrees + 1] = typst_string(degree)
     end
+    for _, affiliation in ipairs(author.affiliations) do
+      affiliations[#affiliations + 1] = typst_string(affiliation.name)
+    end
+    for _, attribute in ipairs(author.attributes) do
+      attributes[#attributes + 1] = typst_string(attribute)
+    end
+    authors[#authors + 1] = typst_dict({
+      name = typst_string(author.name),
+      url = author.url and typst_string(author.url) or 'none',
+      photo = author.photo and typst_string(author.photo) or 'none',
+      alt = author.photo and author.photo_alt ~= '' and typst_string(author.photo_alt) or 'none',
+      degrees = typst_array(degrees),
+      orcid = typst_string(author.orcid or ''),
+      email = typst_string(author.email or ''),
+      affiliations = typst_array(affiliations),
+      attributes = typst_array(attributes),
+      note = author.note and typst_string(author.note) or 'none',
+    })
   end
-  return typst_dict({ authors = typst_array(authors), affiliations = typst_array(affiliations) })
+  return typst_dict({ authors = typst_array(authors) })
 end
 
 --- The corner motif of a workshop handout, as a Typst dictionary of its
@@ -313,7 +283,7 @@ local function publish(meta)
     '#let atelier-preset-fonts = ' .. fonts_code(preset),
     '#let atelier-labels = ' .. labels_code(),
     '#let atelier-switches = ' .. switches_code(options),
-    '#let atelier-people = ' .. authors_code(meta, model),
+    '#let atelier-people = ' .. authors_code(meta),
     '#let atelier-motif-data = ' .. motif_code(model, preset, tokens, dark),
     '#let atelier-logo = ' .. logo_code(meta, dark),
   }

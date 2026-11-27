@@ -131,7 +131,7 @@ The pages below come from a report with the switches of this example, and a `.pa
 
 ### Workshop handouts
 
-The PDF shows the workshop blocks and the [workshop extras](workshop.qmd#speakers) in both modes.
+The PDF shows the workshop blocks and the [workshop extras](workshop.qmd#authors) in both modes.
 In workshop mode, it also shows the session duration and the workshop labels.
 
 ### Answers in a PDF

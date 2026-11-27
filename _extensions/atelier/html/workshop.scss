@@ -554,22 +554,6 @@ html.atelier-workshop #title-block-header {
 }
 
 // ===========================================================================
-// SPEAKERS
-// ===========================================================================
-// `html/scripts/title-block.html` puts the photo of each speaker in front of
-// the name in the title block, as a round picture.
-
-#title-block-header .atelier-speaker-photo {
-  flex: none;
-  vertical-align: middle;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin-right: 0.4rem;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-// ===========================================================================
 // CREDIT AND CLOSING
 // ===========================================================================
 // The Lua filter ends a workshop page with the CRediT table of the authors,

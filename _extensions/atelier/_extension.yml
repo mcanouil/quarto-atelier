@@ -95,6 +95,19 @@ contributes:
         - bundled/portable-links.lua
     html:
       respect-user-color-scheme: true
+      # The title block writes the authors of `workshop/core.lua`, with their
+      # photos and details, and the keywords as chips, with no script.
+      # Quarto accepts a user partial only when its name is in the list of the
+      # page, and a page with `title-block-style: none` has no
+      # `title-metadata.html`, so the render fails. `html/toc.html` is a copy
+      # of the Quarto partial with that name, always in the list, so such a
+      # page renders. Keep it identical to the Quarto file.
+      # Upstream: none filed (Quarto rejects a template partial that the page
+      # does not use)
+      # Remove when: Quarto accepts a template partial that the page does not use.
+      template-partials:
+        - html/title-metadata.html
+        - html/toc.html
       # Quarto builds the canonical link from `website.site-url`, giving a
       # directory index the URL of its directory. Set `canonical-url: false`
       # on a page served from more than one URL, such as `404.qmd`.
