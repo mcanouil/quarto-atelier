@@ -14,6 +14,8 @@
 --- otherwise, which Quarto then moves up to level 1. A nested tabset moves
 --- with the tabset around it, then under the heading before it.
 --- The tabset keeps its identifier and its other classes on a plain Div.
+--- Remove when: never. The levels are an Atelier choice, not a copy of a
+--- Quarto behaviour.
 --- The filter runs in Typst only, before offset-headings, so it reads the
 --- heading levels of the source. A `shift-heading-level-by` set by the
 --- document is not visible to filters, so the level of a tabset with no
@@ -62,8 +64,14 @@ local function each_own_heading(blocks, fn)
   })
 end
 
+--- Filter that walks the document, or the content of a tabset, in order.
+--- @type table
+local in_order
+
 --- Move the headings of a tabset under the heading before it, and remove
---- the tabset class.
+--- the tabset class. The content is walked here, so a nested tabset goes
+--- under its own tab, and the heading before the tabset stays the parent of
+--- the next tabset of the same section.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 local function flatten_tabset(div)
@@ -92,8 +100,11 @@ local function flatten_tabset(div)
     end
     return header
   end)
+  local outer_level = parent_level
+  div.content = div.content:walk(in_order)
+  parent_level = outer_level
   div.classes = div.classes:filter(function(class) return class ~= TABSET_CLASS end)
-  return div
+  return div, false
 end
 
 --- Record whether the source has a level-1 heading, as Quarto does.
@@ -106,11 +117,13 @@ if not quarto.doc.is_format('typst') then
   return {}
 end
 
+in_order = {
+  traverse = 'topdown',
+  Header = track_heading,
+  Div = flatten_tabset,
+}
+
 return {
   { Header = find_level_one },
-  {
-    traverse = 'topdown',
-    Header = track_heading,
-    Div = flatten_tabset,
-  },
+  in_order,
 }
