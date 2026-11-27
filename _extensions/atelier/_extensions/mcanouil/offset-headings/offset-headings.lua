@@ -13,7 +13,7 @@
 ---       offset-headings:
 ---         by: 1
 ---         recursive: true
----         max-level: 6
+---         max-level: 4
 ---         depth: 0
 ---
 ---     - `by` (integer, default 0): offset applied to every heading in the
@@ -23,12 +23,14 @@
 ---       per-heading offsets, used when a heading omits the
 ---       `offset-headings-recursive` attribute.
 ---
----     - `max-level` (integer, default 6): deepest level a heading may be
----       pushed to by a positive offset, used when a heading omits the
----       `offset-headings-max-level` attribute. Values outside [1, 6] are
----       clamped and a warning is emitted. The cap applies to the combined
----       level (document offset + per-heading offset), not to the per-heading
----       offset alone.
+---     - `max-level` (integer, no default): deepest level any heading may
+---       reach, and the default for the `offset-headings-max-level`
+---       attribute. When it is not set, headings have no upper level, so a
+---       heading can go deeper than 6; HTML and PDF show such a heading as
+---       text, and a format can style it. A value below 1 is clamped to 1 and
+---       a warning is emitted. The cap applies to the combined level
+---       (document offset + per-heading offset), not to the per-heading offset
+---       alone.
 ---
 ---     - `depth` (integer, default 0): default limit on how many descendant
 ---       heading levels inherit a cascading offset, used when a heading omits
@@ -57,7 +59,8 @@
 ---
 ---     - `offset-headings-by` (integer, required on the heading): amount added
 ---       to the heading level. Positive values push the heading deeper;
----       negative values pull it up. The result is clamped to [1, 6].
+---       negative values pull it up. The result is never below 1, and never
+---       deeper than `max-level` when it is set.
 ---
 ---     - `offset-headings-recursive` (boolean, optional, defaults to the
 ---       document-level `recursive` option): when true, every following
@@ -70,9 +73,9 @@
 ---
 ---     - `offset-headings-max-level` (integer, optional, defaults to the
 ---       document-level `max-level` option): caps the combined heading level
----       (document offset + this heading's offset). The result never goes
----       below this level, and the global range [1, 6] still applies. Values
----       outside [1, 6] are clamped and a warning is emitted.
+---       (document offset + this heading's offset), and of the headings its
+---       cascade reaches. It can only tighten the document `max-level`, never
+---       go deeper. A value below 1 is clamped to 1 and a warning is emitted.
 ---
 ---     - `offset-headings-depth` (integer, optional, defaults to the
 ---       document-level `depth` option): bounds how many descendant heading
@@ -132,7 +135,6 @@ local MAX_LEVEL_ATTRIBUTE = 'offset-headings-max-level'
 local DEPTH_ATTRIBUTE = 'offset-headings-depth'
 
 local MIN_LEVEL = 1
-local MAX_LEVEL = 6
 
 --- A cascade depth of 0 means unlimited descendant levels inherit the offset.
 local UNLIMITED_CASCADE_DEPTH = 0
@@ -143,8 +145,8 @@ local document_offset = 0
 --- Document-level default for per-heading cascading.
 local document_recursive = true
 
---- Document-level default for the deepest level a positive offset may reach.
-local document_max_level = MAX_LEVEL
+--- Document-level deepest level, or nil when the document sets no cap.
+local document_max_level = nil
 
 --- Document-level default for the cascade depth limit.
 local document_cascade_depth = UNLIMITED_CASCADE_DEPTH
@@ -152,20 +154,15 @@ local document_cascade_depth = UNLIMITED_CASCADE_DEPTH
 --- Whether to warn when Quarto's automatic heading shift can apply.
 local document_quarto_shift_warning = true
 
---- Clamp a heading level to the valid Pandoc range [1, 6].
+--- Clamp a heading level to at least 1, and to at most `max` when it is set.
 --- @param level number The desired heading level.
---- @return number The level clamped to [MIN_LEVEL, MAX_LEVEL].
-local function clamp_level(level)
-  return math.max(MIN_LEVEL, math.min(MAX_LEVEL, level))
-end
-
---- Clamp a heading level to the range [1, max], honouring the per-heading or
---- document-level maximum target level before the global Pandoc range applies.
---- @param level number The desired heading level.
---- @param max number The deepest level the heading may be pushed to.
---- @return number The level clamped to [MIN_LEVEL, min(max, MAX_LEVEL)].
-local function clamp_level_to_max(level, max)
-  return math.max(MIN_LEVEL, math.min(MAX_LEVEL, math.min(max, level)))
+--- @param max number|nil The deepest level allowed, or nil for no cap.
+--- @return number The clamped level.
+local function clamp_level(level, max)
+  if max ~= nil then
+    level = math.min(level, max)
+  end
+  return math.max(MIN_LEVEL, level)
 end
 
 --- Extract the per-heading offset from the element's resolved attributes.
@@ -184,20 +181,19 @@ local function get_offset_from_resolved(resolved)
   return value
 end
 
---- Clamp a max-level value to [MIN_LEVEL, MAX_LEVEL] and warn when out of range.
+--- Raise a max-level value below MIN_LEVEL to MIN_LEVEL, and warn when it does.
 --- @param value number The desired max-level.
 --- @param source string Human-readable source label (option or attribute name).
---- @return number The value clamped to the global heading range.
+--- @return number The value, at least MIN_LEVEL.
 local function clamp_max_level_with_warning(value, source)
-  if value < MIN_LEVEL or value > MAX_LEVEL then
-    local clamped = clamp_level(value)
+  if value < MIN_LEVEL then
     log.log_warning(
       EXTENSION_NAME,
       'Clamping "' .. source .. '" value ' .. tostring(value)
-        .. ' to ' .. tostring(clamped)
-        .. ' (must be in the range [' .. MIN_LEVEL .. ', ' .. MAX_LEVEL .. ']).'
+        .. ' to ' .. tostring(MIN_LEVEL)
+        .. ' (must be at least ' .. MIN_LEVEL .. ').'
     )
-    return clamped
+    return MIN_LEVEL
   end
   return value
 end
@@ -257,12 +253,12 @@ local function read_metadata(meta)
 
   local resolved_max_level = checker:option(MAX_LEVEL_OPTION)
   if type(resolved_max_level) == 'number' then
-    -- An in-range integer stays silent; one outside [1, 6] still gets
+    -- A value of 1 or more stays silent; one below 1 still gets
     -- clamp_max_level_with_warning's own message, because that one names the
     -- resulting clamped value, which the schema's own message does not.
     document_max_level = clamp_max_level_with_warning(resolved_max_level, MAX_LEVEL_OPTION)
   else
-    document_max_level = MAX_LEVEL
+    document_max_level = nil
   end
 
   local resolved_cascade_depth = checker:option(DEPTH_OPTION)
@@ -330,11 +326,16 @@ local function process_pandoc(doc)
     local resolved = checker:attributes(header.attributes, 'Header') or {}
 
     local raw_offset = header.attributes[OFFSET_ATTRIBUTE]
+    local raw_recursive = header.attributes[RECURSIVE_ATTRIBUTE]
+    local raw_max_level = header.attributes[MAX_LEVEL_ATTRIBUTE]
+    local raw_cascade_depth = header.attributes[DEPTH_ATTRIBUTE]
+    header.attributes[OFFSET_ATTRIBUTE] = nil
+    header.attributes[RECURSIVE_ATTRIBUTE] = nil
+    header.attributes[MAX_LEVEL_ATTRIBUTE] = nil
+    header.attributes[DEPTH_ATTRIBUTE] = nil
 
     if raw_offset ~= nil then
       local offset = get_offset_from_resolved(resolved)
-      header.attributes[OFFSET_ATTRIBUTE] = nil
-      local raw_recursive = header.attributes[RECURSIVE_ATTRIBUTE]
       local recursive
       if raw_recursive == nil then
         recursive = document_recursive
@@ -348,24 +349,22 @@ local function process_pandoc(doc)
         -- working, not a behaviour to change.
         recursive = parse_boolean(raw_recursive)
       end
-      header.attributes[RECURSIVE_ATTRIBUTE] = nil
 
-      local raw_max_level = header.attributes[MAX_LEVEL_ATTRIBUTE]
       local max_level = document_max_level
       if raw_max_level ~= nil then
         -- A non-integer value is named once, by the checker:attributes call
-        -- above; an in-range integer that falls outside [1, 6] still gets
-        -- clamp_max_level_with_warning's own message below, because that one
-        -- names the resulting clamped value, which the schema's message does
-        -- not.
+        -- above; an integer below 1 still gets clamp_max_level_with_warning's
+        -- own message below, because that one names the resulting clamped
+        -- value, which the schema's message does not.
         local resolved_max_level = resolved[MAX_LEVEL_ATTRIBUTE]
         if type(resolved_max_level) == 'number' then
           max_level = clamp_max_level_with_warning(resolved_max_level, MAX_LEVEL_ATTRIBUTE)
+          if document_max_level ~= nil then
+            max_level = math.min(max_level, document_max_level)
+          end
         end
       end
-      header.attributes[MAX_LEVEL_ATTRIBUTE] = nil
 
-      local raw_cascade_depth = header.attributes[DEPTH_ATTRIBUTE]
       local depth = document_cascade_depth
       if raw_cascade_depth ~= nil then
         -- A value the schema rejects is named once, by the checker:attributes
@@ -375,16 +374,15 @@ local function process_pandoc(doc)
           depth = resolved_depth
         end
       end
-      header.attributes[DEPTH_ATTRIBUTE] = nil
 
       if offset == nil then
         -- A value the schema rejects is named once, by the
         -- checker:attributes call above; no extension-side echo is added
         -- here.
-        header.level = clamp_level(original_level + document_offset)
+        header.level = clamp_level(original_level + document_offset, document_max_level)
         cascade = nil
       else
-        header.level = clamp_level_to_max(original_level + document_offset + offset, max_level)
+        header.level = clamp_level(original_level + document_offset + offset, max_level)
         if recursive then
           cascade = {
             offset = offset,
@@ -399,17 +397,17 @@ local function process_pandoc(doc)
     elseif cascade ~= nil and original_level <= cascade.base_level then
       -- Sibling or ancestor: stop cascading and apply only the document offset.
       cascade = nil
-      header.level = clamp_level(original_level + document_offset)
+      header.level = clamp_level(original_level + document_offset, document_max_level)
     elseif cascade ~= nil
       and cascade.depth ~= UNLIMITED_CASCADE_DEPTH
       and (original_level - cascade.base_level) > cascade.depth then
       -- Deeper than the cascade depth limit: apply only the document offset.
-      header.level = clamp_level(original_level + document_offset)
+      header.level = clamp_level(original_level + document_offset, document_max_level)
     elseif cascade ~= nil then
       -- Descendant within the active cascade: apply document and cascade offsets.
-      header.level = clamp_level_to_max(original_level + document_offset + cascade.offset, cascade.max_level)
+      header.level = clamp_level(original_level + document_offset + cascade.offset, cascade.max_level)
     else
-      header.level = clamp_level(original_level + document_offset)
+      header.level = clamp_level(original_level + document_offset, document_max_level)
     end
 
     return header, cascade
