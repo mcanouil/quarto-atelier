@@ -284,7 +284,6 @@ end
 --- @return table
 local function publish(meta)
   local options = core.read_options(meta)
-  local model = { mode = core.read_mode(meta, quarto.doc.input_file or '', true), options = options }
   local scheme = palette.document_scheme(meta)
   local painted = palette.painted_scheme(scheme)
   local preset = palette.preset(painted)

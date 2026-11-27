@@ -466,7 +466,8 @@ The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each p
 The end matter is what comes after the body: the closing, the funding, the CRediT table, the references, the licence and copyright, and the citation.
 It works in every mode.
 HTML and the PDF show these parts in one order, and each heading has the level of a top-level section.
-The deck keeps its closing slide last, so it shows the references slide before the closing slide, and the closing slide keeps the licence and copyright.
+The deck keeps its closing slide last, so it shows the references slide before the closing slide.
+The bottom row of every slide shows the licence and copyright.
 
 | Part                  | HTML                                  | PDF                                    | Deck                                         |
 | --------------------- | ------------------------------------- | -------------------------------------- | -------------------------------------------- |
@@ -474,7 +475,7 @@ The deck keeps its closing slide last, so it shows the references slide before t
 | Funding               | Quarto appendix                       | After the closing                      | On the closing slide, or on the end slide    |
 | CRediT table          | Quarto appendix                       | After the funding                      | On the closing slide, or on the end slide    |
 | References            | Quarto appendix                       | After the CRediT table                 | A slide before the closing slide             |
-| Licence and copyright | Quarto appendix                       | Page footer, and the closing section   | The closing slide                            |
+| Licence and copyright | Quarto appendix                       | Page footer, and the closing section   | The bottom row of every slide                |
 | Citation              | Quarto appendix                       | The last section, when `citation` is set | Not shown                                  |
 
 : The order of the end matter in each format. {.striped .hover tbl-colwidths="[18,24,28,30]"}
@@ -544,7 +545,7 @@ The closing shows the copyright and the licence only where the reader has no oth
   It also keeps a copyright that is a holder and a year, because the appendix shows only a text or a statement.
 - PDF: the closing keeps them.
   The page footer is an artifact, so a screen reader never reads it.
-- Deck: the closing keeps them.
+- Deck: the bottom row of every slide shows them, also when the closing hides them, so the closing slide leaves them out.
 
 ### Funding
 

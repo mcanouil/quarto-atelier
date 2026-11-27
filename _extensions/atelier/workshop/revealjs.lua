@@ -363,7 +363,9 @@ function M.code_block(code, model)
     return nil
   end
   terminal_count = terminal_count + 1
-  code.identifier = 'atelier-terminal-' .. terminal_count
+  if code.identifier == '' then
+    code.identifier = 'atelier-terminal-' .. terminal_count
+  end
   code.text = terminal.text
   code.classes:insert('atelier-terminal')
   if (code.attributes['code-window-auto-label'] or '') == '' then
