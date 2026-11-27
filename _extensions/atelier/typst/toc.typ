@@ -99,9 +99,9 @@
 #let atelier-chapter(it, switches) = {
   if not it.outlined { return it }
   let dividers = switches.at("chapter-dividers")
-  if not dividers and not switches.at("chapter-contents") { return it }
+  if not dividers and not switches.at("chapter-contents") { return atelier-terminal-chapter(it) }
   pagebreak(weak: true)
-  if not dividers { return it }
+  if not dividers { return atelier-terminal-chapter(it) }
   atelier-surface("divider")
   v(28%)
   context block(below: 0.8em, atelier-kicker(atelier-chapter-label(it, atelier-part-next.get())))

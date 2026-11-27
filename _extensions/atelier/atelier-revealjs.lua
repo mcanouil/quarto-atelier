@@ -393,6 +393,10 @@ local function publish(meta)
     meta['atelier-logo-html'] = pandoc.RawInline('html', deck.logo_html)
   end
   quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck, left_buttons(meta)))
+  if palette.terminal_decoration(scheme) then
+    quarto.doc.include_file('in-header', 'revealjs/terminal-decoration.html')
+    meta['atelier-terminal-cursor'] = true
+  end
   if meta.chalkboard then
     quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
   end

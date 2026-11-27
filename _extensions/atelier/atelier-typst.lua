@@ -298,6 +298,7 @@ local function publish(meta)
   local terminal_styles = palette.highlighting(preset, 'dark')
   local lines = {
     '#let atelier-preset = ' .. typst_string(preset),
+    '#let atelier-terminal-decoration = ' .. tostring(palette.terminal_decoration(scheme)),
     '#let atelier-tokens = ' .. tokens_code(tokens),
     '#let atelier-highlighting = ' .. typst_dict({
       page = highlighting_code(styles, { tokens.surface }),

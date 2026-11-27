@@ -384,6 +384,46 @@
 // DOCUMENT
 // ===========================================================================
 
+// ===========================================================================
+// TERMINAL DECORATION
+// ===========================================================================
+// The terminal preset marks the title with a prompt and a cursor, a heading
+// of level 2 or 3 in the source with `##` or `###`, and a list item with `-`,
+// as `html/terminal.scss` does. Quarto moves each heading of a document with a
+// title up one level, so the marker has one `#` more than the Typst level. Each marker is an artefact, so a screen reader
+// skips it. The cursor is steady, because a page has no animation. The
+// `atelier-terminal-decoration` data is false for other presets and when the
+// brand turns the decoration off.
+
+// Answer a marker of the terminal decoration: text in a colour, as an artefact.
+// - mark: the text of the marker.
+// - ink: name of the colour token.
+#let atelier-terminal-mark(mark, ink) = pdf.artifact(text(fill: atelier-colour(ink), mark))
+
+// Answer a heading of Typst level 1 or 2 with its marker before it and its
+// dashed rule under it. The marker sits next to the heading, not in its body, so
+// the outline, the bookmarks and the running header do not hold it. The size
+// of the marker is the default size of the heading.
+// - it: the heading.
+#let atelier-terminal-heading(it) = {
+  let size = if it.level == 1 { 1.4em } else { 1.2em }
+  let marker = range(it.level + 1).map(_ => "#").join() + " "
+  block(above: 1.4em, below: 0.9em, width: 100%, {
+    grid(
+      columns: (auto, 1fr),
+      column-gutter: 0pt,
+      atelier-terminal-mark(text(size: size, weight: "bold", marker), "muted"),
+      it,
+    )
+    v(0.35em, weak: true)
+    pdf.artifact(line(length: 100%, stroke: (paint: atelier-colour("border"), thickness: 0.75pt, dash: "dashed")))
+  })
+}
+
+// Answer a heading, with the terminal decoration when it is on.
+// - it: the heading.
+#let atelier-terminal-chapter(it) = if atelier-terminal-decoration { atelier-terminal-heading(it) } else { it }
+
 // Style the elements of a document with the tokens.
 // - body: the content of the document.
 #let atelier-elements(body) = {
@@ -396,6 +436,8 @@
     width: 100%,
   )
   show quote: atelier-quote
+  show heading.where(level: 2): atelier-terminal-chapter
+  set list(marker: atelier-terminal-mark("-", "accent-ink")) if atelier-terminal-decoration
   show figure: it => {
     if type(it.kind) != str {
       it

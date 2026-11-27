@@ -143,7 +143,17 @@
     block(below: 1.2em, if meta.logo.alt == none { pdf.artifact(mark) } else { mark })
   }
   if meta.title != none {
-    block(below: 0.5em, text(size: title-size, weight: "bold", fill: atelier-colour("heading"), headings(meta.title)))
+    // The terminal decoration puts a prompt before the title and a steady
+    // cursor after it. Both are artefacts.
+    let decorate(mark) = if atelier-terminal-decoration { atelier-terminal-mark(mark, "accent-ink") }
+    block(
+      below: 0.5em,
+      text(size: title-size, weight: "bold", fill: atelier-colour("heading"), {
+        decorate([\$$ ])
+        headings(meta.title)
+        decorate("█")
+      }),
+    )
   }
   // The gap follows the title size, so the rule clears the descenders.
   block(

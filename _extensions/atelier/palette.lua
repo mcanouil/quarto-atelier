@@ -523,6 +523,14 @@ local function apply_dark_fallback(v)
   end
 end
 
+--- Whether the brand value of `atelier-terminal-decoration` leaves the terminal
+--- decoration on: only `false` and `'false'` turn it off.
+--- @param value any The brand value, or nil
+--- @return boolean
+local function decoration_on(value)
+  return value ~= false and value ~= 'false'
+end
+
 --- Resolve the tokens from a set of inputs. This function does not read the
 --- document, so a test can call it with any inputs.
 --- @param inputs { scheme: string, preset: string|nil, variables: table<string, any> }
@@ -640,8 +648,7 @@ function M.resolve(inputs)
   t['link'] = v.colour('link-color') or t['accent-text']
   t['link-hover'] = contrast(M.mix(page_fg, t['link'], 0.2), page_bg, 4.5)
   -- html/terminal.scss: the terminal decoration frames code in the control border.
-  local decoration = v.get('atelier-terminal-decoration')
-  if preset == 'terminal' and decoration ~= false and decoration ~= 'false' then
+  if preset == 'terminal' and decoration_on(v.get('atelier-terminal-decoration')) then
     t['code-border'] = t['control-border']
   else
     t['code-border'] = t['border']
@@ -729,6 +736,15 @@ function M.preset(scheme)
     return 'default'
   end
   return tostring(preset)
+end
+
+--- Whether the terminal preset decoration is on for one scheme: the brand paints
+--- the terminal preset, and `atelier-terminal-decoration` is not `false`.
+--- @param scheme string The colour scheme, `light` or `dark`
+--- @return boolean
+function M.terminal_decoration(scheme)
+  return M.preset(M.painted_scheme(scheme)) == 'terminal'
+    and decoration_on(plain(M.brand_defaults(M.painted_scheme(scheme))['atelier-terminal-decoration']))
 end
 
 --- The Sass variables that the brand sets for one scheme: its Bootstrap
