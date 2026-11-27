@@ -292,7 +292,10 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
 
   // One item for each author, with its details and affiliations under the
   // name. The items sit side by side while they fit.
+  // Quarto lays the label and the contents of this group in two columns, which
+  // leaves the left half empty under the label.
   .quarto-title-meta-author {
+    display: block;
     margin-top: 1.1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--atelier-border);

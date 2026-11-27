@@ -89,6 +89,17 @@
   stack(spacing: 0.3em, ..lines.filter(line => line != none))
 }
 
+// Answer the authors side by side, up to three in a row, so that the block
+// does not leave the right of the page empty.
+// - authors: array of author dictionaries.
+#let atelier-author-grid(authors) = grid(
+  columns: (1fr,) * calc.min(authors.len(), 3),
+  align: top + start,
+  column-gutter: 1.5em,
+  row-gutter: 0.9em,
+  ..authors.map(atelier-author),
+)
+
 // Answer the keywords as chips, with the label above them.
 // - keywords: array of strings.
 // - label: the label.
@@ -147,7 +158,7 @@
   if people.authors.len() > 0 {
     block(
       below: 0.8em,
-      atelier-meta-line(meta.labels.authors, stack(spacing: 0.9em, ..people.authors.map(atelier-author))),
+      atelier-meta-line(meta.labels.authors, atelier-author-grid(people.authors)),
     )
   }
   let dates = ()
