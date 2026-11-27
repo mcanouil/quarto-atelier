@@ -53,3 +53,33 @@
   )
   pdf.artifact(place(corner, flipped))
 }
+
+// The space that the motif keeps clear of text, past the edge of its shapes.
+#let atelier-motif-clearance = 2mm
+
+// Answer how far from the right page edge the shapes of a motif reach in a
+// band of the page, plus the clearance, or 0pt when no shape is in the band.
+// The motif sits flush in the top right corner of the page.
+// - shapes: the shapes of the motif, see atelier-motif().
+// - size: side of the square motif.
+// - top: top of the band, from the top edge of the page.
+// - bottom: bottom of the band, from the top edge of the page.
+#let atelier-motif-inset(shapes, size, top, bottom) = {
+  let unit = size / 100
+  let (from, to) = (top / unit, bottom / unit)
+  let reach = none
+  for shape in shapes {
+    let left = none
+    if shape.kind == "rect" {
+      if shape.y < to and shape.y + shape.size > from { left = shape.x }
+    } else if shape.kind == "quarter" {
+      // The straight edge at x runs the whole height of the quarter.
+      if shape.y - shape.r < to and shape.y > from { left = shape.x }
+    } else {
+      let gap = if from <= shape.y and shape.y <= to { 0 } else { calc.min(calc.abs(from - shape.y), calc.abs(to - shape.y)) }
+      if gap < shape.r { left = shape.x - calc.sqrt(shape.r * shape.r - gap * gap) }
+    }
+    if left != none and (reach == none or left < reach) { reach = left }
+  }
+  if reach == none { 0pt } else { (100 - reach) * unit + atelier-motif-clearance }
+}
