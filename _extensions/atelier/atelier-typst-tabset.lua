@@ -14,6 +14,10 @@
 --- otherwise, which Quarto then moves up to level 1. A nested tabset moves
 --- with the tabset around it, then under the heading before it.
 --- The tabset keeps its identifier and its other classes on a plain Div.
+--- The filter runs in Typst only, before offset-headings, so it reads the
+--- heading levels of the source. A `shift-heading-level-by` set by the
+--- document is not visible to filters, so the level of a tabset with no
+--- heading before it does not take it into account.
 
 --- Class that marks a tabset.
 --- @type string
@@ -54,9 +58,7 @@ local function each_own_heading(blocks, fn)
         return div, false
       end
     end,
-    Header = function(header)
-      return fn(header)
-    end,
+    Header = fn,
   })
 end
 
@@ -98,6 +100,10 @@ end
 --- @param header pandoc.Header
 local function find_level_one(header)
   has_level_one = has_level_one or header.level == 1
+end
+
+if not quarto.doc.is_format('typst') then
+  return {}
 end
 
 return {

@@ -82,6 +82,8 @@ contributes:
         - path: bundled/div-reuse.lua
           at: post-quarto
         - bundled/highlight-text.lua
+        - path: atelier-typst-tabset.lua
+          at: pre-ast
         - path: bundled/offset-headings.lua
           at: pre-ast
         - path: bundled/preview-colour.lua
@@ -157,7 +159,9 @@ contributes:
       # the pre-AST stage, where list order decides which runs first. prism
       # stays before offset-headings, so a format-scoped attribute such as
       # `atelier-html:offset-headings-by` is promoted before offset-headings
-      # reads it.
+      # reads it. The Typst tabset filter also stays before offset-headings, so
+      # it reads the heading levels of the source, as Quarto does when it
+      # decides whether to move the Typst headings up one level.
       extensions:
         gitlink:
           widget:
@@ -204,8 +208,6 @@ contributes:
       font-paths: fonts
       pdf-standard: ua-1
       filters:
-        - path: atelier-typst-tabset.lua
-          at: pre-ast
         - atelier-typst.lua
         - path: bundled/typst-extras.lua
           at: post-quarto
