@@ -135,7 +135,7 @@
     let prompt = number in terminal.prompts
     let command = prompt or number in terminal.continuations
     if prompt {
-      text(fill: atelier-colour("terminal-prompt"))[\$$ ]
+      text(fill: atelier-colour("terminal-prompt"), raw("$$ "))
     }
     atelier-line-ink.update(atelier-colour(if command { "terminal-fg" } else { "terminal-muted" }))
     line
