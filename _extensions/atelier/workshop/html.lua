@@ -12,6 +12,8 @@
 --- `atelier-workshop` class on `<html>` and the motif of its preset, and a
 --- workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
+--- Every page gets the block geometry of `palette.geometry` as custom
+--- properties, which `html/workshop.scss` reads.
 --- The blocks of `workshop/core.lua` become the head line and body of each
 --- block, objective checkboxes, a `<details>` answer, and a terminal code
 --- block for the code-blocks script.
@@ -36,7 +38,30 @@ local function encode(data)
   return (quarto.json.encode(data):gsub('</', '<\\/'))
 end
 
---- Add the workshop data block to the head, the authors that
+--- The block geometry of a preset, as CSS declarations.
+--- @param preset string The preset
+--- @return string
+local function geometry_declarations(preset)
+  local geometry = palette.geometry(preset)
+  return string.format(
+    '--atelier-block-radius: %gpx; --atelier-checkpoint-bar: %gpx;',
+    geometry['block-radius'],
+    geometry['checkpoint-bar']
+  )
+end
+
+--- Write the block geometry into the head. A brand can set a preset for each
+--- scheme, so the dark page takes the geometry of its own preset.
+local function publish_geometry()
+  local light, dark = palette.preset('light'), palette.preset('dark')
+  local style = ':root { ' .. geometry_declarations(light) .. ' }'
+  if geometry_declarations(dark) ~= geometry_declarations(light) then
+    style = style .. ' body.quarto-dark { ' .. geometry_declarations(dark) .. ' }'
+  end
+  quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
+end
+
+--- Add the workshop data block to the head, the block geometry, the authors that
 --- `html/title-metadata.html` writes in the title block, and the
 --- title-block labels of a workshop page.
 --- @param meta table The document metadata
@@ -44,6 +69,7 @@ end
 --- @return table|nil The changed metadata, or nil when the page changes none
 function M.publish(meta, model)
   objectives = {}
+  publish_geometry()
   local data = {
     mode = model.mode,
     offset = quarto.project.offset or '',
@@ -193,7 +219,7 @@ local function objectives_block(div, model)
     end
   end
   return pandoc.Div(
-    { M.block_head('bullseye', block.title, block.time), M.block_body(body) },
+    { M.block_head(core.BLOCKS.objectives, block.title, block.time), M.block_body(body) },
     M.block_attr(div, 'objectives')
   )
 end

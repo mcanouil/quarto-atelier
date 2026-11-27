@@ -584,8 +584,9 @@ html.atelier-workshop #title-block-header {
 // W1 TO W3 BLOCKS
 // ===========================================================================
 // Prerequisites, objectives, checkpoints, exercises, and answers are blocks
-// with a hairline border and a large radius. The Lua filter writes them in
-// both modes.
+// with a hairline border and the radius of `palette.geometry`, which
+// `workshop/html.lua` writes as custom properties. The Lua filter writes the
+// blocks in both modes.
 
 .atelier-prerequisites,
 .atelier-objectives,
@@ -595,7 +596,7 @@ html.atelier-workshop #title-block-header {
   margin: 1rem 0;
   overflow: hidden;
   border: 1px solid var(--atelier-border);
-  border-radius: $border-radius-lg;
+  border-radius: var(--atelier-block-radius);
   font-size: 0.9rem;
 }
 
@@ -715,7 +716,7 @@ $_atelier-icon-check: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/20
 // A checkpoint is a stop in the work: a thick start border and a head in the
 // tip colour of the callouts, with no fill.
 .atelier-checkpoint {
-  border-left: 4px solid atelier-callout-border($callout-color-tip);
+  border-left: var(--atelier-checkpoint-bar) solid atelier-callout-border($callout-color-tip);
 
   > .atelier-block-head {
     color: atelier-callout-ink($callout-color-tip);

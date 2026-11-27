@@ -20,6 +20,7 @@ local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
+local icons = require(quarto.utils.resolve_path('icons.lua'):gsub('%.lua$', ''))
 
 --- Name that prefixes each warning.
 --- @type string
@@ -260,6 +261,28 @@ local function logo_code(meta, dark)
   return typst_dict({ path = typst_string(image.path), alt = image.alt ~= '' and typst_string(image.alt) or 'none' })
 end
 
+--- The block geometry of a preset, as a Typst dictionary of lengths: the CSS
+--- px of `palette.geometry` at 0.75pt each.
+--- @param preset string
+--- @return string
+local function geometry_code(preset)
+  local entries = {}
+  for name, px in pairs(palette.geometry(preset)) do
+    entries[name] = string.format('%gpt', px * 0.75)
+  end
+  return typst_dict(entries)
+end
+
+--- The head icon of each block kind, as a Typst dictionary of icon names.
+--- @return string
+local function block_icons_code()
+  local entries = {}
+  for kind, name in pairs(core.BLOCKS) do
+    entries[kind] = typst_string(name)
+  end
+  return typst_dict(entries)
+end
+
 --- Write the document data into `atelier-typst-data`.
 --- @param meta table
 --- @return table
@@ -286,6 +309,9 @@ local function publish(meta)
     '#let atelier-people = ' .. authors_code(meta),
     '#let atelier-motif-data = ' .. motif_code(model, preset, tokens, dark),
     '#let atelier-logo = ' .. logo_code(meta, dark),
+    '#let atelier-geometry = ' .. geometry_code(preset),
+    '#let atelier-icons = ' .. icons.typst(),
+    '#let atelier-block-icons = ' .. block_icons_code(),
   }
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })
   return meta

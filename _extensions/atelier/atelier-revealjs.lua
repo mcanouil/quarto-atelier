@@ -21,6 +21,7 @@ local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', 
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
+local icons = require(quarto.utils.resolve_path('icons.lua'):gsub('%.lua$', ''))
 
 --- The fallback family of each font role.
 --- @type table<string, string>
@@ -307,7 +308,8 @@ local function logo_rules(page_dark, section_dark)
   return rules
 end
 
---- The style element of the deck.
+--- The style element of the deck: the tokens, the block geometry and the
+--- masks of the block icons.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
@@ -317,6 +319,9 @@ end
 local function deck_style(scheme, tokens, dark, state, buttons)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
   lines[#lines + 1] = '  --atelier-row-buttons: ' .. buttons .. ';'
+  local geometry = palette.geometry(palette.preset(palette.painted_scheme(scheme)))
+  lines[#lines + 1] = string.format('  --atelier-block-radius: %gpx;', geometry['block-radius'])
+  lines[#lines + 1] = string.format('  --atelier-checkpoint-bar: %gpx;', geometry['checkpoint-bar'])
   for _, line in ipairs(token_declarations(tokens)) do
     lines[#lines + 1] = line
   end
@@ -329,6 +334,9 @@ local function deck_style(scheme, tokens, dark, state, buttons)
     lines[#lines + 1] = line
   end
   lines[#lines + 1] = '}'
+  for _, name in ipairs(sorted_keys(icons.PATHS)) do
+    lines[#lines + 1] = '.reveal .slides .atelier-block-head .bi-' .. name .. ' { mask-image: ' .. icons.mask(name) .. '; }'
+  end
   for _, rule in ipairs(scheme_highlighting('.reveal .slides', scheme, tokens)) do
     lines[#lines + 1] = rule
   end

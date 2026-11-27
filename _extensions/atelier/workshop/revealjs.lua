@@ -149,7 +149,7 @@ function M.div(div, model)
     for position, content in ipairs(read.blocks) do
       body:insert(position == read.list and objective_list(content) or content)
     end
-    return block(div, 'objectives', 'bullseye', read.title, read.time, body)
+    return block(div, 'objectives', core.BLOCKS.objectives, read.title, read.time, body)
   end
   local kind = core.block_kind(div)
   if kind ~= nil then

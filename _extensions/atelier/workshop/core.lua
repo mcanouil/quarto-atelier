@@ -1352,20 +1352,23 @@ function M.objective_text(item)
   return pandoc.Inlines({}), 1
 end
 
---- The blocks with a head line and a body, other than the objectives, by
---- class, with the Bootstrap Icons name of the icon of each one.
+--- The blocks with a head icon, by class, with the Bootstrap Icons name of
+--- the icon of each one, which `icons.lua` draws. The answer has no icon.
+--- `M.block_kind` finds all of them but the objectives.
 --- @type table<string, string>
 M.BLOCKS = {
+  objectives = 'bullseye',
   prerequisites = 'list-check',
   checkpoint = 'flag',
   exercise = 'pencil-square',
 }
 
---- The classes of `M.BLOCKS`, in the order that `M.block_kind` tries them.
+--- The classes of `M.BLOCKS` other than the objectives, in the order that
+--- `M.block_kind` tries them.
 --- @type string[]
 local BLOCK_ORDER = { 'prerequisites', 'checkpoint', 'exercise' }
 
---- Answer the class of the first block of `M.BLOCKS` that a div has, in the
+--- Answer the class of the first block of `BLOCK_ORDER` that a div has, in the
 --- order prerequisites, checkpoint, exercise.
 --- @param div pandoc.Div The div
 --- @return string|nil The class, or nil when the div is no such block
@@ -1378,10 +1381,10 @@ function M.block_kind(div)
   return nil
 end
 
---- Read a block of `M.BLOCKS`: the `title` attribute, else the label of the
+--- Read a block of `BLOCK_ORDER`: the `title` attribute, else the label of the
 --- kind, and the `duration` attribute.
 --- @param div pandoc.Div The div
---- @param kind string The class, a key of `M.BLOCKS`
+--- @param kind string The class, an item of `BLOCK_ORDER`
 --- @param model table The page model
 --- @return { title: string, time: string|nil, blocks: pandoc.Blocks } The block
 function M.block(div, kind, model)

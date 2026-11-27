@@ -871,6 +871,18 @@ M.PRESET_FONTS = {
   terminal = { base = 'JetBrains Mono', headings = 'JetBrains Mono', monospace = 'JetBrains Mono' },
 }
 
+--- The shape of the workshop blocks of one preset, in CSS px, for every
+--- format: the corner radius of a block and the width of the start bar of a
+--- checkpoint. The terminal preset has square blocks.
+--- @param preset string `default`, `quarto` or `terminal`
+--- @return { ['block-radius']: number, ['checkpoint-bar']: number }
+function M.geometry(preset)
+  return {
+    ['block-radius'] = preset == 'terminal' and 0 or 12,
+    ['checkpoint-bar'] = 4,
+  }
+end
+
 --- The token styles of every highlighting theme, loaded on first use.
 local highlighting_themes = nil
 
