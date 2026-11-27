@@ -578,7 +578,7 @@ author:
 ```
 
 A standalone web page, the PDF, and the deck show the table.
-A page of a website shows it only where `closing` is set.
+A page of a website, or a chapter of a book, shows it only where `closing` is set.
 A page with no roles shows no table.
 
 The table comes after the funding.

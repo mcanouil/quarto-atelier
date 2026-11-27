@@ -322,7 +322,7 @@ end
 --- moves into its appendix before the references.
 --- The closing drops its copyright and its licence line when Quarto's
 --- appendix shows it, as Copyright or Reuse.
---- The pages of a website share their authors, so a website page shows the
+--- The pages of a website or a book share their authors, so such a page shows the
 --- CRediT table only when it sets `extensions.atelier.closing`.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model

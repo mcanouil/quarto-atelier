@@ -771,6 +771,8 @@ function M.closing(meta, model, shown)
   return closing
 end
 
+local project_in_book = nil
+
 --- Answer whether the page is a chapter of a Quarto book. A filter does not
 --- get `book` in the document metadata, so it also comes from the project
 --- metadata.
@@ -780,8 +782,11 @@ function M.in_book(meta)
   if meta.book ~= nil then
     return true
   end
-  local project = meta_mod.get_project_metadata()
-  return project ~= nil and project.book ~= nil
+  if project_in_book == nil then
+    local project = meta_mod.get_project_metadata()
+    project_in_book = project ~= nil and project.book ~= nil
+  end
+  return project_in_book
 end
 
 --- Answer which of the copyright and the licence Quarto shows in its HTML
