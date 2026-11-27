@@ -20,6 +20,7 @@ local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
+local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -257,7 +258,8 @@ function M.div(div, model)
   return nil
 end
 
---- Build the CRediT section: a heading and the table.
+--- Build the CRediT section: a heading and the table, in an `.appendix`
+--- section that Quarto moves into its appendix.
 --- @param credit table The table of `core.credit`
 --- @param labels table<string, string> The resolved labels
 --- @return pandoc.Div
@@ -265,30 +267,82 @@ function M.credit_section(credit, labels)
   return pandoc.Div({
     pandoc.Header(2, pandoc.Inlines(labels['credit-title']), pandoc.Attr('atelier-credit-title', { 'unnumbered' })),
     core.credit_table(credit, labels),
-  }, pandoc.Attr('', { 'atelier-credit' }))
+  }, pandoc.Attr('', { 'atelier-credit', 'appendix' }))
 end
 
---- Finish a workshop page after its blocks: the CRediT table, then the
---- closing, at the end of the page that sets `extensions.atelier.closing`.
---- The pages of a course share their authors, so only the page that closes
---- the workshop shows the table.
+--- Build the funding section: a heading, the statements and the awards, in
+--- an `.appendix` section that Quarto moves into its appendix.
+--- @param funding table The funding of `core.funding`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Div
+function M.funding_section(funding, labels)
+  local blocks = pandoc.Blocks({
+    pandoc.Header(2, pandoc.Inlines(labels['funding-title']), pandoc.Attr('atelier-funding-title', { 'unnumbered' })),
+  })
+  blocks:extend(core.funding_blocks(funding, labels))
+  return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-funding', 'appendix' }))
+end
+
+--- Write a list of links as a `ul` with `role="list"`. The style hides the
+--- bullets, and some browsers then drop the list semantics, so the role keeps
+--- them. Each item stays pandoc inlines, so Quarto still resolves the links.
+--- @param list pandoc.BulletList The list
+--- @return pandoc.Blocks
+local function link_list(list)
+  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<ul role="list">') })
+  for _, item in ipairs(list.content) do
+    local inlines = pandoc.Inlines({ pandoc.RawInline('html', '<li>') })
+    inlines:extend(pandoc.utils.blocks_to_inlines(item))
+    inlines:insert(pandoc.RawInline('html', '</li>'))
+    blocks:insert(pandoc.Plain(inlines))
+  end
+  blocks:insert(pandoc.RawBlock('html', '</ul>'))
+  return blocks
+end
+
+--- Build the closing section: the heading and the parts, with the links as
+--- a list that keeps its semantics.
+--- @param closing table The closing of `core.closing`
+--- @return pandoc.Div
+local function closing_section(closing)
+  local blocks = pandoc.Blocks({
+    pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
+  })
+  for _, part in ipairs(core.closing_parts(closing)) do
+    if part.classes:includes('atelier-closing-links') then
+      part.content = link_list(part.content[1])
+    end
+    blocks:insert(part)
+  end
+  return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' }))
+end
+
+--- Finish a page after its blocks: the closing at the end of the body, then
+--- the funding and the CRediT table as `.appendix` sections, which Quarto
+--- moves into its appendix before the references.
+--- The closing drops its copyright and its licence line when Quarto's
+--- appendix shows it, as Copyright or Reuse.
+--- The pages of a website or a book share their authors, so such a page shows the
+--- CRediT table only when it sets `extensions.atelier.closing`.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
-  local closing = core.closing(doc.meta, model)
-  if closing == nil then
+  local closing = core.closing(doc.meta, model, core.appendix_rights(doc.meta))
+  local funding = core.funding(doc.meta)
+  local credit = (closing ~= nil or not (logo.in_website() or core.in_book(doc.meta))) and core.credit(doc.meta, model) or nil
+  if closing == nil and funding == nil and credit == nil then
     return nil
   end
-  local credit = core.credit(doc.meta, model)
+  if closing ~= nil then
+    doc.blocks:insert(closing_section(closing))
+  end
+  if funding ~= nil then
+    doc.blocks:insert(M.funding_section(funding, model.labels))
+  end
   if credit ~= nil then
     doc.blocks:insert(M.credit_section(credit, model.labels))
   end
-  local blocks = pandoc.Blocks({
-    pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
-  })
-  blocks:extend(core.closing_parts(closing))
-  doc.blocks:insert(pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' })))
   return doc
 end
 

@@ -38,6 +38,9 @@
 - feat: The title block shows the same author details in HTML, the PDF and the deck: photo, degrees, ORCID, email, affiliations under each author, and visible text for corresponding, equal contribution and deceased.
 - feat: Author photos use the native author keys `photo` and `photo-alt`, and `extensions.atelier.speakers` is removed.
 - fix: The accent rule under the PDF title no longer touches the title text.
+- feat: The end matter has one order in HTML and the PDF: closing, funding, CRediT, references, licence and copyright, then citation. The deck keeps its closing slide last, with the references slide before it.
+- feat: Atelier shows the native Quarto `funding` key in every format.
+- feat: The PDF shows the citation of the document after the references when `citation` is set.
 
 ## 0.15.3 (2026-11-23)
 

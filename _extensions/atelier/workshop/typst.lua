@@ -17,6 +17,7 @@
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
+local citation = require(quarto.utils.resolve_path('workshop/citation.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -242,10 +243,32 @@ local function closing_update(closing)
   return blocks
 end
 
+--- The Typst code that stores the citation in the state
+--- `atelier-citation-data`, which the template shows after the bibliography:
+--- the heading, the "cite as" label and the entry.
+--- @param entry pandoc.Inlines The entry of `citation.text`
+--- @return pandoc.Plain
+local function citation_update(entry)
+  local language = quarto.doc.language or {}
+  local function label(key, default)
+    local value = language[key]
+    return type(value) == 'string' and value or default
+  end
+  local inlines = pandoc.Inlines({ pandoc.RawInline('typst', string.format(
+    '#atelier-citation-data.update((title: %s, label: %s, body: [',
+    typst_string(label('section-title-citation', 'Citation')),
+    typst_string(label('appendix-attribution-cite-as', 'For attribution, please cite this work as:'))
+  )) })
+  inlines:extend(entry)
+  inlines:insert(pandoc.RawInline('typst', ']))'))
+  return pandoc.Plain(inlines)
+end
+
 --- Finish the handout after its blocks: write the answers collected for the
 --- end, an "Answers" heading, then one heading and the content of each
---- answer, then the CRediT table and the closing, which the template shows
---- after the body.
+--- answer, then the closing section, the funding and the CRediT table, in the
+--- order of the end matter. The bibliography follows, then the citation from
+--- the template, and a closing page, if the report has one, comes last.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
@@ -253,7 +276,9 @@ function M.finish(doc, model)
   local page = model.answers
   local credit = core.credit(doc.meta, model)
   local closing = core.closing(doc.meta, model)
-  if page.count == 0 and credit == nil and closing == nil then
+  local funding = core.funding(doc.meta)
+  local cite = citation.text(doc.meta)
+  if page.count == 0 and credit == nil and closing == nil and funding == nil and cite == nil then
     return nil
   end
   if #page.collected > 0 then
@@ -267,11 +292,20 @@ function M.finish(doc, model)
       doc.blocks:extend(entry.content)
     end
   end
+  if closing ~= nil then
+    doc.blocks:extend(closing_update(closing))
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-closing-section()'))
+  end
+  if funding ~= nil then
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-ws-funding(' .. typst_string(model.labels['funding-title']) .. ')['))
+    doc.blocks:extend(core.funding_blocks(funding, model.labels))
+    doc.blocks:insert(pandoc.RawBlock('typst', ']'))
+  end
   if credit ~= nil then
     doc.blocks:insert(pandoc.RawBlock('typst', credit_call(credit, model.labels)))
   end
-  if closing ~= nil then
-    doc.blocks:extend(closing_update(closing))
+  if cite ~= nil then
+    doc.blocks:insert(citation_update(cite))
   end
   return doc
 end
