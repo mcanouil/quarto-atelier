@@ -16,7 +16,7 @@
 - feat: Add the `.prerequisites` and `.checkpoint` workshop blocks, with a label, an icon and an optional duration, in HTML, Typst and Reveal.js. (#151)
 - feat: `extensions.atelier.closing` ends the page, the handout or the deck with a thank-you, links and the licence, and a deck that cites sources gets a references slide before it. (#151)
 - feat: A CRediT table shows the contribution roles of the authors, from the `roles` field of `author`, at the end of a handout or a deck and on the page that sets the closing. (#151)
-- feat: In workshop mode, the title block, the title slide and the section slides show the motif of the preset: steps, quadrants or dots. (#151)
+- feat: The title block, the title slide and the section slides show the motif of the preset: steps, quadrants or dots. (#151)
 - fix: The entries of a bibliography that Quarto marks as a list keep their list item role, so screen readers announce the list again. (#151)
 - fix: A Typst page no longer logs the offset-headings warning about the heading shift of Quarto.
 - feat: The workshop and documentation templates offer the PDF and the slide deck on their home page, with the link change of the PDF and the deck off until you set `website.site-url`.
@@ -41,6 +41,14 @@
 - feat: The end matter has one order in HTML and the PDF: closing, funding, CRediT, references, licence and copyright, then citation. The deck keeps its closing slide last, with the references slide before it.
 - feat: Atelier shows the native Quarto `funding` key in every format.
 - feat: The PDF shows the citation of the document after the references when `citation` is set.
+- feat: Text wraps around the shape of the motif in HTML and the deck, and the PDF title keeps clear of it.
+- feat: The block icons, the block corners and the checkpoint bar are the same in HTML, the PDF and the deck.
+- feat: The terminal block shows the prompt colour, the muted output and grey title dots in the PDF and the deck too.
+- feat: The terminal preset decoration shows in the PDF and the deck too, and `atelier-terminal-decoration: false` turns it off everywhere.
+- feat: The HTML title logo shows without JavaScript.
+- feat: The deck bottom row shows the copyright and the licence, keeps the slide number in the row with a logo, and puts every item on one centre line.
+- fix: The callout label sits on the centre of its icon.
+- fix: The closed accessibility menu of a deck no longer casts a shadow on the right edge of the slide.
 
 ## 0.15.3 (2026-11-23)
 
