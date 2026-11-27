@@ -384,14 +384,15 @@ end
 --- the source, with the content of the tab under it. Quarto has no Typst
 --- rendering for a tabset: its fallback warns, and caps the headings at level 4.
 --- @param tabset table The Quarto tabset node
---- @return pandoc.Blocks
+--- The tabset keeps its identifier and classes on a Div around the headings.
+--- @return pandoc.Div
 local function flatten_tabset(tabset)
   local blocks = pandoc.Blocks({})
   for _, tab in ipairs(tabset.tabs) do
     blocks:insert(pandoc.Header(tabset.level, quarto.utils.as_inlines(tab.title)))
     blocks:extend(quarto.utils.as_blocks(tab.content))
   end
-  return blocks
+  return pandoc.Div(blocks, tabset.attr)
 end
 
 return {
