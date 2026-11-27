@@ -149,7 +149,7 @@ function M.div(div, model)
     for position, content in ipairs(read.blocks) do
       body:insert(position == read.list and objective_list(content) or content)
     end
-    return block(div, 'objectives', 'bullseye', read.title, read.time, body)
+    return block(div, 'objectives', core.BLOCKS.objectives, read.title, read.time, body)
   end
   local kind = core.block_kind(div)
   if kind ~= nil then
@@ -261,7 +261,9 @@ function M.finish(doc, model)
   if model.answers_used then
     declare_group(doc.meta)
   end
-  local closing = core.closing(doc.meta, model)
+  -- The bottom row shows the copyright and the licence on every slide, so the
+  -- closing leaves them out.
+  local closing = core.closing(doc.meta, model, { copyright = true, licence = true })
   local credit = core.credit(doc.meta, model)
   local funding = core.funding(doc.meta)
   if closing == nil and credit == nil and funding == nil then
@@ -292,7 +294,7 @@ function M.finish(doc, model)
   end
   references_slide()
   doc.blocks:insert(pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing', { 'atelier-closing', 'unnumbered' })))
-  doc.blocks:extend(core.closing_parts(closing))
+  doc.blocks:extend(core.closing_parts_html(closing))
   if funding ~= nil then
     doc.blocks:extend(funding_part(funding, model, 3))
   end
@@ -302,20 +304,74 @@ function M.finish(doc, model)
   return doc
 end
 
---- Draw a `.terminal` code block as a terminal, in both modes. The prompts
---- stay in the text, as in Typst: the deck has no script that draws them.
+local terminal_count = 0
+
+--- The scoped style of one terminal block: the prompt before each prompt
+--- line, and the muted colour on each output line. Lua writes it, so the deck
+--- needs no script. The empty alternative text and `user-select` keep the
+--- prompt out of the accessible text and out of a copy.
+--- @param id string The identifier of the code block
+--- @param terminal { text: string, prompts: string[], continuations: string[] } The terminal
+--- @return string
+local function terminal_style(id, terminal)
+  local command = {}
+  for _, number in ipairs(terminal.prompts) do
+    command[number] = 'prompt'
+  end
+  for _, number in ipairs(terminal.continuations) do
+    command[number] = 'continuation'
+  end
+  local prompts = {}
+  local output = {}
+  local count = select(2, terminal.text:gsub('\n', '')) + 1
+  for number = 1, count do
+    local selector = '#' .. id .. '-' .. number
+    if command[tostring(number)] == 'prompt' then
+      prompts[#prompts + 1] = selector .. '::before'
+    elseif command[tostring(number)] == nil then
+      output[#output + 1] = selector
+      output[#output + 1] = selector .. ' span'
+    end
+  end
+  local rules = { '<style>' }
+  if #prompts > 0 then
+    rules[#rules + 1] = table.concat(prompts, ',\n') .. ' {'
+    rules[#rules + 1] = '  content: "$ ";'
+    rules[#rules + 1] = '  content: "$ " / "";'
+    rules[#rules + 1] = '  color: var(--atelier-terminal-prompt);'
+    rules[#rules + 1] = '  user-select: none;'
+    rules[#rules + 1] = '}'
+  end
+  if #output > 0 then
+    rules[#rules + 1] = table.concat(output, ',\n') .. ' {'
+    rules[#rules + 1] = '  color: var(--atelier-terminal-muted);'
+    rules[#rules + 1] = '}'
+  end
+  rules[#rules + 1] = '</style>'
+  return table.concat(rules, '\n')
+end
+
+--- Draw a `.terminal` code block as a terminal, in both modes. The block
+--- keeps its commands and output without the `$`, and a scoped style draws
+--- the prompt before each prompt line and mutes the output lines.
 --- @param code pandoc.CodeBlock The code block
 --- @param model table The page model
---- @return pandoc.CodeBlock|nil
+--- @return pandoc.Blocks|nil
 function M.code_block(code, model)
-  if core.terminal(code) == nil then
+  local terminal = core.terminal(code)
+  if terminal == nil then
     return nil
   end
+  terminal_count = terminal_count + 1
+  if code.identifier == '' then
+    code.identifier = 'atelier-terminal-' .. terminal_count
+  end
+  code.text = terminal.text
   code.classes:insert('atelier-terminal')
   if (code.attributes['code-window-auto-label'] or '') == '' then
     code.attributes['code-window-auto-label'] = model.labels.terminal
   end
-  return code
+  return pandoc.Blocks({ pandoc.RawBlock('html', terminal_style(code.identifier, terminal)), code })
 end
 
 return M

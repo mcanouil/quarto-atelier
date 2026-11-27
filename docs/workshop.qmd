@@ -306,7 +306,8 @@ Some blocks change with the format:
 
 - Objectives show a list with a box in the PDF and the deck, and the reader cannot tick it.
 - An answer is a disclosure on the web page, a hidden veil group in the deck, and a placed block in the PDF, as `extensions.atelier.answers` says.
-- A terminal block keeps its prompt and its code window in each format.
+- A terminal block keeps its prompt colour, its muted output, its grey title dots, and its code window in each format.
+- The block icons, the block corners, and the bar of a checkpoint are the same in each format.
 
 These pictures show each block in the three formats, in the light colour scheme.
 The HTML picture shows the block only, the PDF picture shows the block on its page, and the Reveal.js picture shows its slide.
@@ -387,7 +388,7 @@ Select a picture to see it larger.
 
 ## Workshop extras
 
-These features work in both modes, except the motif, which shows in workshop mode only.
+These features work in both modes.
 Each one works on the web page, in the PDF, and in the deck.
 
 ### Authors
@@ -453,6 +454,9 @@ Each preset has its own motif:
 
 : The motif of each preset. {.striped .hover tbl-colwidths="[30,70]"}
 
+The motif shows in both modes, on every page.
+In HTML and in the deck, the text wraps around the shape of the motif.
+In the PDF, the title keeps clear of it.
 The motif takes its colour from the palette of the preset, and assistive technology skips it.
 You cannot choose another motif.
 The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each preset.
@@ -462,7 +466,8 @@ The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each p
 The end matter is what comes after the body: the closing, the funding, the CRediT table, the references, the licence and copyright, and the citation.
 It works in every mode.
 HTML and the PDF show these parts in one order, and each heading has the level of a top-level section.
-The deck keeps its closing slide last, so it shows the references slide before the closing slide, and the closing slide keeps the licence and copyright.
+The deck keeps its closing slide last, so it shows the references slide before the closing slide.
+The bottom row of every slide shows the licence and copyright.
 
 | Part                  | HTML                                  | PDF                                    | Deck                                         |
 | --------------------- | ------------------------------------- | -------------------------------------- | -------------------------------------------- |
@@ -470,7 +475,7 @@ The deck keeps its closing slide last, so it shows the references slide before t
 | Funding               | Quarto appendix                       | After the closing                      | On the closing slide, or on the end slide    |
 | CRediT table          | Quarto appendix                       | After the funding                      | On the closing slide, or on the end slide    |
 | References            | Quarto appendix                       | After the CRediT table                 | A slide before the closing slide             |
-| Licence and copyright | Quarto appendix                       | Page footer, and the closing section   | The closing slide                            |
+| Licence and copyright | Quarto appendix                       | Page footer, and the closing section   | The bottom row of every slide                |
 | Citation              | Quarto appendix                       | The last section, when `citation` is set | Not shown                                  |
 
 : The order of the end matter in each format. {.striped .hover tbl-colwidths="[18,24,28,30]"}
@@ -540,7 +545,7 @@ The closing shows the copyright and the licence only where the reader has no oth
   It also keeps a copyright that is a holder and a year, because the appendix shows only a text or a statement.
 - PDF: the closing keeps them.
   The page footer is an artifact, so a screen reader never reads it.
-- Deck: the closing keeps them.
+- Deck: the bottom row of every slide shows them, also when the closing hides them, so the closing slide leaves them out.
 
 ### Funding
 

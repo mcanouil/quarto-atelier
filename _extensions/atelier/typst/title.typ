@@ -140,10 +140,20 @@
   // A logo with no alt text only decorates, so it is an artefact.
   if meta.logo != none {
     let mark = image(meta.logo.path, height: 2.2em, alt: meta.logo.alt)
-    block(below: 1.2em, if meta.logo.alt == none { pdf.artifact(mark) } else { mark })
+    block(below: 1.2em, atelier-motif-guard(if meta.logo.alt == none { pdf.artifact(mark) } else { mark }))
   }
   if meta.title != none {
-    block(below: 0.5em, text(size: title-size, weight: "bold", fill: atelier-colour("heading"), headings(meta.title)))
+    // The terminal decoration puts a prompt before the title and a steady
+    // cursor after it. Both are artefacts.
+    let decorate(mark) = if atelier-terminal-decoration { atelier-terminal-mark(mark, "accent-ink") }
+    block(
+      below: 0.5em,
+      atelier-motif-guard(text(size: title-size, weight: "bold", fill: atelier-colour("heading"), {
+        decorate([\$$ ])
+        headings(meta.title)
+        decorate("█")
+      })),
+    )
   }
   // The gap follows the title size, so the rule clears the descenders.
   block(
@@ -152,13 +162,13 @@
     pdf.artifact(line(length: 30%, stroke: 2pt + atelier-colour("accent-mark"))),
   )
   if meta.subtitle != none {
-    block(below: 1.2em, text(size: 1.2em, fill: atelier-colour("muted"), headings(meta.subtitle)))
+    block(below: 1.2em, atelier-motif-guard(text(size: 1.2em, fill: atelier-colour("muted"), headings(meta.subtitle))))
   }
   let people = atelier-people
   if people.authors.len() > 0 {
     block(
       below: 0.8em,
-      atelier-meta-line(meta.labels.authors, atelier-author-grid(people.authors)),
+      atelier-motif-guard(atelier-meta-line(meta.labels.authors, atelier-author-grid(people.authors))),
     )
   }
   let dates = ()
@@ -175,7 +185,7 @@
     dates.push(atelier-meta-line(atelier-labels.at("duration"), meta.duration))
   }
   if dates.len() > 0 {
-    block(below: 1em, grid(columns: dates.len(), column-gutter: 2.5em, ..dates))
+    block(below: 1em, atelier-motif-guard(grid(columns: dates.len(), column-gutter: 2.5em, ..dates)))
   }
 }
 

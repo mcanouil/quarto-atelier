@@ -12,6 +12,8 @@
 --- `atelier-workshop` class on `<html>` and the motif of its preset, and a
 --- workshop page that no listed
 --- sidebar holds also gets `atelier-workshop-unlisted`.
+--- Every page gets the block geometry of `palette.geometry` as custom
+--- properties, which `html/workshop.scss` reads.
 --- The blocks of `workshop/core.lua` become the head line and body of each
 --- block, objective checkboxes, a `<details>` answer, and a terminal code
 --- block for the code-blocks script.
@@ -36,7 +38,30 @@ local function encode(data)
   return (quarto.json.encode(data):gsub('</', '<\\/'))
 end
 
---- Add the workshop data block to the head, the authors that
+--- The block geometry of a preset, as CSS declarations.
+--- @param preset string The preset
+--- @return string
+local function geometry_declarations(preset)
+  local geometry = palette.geometry(preset)
+  return string.format(
+    '--atelier-block-radius: %gpx; --atelier-checkpoint-bar: %gpx;',
+    geometry['block-radius'],
+    geometry['checkpoint-bar']
+  )
+end
+
+--- Write the block geometry into the head. A brand can set a preset for each
+--- scheme, so the dark page takes the geometry of its own preset.
+local function publish_geometry()
+  local light, dark = palette.preset('light'), palette.preset('dark')
+  local style = ':root { ' .. geometry_declarations(light) .. ' }'
+  if geometry_declarations(dark) ~= geometry_declarations(light) then
+    style = style .. ' body.quarto-dark { ' .. geometry_declarations(dark) .. ' }'
+  end
+  quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
+end
+
+--- Add the workshop data block to the head, the block geometry, the authors that
 --- `html/title-metadata.html` writes in the title block, and the
 --- title-block labels of a workshop page.
 --- @param meta table The document metadata
@@ -44,6 +69,16 @@ end
 --- @return table|nil The changed metadata, or nil when the page changes none
 function M.publish(meta, model)
   objectives = {}
+  publish_geometry()
+  -- The motif of the preset, which `html/workshop.scss` draws in the title
+  -- block. A brand can set a preset for each scheme, so the dark page takes
+  -- the motif of its own preset.
+  local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
+  local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
+  if dark ~= light then
+    style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
+  end
+  quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
   local data = {
     mode = model.mode,
     offset = quarto.project.offset or '',
@@ -76,15 +111,6 @@ function M.publish(meta, model)
       'in-header',
       '<script>document.documentElement.classList.add(' .. classes .. ');</script>'
     )
-    -- The motif of the preset, which `html/workshop.scss` draws in the title
-    -- block. A brand can set a preset for each scheme, so the dark page takes
-    -- the motif of its own preset.
-    local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
-    local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
-    if dark ~= light then
-      style = style .. ' body.quarto-dark { --atelier-motif: ' .. motifs.mask(dark) .. '; }'
-    end
-    quarto.doc.include_text('in-header', '<style>' .. style .. '</style>')
     core.apply_title_labels(meta, model.labels)
   end
   quarto.doc.include_text(
@@ -193,7 +219,7 @@ local function objectives_block(div, model)
     end
   end
   return pandoc.Div(
-    { M.block_head('bullseye', block.title, block.time), M.block_body(body) },
+    { M.block_head(core.BLOCKS.objectives, block.title, block.time), M.block_body(body) },
     M.block_attr(div, 'objectives')
   )
 end
@@ -283,23 +309,6 @@ function M.funding_section(funding, labels)
   return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-funding', 'appendix' }))
 end
 
---- Write a list of links as a `ul` with `role="list"`. The style hides the
---- bullets, and some browsers then drop the list semantics, so the role keeps
---- them. Each item stays pandoc inlines, so Quarto still resolves the links.
---- @param list pandoc.BulletList The list
---- @return pandoc.Blocks
-local function link_list(list)
-  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<ul role="list">') })
-  for _, item in ipairs(list.content) do
-    local inlines = pandoc.Inlines({ pandoc.RawInline('html', '<li>') })
-    inlines:extend(pandoc.utils.blocks_to_inlines(item))
-    inlines:insert(pandoc.RawInline('html', '</li>'))
-    blocks:insert(pandoc.Plain(inlines))
-  end
-  blocks:insert(pandoc.RawBlock('html', '</ul>'))
-  return blocks
-end
-
 --- Build the closing section: the heading and the parts, with the links as
 --- a list that keeps its semantics.
 --- @param closing table The closing of `core.closing`
@@ -308,12 +317,7 @@ local function closing_section(closing)
   local blocks = pandoc.Blocks({
     pandoc.Header(2, closing.title, pandoc.Attr('atelier-closing-title', { 'unnumbered' })),
   })
-  for _, part in ipairs(core.closing_parts(closing)) do
-    if part.classes:includes('atelier-closing-links') then
-      part.content = link_list(part.content[1])
-    end
-    blocks:insert(part)
-  end
+  blocks:extend(core.closing_parts_html(closing))
   return pandoc.Div(blocks, pandoc.Attr('', { 'atelier-closing' }))
 end
 

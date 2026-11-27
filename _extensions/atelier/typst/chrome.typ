@@ -20,6 +20,29 @@
   if marks.len() > 0 { marks.first().value }
 }
 
+// Answer a part of the title block or of a divider page with room kept on the
+// right, so that no line reaches under the corner motif of the page. The
+// motif is larger on a divider page. The room follows the shapes of the motif
+// that the part covers, and the lines of a narrower part can wrap to more
+// lines, so the height is measured again with the room.
+// - part: the content, placed in a block at the position of the part.
+#let atelier-motif-guard(part) = context {
+  let motif = atelier-motif-data
+  let number = here().page()
+  let ratio = if atelier-surface-at(number) == "divider" { motif.ratio.large } else if number == 1 { motif.ratio.title }
+  if ratio == none { return part }
+  let size = ratio * page.width
+  let top = here().position().y
+  layout(room => {
+    let inset = 0pt
+    for _ in range(3) {
+      let height = measure(width: room.width - inset, part).height
+      inset = atelier-motif-inset(motif.shapes, size, top, top + height)
+    }
+    pad(right: inset, part)
+  })
+}
+
 // Lay out a header or footer as three cells, aligned left, centred and
 // aligned right. An empty cell renders nothing.
 #let atelier-slots(left: none, centre: none, right: none) = grid(
@@ -77,12 +100,13 @@
   }
   set page(
     fill: atelier-colour("bg"),
-    // The workshop motif sits in the top right corner of the first page,
-    // with the title block or the cover.
+    // The motif sits in the top right corner of the first page, with the
+    // title block or the cover, and of a chapter divider, which is larger.
     background: context {
       let motif = atelier-motif-data
-      if motif != none and here().page() == 1 {
-        atelier-motif(motif.shapes, top + right, 45mm, motif.paint, factor: motif.factor)
+      let ratio = if kind() == "divider" { motif.ratio.large } else if here().page() == 1 { motif.ratio.title }
+      if ratio != none {
+        atelier-motif(motif.shapes, top + right, ratio * page.width, motif.paint, factor: motif.factor)
       }
     },
     header: context {

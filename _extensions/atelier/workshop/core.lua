@@ -676,7 +676,7 @@ end
 --- `statement`, or "© year holder".
 --- @param value any The Quarto `copyright`
 --- @return pandoc.Inlines|nil
-local function copyright_text(value)
+function M.copyright_text(value)
   if pandoc.utils.type(value) ~= 'table' then
     return inlines_or_nil(value)
   end
@@ -699,7 +699,7 @@ end
 --- its `type`, as `typst/typst-show.typ` reads it for the PDF frame.
 --- @param value any The Quarto `license`
 --- @return pandoc.Inlines|nil
-local function licence_text(value)
+function M.licence_text(value)
   if pandoc.utils.type(value) == 'table' then
     value = value.text or value.type
   end
@@ -763,10 +763,10 @@ function M.closing(meta, model, shown)
   end
   shown = shown or {}
   if closing_switch(options, 'copyright', 'copyright') and not shown.copyright then
-    closing.copyright = copyright_text(meta.copyright)
+    closing.copyright = M.copyright_text(meta.copyright)
   end
   if closing_switch(options, 'licence', 'license') and not shown.licence then
-    closing.licence = licence_text(meta.license)
+    closing.licence = M.licence_text(meta.license)
   end
   return closing
 end
@@ -836,6 +836,37 @@ function M.closing_parts(closing)
     end
   end
   return blocks
+end
+
+--- Write a list of links as a `ul` with `role="list"`. The style hides the
+--- bullets, and some browsers then drop the list semantics, so the role keeps
+--- them. Each item stays pandoc inlines, so Quarto still resolves the links.
+--- @param list pandoc.BulletList The list
+--- @return pandoc.Blocks
+local function link_list(list)
+  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<ul role="list">') })
+  for _, item in ipairs(list.content) do
+    local inlines = pandoc.Inlines({ pandoc.RawInline('html', '<li>') })
+    inlines:extend(pandoc.utils.blocks_to_inlines(item))
+    inlines:insert(pandoc.RawInline('html', '</li>'))
+    blocks:insert(pandoc.Plain(inlines))
+  end
+  blocks:insert(pandoc.RawBlock('html', '</ul>'))
+  return blocks
+end
+
+--- Build the parts of the closing for HTML output (the page and the deck),
+--- with the links as a list that keeps its semantics.
+--- @param closing table The closing of `M.closing`
+--- @return pandoc.Blocks
+function M.closing_parts_html(closing)
+  local parts = M.closing_parts(closing)
+  for _, part in ipairs(parts) do
+    if part.classes:includes('atelier-closing-links') then
+      part.content = link_list(part.content[1])
+    end
+  end
+  return parts
 end
 
 -- ============================================================================
@@ -1352,20 +1383,23 @@ function M.objective_text(item)
   return pandoc.Inlines({}), 1
 end
 
---- The blocks with a head line and a body, other than the objectives, by
---- class, with the Bootstrap Icons name of the icon of each one.
+--- The blocks with a head icon, by class, with the Bootstrap Icons name of
+--- the icon of each one, which `icons.lua` draws. The answer has no icon.
+--- `M.block_kind` finds all of them but the objectives.
 --- @type table<string, string>
 M.BLOCKS = {
+  objectives = 'bullseye',
   prerequisites = 'list-check',
   checkpoint = 'flag',
   exercise = 'pencil-square',
 }
 
---- The classes of `M.BLOCKS`, in the order that `M.block_kind` tries them.
+--- The classes of `M.BLOCKS` other than the objectives, in the order that
+--- `M.block_kind` tries them.
 --- @type string[]
 local BLOCK_ORDER = { 'prerequisites', 'checkpoint', 'exercise' }
 
---- Answer the class of the first block of `M.BLOCKS` that a div has, in the
+--- Answer the class of the first block of `BLOCK_ORDER` that a div has, in the
 --- order prerequisites, checkpoint, exercise.
 --- @param div pandoc.Div The div
 --- @return string|nil The class, or nil when the div is no such block
@@ -1378,10 +1412,10 @@ function M.block_kind(div)
   return nil
 end
 
---- Read a block of `M.BLOCKS`: the `title` attribute, else the label of the
+--- Read a block of `BLOCK_ORDER`: the `title` attribute, else the label of the
 --- kind, and the `duration` attribute.
 --- @param div pandoc.Div The div
---- @param kind string The class, a key of `M.BLOCKS`
+--- @param kind string The class, an item of `BLOCK_ORDER`
 --- @param model table The page model
 --- @return { title: string, time: string|nil, blocks: pandoc.Blocks } The block
 function M.block(div, kind, model)

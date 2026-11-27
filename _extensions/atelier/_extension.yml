@@ -105,6 +105,7 @@ contributes:
       # Upstream: https://github.com/quarto-dev/quarto-cli/issues/15430
       # Remove when: the minimum Quarto version includes the fix.
       template-partials:
+        - html/title-block.html
         - html/title-metadata.html
         - html/toc.html
       # Quarto builds the canonical link from `website.site-url`, giving a
@@ -197,7 +198,6 @@ contributes:
         - file: html/scripts/course.html
         - file: html/scripts/announcement.html
         - file: html/scripts/toc-card.html
-        - file: html/scripts/title-block.html
         - file: html/scripts/code-blocks.html
         - file: html/scripts/listings.html
         - file: html/scripts/table-scroll.html

@@ -99,13 +99,13 @@
 #let atelier-chapter(it, switches) = {
   if not it.outlined { return it }
   let dividers = switches.at("chapter-dividers")
-  if not dividers and not switches.at("chapter-contents") { return it }
+  if not dividers and not switches.at("chapter-contents") { return atelier-terminal-chapter(it) }
   pagebreak(weak: true)
-  if not dividers { return it }
+  if not dividers { return atelier-terminal-chapter(it) }
   atelier-surface("divider")
   v(28%)
-  context block(below: 0.8em, atelier-kicker(atelier-chapter-label(it, atelier-part-next.get())))
-  block(text(size: 2.4em, weight: "bold", fill: atelier-colour("heading"), it.body))
+  context block(below: 0.8em, atelier-motif-guard(atelier-kicker(atelier-chapter-label(it, atelier-part-next.get()))))
+  block(atelier-motif-guard(text(size: 2.4em, weight: "bold", fill: atelier-colour("heading"), it.body)))
 }
 
 // End the page that a level-1 heading starts: the rule of a divider page,

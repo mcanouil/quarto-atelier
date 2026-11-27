@@ -311,18 +311,30 @@ function M.finish(doc, model)
 end
 
 --- Draw a `.terminal` code block as a terminal: the code window takes the
---- terminal label and colours, and the prompts stay in the text.
+--- terminal label and colours, and the prompts stay in the text. The block
+--- keeps its commands and output without the `$`, and the Typst function
+--- draws the prompt in its own colour. The call shadows `Skylighting` for the
+--- block only, because Quarto gives its highlighter no line number.
 --- @param block pandoc.CodeBlock The code block
 --- @param model table The page model
 --- @return pandoc.Blocks|nil
 function M.code_block(block, model)
-  if core.terminal(block) == nil then
+  local terminal = core.terminal(block)
+  if terminal == nil then
     return nil
   end
+  block.text = terminal.text
   if (block.attributes['code-window-auto-label'] or '') == '' then
     block.attributes['code-window-auto-label'] = model.labels.terminal
   end
-  return wrap('#atelier-terminal', pandoc.Blocks({ block }))
+  local call = string.format(
+    '#{ let Skylighting = atelier-terminal-skylighting(Skylighting); atelier-terminal((%s), (%s))',
+    table.concat(terminal.prompts, ', ') .. (#terminal.prompts == 1 and ',' or ''),
+    table.concat(terminal.continuations, ', ') .. (#terminal.continuations == 1 and ',' or '')
+  )
+  local blocks = wrap(call, pandoc.Blocks({ block }))
+  blocks:insert(pandoc.RawBlock('typst', '}'))
+  return blocks
 end
 
 return M
