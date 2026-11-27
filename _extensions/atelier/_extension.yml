@@ -102,9 +102,8 @@ contributes:
       # `title-metadata.html`, so the render fails. `html/toc.html` is a copy
       # of the Quarto partial with that name, always in the list, so such a
       # page renders. Keep it identical to the Quarto file.
-      # Upstream: none filed (Quarto rejects a template partial that the page
-      # does not use)
-      # Remove when: Quarto accepts a template partial that the page does not use.
+      # Upstream: https://github.com/quarto-dev/quarto-cli/issues/15430
+      # Remove when: the minimum Quarto version includes the fix.
       template-partials:
         - html/title-metadata.html
         - html/toc.html
