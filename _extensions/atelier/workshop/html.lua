@@ -330,7 +330,7 @@ end
 function M.finish(doc, model)
   local closing = core.closing(doc.meta, model, core.appendix_rights(doc.meta))
   local funding = core.funding(doc.meta)
-  local credit = (closing ~= nil or not logo.in_website()) and core.credit(doc.meta, model) or nil
+  local credit = (closing ~= nil or not (logo.in_website() or core.in_book(doc.meta))) and core.credit(doc.meta, model) or nil
   if closing == nil and funding == nil and credit == nil then
     return nil
   end

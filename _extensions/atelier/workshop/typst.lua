@@ -250,10 +250,14 @@ end
 --- @return pandoc.Plain
 local function citation_update(entry)
   local language = quarto.doc.language or {}
+  local function label(key, default)
+    local value = language[key]
+    return type(value) == 'string' and value or default
+  end
   local inlines = pandoc.Inlines({ pandoc.RawInline('typst', string.format(
     '#atelier-citation-data.update((title: %s, label: %s, body: [',
-    typst_string(language['section-title-citation'] or 'Citation'),
-    typst_string(language['appendix-attribution-cite-as'] or 'For attribution, please cite this work as:')
+    typst_string(label('section-title-citation', 'Citation')),
+    typst_string(label('appendix-attribution-cite-as', 'For attribution, please cite this work as:'))
   )) })
   inlines:extend(entry)
   inlines:insert(pandoc.RawInline('typst', ']))'))

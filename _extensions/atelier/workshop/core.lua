@@ -771,22 +771,30 @@ function M.closing(meta, model, shown)
   return closing
 end
 
+--- Answer whether the page is a chapter of a Quarto book. A filter does not
+--- get `book` in the document metadata, so it also comes from the project
+--- metadata.
+--- @param meta table The document metadata
+--- @return boolean
+function M.in_book(meta)
+  if meta.book ~= nil then
+    return true
+  end
+  local project = meta_mod.get_project_metadata()
+  return project ~= nil and project.book ~= nil
+end
+
 --- Answer which of the copyright and the licence Quarto shows in its HTML
 --- appendix, as Copyright and Reuse. Quarto shows no appendix in a book or
 --- with `appendix-style` `none` or `false`. It shows the copyright only as a
 --- string or a `statement`, and the licence only as a string, a list or a
---- `text`. A filter does not get `book` in the document metadata, so it also
---- comes from the project metadata.
+--- `text`.
 --- @param meta table The document metadata
 --- @return { copyright: boolean, licence: boolean }
 function M.appendix_rights(meta)
   local none = { copyright = false, licence = false }
   local style = meta['appendix-style']
-  if style == false or text_of(style) == 'none' or text_of(style) == 'false' or meta.book ~= nil then
-    return none
-  end
-  local project = meta_mod.get_project_metadata()
-  if project ~= nil and project.book ~= nil then
+  if style == false or text_of(style) == 'none' or text_of(style) == 'false' or M.in_book(meta) then
     return none
   end
   local function shown(value, key)
