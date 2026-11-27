@@ -789,6 +789,26 @@ html.print-pdf:root {
   }
 }
 
+// The slide keeps its text clear of the motif with an empty float of the
+// same size, whose `shape-outside` is the motif mask, so the lines wrap
+// around the shapes. `revealjs/motif-guard.html` moves the float to the top
+// right corner of the window, where the background paints the motif, and
+// cuts its bottom margin at the end of the content. The slide clips the part
+// of the float below its content, so Reveal.js centres the content, not the
+// float.
+
+.reveal .slides section.atelier-motif::before {
+  content: "";
+  float: right;
+  width: calc(var(--slide-width, 1280px) * var(--atelier-motif-size));
+  height: calc(var(--slide-width, 1280px) * var(--atelier-motif-size) + var(--atelier-motif-cut, 0px));
+  margin-top: calc(-1 * var(--atelier-slide-top, 0px));
+  margin-right: calc(-1 * var(--atelier-slide-right, 0px));
+  pointer-events: none;
+  shape-outside: var(--atelier-motif);
+  shape-margin: 16px;
+}
+
 // ===========================================================================
 // CLOSING
 // ===========================================================================

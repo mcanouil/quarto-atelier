@@ -226,8 +226,9 @@ local function font_declarations(scheme)
   return lines
 end
 
---- The rules of the motif of a deck: the mask of the preset, its size on the
---- title slide and on the section slides, and its colour and opacity on the title slide, on the section slides and on
+--- The rules of the motif of a deck: the mask of the preset and its size on the
+--- title slide and on the section slides, for the background that paints the
+--- motif and for the slide that keeps its text clear of it, and its colour and opacity on the title slide, on the section slides and on
 --- the dark section slides, after the surface that `mark_slide` paints. A
 --- light surface takes the mark at `motifs.LIGHT_OPACITY`, and a dark one the
 --- ink, or the chrome mark on a section slide. The motif sits on the slide
@@ -240,12 +241,13 @@ end
 local function motif_rules(scheme, tokens, dark)
   local preset = palette.preset(palette.painted_scheme(scheme))
   local background = '.reveal .slide-background.' .. MOTIF_CLASS
+  local slide = '.reveal .slides section.' .. MOTIF_CLASS
   local lines = {
-    background .. ' {',
+    background .. ', ' .. slide .. ' {',
     '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';',
     '  --atelier-motif-size: ' .. string.format('%g', motifs.RATIO.title) .. ';',
     '}',
-    background .. '.' .. SECTION_CLASS .. ' {',
+    background .. '.' .. SECTION_CLASS .. ', ' .. slide .. '.' .. SECTION_CLASS .. ' {',
     '  --atelier-motif-size: ' .. string.format('%g', motifs.RATIO.large) .. ';',
     '}',
   }
@@ -401,6 +403,7 @@ local function publish(meta)
     quarto.doc.include_file('in-header', 'revealjs/terminal-decoration.html')
     meta['atelier-terminal-cursor'] = true
   end
+  quarto.doc.include_file('after-body', 'revealjs/motif-guard.html')
   if meta.chalkboard then
     quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
   end
