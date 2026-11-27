@@ -1,0 +1,63 @@
+<script id="atelier-bottom-row" type="text/javascript">
+	/**
+	 * @license MIT
+	 * @copyright 2026 Mickaël Canouil
+	 * @author Mickaël Canouil
+	 */
+	// Reveal.js draws the slide number outside the footer, so the number cannot
+	// be an item of the bottom row. The end slot of the row holds an empty place
+	// for it, between the copyright and licence and the logo. This script gives
+	// that place the width of the number, `--atelier-number-width`, and puts the
+	// number over it with `--atelier-number-right`, the distance from the right
+	// edge of the deck to the place. A deck that shows no slide number keeps no
+	// place for it. `--atelier-end-min` is the width of the place and the logo,
+	// from the right edge of the deck, so the side columns of the row never
+	// get narrower than them. The script measures again after each slide
+	// change, because the number and the footer change with the slide.
+	(() => {
+		const shown = (el) => getComputedStyle(el).display !== "none";
+
+		const measure = () => {
+			const reveal = document.querySelector(".reveal");
+			const number = document.querySelector(".reveal > .slide-number");
+			if (!reveal || !number) return;
+			const visible = shown(number);
+			const places = document.querySelectorAll(".reveal > .footer .atelier-slot-number");
+			places.forEach((place) => {
+				place.hidden = !visible;
+			});
+			const root = document.documentElement.style;
+			if (visible) {
+				root.setProperty("--atelier-number-width", `${number.getBoundingClientRect().width}px`);
+			}
+			const place = [...places].find((el) => shown(el.closest(".footer")));
+			if (!place) return;
+			const edge = reveal.getBoundingClientRect().right;
+			const end = place.closest(".atelier-slot-end");
+			const fixed = [...end.children].filter((el) => !el.classList.contains("atelier-slot-rights") && shown(el));
+			const start = fixed.length ? Math.min(...fixed.map((el) => el.getBoundingClientRect().left)) : edge;
+			root.setProperty("--atelier-end-min", `${edge - start}px`);
+			if (visible) {
+				root.setProperty("--atelier-number-right", `${edge - place.getBoundingClientRect().right}px`);
+			}
+		};
+
+		const start = () => {
+			if (!window.Reveal) return;
+			const run = () => {
+				measure();
+				Reveal.on("slidechanged", measure);
+				Reveal.on("resize", measure);
+				window.addEventListener("resize", () => requestAnimationFrame(measure));
+				document.fonts.ready.then(measure);
+				document.querySelectorAll(".reveal > .footer .atelier-slot-logo img").forEach((img) => {
+					img.addEventListener("load", measure);
+				});
+			};
+			if (Reveal.isReady()) run();
+			else Reveal.on("ready", run);
+		};
+		if (document.readyState === "complete") start();
+		else window.addEventListener("load", start);
+	})();
+</script>

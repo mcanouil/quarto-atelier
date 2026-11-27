@@ -1,12 +1,12 @@
 ---
 title: "Add a page to a site"
-subtitle: "Solutions: inline"
+subtitle: "Answers: inline"
 author: Ana Diaz
 format: atelier-typst
 extensions:
   atelier:
     mode: workshop
-    solutions: inline
+    answers: inline
 ---
 
 # Notes

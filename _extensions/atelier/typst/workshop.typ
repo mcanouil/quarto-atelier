@@ -1,6 +1,6 @@
 // Atelier - Typst workshop blocks
 // The blocks of a workshop handout, as `workshop/typst.lua` writes them:
-// prerequisites, objectives, checkpoints, exercises and solutions, each a box with a head line that
+// prerequisites, objectives, checkpoints, exercises and answers, each a box with a head line that
 // holds an icon, the title and the duration. The icons and the list boxes
 // only decorate, so they are artefacts: the title names the block.
 //
@@ -8,42 +8,21 @@
 // @copyright 2026 Mickaël Canouil
 // @author Mickaël Canouil
 
-// Corner radius of a workshop block, as the large Bootstrap radius of HTML.
-#let atelier-ws-radius = if atelier-preset == "terminal" { 0pt } else { 8pt }
-
-// Answer the icon of a block, drawn in the colour of its head.
+// Answer the icon of a block, in the colour of its head: the Bootstrap Icons
+// paths of `icons.lua`, which `atelier-typst-data` holds in `atelier-icons`.
 // - kind: `prerequisites`, `objectives`, `checkpoint` or `exercise`.
 // - ink: colour of the icon.
 #let atelier-ws-icon(kind, ink) = {
-  let size = 1em
-  let pen = 1pt + ink
-  let drawing = if kind == "objectives" {
-    box(width: size, height: size, {
-      place(center + horizon, circle(radius: size * 0.45, stroke: pen))
-      place(center + horizon, circle(radius: size * 0.25, stroke: pen))
-      place(center + horizon, circle(radius: size * 0.07, fill: ink, stroke: none))
-    })
-  } else if kind == "prerequisites" {
-    box(width: size, height: size, {
-      for row in range(3) {
-        let y = size * (0.2 + 0.3 * row)
-        place(top + left, line(start: (0pt, y), end: (size * 0.12, y + size * 0.1), stroke: pen))
-        place(top + left, line(start: (size * 0.12, y + size * 0.1), end: (size * 0.25, y - size * 0.08), stroke: pen))
-        place(top + left, line(start: (size * 0.4, y), end: (size, y), stroke: pen))
-      }
-    })
-  } else if kind == "checkpoint" {
-    box(width: size, height: size, {
-      place(top + left, line(start: (size * 0.15, 0pt), end: (size * 0.15, size), stroke: pen))
-      place(top + left, polygon(fill: ink, stroke: none, (size * 0.15, 0pt), (size * 0.95, size * 0.06), (size * 0.95, size * 0.5), (size * 0.15, size * 0.56)))
-    })
-  } else {
-    box(width: size, height: size, {
-      place(top + left, dy: size * 0.2, rect(width: size * 0.8, height: size * 0.8, radius: 1.5pt, stroke: pen))
-      place(top + left, line(start: (size * 0.35, size * 0.65), end: (size * 0.95, size * 0.05), stroke: 1.4pt + ink))
-    })
-  }
-  box(baseline: 0.15em, pdf.artifact(drawing))
+  let paths = atelier-icons.at(atelier-block-icons.at(kind)).map(path => {
+    let rule = if path.evenodd { " fill-rule=\"evenodd\"" } else { "" }
+    "<path" + rule + " d=\"" + path.d + "\"/>"
+  })
+  let svg = (
+    "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\" fill=\"" + ink.to-hex() + "\">",
+    ..paths,
+    "</svg>",
+  ).join()
+  box(baseline: 0.15em, pdf.artifact(image(bytes(svg), format: "svg", height: 1em, alt: none)))
 }
 
 // The fonts of the document, for the parts that need the monospace font.
@@ -59,7 +38,7 @@
 }
 
 // Answer a workshop block: a box with a head line and a body.
-// - kind: `prerequisites`, `objectives`, `checkpoint`, `exercise` or `solution`.
+// - kind: `prerequisites`, `objectives`, `checkpoint`, `exercise` or `answer`.
 // - title: title of the block.
 // - time: duration text, or none.
 // - body: content of the block.
@@ -69,31 +48,31 @@
     objectives: atelier-colour("accent-soft"),
     checkpoint: none,
     exercise: atelier-colour("workshop-bar-bg"),
-    solution: none,
+    answer: none,
   ).at(kind)
   let head-ink = (
     prerequisites: atelier-colour("fg"),
     objectives: atelier-colour("accent-ink"),
     checkpoint: atelier-colour("callout-tip-ink"),
     exercise: atelier-colour("workshop-bar-fg"),
-    solution: atelier-colour("accent-ink"),
+    answer: atelier-colour("accent-ink"),
   ).at(kind)
-  let solution = kind == "solution"
+  let answer = kind == "answer"
   block(
     width: 100%,
     above: 1em,
     below: 1em,
     breakable: true,
     clip: true,
-    radius: atelier-ws-radius,
+    radius: atelier-geometry.at("block-radius"),
     stroke: {
       let edge = (
-        paint: atelier-colour(if solution { "control-border" } else { "border" }),
+        paint: atelier-colour(if answer { "control-border" } else { "border" }),
         thickness: 0.75pt,
-        dash: if solution { "dashed" } else { none },
+        dash: if answer { "dashed" } else { none },
       )
       if kind == "checkpoint" {
-        (rest: edge, left: 3pt + atelier-colour("callout-tip-border"))
+        (rest: edge, left: atelier-geometry.at("checkpoint-bar") + atelier-colour("callout-tip-border"))
       } else { edge }
     },
     {
@@ -107,7 +86,7 @@
           columns: (auto, 1fr, auto),
           column-gutter: 0.6em,
           align: horizon,
-          if not solution { atelier-ws-icon(kind, head-ink) },
+          if not answer { atelier-ws-icon(kind, head-ink) },
           title,
           if time != none { atelier-ws-time(time, head-ink) },
         )),
@@ -135,22 +114,56 @@
   body
 }
 
-// Answer the link from an exercise to its solution at the end:
-// "Solution: page n".
-// - target: label of the solution heading.
-#let atelier-ws-solution-link(target) = context {
+// Answer the link from an exercise to its answer at the end:
+// "Answer: page n".
+// - target: label of the answer heading.
+#let atelier-ws-answer-link(target) = context {
   let number = counter(page).at(target).first()
-  block(above: 0.8em, link(target, atelier-labels.at("solution-page").replace("{page}", str(number))))
+  block(above: 0.8em, link(target, atelier-labels.at("answer-page").replace("{page}", str(number))))
 }
 
-// Answer the heading of the solutions at the end of a handout, on a new page.
-#let atelier-ws-solutions-heading() = {
+// Answer the heading of the answers at the end of a handout, on a new page.
+#let atelier-ws-answers-heading() = {
   pagebreak(weak: true)
-  heading(level: 1, atelier-labels.at("solutions-title"))
+  heading(level: 1, atelier-labels.at("answers-title"))
+}
+
+// Answer the funding section: a heading of the level of the CRediT heading,
+// then the statements and the awards.
+// - title: the heading.
+// - body: the content of the section.
+#let atelier-ws-funding(title, body) = {
+  heading(level: 1, numbering: none, title)
+  atelier-chapter-end()
+  body
+}
+
+// The citation of a handout, from its `citation` key: a dictionary of
+// title, label and body, or none. The template shows it after the
+// bibliography.
+#let atelier-citation-data = state("atelier-citation-data", none)
+
+// Answer the citation section: a heading of the level of the CRediT heading,
+// the "cite as" label in the muted colour, then the formatted entry.
+// - title: the heading.
+// - label: the line before the entry.
+// - body: the entry.
+#let atelier-ws-citation(title, label, body) = {
+  heading(level: 1, numbering: none, title)
+  atelier-chapter-end()
+  block(below: 0.6em, text(fill: atelier-colour("muted"), label))
+  body
+}
+
+// Answer the citation section, where the template calls it after the
+// bibliography, when the handout has a citation.
+#let atelier-citation-section() = context {
+  let data = atelier-citation-data.final()
+  if data != none { atelier-ws-citation(data.title, data.label, data.body) }
 }
 
 // Answer the CRediT table: the contribution of each author to each role,
-// under a heading of its own level, as the solutions have. The first column
+// under a heading of its own level, as the answers have. The first column
 // names the role.
 // - title: the heading.
 // - head: the header row, the role label then the author names.

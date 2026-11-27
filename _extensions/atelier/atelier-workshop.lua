@@ -53,15 +53,19 @@ end
 --- Filter tables run one after the other: pandoc finishes the `Meta` pass
 --- before the `Div` pass starts, so the model is complete when the block
 --- handlers read it. One table gives no such order between element types.
+--- The `Proof` pass runs before the `Div` pass, while the slot of a Quarto
+--- solution is still a div, so an answer with a `sol-` id stays Quarto's.
 --- A writer can also finish the document after the blocks.
 return {
   { Meta = publish_workshop },
   {
+    Proof = function(proof)
+      return core.release_answer_id(proof)
+    end,
+  },
+  {
     Div = function(div)
       return writer and writer.div(div, model)
-    end,
-    Proof = function(proof)
-      return writer and writer.proof(proof, model)
     end,
     CodeBlock = function(block)
       return writer and writer.code_block(block, model)
