@@ -201,7 +201,9 @@ $code-block-font-size: 0.6em !default;
   --atelier-hit: 32px;
   --atelier-icon: 22px;
   --atelier-row-gap: 4px;
+  --atelier-end-gap: 16px;
   --atelier-row-left: calc(var(--atelier-row-edge) + var(--atelier-row-buttons, 1) * (var(--atelier-hit) + var(--atelier-row-gap)) + 12px);
+  --atelier-row-side: max(var(--atelier-row-left), var(--atelier-end-min, 0px));
 }
 
 // A PDF export hides the buttons, so the title slot starts at the edge.
@@ -279,10 +281,14 @@ html.print-pdf:root {
 
 // The side columns of the row are at least as wide as the left buttons, so
 // the centre slot stays at the centre and never runs into them. On a narrow
-// screen, the title slot can have no room left, and it does not show.
+// screen, the title slot can have no room left, and it does not show. The
+// centre slot takes at most half of the row, so the end slot keeps room for
+// the copyright and the licence. `revealjs/bottom-row.html` writes
+// `--atelier-end-min`, the width of the slide number and the logo, so the
+// side columns are at least that wide too.
 .reveal .footer .atelier-footer-row {
   display: grid;
-  grid-template-columns: minmax(var(--atelier-row-left), 1fr) auto minmax(var(--atelier-row-left), 1fr);
+  grid-template-columns: minmax(var(--atelier-row-side), 1fr) fit-content(50%) minmax(var(--atelier-row-side), 1fr);
   align-items: center;
   column-gap: 24px;
   height: 100%;
@@ -319,20 +325,72 @@ html.print-pdf:root {
   visibility: hidden;
 }
 
-.reveal .footer .atelier-slot-logo {
+// The end slot holds the copyright and the licence, the place of the slide
+// number and the logo. The copyright and the licence give way first: they
+// are cut with an ellipsis, and their span carries the full text as its
+// title.
+.reveal .footer .atelier-slot-end {
   display: flex;
   align-items: center;
   grid-column: 3;
-  justify-self: end;
+  justify-content: flex-end;
+  gap: var(--atelier-end-gap);
+  min-width: 0;
   margin-right: var(--atelier-row-edge);
+}
+
+.reveal .footer .atelier-slot-rights {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reveal .footer .atelier-slot-number {
+  flex: none;
+  width: var(--atelier-number-width, 2ch);
+}
+
+.reveal .footer .atelier-slot-number[hidden] {
+  display: none;
+}
+
+.reveal .footer .atelier-slot-logo {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+// The title slide shows the copyright and the licence after the footer, in
+// the centre slot, and the other slides show them in the end slot.
+.reveal .footer .atelier-title-rights {
+  display: none;
+}
+
+// THE CENTRE LINE OF THE TEXT
+// A line box centres the whole height of the font, not its capitals, so
+// text sits a little off the centre line of the icons and the logo. Each text
+// item trims its box to the cap height and the baseline, and the row centres
+// that box. The same padding above and below keeps the centre, and leaves
+// room for accents and descenders in a slot that cuts its text. Figures stay
+// on the baseline and at the cap height, also in a font whose default
+// figures are old-style.
+// Remove when: never.
+.reveal :is(.footer, .slide-number) {
+  font-variant-numeric: lining-nums;
+}
+
+.reveal .footer :is(.atelier-slot-left, .atelier-slot-centre, .atelier-slot-rights) {
+  padding-block: 0.3em;
+  text-box: trim-both cap alphabetic;
 }
 
 // THE LOGO
 // The title slide shows the logo above the title, and the other slides show
 // it at the right end of the bottom row. Each place holds the light and the
 // dark image; `atelier-revealjs.lua` writes the rules that show the dark one
-// on dark surfaces. Quarto's own logo stays in the page, hidden, so Quarto
-// keeps the `has-logo` class that puts the slide number at the top.
+// on dark surfaces. Quarto's own logo stays in the page, hidden.
 // Remove when: never.
 .reveal.reveal .slide-logo {
   display: none;
@@ -342,10 +400,15 @@ html.print-pdf:root {
   display: none;
 }
 
+// A wide logo takes at most a quarter of the window, so the row keeps room
+// for the footer text. The image keeps its shape inside that width.
 .reveal .footer .atelier-slot-logo img {
   width: auto;
+  max-width: 25vw;
   height: var(--atelier-hit);
   margin: 0;
+  object-fit: contain;
+  object-position: right center;
 }
 
 .reveal .slides section .atelier-title-logo {
@@ -362,21 +425,34 @@ html.print-pdf:root {
   }
 }
 
-// Without a logo, Quarto puts the slide number in the bottom-right corner.
-// It sits on the row there, on the same centre line. With a logo, Quarto
-// moves it to the top-right corner, and it stays there.
+// THE SLIDE NUMBER
+// The slide number sits in the bottom row, between the copyright and licence
+// and the logo, also when the deck has a logo: `revealjs/bottom-row.html`
+// writes `--atelier-number-right`, the place that the end slot keeps for it.
+// The rule wins over the `.reveal.has-logo .slide-number` rule of Quarto,
+// which loads later and moves the number to the top-right corner. The link
+// of the number is a flex box of the row height, and its text is trimmed as
+// the text of the footer is.
+// Reveal.js sets `display` inline on the slide number.
 // Remove when: never.
-// Reveal.js sets `display` inline on the slide number, so the line height
-// centres the text in the row.
-.reveal.reveal:not(.has-logo) .slide-number {
-  right: var(--atelier-row-edge);
+.reveal.reveal.reveal .slide-number {
+  top: auto;
+  right: var(--atelier-number-right, var(--atelier-row-edge));
   bottom: var(--atelier-row-bottom);
   height: var(--atelier-row-height);
   padding: 0;
+  line-height: normal;
 }
 
-.reveal.reveal:not(.has-logo) :is(.slide-number, .slide-number a) {
-  line-height: var(--atelier-row-height);
+.reveal.reveal .slide-number a {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  line-height: normal;
+}
+
+.reveal.reveal .slide-number a > * {
+  text-box: trim-both cap alphabetic;
 }
 
 // The arrows of the bottom-right layout sit above the row, so the logo slot
@@ -393,9 +469,33 @@ html.print-pdf:root {
 // it takes the hidden buttons out of the tab order. `atelier-revealjs.lua`
 // gives these slides their `data-state`.
 // Remove when: never.
-.atelier-title-state .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-logo),
+.atelier-title-state .reveal :is(.slide-menu-button, .slide-chalkboard-buttons, .slide-number, .footer .atelier-slot-left, .footer .atelier-slot-end),
 .atelier-no-number-state .reveal .slide-number {
   visibility: hidden;
+}
+
+// On the title slide, the centre slot shows the footer, then the copyright
+// and the licence, on one line. The side slots are hidden, so the centre slot
+// takes the width that they leave. When the text does not fit, the line wraps
+// to two lines, and the row grows up from its bottom, so no text is cut.
+.atelier-title-state .reveal .footer .atelier-title-rights {
+  display: inline;
+}
+
+.atelier-title-state .reveal.reveal > .footer {
+  height: auto;
+  min-height: var(--atelier-row-height);
+}
+
+.atelier-title-state .reveal .footer .atelier-footer-row {
+  grid-template-columns: var(--atelier-row-left) 1fr var(--atelier-row-left);
+  min-height: var(--atelier-row-height);
+}
+
+.atelier-title-state .reveal .footer .atelier-slot-centre {
+  overflow: visible;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .atelier-section-state .reveal :is(.footer, .slide-number, .slide-number a, .controls, .slide-menu-button a, .slide-chalkboard-buttons) {

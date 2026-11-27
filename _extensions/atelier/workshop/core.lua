@@ -676,7 +676,7 @@ end
 --- `statement`, or "© year holder".
 --- @param value any The Quarto `copyright`
 --- @return pandoc.Inlines|nil
-local function copyright_text(value)
+function M.copyright_text(value)
   if pandoc.utils.type(value) ~= 'table' then
     return inlines_or_nil(value)
   end
@@ -699,7 +699,7 @@ end
 --- its `type`, as `typst/typst-show.typ` reads it for the PDF frame.
 --- @param value any The Quarto `license`
 --- @return pandoc.Inlines|nil
-local function licence_text(value)
+function M.licence_text(value)
   if pandoc.utils.type(value) == 'table' then
     value = value.text or value.type
   end
@@ -763,10 +763,10 @@ function M.closing(meta, model, shown)
   end
   shown = shown or {}
   if closing_switch(options, 'copyright', 'copyright') and not shown.copyright then
-    closing.copyright = copyright_text(meta.copyright)
+    closing.copyright = M.copyright_text(meta.copyright)
   end
   if closing_switch(options, 'licence', 'license') and not shown.licence then
-    closing.licence = licence_text(meta.license)
+    closing.licence = M.licence_text(meta.license)
   end
   return closing
 end
