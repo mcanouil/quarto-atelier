@@ -440,6 +440,40 @@ These pictures show an author with a photo in each format.
 
 :::
 
+### Motifs
+
+A motif is a decorative shape on the title block, the title slide, and the section slides.
+Each preset has its own motif:
+
+| Preset     | Motif       |
+| ---------- | ----------- |
+| `default`  | `steps`     |
+| `quarto`   | `quadrants` |
+| `terminal` | `dots`      |
+
+: The motif of each preset. {.striped .hover tbl-colwidths="[30,70]"}
+
+The motif takes its colour from the palette of the preset, and assistive technology skips it.
+You cannot choose another motif.
+The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each preset.
+
+## End matter
+
+The end matter is what comes after the body: the closing, the funding, the CRediT table, the references, the licence and copyright, and the citation.
+It works in every mode.
+HTML, the PDF, and the deck show these parts in the same order, and each heading has the level of a top-level section.
+
+| Part                  | HTML                                  | PDF                                    | Deck                                         |
+| --------------------- | ------------------------------------- | -------------------------------------- | -------------------------------------------- |
+| Closing               | End of the body                       | End of the body, or the closing page   | The last slide                               |
+| Funding               | Quarto appendix                       | After the closing                      | On the closing slide, or on the end slide    |
+| CRediT table          | Quarto appendix                       | After the funding                      | On the closing slide, or on the end slide    |
+| References            | Quarto appendix                       | After the CRediT table                 | A slide before the closing slide             |
+| Licence and copyright | Quarto appendix                       | Page footer, and the closing section   | The closing slide                            |
+| Citation              | Quarto appendix                       | The last section, when `citation` is set | Not shown                                  |
+
+: The order of the end matter in each format. {.striped .hover tbl-colwidths="[18,24,28,30]"}
+
 ### Closing
 
 `extensions.atelier.closing` ends a page, a handout, or a deck with a thank-you, your own text, links, the copyright, and the licence.
@@ -496,6 +530,37 @@ The PDF and the deck also show the CRediT table.
 
 :::
 
+### Rights in the closing
+
+The closing shows the copyright and the licence only where the reader has no other place to find them.
+
+- HTML: the Quarto appendix shows Reuse and Copyright, so the closing drops them.
+  The closing keeps them when Quarto shows no appendix, as in a book or with `appendix-style: none` or `false`.
+  It also keeps a copyright that is a holder and a year, because the appendix shows only a text or a statement.
+- PDF: the closing keeps them.
+  The page footer is an artifact, so a screen reader never reads it.
+- Deck: the closing keeps them.
+
+### Funding
+
+Atelier reads the Quarto `funding` key.
+It shows the statement first, then each award with its source, its identifier, and its recipient.
+`funding` can be a text, a list of texts, or a map with `statement` and `awards`.
+The `open-access` key is not shown.
+
+```{.yaml filename="index.qmd"}
+funding:
+  statement: "This work was supported by Riverlab."
+  awards:
+    - source: "Riverlab Foundation"
+      id: "RF-2026-14"
+      recipient:
+        - ref: diaz
+```
+
+A recipient with `ref` shows the name of the author, not the identifier.
+A page with no `funding` shows no funding section.
+
 ### CRediT table
 
 The `roles` field of an author gives the contribution roles, with the CRediT terms of Quarto.
@@ -511,31 +576,16 @@ author:
       - writing: lead
 ```
 
-The PDF and the deck always show the table, at the end and on the closing slide.
-A web page shows it only where `closing` is set.
+A standalone web page, the PDF, and the deck show the table.
+A page of a website shows it only where `closing` is set.
 A page with no roles shows no table.
 
-On a web page, the table comes before the closing.
+The table comes after the funding.
+On a web page it is in the Quarto appendix, so it comes after the closing.
+In the deck it sits on the closing slide, or on the end slide when there is no closing.
 The [Closing](#closing) pictures show the table in the PDF and in the deck.
 
 ![The CRediT table of a web page.](assets/gallery/workshop-credit-html.png){.lightbox group="workshop-credit" width="996" height="160" loading="lazy" fig-alt="The table Author contributions (CRediT) on a web page: a column Role and a column Ana Diaz, with the row Writing, original draft, and the value Lead."}
-
-### Motifs
-
-A motif is a decorative shape on the title block, the title slide, and the section slides.
-Each preset has its own motif:
-
-| Preset     | Motif       |
-| ---------- | ----------- |
-| `default`  | `steps`     |
-| `quarto`   | `quadrants` |
-| `terminal` | `dots`      |
-
-: The motif of each preset. {.striped .hover tbl-colwidths="[30,70]"}
-
-The motif takes its colour from the palette of the preset, and assistive technology skips it.
-You cannot choose another motif.
-The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each preset.
 
 ## Title block labels
 
