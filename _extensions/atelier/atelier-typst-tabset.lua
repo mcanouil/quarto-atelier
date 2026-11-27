@@ -9,18 +9,21 @@
 --- skip a level. This filter runs before Quarto reads the tabsets. Each tab
 --- heading becomes a direct child of the heading before the tabset, and the
 --- highest heading inside the tabs becomes a direct child of a tab heading.
---- A tab heading is never above level 2, so a tabset does not start a
---- chapter. A nested tabset moves with the tabset around it, then under the
---- heading before it.
+--- A tabset with no heading before it sits with the top sections of the PDF:
+--- at level 1 when the source has a level-1 heading, and at level 2
+--- otherwise, which Quarto then moves up to level 1. A nested tabset moves
+--- with the tabset around it, then under the heading before it.
 --- The tabset keeps its identifier and its other classes on a plain Div.
 
 --- Class that marks a tabset.
 --- @type string
 local TABSET_CLASS = 'panel-tabset'
 
---- Highest level that a tab heading can take.
---- @type integer
-local MIN_TAB_LEVEL = 2
+--- Whether the source has a level-1 heading. Quarto moves every Typst heading
+--- up one level when it has none, and decides this from the source, before
+--- any filter runs.
+--- @type boolean
+local has_level_one = false
 
 --- Level of the last heading seen, in document order.
 --- @type integer
@@ -70,7 +73,8 @@ local function flatten_tabset(div)
     return nil
   end
   local tab_level = first.level
-  local new_tab_level = math.max(parent_level + 1, MIN_TAB_LEVEL)
+  local top_level = has_level_one and 1 or 2
+  local new_tab_level = math.max(parent_level + 1, top_level)
   local min_content_level = nil
   each_own_heading(div.content, function(header)
     if header.level ~= tab_level then
@@ -90,7 +94,14 @@ local function flatten_tabset(div)
   return div
 end
 
+--- Record whether the source has a level-1 heading, as Quarto does.
+--- @param header pandoc.Header
+local function find_level_one(header)
+  has_level_one = has_level_one or header.level == 1
+end
+
 return {
+  { Header = find_level_one },
   {
     traverse = 'topdown',
     Header = track_heading,
