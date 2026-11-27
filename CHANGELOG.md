@@ -51,6 +51,7 @@
 - fix: The closed accessibility menu of a deck no longer casts a shadow on the right edge of the slide.
 - fix: A tabset in a PDF becomes one heading per tab, just below the heading before the tabset, with the tab content under it, and the render no longer warns that it cannot recognise the format. (#166)
 - fix: An image with `fig-align`, `fig-alt` and no caption keeps its alt text in a PDF, so the PDF/UA-1 build no longer stops on it. (#167)
+- fix: Update the embedded offset-headings to 0.6.1 and code-window to 1.10.2, so a heading without `offset-headings-by` no longer leaks the offset attributes, and a Typst code block that shows annotation markers no longer breaks the compile.
 
 ## 0.15.3 (2026-11-23)
 
