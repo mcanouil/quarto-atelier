@@ -273,8 +273,9 @@ You can use it with the split hero or with `.centred`.
 ## Framed figure
 
 The `.framed` modifier goes on the figure part, `.atelier-hero-figure`.
-It draws the image in the same frame as a card: an ink border, an offset ink shadow and padding around the image.
-The frame is turned by a small angle, which is the same for every framed image and does not move.
+It draws the image in a frame with an ink border, an offset ink shadow and padding around the image.
+The frame looks like a card, but its shadow is ink, not the accent colour, and the frame is turned by a small angle.
+The angle is the same for every framed image, and it does not move.
 Use it for a screenshot of a page.
 The frame is drawn from the page ink and paper, so it follows the colour scheme.
 

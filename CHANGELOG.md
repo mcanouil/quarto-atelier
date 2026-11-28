@@ -54,9 +54,9 @@
 - fix: Update the embedded offset-headings to 0.6.1 and code-window to 1.10.2, so a heading without `offset-headings-by` no longer leaks the offset attributes, and a Typst code block that shows annotation markers no longer breaks the compile.
 - fix: On a website or in a book, the funding shows only on the page that sets the closing, as the CRediT table does. (#172)
 - feat: A heading deeper than the sixth level shows as bold body text in HTML and the PDF, with no number and no entry in the table of contents. (#173)
-- feat: A landing page card has an ink border, and shows an offset shadow in the accent colour and moves up and to the left on hover and on focus. The cards of a grid listing do the same.
-- feat: Add the `.framed` modifier for `.atelier-hero-figure`, which draws a page screenshot in an ink frame with an offset shadow and a small tilt.
-- refactor: Remove the `.gradient` modifier of the hero and its Sass variables, so a hero title is plain text. Remove the class from your pages.
+- feat: A landing page card has an ink border, and shows an offset shadow in the accent colour and moves up and to the left on hover and on focus. The cards of a grid listing do the same. (#175)
+- feat: Add the `.framed` modifier for `.atelier-hero-figure`, which draws a page screenshot in an ink frame with an offset shadow and a small tilt. (#175)
+- refactor: Remove the `.gradient` modifier of the hero and its Sass variables, so a hero title is plain text. Remove the class from your pages. (#175)
 
 ## 0.15.3 (2026-11-23)
 

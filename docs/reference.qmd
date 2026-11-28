@@ -541,24 +541,24 @@ The [Landing page](landing.qmd) guide shows each block and its Markdown, and the
 :::
 ```
 
-| Block        | Classes                                                                                                                 | Modifiers                                                |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Container    | `.atelier-landing`                                                                                                      | None.                                                    |
-| Hero         | `.atelier-hero`, with the parts `.atelier-hero-text`, `.atelier-hero-figure`, `.atelier-eyebrow`, `.atelier-lead` and `.atelier-actions` | `.split`, `.centred` and `.banner`                       |
-| Feature row  | `.atelier-feature`, with the parts `.atelier-feature-text` and `.atelier-feature-figure`                                 | `.reverse`                                               |
-| Legend       | `.atelier-legend` around an ordered list, with `.atelier-detail` spans                                                  | None.                                                    |
-| Cards        | `.atelier-cards`, which holds `.atelier-card` divs                                                                       | `.compact`                                               |
+| Block       | Classes                                                                                                                                  | Modifiers                          |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| Container   | `.atelier-landing`                                                                                                                       | None.                              |
+| Hero        | `.atelier-hero`, with the parts `.atelier-hero-text`, `.atelier-hero-figure`, `.atelier-eyebrow`, `.atelier-lead` and `.atelier-actions` | `.split`, `.centred` and `.banner` |
+| Feature row | `.atelier-feature`, with the parts `.atelier-feature-text` and `.atelier-feature-figure`                                                 | `.reverse`                         |
+| Legend      | `.atelier-legend` around an ordered list, with `.atelier-detail` spans                                                                   | None.                              |
+| Cards       | `.atelier-cards`, which holds `.atelier-card` divs                                                                                       | `.compact`                         |
 
 : Classes and modifiers of the landing page blocks. {.striped .hover tbl-colwidths="[16,56,28]"}
 
-| Modifier    | Effect                                                                                                    |
-| ----------- | --------------------------------------------------------------------------------------------------------- |
-| `.split`    | Puts the text part and the figure part side by side. A hero has this layout when it has no other layout modifier. |
-| `.centred`  | Centres the text part, in one column. A centred hero has no figure part.                                  |
-| `.banner`   | Puts the hero on a tinted surface with a border.                                                          |
-| `.framed`   | Goes on `.atelier-hero-figure`. Draws the image in a frame with an ink border, an offset ink shadow and a small static tilt. |
-| `.reverse`  | Puts the figure part of a feature row on the left.                                                        |
-| `.compact`  | Makes smaller cards, with the icon and the heading on one line.                                           |
+| Modifier   | Effect                                                                                                                       |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `.split`   | Puts the text part and the figure part side by side. A hero has this layout when it has no other layout modifier.            |
+| `.centred` | Centres the text part, in one column. A centred hero has no figure part.                                                     |
+| `.banner`  | Puts the hero on a tinted surface with a border.                                                                             |
+| `.framed`  | Goes on `.atelier-hero-figure`. Draws the image in a frame with an ink border, an offset ink shadow and a small static tilt. |
+| `.reverse` | Puts the figure part of a feature row on the left.                                                                           |
+| `.compact` | Makes smaller cards, with the icon and the heading on one line.                                                              |
 
 : Modifiers of the landing page blocks. {.striped .hover tbl-colwidths="[16,84]"}
 
@@ -593,13 +593,13 @@ Set them in the `defaults` layer of a project stylesheet.
 These Sass variables set the colours.
 Atelier calculates each default from the brand for each colour scheme.
 
-| Variable                         | Default                                                 | Effect                                 |
-| -------------------------------- | ------------------------------------------------------- | -------------------------------------- |
-| `$atelier-landing-accent`        | `$primary`, moved to 4.5:1 against the page             | Eyebrow, legend numbers, card icon.   |
-| `$atelier-landing-muted`         | `$text-muted`, moved to 4.5:1 against the page          | Lead and legend detail text.           |
-| `$atelier-landing-surface`       | `body-mix(95%)`                                         | Banner surface.                        |
-| `$atelier-landing-border`        | `var(--atelier-border)`                                 | Banner, feature row and card icon borders. |
-| `$atelier-card-muted`            | `$text-muted`, moved to 4.5:1 against the page          | Card text.                             |
-| `$atelier-card-link`             | `$link-color`, moved to 4.5:1 against the page          | Card link.                             |
+| Variable                   | Default                                        | Effect                                     |
+| -------------------------- | ---------------------------------------------- | ------------------------------------------ |
+| `$atelier-landing-accent`  | `$primary`, moved to 4.5:1 against the page    | Eyebrow, legend numbers, card icon.        |
+| `$atelier-landing-muted`   | `$text-muted`, moved to 4.5:1 against the page | Lead and legend detail text.               |
+| `$atelier-landing-surface` | `body-mix(95%)`                                | Banner surface.                            |
+| `$atelier-landing-border`  | `var(--atelier-border)`                        | Banner, feature row and card icon borders. |
+| `$atelier-card-muted`      | `$text-muted`, moved to 4.5:1 against the page | Card text.                                 |
+| `$atelier-card-link`       | `$link-color`, moved to 4.5:1 against the page | Card link.                                 |
 
 : Colour variables of the landing page blocks. {.striped .hover tbl-colwidths="[34,40,26]"}
