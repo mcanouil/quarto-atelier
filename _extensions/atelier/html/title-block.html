@@ -5,8 +5,9 @@
 -->
 <!--
 Copy of the Quarto partials `title-block.html` and `banner/title-block.html`,
-with the logo (`atelier-title-logo`, written by `atelier-html-logo.lua`) as the
-first child of `.quarto-title`. A partial cannot add to the title block of
+with the logo (`atelier-title-logo`, written by `atelier-html-logo.lua`) in the
+row `atelier-title-tools`, the first child of `.quarto-title`. On a page with no
+navbar, `html/scripts/a11y-fixes.html` adds the colour scheme toggle to this row. A partial cannot add to the title block of
 Quarto, and a script that moves the logo leaves the page with no logo when
 JavaScript is off. The manuscript title block is not supported.
 Upstream: none filed (no hook in the title block for extra content).
@@ -16,7 +17,7 @@ $if(title-block-banner)$
 <header id="title-block-header" class="quarto-title-block default$if(quarto-template-params.banner-header-class)$ $quarto-template-params.banner-header-class$$endif$">
   <div class="quarto-title-banner">
     <div class="quarto-title column-body">
-      $if(atelier-title-logo)$<div class="atelier-title-logo">$atelier-title-logo$</div>$endif$
+      $if(atelier-title-logo)$<div class="atelier-title-tools"><div class="atelier-title-logo">$atelier-title-logo$</div></div>$endif$
       $if(title)$<h1 class="title">$title$</h1>$endif$
       $if(subtitle)$
       <p class="subtitle lead">$subtitle$</p>
@@ -46,7 +47,7 @@ $if(title-block-banner)$
 $else$
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-$if(atelier-title-logo)$<div class="atelier-title-logo">$atelier-title-logo$</div>$endif$
+$if(atelier-title-logo)$<div class="atelier-title-tools"><div class="atelier-title-logo">$atelier-title-logo$</div></div>$endif$
 $if(title)$
 <h1 class="title">$title$</h1>
 $endif$

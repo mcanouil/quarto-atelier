@@ -596,8 +596,9 @@
 		// draws the toggle with an absolute position at the top right. Focus
 		// reaches it last, the announcement bar covers it, and on a narrow
 		// page it sits on the motif of the title block. When the page has a
-		// title block, move the toggle into a row at the start of the title,
-		// with the logo when there is one, and remove the empty container.
+		// title block, move the toggle into the row at the start of the title,
+		// after the logo (html/title-block.html writes the row when there is a
+		// logo), and remove the empty container.
 		// Otherwise, move the container after the fixed header that holds the
 		// announcement bar, or after the skip link when there is no header. It
 		// stays a direct child of <body>.
@@ -611,12 +612,13 @@
 		const floatingToggle = toggleButton?.closest("body > *");
 		const titleBlock = document.querySelector("#title-block-header .quarto-title");
 		if (floatingToggle && titleBlock) {
-			const row = document.createElement("div");
-			row.className = "atelier-title-tools";
-			const logo = titleBlock.querySelector(":scope > .atelier-title-logo");
-			if (logo) row.append(logo);
+			let row = titleBlock.querySelector(":scope > .atelier-title-tools");
+			if (!row) {
+				row = document.createElement("div");
+				row.className = "atelier-title-tools";
+				titleBlock.prepend(row);
+			}
 			row.append(toggleButton);
-			titleBlock.prepend(row);
 			floatingToggle.remove();
 		} else if (floatingToggle) {
 			const anchor = document.body.querySelector(":scope > #quarto-header")
