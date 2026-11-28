@@ -79,6 +79,15 @@ The first page has no header.
 A cover, a divider and the closing page have no header.
 Their footer shows only the copyright and the licence, where the first line of the footer sits.
 
+### Tabsets
+
+A PDF cannot show tabs, so each tab of a tabset becomes a heading, with the content of the tab under it.
+The tab headings go one level below the heading before the tabset, whatever their level in the source.
+The highest heading inside the tabs goes one level below the tab heading, and the other headings keep their depth relative to it.
+
+If a tabset has no heading before it, its tabs go at the top level of the PDF.
+In a document with level-1 headings, these tabs are chapters, so each one gets the chapter features of the report switches.
+
 ### Report switches
 
 Five switches under `extensions.atelier` turn on the parts of a long report.
@@ -131,28 +140,32 @@ The pages below come from a report with the switches of this example, and a `.pa
 
 ### Workshop handouts
 
-In workshop mode, the PDF also shows the session duration, the workshop labels, the workshop blocks, and the [workshop extras](workshop.qmd#speakers).
-`extensions.atelier.solutions` sets where the PDF puts the solutions:
+The PDF shows the workshop blocks and the [workshop extras](workshop.qmd#authors) in both modes.
+In workshop mode, it also shows the session duration and the workshop labels.
+
+### Answers in a PDF
+
+`extensions.atelier.answers` sets where the PDF puts the answers:
 
 | Value    | Effect                                                                                      |
 | -------- | ------------------------------------------------------------------------------------------- |
-| `end`    | The default. The solutions are at the end, and each exercise links to its solution.         |
-| `inline` | Each solution stays under its exercise.                                                     |
-| `hide`   | The PDF has no solutions.                                                                   |
+| `end`    | The default. The answers are at the end, and each exercise links to its answer.             |
+| `inline` | Each answer stays under its exercise.                                                       |
+| `hide`   | The PDF has no answers.                                                                     |
 
-: The values of `extensions.atelier.solutions`. {.striped .hover tbl-colwidths="[18,82]"}
+: The values of `extensions.atelier.answers`. {.striped .hover tbl-colwidths="[18,82]"}
 
-The three PDFs below hold the same exercise and the same solution.
+The three PDFs below hold the same exercise and the same answer.
 
 | `end` | `inline` | `hide` |
 | ----- | -------- | ------ |
-| ![The exercise page with solutions at the end.](assets/gallery/formats-solutions-end.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and a link, Solution: page 2, under it."} | ![The exercise page with the solution inline.](assets/gallery/formats-solutions-inline.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and its solution in a dashed frame under it."} | ![The exercise page with the solutions hidden.](assets/gallery/formats-solutions-hide.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and no solution."} |
-| ![The page with the solutions.](assets/gallery/formats-solutions-end-solution.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="The last page of the PDF with the heading Solutions and the text of the solution."} | | |
+| ![The exercise page with the answers at the end.](assets/gallery/formats-solutions-end.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and a link, Answer: page 2, under it."} | ![The exercise page with the answer inline.](assets/gallery/formats-solutions-inline.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and its answer in a dashed frame under it."} | ![The exercise page with the answers hidden.](assets/gallery/formats-solutions-hide.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="A PDF page with the exercise Add a page and no answer."} |
+| ![The page with the answers.](assets/gallery/formats-solutions-end-solution.png){.lightbox group="typst-solutions" width="909" height="1286" loading="lazy" fig-alt="The last page of the PDF with the heading Answers and the text of the answer."} | | |
 
-: The same handout with each value of `extensions.atelier.solutions`. {.striped .hover}
+: The same handout with each value of `extensions.atelier.answers`. {.striped .hover}
 
 Any other value logs a warning, and Atelier uses `end`.
-A reference such as `@sol-a` links to the solution in each format.
+Quarto's own `.solution` blocks stay in place, and a reference such as `@sol-a` links to the solution in each format.
 
 ## The `atelier-revealjs` format
 
@@ -164,8 +177,9 @@ It shows the slide number as "n/total" and a progress bar.
 - A slide with the class `.dark` uses the dark colours.
 - The menu button, the chalkboard buttons, and the footer share one row at the bottom of each slide.
 - The footer shows the title of the document on the left and your `footer` text in the centre.
-  The slide number is at the right end of that row, or in the top-right corner when the deck has a logo.
-- With a logo, the title slide shows it above the title, and the other slides show it at the right end of that row.
+  The `copyright` and the `license` show in the same row, and every item sits on one centre line.
+  The slide number is at the right end of that row, also when the deck has a logo.
+- With a logo, the title slide shows it above the title, and the other slides show it in that row.
   A dark slide shows the dark image of the logo.
 - The title slide shows only your `footer` text in that row, with no slide number.
   A section slide shows no slide number.
@@ -192,8 +206,8 @@ Use `.dark` on single slides when you want a contrast.
 This slide uses the dark colours.
 ```
 
-In workshop mode, the deck shows the workshop blocks.
-Its solutions go into the veil group `solutions`, which is hidden when the deck opens.
+The deck shows the workshop blocks in both modes.
+Its answers go into the veil group `answers`, which is hidden when the deck opens.
 
 The embedded extensions cascade, codefrag, tabset, and a11y add to the deck.
 The [reference](reference.qmd#embedded-extensions) lists them with their options.
@@ -205,5 +219,3 @@ The [reference](reference.qmd#embedded-extensions) lists them with their options
 - The report switches have no effect in HTML and Reveal.js.
 - Typst cannot read WOFF2 fonts.
   Atelier holds static TrueType cuts of its fonts for this reason.
-- A solution with an `id` that does not start with `sol-` stops the Quarto render ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
-  Give a solution no `id`, or an `id` that starts with `sol-`.

@@ -6,7 +6,7 @@
 --- @brief The format-neutral part of the workshop mode.
 --- @description Reads the page model (mode, duration, labels), the course
 --- model (the sidebar that lists the page and the durations of its pages),
---- and the workshop blocks (objectives, exercise, solution, terminal). Each
+--- and the workshop blocks (objectives, exercise, answer, terminal). Each
 --- reader returns plain data, and the writer of each format turns that data
 --- into its output. This module writes no output.
 
@@ -67,13 +67,19 @@ local LABELS = {
   'credit-equal',
   'credit-supporting',
   'credit-contributed',
+  'funding-title',
+  'funding-recipient',
   'closing-thanks',
-  'solution-summary',
+  'answer-summary',
   'terminal',
   'workshop-author-single',
   'workshop-author-plural',
   'workshop-published',
   'workshop-modified',
+  'author-corresponding',
+  'author-equal',
+  'author-deceased',
+  'author-orcid-profile',
 }
 
 -- ============================================================================
@@ -227,10 +233,12 @@ end
 --- @return { mode: string, duration: integer|nil, labels: table<string, string>, options: table, source: string } The model
 function M.page(meta)
   local source = quarto.doc.input_file or ''
+  local mode = M.read_mode(meta, source)
   return {
     options = M.read_options(meta),
-    mode = M.read_mode(meta, source),
-    duration = M.read_duration(meta, source),
+    mode = mode,
+    -- The page duration is workshop metadata, so a page in another mode has none.
+    duration = mode == M.MODE_WORKSHOP and M.read_duration(meta, source) or nil,
     labels = M.resolve_labels(),
     source = source,
   }
@@ -273,10 +281,10 @@ function M.apply_title_labels(meta, labels)
 end
 
 -- ============================================================================
--- SPEAKERS
+-- AUTHORS
 -- ============================================================================
 
---- The media types of the photo files that a speaker can have, by extension.
+--- The media types of the photo files that an author can have, by extension.
 --- @type table<string, string>
 local PHOTO_TYPES = {
   svg = 'image/svg+xml',
@@ -308,7 +316,7 @@ function M.author_name(author)
 end
 
 --- Resolve a path against the folder of the document, such as the photo of
---- a speaker or the file of the closing. An absolute path stays as it is.
+--- an author or the file of the closing. An absolute path stays as it is.
 --- @param path string The path, relative to the document
 --- @return string
 local function document_file(path)
@@ -318,18 +326,36 @@ local function document_file(path)
   return path
 end
 
---- Check the photo file of a speaker. A file that does not exist, or that is
+--- Resolve the `photo` key of an author to a path relative to the folder of
+--- the document. A value that starts with `/` is relative to the project
+--- root, as other Quarto site paths are, so a project-level author list works
+--- on nested pages; any other value is relative to the document.
+--- @param value string The value of the `photo` key
+--- @return string The path, relative to the folder of the document
+local function photo_path(value)
+  if value:sub(1, 1) ~= '/' or quarto.doc.input_file == nil then
+    return value
+  end
+  local root = quarto.project.directory or pandoc.path.directory(quarto.doc.input_file)
+  local file = pandoc.path.join({ root, value:sub(2) })
+  -- `unsafe` lets the answer start with `../`, for a page below the root.
+  return pandoc.path.make_relative(file, pandoc.path.directory(quarto.doc.input_file), true)
+end
+
+--- Check the photo file of an author. A file that does not exist, or that is
 --- not an image type that a browser shows, logs a warning.
 --- @param path string The path, relative to the document
---- @param key string The key of the speaker, for the warning
+--- @param value string The value of the `photo` key, for the warning
+--- @param name string The name of the author, for the warning
 --- @return boolean True when the photo can be shown
-local function photo_ok(path, key)
-  local subject = 'extensions.atelier.speakers.' .. key .. '.photo'
+local function photo_ok(path, value, name)
+  local subject = "The photo '" .. value .. "' of the author " .. name .. ' in ' ..
+    (quarto.doc.input_file or '')
   if PHOTO_TYPES[(path:match('%.([^./\\]+)$') or ''):lower()] == nil then
     log.log_warning(
       EXTENSION_NAME,
-      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
-      ' is not an svg, png, jpg, gif or webp file, so the speaker has no photo.'
+      subject .. ' is not an svg, png, jpg, gif or webp file, so the author has no photo. ' ..
+      'Set the author key photo to an image file.'
     )
     return false
   end
@@ -337,8 +363,8 @@ local function photo_ok(path, key)
   if file == nil then
     log.log_warning(
       EXTENSION_NAME,
-      subject .. " '" .. path .. "' in " .. (quarto.doc.input_file or '') ..
-      ' does not exist, so the speaker has no photo. Correct the path, relative to the document.'
+      subject .. ' does not exist, so the author has no photo. ' ..
+      'Correct the author key photo: a path relative to the document, or to the project root when it starts with /.'
     )
     return false
   end
@@ -346,8 +372,8 @@ local function photo_ok(path, key)
   return true
 end
 
---- Read the photo of a speaker as a data URI, so the page carries it.
---- @param path string The path of a photo that `M.speakers` checked
+--- Read the photo of an author as a data URI, so the page carries it.
+--- @param path string The path of a photo that `M.authors` checked
 --- @return string The data URI
 function M.photo_uri(path)
   local file = assert(io.open(document_file(path), 'rb'))
@@ -357,62 +383,160 @@ function M.photo_uri(path)
   return 'data:' .. media .. ';base64,' .. quarto.base64.encode(content)
 end
 
---- Read the speakers of a workshop page: each author of Quarto's `author`
---- list, with the photo of `extensions.atelier.speakers`, a map from the
---- author `id`, else the author name, to `photo` and `alt`, or to the photo
---- path alone. A key that names
---- no author logs a warning. A photo with no `alt` is decorative, as the name
---- is next to it.
+--- The author attributes that show as text, in order, with their label keys.
+--- @type { key: string, label: string }[]
+local AUTHOR_ATTRIBUTES = {
+  { key = 'corresponding', label = 'author-corresponding' },
+  { key = 'equal-contributor', label = 'author-equal' },
+  { key = 'deceased', label = 'author-deceased' },
+}
+
+--- Tell whether a metadata value is true.
+--- @param value any
+--- @return boolean
+local function is_true(value)
+  return value == true or text_of(value) == 'true'
+end
+
+--- @class Author
+--- @field index integer The position of the author in `by-author`
+--- @field name string
+--- @field url string|nil
+--- @field photo string|nil The checked path, relative to the folder of the document
+--- @field photo_alt string The alt text of the photo, empty when it is decorative
+--- @field degrees string[]
+--- @field orcid string|nil
+--- @field email string|nil
+--- @field affiliations { name: string, url: string|nil }[]
+--- @field attributes string[] The visible labels of the author attributes
+--- @field note string|nil
+
+--- Read one value of an author as text, or nil when it is empty.
+--- @param value any
+--- @return string|nil
+local function optional_text(value)
+  local text = text_of(value)
+  return text ~= '' and text or nil
+end
+
+--- Read the authors of a page: each named author of Quarto's `by-author`,
+--- in order, with the native keys `photo` and `photo-alt`. A photo with no
+--- `photo-alt` is decorative, because the name is next to it.
 --- @param meta table The document metadata
---- @param model table The page model
---- @return { index: integer, name: string, degrees: string[], affiliation: string|nil, photo: string|nil, alt: string }[] The speakers, empty outside workshop mode: `index` is the position of the author in `by-author`, and `photo` the checked path, relative to the document
-function M.speakers(meta, model)
-  if model.mode ~= M.MODE_WORKSHOP then
-    return {}
-  end
-  local photos = type(model.options.speakers) == 'table' and model.options.speakers or {}
-  local used = {}
-  local speakers = {}
+--- @param labels table<string, string> The resolved Atelier labels
+--- @return Author[] The authors
+function M.authors(meta, labels)
+  local authors = {}
   for index, author in ipairs(meta['by-author'] or {}) do
     local name = M.author_name(author)
     if name ~= '' then
-      local id = text_of(author.id)
-      local key = (id ~= '' and photos[id] ~= nil) and id or name
-      local entry = photos[key]
-      local speaker = { index = index, name = name, degrees = {}, alt = '' }
+      local extra = author.metadata or {}
+      local entry = {
+        index = index,
+        name = name,
+        url = optional_text(author.url),
+        photo_alt = '',
+        degrees = {},
+        orcid = optional_text(author.orcid),
+        email = optional_text(author.email),
+        affiliations = {},
+        attributes = {},
+        note = author.note and optional_text(author.note.text or author.note) or nil,
+      }
+      local value = text_of(extra.photo)
+      if value ~= '' then
+        local path = photo_path(value)
+        if photo_ok(path, value, name) then
+          entry.photo = path
+          entry.photo_alt = text_of(extra['photo-alt'])
+        end
+      end
       for _, degree in ipairs(author.degrees or {}) do
-        speaker.degrees[#speaker.degrees + 1] = text_of(degree)
+        entry.degrees[#entry.degrees + 1] = text_of(degree)
       end
-      local affiliation = (author.affiliations or {})[1]
-      if affiliation ~= nil and text_of(affiliation.name) ~= '' then
-        speaker.affiliation = text_of(affiliation.name)
-      end
-      if entry ~= nil then
-        used[key] = true
-        -- A bare value is the photo path, with no alt text.
-        if pandoc.utils.type(entry) ~= 'table' then
-          entry = { photo = entry }
-        end
-        local photo = text_of(entry.photo)
-        if photo ~= '' and photo_ok(photo, key) then
-          speaker.photo = photo
-          speaker.alt = text_of(entry.alt)
+      for _, affiliation in ipairs(author.affiliations or {}) do
+        local affiliation_name = text_of(affiliation.name)
+        if affiliation_name ~= '' then
+          entry.affiliations[#entry.affiliations + 1] = {
+            name = affiliation_name,
+            url = optional_text(affiliation.url),
+          }
         end
       end
-      speakers[#speakers + 1] = speaker
+      for _, attribute in ipairs(AUTHOR_ATTRIBUTES) do
+        if is_true((author.attributes or {})[attribute.key]) then
+          entry.attributes[#entry.attributes + 1] = labels[attribute.label]
+        end
+      end
+      authors[#authors + 1] = entry
     end
   end
-  for key in pairs(photos) do
-    if not used[key] then
-      log.log_warning(
-        EXTENSION_NAME,
-        "extensions.atelier.speakers has '" .. key .. "' in " .. (quarto.doc.input_file or '') ..
-        ', which is the id or the name of no author, so its photo is not shown. ' ..
-        'Use the id or the name of an author of the author list.'
-      )
+  return authors
+end
+
+--- Text for a template that puts it in an attribute. Pandoc escapes `&` and
+--- `<` in inlines but not `"`, so each `"` becomes a raw entity and the value
+--- cannot end the attribute.
+--- @param text string
+--- @return pandoc.MetaInlines
+local function escaped(text)
+  local inlines = pandoc.List({})
+  local first = true
+  for piece in (text .. '"'):gmatch('(.-)"') do
+    if not first then
+      inlines:insert(pandoc.RawInline('html', '&quot;'))
+    end
+    first = false
+    if piece ~= '' then
+      inlines:insert(pandoc.Str(piece))
     end
   end
-  return speakers
+  return pandoc.MetaInlines(inlines)
+end
+
+--- Write the authors as metadata for a template partial: one map for each
+--- author, with no key for an absent field, so `$if(...)$` works.
+--- @param authors Author[] The authors of `M.authors`
+--- @param labels table<string, string> The resolved Atelier labels
+--- @param photo_src fun(path: string): string Answers the `src` of a checked photo
+--- @return pandoc.List The metadata list
+function M.authors_meta(authors, labels, photo_src)
+  local list = pandoc.List({})
+  for _, author in ipairs(authors) do
+    local item = {
+      index = pandoc.MetaString(tostring(author.index)),
+      name = pandoc.MetaString(author.name),
+      url = author.url and escaped(author.url) or nil,
+      degrees = #author.degrees > 0 and pandoc.MetaString(table.concat(author.degrees, ', ')) or nil,
+      email = author.email and escaped(author.email) or nil,
+      note = author.note and pandoc.MetaString(author.note) or nil,
+    }
+    if author.photo then
+      item.photo = escaped(photo_src(author.photo))
+      item['photo-alt'] = escaped(author.photo_alt)
+    end
+    if author.orcid then
+      item.orcid = escaped(author.orcid)
+      item['orcid-label'] = escaped((labels['author-orcid-profile']:gsub('{name}', function()
+        return author.name
+      end)))
+    end
+    if #author.affiliations > 0 then
+      local affiliations = pandoc.List({})
+      for _, affiliation in ipairs(author.affiliations) do
+        affiliations:insert({
+          name = pandoc.MetaString(affiliation.name),
+          url = affiliation.url and escaped(affiliation.url) or nil,
+        })
+      end
+      item.affiliations = affiliations
+    end
+    if #author.attributes > 0 then
+      item.attributes = pandoc.List(author.attributes):map(pandoc.MetaString)
+    end
+    list:insert(item)
+  end
+  return list
 end
 
 -- ============================================================================
@@ -430,11 +554,8 @@ local DEGREES = { lead = true, equal = true, supporting = true }
 --- contributed, or an empty string when the author has not that role.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil outside workshop mode or when no author has a role
+--- @return { authors: string[], rows: { role: string, cells: string[] }[] }|nil The table, or nil when no author has a role
 function M.credit(meta, model)
-  if model.mode ~= M.MODE_WORKSHOP then
-    return nil
-  end
   local authors, people = {}, {}
   for _, author in ipairs(meta['by-author'] or {}) do
     local name = M.author_name(author)
@@ -555,7 +676,7 @@ end
 --- `statement`, or "© year holder".
 --- @param value any The Quarto `copyright`
 --- @return pandoc.Inlines|nil
-local function copyright_text(value)
+function M.copyright_text(value)
   if pandoc.utils.type(value) ~= 'table' then
     return inlines_or_nil(value)
   end
@@ -578,7 +699,7 @@ end
 --- its `type`, as `typst/typst-show.typ` reads it for the PDF frame.
 --- @param value any The Quarto `license`
 --- @return pandoc.Inlines|nil
-local function licence_text(value)
+function M.licence_text(value)
   if pandoc.utils.type(value) == 'table' then
     value = value.text or value.type
   end
@@ -620,13 +741,15 @@ end
 --- `true`, or a map with `title`, `text` or `file`, `links`, `copyright` and
 --- `licence`. The title is the closing label by default. The copyright and
 --- the licence are the Quarto `copyright` and `license`, and each of
---- `copyright: false` and `licence: false` hides its line.
+--- `copyright: false` and `licence: false` hides its line. A part that the
+--- format shows elsewhere, `true` in `shown`, is left out whatever its switch.
 --- @param meta table The document metadata
 --- @param model table The page model
---- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil outside workshop mode or when unset
-function M.closing(meta, model)
+--- @param shown { copyright: boolean, licence: boolean }|nil The parts that the format shows elsewhere
+--- @return { title: pandoc.Inlines, content: pandoc.Blocks|nil, links: pandoc.Inlines[], copyright: pandoc.Inlines|nil, licence: pandoc.Inlines|nil }|nil The closing, or nil when unset
+function M.closing(meta, model, shown)
   local value = model.options.closing
-  if model.mode ~= M.MODE_WORKSHOP or value == nil or value == false then
+  if value == nil or value == false then
     return nil
   end
   local options = type(value) == 'table' and value or {}
@@ -638,13 +761,57 @@ function M.closing(meta, model)
   for _, link in ipairs(options.links or {}) do
     closing.links[#closing.links + 1] = to_inlines(link)
   end
-  if closing_switch(options, 'copyright', 'copyright') then
-    closing.copyright = copyright_text(meta.copyright)
+  shown = shown or {}
+  if closing_switch(options, 'copyright', 'copyright') and not shown.copyright then
+    closing.copyright = M.copyright_text(meta.copyright)
   end
-  if closing_switch(options, 'licence', 'license') then
-    closing.licence = licence_text(meta.license)
+  if closing_switch(options, 'licence', 'license') and not shown.licence then
+    closing.licence = M.licence_text(meta.license)
   end
   return closing
+end
+
+local project_in_book = nil
+
+--- Answer whether the page is a chapter of a Quarto book. A filter does not
+--- get `book` in the document metadata, so it also comes from the project
+--- metadata.
+--- @param meta table The document metadata
+--- @return boolean
+function M.in_book(meta)
+  if meta.book ~= nil then
+    return true
+  end
+  if project_in_book == nil then
+    local project = meta_mod.get_project_metadata()
+    project_in_book = project ~= nil and project.book ~= nil
+  end
+  return project_in_book
+end
+
+--- Answer which of the copyright and the licence Quarto shows in its HTML
+--- appendix, as Copyright and Reuse. Quarto shows no appendix in a book or
+--- with `appendix-style` `none` or `false`. It shows the copyright only as a
+--- string or a `statement`, and the licence only as a string, a list or a
+--- `text`.
+--- @param meta table The document metadata
+--- @return { copyright: boolean, licence: boolean }
+function M.appendix_rights(meta)
+  local none = { copyright = false, licence = false }
+  local style = meta['appendix-style']
+  if style == false or text_of(style) == 'none' or text_of(style) == 'false' or M.in_book(meta) then
+    return none
+  end
+  local function shown(value, key)
+    if pandoc.utils.type(value) == 'table' then
+      value = value[key]
+    end
+    return text_of(value) ~= ''
+  end
+  return {
+    copyright = shown(meta.copyright, 'statement'),
+    licence = shown(meta.license, 'text'),
+  }
 end
 
 --- Build the parts of the closing after its heading: the content, the links
@@ -667,6 +834,146 @@ function M.closing_parts(closing)
     if closing[part] ~= nil then
       blocks:insert(pandoc.Div({ pandoc.Para(closing[part]) }, pandoc.Attr('', { 'atelier-closing-' .. part })))
     end
+  end
+  return blocks
+end
+
+--- Write a list of links as a `ul` with `role="list"`. The style hides the
+--- bullets, and some browsers then drop the list semantics, so the role keeps
+--- them. Each item stays pandoc inlines, so Quarto still resolves the links.
+--- @param list pandoc.BulletList The list
+--- @return pandoc.Blocks
+local function link_list(list)
+  local blocks = pandoc.Blocks({ pandoc.RawBlock('html', '<ul role="list">') })
+  for _, item in ipairs(list.content) do
+    local inlines = pandoc.Inlines({ pandoc.RawInline('html', '<li>') })
+    inlines:extend(pandoc.utils.blocks_to_inlines(item))
+    inlines:insert(pandoc.RawInline('html', '</li>'))
+    blocks:insert(pandoc.Plain(inlines))
+  end
+  blocks:insert(pandoc.RawBlock('html', '</ul>'))
+  return blocks
+end
+
+--- Build the parts of the closing for HTML output (the page and the deck),
+--- with the links as a list that keeps its semantics.
+--- @param closing table The closing of `M.closing`
+--- @return pandoc.Blocks
+function M.closing_parts_html(closing)
+  local parts = M.closing_parts(closing)
+  for _, part in ipairs(parts) do
+    if part.classes:includes('atelier-closing-links') then
+      part.content = link_list(part.content[1])
+    end
+  end
+  return parts
+end
+
+-- ============================================================================
+-- FUNDING
+-- ============================================================================
+
+--- @class Award
+--- @field source pandoc.Inlines|nil The sources, joined with ', '
+--- @field id string|nil The award id
+--- @field recipients pandoc.Inlines|nil The names or institutions, joined with ', '
+
+--- @class Funding
+--- @field statements pandoc.Inlines[] One for each funding group with a statement
+--- @field awards Award[]
+
+--- Answer the text of one source or recipient as Quarto normalises it:
+--- `{ text }`, `{ name }` or `{ institution }`.
+--- @param entry table The entry
+--- @return string
+local function funder_text(entry)
+  if entry.name ~= nil then
+    return M.author_name(entry)
+  elseif entry.institution ~= nil then
+    return text_of(entry.institution.name or entry.institution)
+  end
+  return text_of(entry.text)
+end
+
+--- Join the texts of a list of sources or recipients with ', ', or answer
+--- nil when none has a text.
+--- @param entries table|nil The entries
+--- @return pandoc.Inlines|nil
+local function funder_list(entries)
+  local names = {}
+  for _, entry in ipairs(entries or {}) do
+    local name = funder_text(entry)
+    if name ~= '' then
+      names[#names + 1] = name
+    end
+  end
+  if #names == 0 then
+    return nil
+  end
+  return pandoc.Inlines(table.concat(names, ', '))
+end
+
+--- Read the funding of the document from the Quarto `funding` key, which
+--- Quarto normalises into a list of groups, each with a `statement` and
+--- `awards`. The `open-access` key is not shown.
+--- @param meta table The document metadata
+--- @return Funding|nil The funding, or nil when there is no statement and no award
+function M.funding(meta)
+  local funding = { statements = {}, awards = {} }
+  for _, group in ipairs(meta.funding or {}) do
+    if text_of(group.statement) ~= '' then
+      funding.statements[#funding.statements + 1] = to_inlines(group.statement)
+    end
+    for _, raw in ipairs(group.awards or {}) do
+      local id = text_of(raw.id)
+      local award = {
+        source = funder_list(raw.source),
+        id = id ~= '' and id or nil,
+        recipients = funder_list(raw.recipient),
+      }
+      if award.source ~= nil or award.id ~= nil or award.recipients ~= nil then
+        funding.awards[#funding.awards + 1] = award
+      end
+    end
+  end
+  if #funding.statements == 0 and #funding.awards == 0 then
+    return nil
+  end
+  return funding
+end
+
+--- Build the funding blocks: one paragraph for each statement, then a list
+--- with one item for each award: the source, the id in parentheses, and the
+--- recipients after the `funding-recipient` label. Each writer adds its own
+--- heading.
+--- @param funding Funding The funding of `M.funding`
+--- @param labels table<string, string> The resolved labels
+--- @return pandoc.Blocks
+function M.funding_blocks(funding, labels)
+  local blocks = pandoc.Blocks({})
+  for _, statement in ipairs(funding.statements) do
+    blocks:insert(pandoc.Para(statement))
+  end
+  local items = {}
+  for _, award in ipairs(funding.awards) do
+    local parts = {}
+    if award.source ~= nil then
+      parts[#parts + 1] = pandoc.utils.stringify(award.source)
+    end
+    if award.id ~= nil then
+      parts[#parts + 1] = '(' .. award.id .. ')'
+    end
+    local text = table.concat(parts, ' ')
+    if award.recipients ~= nil then
+      local recipient = labels['funding-recipient']:gsub('{names}', function()
+        return pandoc.utils.stringify(award.recipients)
+      end)
+      text = text == '' and recipient or text .. ', ' .. recipient
+    end
+    items[#items + 1] = { pandoc.Plain(pandoc.Inlines(text)) }
+  end
+  if #items > 0 then
+    blocks:insert(pandoc.BulletList(items))
   end
   return blocks
 end
@@ -1076,20 +1383,23 @@ function M.objective_text(item)
   return pandoc.Inlines({}), 1
 end
 
---- The blocks with a head line and a body, other than the objectives, by
---- class, with the Bootstrap Icons name of the icon of each one.
+--- The blocks with a head icon, by class, with the Bootstrap Icons name of
+--- the icon of each one, which `icons.lua` draws. The answer has no icon.
+--- `M.block_kind` finds all of them but the objectives.
 --- @type table<string, string>
 M.BLOCKS = {
+  objectives = 'bullseye',
   prerequisites = 'list-check',
   checkpoint = 'flag',
   exercise = 'pencil-square',
 }
 
---- The classes of `M.BLOCKS`, in the order that `M.block_kind` tries them.
+--- The classes of `M.BLOCKS` other than the objectives, in the order that
+--- `M.block_kind` tries them.
 --- @type string[]
 local BLOCK_ORDER = { 'prerequisites', 'checkpoint', 'exercise' }
 
---- Answer the class of the first block of `M.BLOCKS` that a div has, in the
+--- Answer the class of the first block of `BLOCK_ORDER` that a div has, in the
 --- order prerequisites, checkpoint, exercise.
 --- @param div pandoc.Div The div
 --- @return string|nil The class, or nil when the div is no such block
@@ -1102,10 +1412,10 @@ function M.block_kind(div)
   return nil
 end
 
---- Read a block of `M.BLOCKS`: the `title` attribute, else the label of the
+--- Read a block of `BLOCK_ORDER`: the `title` attribute, else the label of the
 --- kind, and the `duration` attribute.
 --- @param div pandoc.Div The div
---- @param kind string The class, a key of `M.BLOCKS`
+--- @param kind string The class, an item of `BLOCK_ORDER`
 --- @param model table The page model
 --- @return { title: string, time: string|nil, blocks: pandoc.Blocks } The block
 function M.block(div, kind, model)
@@ -1116,46 +1426,57 @@ function M.block(div, kind, model)
   }
 end
 
---- Tell whether a `Proof` node is a solution: Quarto's `Proof` of type
---- `Solution`, from a `.solution` div or a `sol-` identifier.
---- @param proof table The `Proof` node
---- @return boolean
-function M.is_solution(proof)
-  return pandoc.utils.stringify(proof.type or ''):lower() == 'solution'
-end
-
---- Tell whether a `Proof` node is a workshop solution, which the workshop
---- hides. Quarto turns a `.solution` div into a `Proof` node of type
---- `Solution` before the `pre-quarto` filters run, and removes the class.
---- A solution with a `sol-` identifier is a cross-reference target and stays
---- shown.
---- @param proof table The `Proof` node
---- @return boolean True when the node is a workshop solution
-function M.is_workshop_solution(proof)
-  if (proof.identifier or ''):find('^sol%-') then
-    return false
-  end
-  return M.is_solution(proof)
-end
-
---- Read a solution from the `Proof` node that Quarto makes of a `.solution`
---- div, in workshop mode only. Quarto removes the class, so the node keeps
---- the div in `div`.
---- The title is the `title` attribute, else the name that Quarto took from
---- the `name` attribute or a leading heading, else the label.
---- @param proof table The `Proof` node
+--- Read an answer block: a div with the class `answer`, in every mode.
+--- The title is the `title` attribute, else the `name` attribute, else the
+--- text of a leading heading, which then leaves the body, else nil, and each
+--- writer gives its own label. The `name` attribute leaves the div.
+--- @param div pandoc.Div The div
 --- @param model table The page model
---- @return { title: string, identifier: string, div: pandoc.Div }|nil The solution, or nil when the node is not a workshop solution
-function M.solution(proof, model)
-  if model.mode ~= M.MODE_WORKSHOP or not M.is_workshop_solution(proof) then
+--- @return { title: string|nil, identifier: string, div: pandoc.Div, blocks: pandoc.Blocks }|nil The answer, or nil when the div is not an answer
+function M.answer(div, model)
+  if not div.classes:includes('answer') then
     return nil
   end
-  local title = proof.div.attributes.title
-  if title == nil then
-    local name = pandoc.utils.stringify(proof.name or '')
-    title = name ~= '' and name or model.labels['solution-summary']
+  local blocks = div.content
+  local title = div.attributes.title or div.attributes.name
+  div.attributes.name = nil
+  if title == nil and #blocks > 0 and blocks[1].t == 'Header' then
+    title = pandoc.utils.stringify(blocks[1])
+    blocks = pandoc.Blocks({ table.unpack(blocks, 2) })
   end
-  return { title = title, identifier = proof.identifier or '', div = proof.div }
+  return {
+    title = not str.is_empty(title) and title or nil,
+    identifier = div.identifier or '',
+    div = div,
+    blocks = blocks,
+  }
+end
+
+--- Leave an answer with a `sol-` identifier to Quarto. Quarto turns every
+--- div with a `sol-` identifier into its own solution before Atelier sees
+--- it, so the div stays a Quarto solution: this drops the `answer` class, so
+--- the block pass leaves the div alone, and warns once so the author learns
+--- why. It must run in a pass before the block pass, while the slot of the
+--- node is still a div. The pass visits each node once, so each warns once.
+--- @param proof table The `Proof` node
+--- @return table|nil The node without the `answer` class, or nil to keep it
+function M.release_answer_id(proof)
+  local identifier = proof.identifier or ''
+  local div = proof.div
+  if pandoc.utils.type(div) ~= 'Block' or div.t ~= 'Div' or not div.classes:includes('answer') or not identifier:find('^sol%-') then
+    return nil
+  end
+  div.classes = div.classes:filter(function(class)
+    return class ~= 'answer'
+  end)
+  proof.div = div
+  log.log_warning(
+    EXTENSION_NAME,
+    "The answer block with the id '" .. identifier .. "' in " .. (quarto.doc.input_file or '') ..
+    ' is a Quarto solution, because Quarto reads every div with a sol- id as one. ' ..
+    'Remove the id to make it an answer, or use .solution for a Quarto cross-reference.'
+  )
+  return proof
 end
 
 --- Pandoc can highlight a language when it names the language on the `code`

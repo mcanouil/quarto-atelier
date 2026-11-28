@@ -15,12 +15,14 @@
 --- The filter gives each level-1 heading the section slide class, each
 --- `.dark` slide its background, the title slide its class, and the footer
 --- one row of slots: the title on the left, the footer of the author in the
---- centre, and the logo slot on the right.
+--- centre, and at the right the copyright and the licence, the place of the
+--- slide number and the logo.
 
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 local motifs = require(quarto.utils.resolve_path('motifs.lua'):gsub('%.lua$', ''))
-local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
+local icons = require(quarto.utils.resolve_path('icons.lua'):gsub('%.lua$', ''))
+local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 
 --- The fallback family of each font role.
 --- @type table<string, string>
@@ -96,7 +98,7 @@ local DARK_BACKGROUND_CLASS = 'has-dark-background'
 --- @type string
 local SECTION_CLASS = 'atelier-section'
 
---- The class of a slide that shows the motif, in workshop mode: the title
+--- The class of a slide that shows the motif: the title
 --- slide and the section slides. Reveal.js copies the classes of a slide to
 --- its background, which covers the window and moves with the slide, and
 --- which the PDF export draws on each page, so the motif sits on it.
@@ -226,8 +228,9 @@ local function font_declarations(scheme)
   return lines
 end
 
---- The rules of the motif of a workshop deck: the mask of the preset, and
---- its colour and opacity on the title slide, on the section slides and on
+--- The rules of the motif of a deck: the mask of the preset and its size on the
+--- title slide and on the section slides, for the background that paints the
+--- motif and for the slide that keeps its text clear of it, and its colour and opacity on the title slide, on the section slides and on
 --- the dark section slides, after the surface that `mark_slide` paints. A
 --- light surface takes the mark at `motifs.LIGHT_OPACITY`, and a dark one the
 --- ink, or the chrome mark on a section slide. The motif sits on the slide
@@ -240,7 +243,16 @@ end
 local function motif_rules(scheme, tokens, dark)
   local preset = palette.preset(palette.painted_scheme(scheme))
   local background = '.reveal .slide-background.' .. MOTIF_CLASS
-  local lines = { background .. ' {', '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';', '}' }
+  local slide = '.reveal .slides section.' .. MOTIF_CLASS
+  local lines = {
+    background .. ', ' .. slide .. ' {',
+    '  --atelier-motif: ' .. motifs.mask(motifs.name(preset)) .. ';',
+    '  --atelier-motif-size: ' .. string.format('%g', motifs.RATIO.title) .. ';',
+    '}',
+    background .. '.' .. SECTION_CLASS .. ', ' .. slide .. '.' .. SECTION_CLASS .. ' {',
+    '  --atelier-motif-size: ' .. string.format('%g', motifs.RATIO.large) .. ';',
+    '}',
+  }
   local surfaces = {
     { scope = background, palette = tokens, surface = 'bg', light = 'accent-mark', dark = 'accent-ink' },
     { scope = background .. '.' .. SECTION_CLASS, palette = tokens, surface = 'navbar-bg', light = 'navbar-accent-mark', dark = 'navbar-accent-mark' },
@@ -307,16 +319,20 @@ local function logo_rules(page_dark, section_dark)
   return rules
 end
 
---- The style element of the deck.
+--- The style element of the deck: the tokens, the block geometry and the
+--- masks of the block icons.
 --- @param scheme string The scheme of the deck
 --- @param tokens table<string, table> The tokens of the deck
 --- @param dark table<string, table> The tokens of the dark slides
---- @param state { workshop: boolean, logo: table|nil, section_dark: boolean } The deck state
+--- @param state { logo: table|nil, section_dark: boolean } The deck state
 --- @param buttons integer The number of buttons at the left of the bottom row
 --- @return string
 local function deck_style(scheme, tokens, dark, state, buttons)
   local lines = { '<style id="atelier-deck-tokens">', ROOT_SCOPE .. ' {' }
   lines[#lines + 1] = '  --atelier-row-buttons: ' .. buttons .. ';'
+  local geometry = palette.geometry(palette.preset(palette.painted_scheme(scheme)))
+  lines[#lines + 1] = string.format('  --atelier-block-radius: %gpx;', geometry['block-radius'])
+  lines[#lines + 1] = string.format('  --atelier-checkpoint-bar: %gpx;', geometry['checkpoint-bar'])
   for _, line in ipairs(token_declarations(tokens)) do
     lines[#lines + 1] = line
   end
@@ -329,27 +345,22 @@ local function deck_style(scheme, tokens, dark, state, buttons)
     lines[#lines + 1] = line
   end
   lines[#lines + 1] = '}'
+  for _, name in ipairs(sorted_keys(icons.PATHS)) do
+    lines[#lines + 1] = '.reveal .slides .atelier-block-head .bi-' .. name .. ' { mask-image: ' .. icons.mask(name) .. '; }'
+  end
   for _, rule in ipairs(scheme_highlighting('.reveal .slides', scheme, tokens)) do
     lines[#lines + 1] = rule
   end
   for _, rule in ipairs(scheme_highlighting(DARK_SCOPE, 'dark', dark)) do
     lines[#lines + 1] = rule
   end
-  if state.workshop then
-    for _, line in ipairs(motif_rules(scheme, tokens, dark)) do
-      lines[#lines + 1] = line
-    end
+  for _, line in ipairs(motif_rules(scheme, tokens, dark)) do
+    lines[#lines + 1] = line
   end
   if state.logo ~= nil then
     for _, line in ipairs(logo_rules(palette.tone(tokens.bg) == 'dark', state.section_dark)) do
       lines[#lines + 1] = line
     end
-    -- The logo takes the bottom-right corner, so the slide number goes to the
-    -- top-right corner, as Quarto does with `has-logo`. Quarto adds that class
-    -- only when it draws its own logo, which it does not for every logo that
-    -- Atelier draws, so the rule keys on the logo of Atelier.
-    lines[#lines + 1] = ':root:root .reveal.reveal .slide-number { top: 8px; right: 8px; bottom: auto; height: auto; padding: 5px; }'
-    lines[#lines + 1] = ':root:root .reveal.reveal :is(.slide-number, .slide-number a) { line-height: normal; }'
   end
   lines[#lines + 1] = '</style>'
   return table.concat(lines, '\n')
@@ -365,8 +376,25 @@ end
 --- @type table
 local deck = {}
 
+--- Answer the copyright and the licence of the deck on one line, copyright
+--- first: "© 2026 Ana Diaz · CC BY 4.0". The bottom row shows them on every
+--- slide, as the footer of every PDF page does.
+--- @param meta table
+--- @return pandoc.Inlines|nil
+local function rights_text(meta)
+  local copyright = core.copyright_text(meta.copyright)
+  local licence = core.licence_text(meta.license)
+  if copyright == nil or licence == nil then
+    return copyright or licence
+  end
+  local inlines = pandoc.Inlines(copyright)
+  inlines:extend({ pandoc.Space(), pandoc.Str('·'), pandoc.Space() })
+  inlines:extend(licence)
+  return inlines
+end
+
 --- Add the deck style and read the deck state. Give the title slide its
---- state, and in a workshop deck mark it for the motif.
+--- state, and mark it for the motif.
 --- @param meta table
 --- @return table The metadata, with the state of the title slide
 local function publish(meta)
@@ -378,13 +406,19 @@ local function publish(meta)
   deck.section_dark = palette.tone(tokens['navbar-bg']) == 'dark'
   deck.dark_bg = palette.hex(dark.bg, dark.bg)
   deck.dark_section_bg = palette.hex(dark['navbar-bg'], dark.bg)
-  deck.workshop = core.read_mode(meta, quarto.doc.input_file or '', true) == core.MODE_WORKSHOP
   deck.logo = logo.resolve(meta)
+  deck.rights = rights_text(meta)
   if deck.logo ~= nil then
     deck.logo_html = logo.images_html(deck.logo, 'atelier-logo-light', 'atelier-logo-dark')
     meta['atelier-logo-html'] = pandoc.RawInline('html', deck.logo_html)
   end
   quarto.doc.include_text('in-header', deck_style(scheme, tokens, dark, deck, left_buttons(meta)))
+  if palette.terminal_decoration(scheme) then
+    quarto.doc.include_file('in-header', 'revealjs/terminal-decoration.html')
+    meta['atelier-terminal-cursor'] = true
+  end
+  quarto.doc.include_file('after-body', 'revealjs/motif-guard.html')
+  quarto.doc.include_file('after-body', 'revealjs/bottom-row.html')
   if meta.chalkboard then
     quarto.doc.include_file('after-body', 'revealjs/chalkboard-buttons.html')
   end
@@ -392,10 +426,8 @@ local function publish(meta)
   local states = attributes['data-state'] and pandoc.utils.stringify(attributes['data-state']) or ''
   attributes['data-state'] = (states == '' and TITLE_STATE) or (states .. ' ' .. TITLE_STATE)
   meta['title-slide-attributes'] = attributes
-  if deck.workshop then
-    -- `revealjs/title-slide.html` adds the motif class to the title slide.
-    meta['atelier-motif'] = true
-  end
+  -- `revealjs/title-slide.html` adds the motif class to the title slide.
+  meta['atelier-motif'] = true
   return meta
 end
 
@@ -443,9 +475,7 @@ local function mark_slide(header)
     add_class(header.attr, SECTION_CLASS)
     add_state(header.attr, dark and DARK_STATE or SECTION_STATE)
     add_state(header.attr, NO_NUMBER_STATE)
-    if deck.workshop then
-      add_class(header.attr, MOTIF_CLASS)
-    end
+    add_class(header.attr, MOTIF_CLASS)
     set_background(header.attr, dark and deck.dark_section_bg or deck.section_bg)
     if dark or deck.section_dark then
       add_class(header.attr, DARK_BACKGROUND_CLASS)
@@ -462,28 +492,28 @@ local function mark_slide(header)
 end
 
 --- Answer the light and the dark image of the logo, for the logo slot of the
---- footer, or nothing when the deck has no logo. The images are raw HTML:
---- Pandoc writes a `data-src` for a deck image, which Reveal.js loads only
---- inside a slide, and the footer is outside the slides.
+--- footer. The images are raw HTML: Pandoc writes a `data-src` for a deck
+--- image, which Reveal.js loads only inside a slide, and the footer is
+--- outside the slides.
 --- @return pandoc.Inlines
 local function logo_images()
-  if deck.logo == nil then
-    return pandoc.Inlines({})
-  end
   return pandoc.Inlines({ pandoc.RawInline('html', deck.logo_html) })
 end
 
---- Fill the slots of the footer that Quarto adds to the deck. The footer of
---- the author goes in the centre slot, the title of the deck in the left one,
---- and the logo slot stays at the right. The slots sit in one row inside the
+--- Fill the slots of the footer that Quarto adds to the deck. The title of
+--- the deck goes in the left slot and the footer of the author in the centre
+--- one. The end slot holds the copyright and the licence, an empty place for
+--- the slide number, over which `revealjs/bottom-row.html` puts the number,
+--- and the logo. The centre slot also holds the copyright and the licence,
+--- which only the title slide shows. The slots sit in one row inside the
 --- footer, so Quarto can still show or hide the footer itself.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 local function fill_footer(div)
-  -- The footer of one slide replaces the footer of the deck on that slide.
-  -- With a logo, it takes the same row, so the logo stays on that slide.
-  local own_footer = div.classes:includes('footer') and deck.logo ~= nil
-  if not div.classes:includes('footer-default') and not own_footer then
+  -- The footer of one slide replaces the footer of the deck on that slide,
+  -- and takes the same row, so the slide keeps the rights, the slide number
+  -- and the logo.
+  if not div.classes:includes('footer-default') and not div.classes:includes('footer') then
     return nil
   end
   local own = pandoc.utils.blocks_to_inlines(div.content)
@@ -492,19 +522,34 @@ local function fill_footer(div)
   end
   -- A slot can cut its text, so the text sits in a span that takes hover and
   -- carries the full text as its title.
-  local text = function(content)
+  local text = function(content, class)
     if #content == 0 then
       return {}
     end
     local plain = pandoc.utils.stringify(content)
-    return { pandoc.Span(content, pandoc.Attr('', { 'atelier-slot-text' }, { title = plain })) }
+    return { pandoc.Span(content, pandoc.Attr('', { 'atelier-slot-text', class }, { title = plain })) }
+  end
+  local centre = text(own)
+  local ending = pandoc.Inlines({})
+  if deck.rights ~= nil then
+    local title_rights = pandoc.Inlines({})
+    if #own > 0 then
+      title_rights:extend({ pandoc.Space(), pandoc.Str('·'), pandoc.Space() })
+    end
+    title_rights:extend(deck.rights)
+    centre[#centre + 1] = pandoc.Span(title_rights, pandoc.Attr('', { 'atelier-title-rights' }))
+    ending:extend(text(deck.rights, 'atelier-slot-rights'))
+  end
+  ending:insert(pandoc.Span({}, pandoc.Attr('', { 'atelier-slot-number' }, { ['aria-hidden'] = 'true' })))
+  if deck.logo ~= nil then
+    ending:insert(slot('logo', logo_images()))
   end
   div.content = pandoc.Blocks({
     pandoc.Div(
       pandoc.Plain({
         slot('left', text(pandoc.Inlines(deck.title))),
-        slot('centre', text(own)),
-        slot('logo', logo_images()),
+        slot('centre', centre),
+        slot('end', ending),
       }),
       pandoc.Attr('', { 'atelier-footer-row' })
     ),

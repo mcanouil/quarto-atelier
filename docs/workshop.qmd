@@ -165,8 +165,7 @@ It has no timer.
 ## Workshop blocks
 
 The workshop blocks are divs with a class.
-They apply in workshop mode only.
-In documentation mode, Atelier does not change these divs.
+They work in both modes, on a documentation page as on a workshop page.
 
 ### Objectives
 
@@ -184,7 +183,8 @@ The default title is "By the end of this module, you can".
 ```
 
 The `title` and `duration` attributes are optional.
-With no `duration` attribute, the block shows the duration of the page.
+In workshop mode, a block with no `duration` attribute shows the duration of the page.
+In documentation mode, the page has no duration, so give the block its own `duration` attribute.
 The [Set up](demos/workshop-sidebar/workshop/setup/index.html#goals) page of the demo shows this block.
 
 ### Exercise
@@ -203,35 +203,39 @@ Give the file a title and one paragraph of text.
 
 The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows this block.
 
-### Solution
+### Answer
 
-A `.solution` div becomes a disclosure that is closed at first.
-The reader opens it to see the solution.
+An `.answer` div becomes a disclosure that is closed at first.
+The reader opens it to see the answer.
 The summary text comes from the `title` attribute.
 If there is no `title`, it comes from the `name` attribute or from a heading at the start of the div.
-The default summary is "Show the solution".
+The default summary is "Show the answer".
 
-In a PDF, `extensions.atelier.solutions` places the solutions: `end`, `inline`, or `hide`.
-See [Workshop handouts](formats.qmd#workshop-handouts).
-In a Reveal.js deck in workshop mode, each solution goes into the veil group `solutions`.
-The solutions are hidden when the deck opens.
-The reader can show or hide all the solutions of the deck with the veil controls.
-A solution with its own `.veil` class or its own `group` attribute keeps them.
-Atelier declares the group `solutions` with the label "Solutions", hidden at first.
-To change the label or the start state, declare `solutions` under `extensions.veil.groups`, and Atelier keeps your declaration.
+In a PDF, `extensions.atelier.answers` places the answers: `end`, `inline`, or `hide`.
+See [Answers in a PDF](formats.qmd#answers-in-a-pdf).
+In a Reveal.js deck, each answer goes into the veil group `answers`.
+The answers are hidden when the deck opens.
+The reader can show or hide all the answers of the deck with the veil controls.
+An answer with its own `.veil` class or its own `group` attribute keeps them.
+Atelier declares the group `answers` with the label "Answers", hidden at first.
+To change the label or the start state, declare `answers` under `extensions.veil.groups`, and Atelier keeps your declaration.
 
 ```markdown
-::: {.solution title="Solution"}
+::: {.answer title="Answer"}
 
 Write this in `notes.qmd`.
 
 :::
 ```
 
-Give a solution no `id`.
-A solution with an `id` that starts with `sol-` stays a Quarto cross-reference target, and Atelier does not change it.
-Quarto stops the render on a solution with an `id` that has a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
-The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows a solution after the exercise.
+Quarto has its own `.solution` block, and Atelier does not change it.
+Use `.solution` when you want a Quarto cross-reference, such as `@sol-notes`.
+A `.solution` div needs an `id` that starts with `sol-`, or no `id`.
+Quarto stops the render on a solution with a different prefix ([quarto-cli#15113](https://github.com/quarto-dev/quarto-cli/issues/15113)).
+Quarto reads every div with an `id` that starts with `sol-` as a Quarto solution, also a div with the class `answer`.
+For this reason, an `.answer` with such an `id` stays a Quarto solution, and Atelier logs a warning.
+Give an answer no `id`, or an `id` with a different prefix.
+The [Exercise](demos/workshop-sidebar/workshop/first-site/exercise.html#the-task) page of the demo shows an answer after the exercise.
 
 ### Terminal
 
@@ -301,12 +305,13 @@ The [Typst and Reveal.js formats](formats.qmd) page tells how to make the PDF an
 Some blocks change with the format:
 
 - Objectives show a list with a box in the PDF and the deck, and the reader cannot tick it.
-- A solution is a disclosure on the web page, a hidden veil group in the deck, and a placed block in the PDF, as `extensions.atelier.solutions` says.
-- A terminal block keeps its prompt and its code window in each format.
+- An answer is a disclosure on the web page, a hidden veil group in the deck, and a placed block in the PDF, as `extensions.atelier.answers` says.
+- A terminal block keeps its prompt colour, its muted output, its grey title dots, and its code window in each format.
+- The block icons, the block corners, and the bar of a checkpoint are the same in each format.
 
 These pictures show each block in the three formats, in the light colour scheme.
 The HTML picture shows the block only, the PDF picture shows the block on its page, and the Reveal.js picture shows its slide.
-The PDF puts the solution at the end, as `solutions: end` says.
+The PDF puts the answer at the end, as `answers: end` says.
 Select a picture to see it larger.
 
 **Objectives**
@@ -333,15 +338,15 @@ Select a picture to see it larger.
 
 :::
 
-**Solution**
+**Answer**
 
 ::: {layout-ncol=3}
 
-![HTML](assets/gallery/workshop-solution-html.png){.lightbox group="workshop-blocks" width="996" height="47" loading="lazy" fig-alt="A closed solution on a web page: one line with an arrow and the summary Solution, in a dashed frame."}
+![HTML](assets/gallery/workshop-solution-html.png){.lightbox group="workshop-blocks" width="996" height="47" loading="lazy" fig-alt="A closed answer on a web page: one line with an arrow and the summary Answer, in a dashed frame."}
 
-![PDF](assets/gallery/workshop-solution-typst.png){.lightbox group="workshop-blocks" width="909" height="126" loading="lazy" fig-alt="The solution at the end of a PDF: the heading Solutions, the heading Solution 1: Solution, and the text of the solution."}
+![PDF](assets/gallery/workshop-solution-typst.png){.lightbox group="workshop-blocks" width="909" height="126" loading="lazy" fig-alt="The answer at the end of a PDF: the heading Answers, the heading Answer 1: Answer, and the text of the answer."}
 
-![Reveal.js](assets/gallery/workshop-solution-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="A solution slide that shows only its heading, because the veil hides the solution when the deck opens."}
+![Reveal.js](assets/gallery/workshop-solution-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="An answer slide that shows only its heading, because the veil hides the answer when the deck opens."}
 
 :::
 
@@ -383,37 +388,48 @@ Select a picture to see it larger.
 
 ## Workshop extras
 
-These features are for workshop mode.
+These features work in both modes.
 Each one works on the web page, in the PDF, and in the deck.
 
-### Speakers
+### Authors
 
-Each author in the `author` list of a page is a speaker.
-The title block of a page, the PDF, and the title slide of a deck show the name, the degrees, and the affiliation.
-Quarto's `author` list cannot hold a photo, so `extensions.atelier.speakers` adds it.
-It is a map from the `id` of an author, or the name of an author, to the photo.
+The title block of a page, the PDF, and the title slide of a deck show each author of the `author` list in the same way, in both modes.
+Atelier reads only the native Quarto author keys.
+
+| Field | What it shows |
+| --- | --- |
+| `name` | The name, linked when `url` is set. |
+| `photo`, `photo-alt` | A round photo before the name. |
+| `degrees` | The degrees after the name, muted and in italics. |
+| `orcid` | An ORCID badge after the name, linked to the profile. |
+| `email` | The address as visible text, linked with `mailto:`. |
+| `affiliations` | The affiliations under the author, with no superscript numbers. |
+| `attributes` | The words Corresponding author, Equal contribution, and Deceased after the name, for `corresponding`, `equal-contributor`, and `deceased` set to `true`. |
+| `note` | The note as visible text with the author. |
+
+The title slide of a deck leaves out the note, the DOI, the keywords, and the abstract.
 
 ```{.yaml filename="workshop/setup/index.qmd"}
 author:
-  - id: ana
-    name: Ana Diaz
+  - name: Ana Diaz
+    photo: ana.png
+    photo-alt: "Ana Diaz, smiling, in front of a window"
+    degrees:
+      - PhD
     affiliations:
       - name: Example University
-extensions:
-  atelier:
-    speakers:
-      ana:
-        photo: ana.png
-        alt: "Ana Diaz, smiling, in front of a window"
 ```
 
-A value can be the path of the photo alone, for example `ana: ana.png`.
-The path is relative to the document.
+The `photo` path is relative to the document.
+A path that starts with `/` is relative to the project root, so an author list in `_quarto.yml` works on nested pages.
 The photo can be an SVG, PNG, JPG, GIF, or WebP file.
-If you write no `alt`, the photo is decorative, because the name is next to it.
-If a key matches no author, or the file is missing, Atelier logs a warning and shows no photo.
+If you write no `photo-alt`, the photo is decorative, because the name is next to it.
+If the file is missing or has the wrong type, Atelier logs a warning that names the file and shows no photo.
 
-These pictures show a speaker with a photo in each format.
+`extensions.atelier.speakers` no longer exists.
+Move each photo to the `photo` key of its author.
+
+These pictures show an author with a photo in each format.
 
 ::: {layout-ncol=3}
 
@@ -424,6 +440,45 @@ These pictures show a speaker with a photo in each format.
 ![The title slide of a deck.](assets/gallery/workshop-speakers-revealjs.png){.lightbox group="workshop-speakers" width="1280" height="720" loading="lazy" fig-alt="The title slide of a deck: the title, the subtitle, a round photo next to the name Ana Diaz and the affiliation, the date, and the motif in the top right corner."}
 
 :::
+
+### Motifs
+
+A motif is a decorative shape on the title block, the title slide, and the section slides.
+Each preset has its own motif:
+
+| Preset     | Motif       |
+| ---------- | ----------- |
+| `default`  | `steps`     |
+| `quarto`   | `quadrants` |
+| `terminal` | `dots`      |
+
+: The motif of each preset. {.striped .hover tbl-colwidths="[30,70]"}
+
+The motif shows in both modes, on every page.
+In HTML and in the deck, the text wraps around the shape of the motif.
+In the PDF, the title keeps clear of it.
+The motif takes its colour from the palette of the preset, and assistive technology skips it.
+You cannot choose another motif.
+The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each preset.
+
+## End matter
+
+The end matter is what comes after the body: the closing, the funding, the CRediT table, the references, the licence and copyright, and the citation.
+It works in every mode.
+HTML and the PDF show these parts in one order, and each heading has the level of a top-level section.
+The deck keeps its closing slide last, so it shows the references slide before the closing slide.
+The bottom row of every slide shows the licence and copyright.
+
+| Part                  | HTML                                  | PDF                                    | Deck                                         |
+| --------------------- | ------------------------------------- | -------------------------------------- | -------------------------------------------- |
+| Closing               | End of the body                       | End of the body, or the closing page   | The last slide                               |
+| Funding               | Quarto appendix                       | After the closing                      | On the closing slide, or on the end slide    |
+| CRediT table          | Quarto appendix                       | After the funding                      | On the closing slide, or on the end slide    |
+| References            | Quarto appendix                       | After the CRediT table                 | A slide before the closing slide             |
+| Licence and copyright | Quarto appendix                       | Page footer, and the closing section   | The bottom row of every slide                |
+| Citation              | Quarto appendix                       | The last section, when `citation` is set | Not shown                                  |
+
+: The order of the end matter in each format. {.striped .hover tbl-colwidths="[18,24,28,30]"}
 
 ### Closing
 
@@ -473,13 +528,44 @@ The PDF and the deck also show the CRediT table.
 
 ::: {layout-ncol=3}
 
-![The closing of a web page.](assets/gallery/workshop-closing-html.png){.lightbox group="workshop-closing" width="996" height="190" loading="lazy" fig-alt="The closing at the end of a web page: the heading Thank you, the link Ask a question, and the licence CC BY 4.0."}
+![The closing of a web page.](assets/gallery/workshop-closing-html.png){.lightbox group="workshop-closing" width="996" height="190" loading="lazy" fig-alt="The closing at the end of a web page: the heading Thank you and the link Ask a question. Quarto's appendix shows the licence below it."}
 
-![The closing of a PDF.](assets/gallery/workshop-closing-typst.png){.lightbox group="workshop-closing" width="909" height="251" loading="lazy" fig-alt="The end of a PDF: the table Author contributions (CRediT), a blue rule, the heading Thank you, the link Ask a question, and the licence CC BY 4.0."}
+![The closing of a PDF.](assets/gallery/workshop-closing-typst.png){.lightbox group="workshop-closing" width="909" height="251" loading="lazy" fig-alt="The end of a PDF: a blue rule, the heading Thank you, the link Ask a question, the licence CC BY 4.0, then the table Author contributions (CRediT)."}
 
 ![The closing slide of a deck.](assets/gallery/workshop-closing-revealjs.png){.lightbox group="workshop-closing" width="1280" height="720" loading="lazy" fig-alt="The closing slide of a deck: the heading Thank you, the link Ask a question, the licence CC BY 4.0, and a small CRediT table."}
 
 :::
+
+### Rights in the closing
+
+The closing shows the copyright and the licence only where the reader has no other place to find them.
+
+- HTML: the Quarto appendix shows Reuse and Copyright, so the closing drops them.
+  The closing keeps them when Quarto shows no appendix, as in a book or with `appendix-style: none` or `false`.
+  It also keeps a copyright that is a holder and a year, because the appendix shows only a text or a statement.
+- PDF: the closing keeps them.
+  The page footer is an artifact, so a screen reader never reads it.
+- Deck: the bottom row of every slide shows them, also when the closing hides them, so the closing slide leaves them out.
+
+### Funding
+
+Atelier reads the Quarto `funding` key.
+It shows the statement first, then each award with its source, its identifier, and its recipient.
+`funding` can be a text, a list of texts, or a map with `statement` and `awards`.
+The `open-access` key is not shown.
+
+```{.yaml filename="index.qmd"}
+funding:
+  statement: "This work was supported by Riverlab."
+  awards:
+    - source: "Riverlab Foundation"
+      id: "RF-2026-14"
+      recipient:
+        - ref: diaz
+```
+
+A recipient with `ref` shows the name of the author, not the identifier.
+A page with no `funding` shows no funding section.
 
 ### CRediT table
 
@@ -496,31 +582,16 @@ author:
       - writing: lead
 ```
 
-The PDF and the deck always show the table, at the end and on the closing slide.
-A web page shows it only where `closing` is set.
+A standalone web page, the PDF, and the deck show the table.
+A page of a website, or a chapter of a book, shows it only where `closing` is set.
 A page with no roles shows no table.
 
-On a web page, the table comes before the closing.
+The table comes after the funding.
+On a web page it is in the Quarto appendix, so it comes after the closing.
+In the deck it sits on the closing slide, or on the end slide when there is no closing.
 The [Closing](#closing) pictures show the table in the PDF and in the deck.
 
 ![The CRediT table of a web page.](assets/gallery/workshop-credit-html.png){.lightbox group="workshop-credit" width="996" height="160" loading="lazy" fig-alt="The table Author contributions (CRediT) on a web page: a column Role and a column Ana Diaz, with the row Writing, original draft, and the value Lead."}
-
-### Motifs
-
-A motif is a decorative shape on the title block, the title slide, and the section slides.
-Each preset has its own motif:
-
-| Preset     | Motif       |
-| ---------- | ----------- |
-| `default`  | `steps`     |
-| `quarto`   | `quadrants` |
-| `terminal` | `dots`      |
-
-: The motif of each preset. {.striped .hover tbl-colwidths="[30,70]"}
-
-The motif takes its colour from the palette of the preset, and assistive technology skips it.
-You cannot choose another motif.
-The [Presets](gallery.qmd#presets) part of the gallery shows the motif of each preset.
 
 ## Title block labels
 

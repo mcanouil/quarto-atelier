@@ -6,14 +6,14 @@ $schema: https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.j
 #     offset-headings:
 #       by: 1
 #       recursive: true
-#       max-level: 6
+#       max-level: 4
 #       depth: 0
 options:
   by:
     type: integer
     default: 0
     title: Document heading offset
-    description: "Amount added to every heading level in the document; the resulting level is clamped to the range 1 to 6."
+    description: "Amount added to every heading level in the document; the resulting level is never below 1, and never deeper than max-level when it is set."
     examples:
       - 1
       - -1
@@ -24,11 +24,9 @@ options:
     description: "Default cascade behaviour for per-heading offsets, used when a heading omits the offset-headings-recursive attribute."
   max-level:
     type: integer
-    default: 6
     minimum: 1
-    maximum: 6
-    title: Default maximum target level
-    description: "Deepest level a heading may be pushed to by a positive offset, used when a heading omits the offset-headings-max-level attribute; values outside the range 1 to 6 are clamped and a warning is emitted."
+    title: Maximum heading level
+    description: "Deepest level any heading may reach, and the default for the offset-headings-max-level attribute. When it is not set, headings have no upper level, so a heading can go deeper than 6. A value below 1 is clamped to 1 and a warning is emitted."
     examples:
       - 4
       - 6
@@ -53,7 +51,7 @@ attributes:
       type: integer
       default: 0
       title: Per-heading offset
-      description: "Amount added to this heading level; positive values push it deeper, negative values pull it up, and the resulting level is clamped to the range 1 to 6."
+      description: "Amount added to this heading level; positive values push it deeper, negative values pull it up. The resulting level is never below 1, and never deeper than max-level when it is set."
       examples:
         - 1
         - -1
@@ -64,11 +62,9 @@ attributes:
       description: "When true, the offset cascades to every descendant heading until a sibling or ancestor stops it, and a heading inside a nested block such as a div stops it only inside that block; defaults to the document-level recursive option."
     offset-headings-max-level:
       type: integer
-      default: 6
       minimum: 1
-      maximum: 6
       title: Maximum target level
-      description: "Caps the combined heading level (document offset + this heading's offset); the resulting level never goes below this value and the global range 1 to 6 still applies. Values outside 1 to 6 are clamped and a warning is emitted. Defaults to the document-level max-level option."
+      description: "Caps the combined heading level (document offset + this heading's offset) of this heading and of the headings its cascade reaches, and can only tighten the document max-level. A value below 1 is clamped to 1 and a warning is emitted. Defaults to the document-level max-level option; with neither set, there is no cap."
       examples:
         - 4
         - 6

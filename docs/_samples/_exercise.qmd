@@ -5,7 +5,7 @@ Give the file a title and one paragraph of text.
 
 :::
 
-::: {.solution title="Solution"}
+::: {.answer title="Answer"}
 
 Write this in `notes.qmd`.
 

@@ -24,13 +24,24 @@
 // `terminal` inside a terminal block, which has its own colours.
 #let atelier-code-scope = state("atelier-code-scope", "page")
 
+// The ink of the line that a terminal block is drawing, or none. A token takes
+// this ink in place of its class colour.
+#let atelier-line-ink = state("atelier-line-ink", none)
+
+// The prompt and continuation line numbers of the terminal block that is being
+// drawn, or none outside a terminal block.
+#let atelier-terminal-lines = state("atelier-terminal-lines", none)
+
 // Answer a highlighted token in the colour of its class on the current
 // surface. Each colour is held at 4.5:1 on that surface by the Lua filter.
 // - name: name of the token function, such as "KeywordTok".
 // - s: text of the token.
 #let atelier-tok(name, s) = context {
+  let ink = atelier-line-ink.get()
   let style = atelier-highlighting.at(atelier-code-scope.get()).at(name, default: none)
-  if style == none {
+  if ink != none {
+    text(fill: ink, raw(s))
+  } else if style == none {
     raw(s)
   } else {
     let token = text(fill: style.fill, weight: style.weight, style: style.style, raw(s))
@@ -101,16 +112,62 @@
     muted: atelier-colour(if page { "muted" } else { "terminal-muted" }),
     traffic-light-size: 0.7em,
     traffic-light-gap: 0.35em,
+    traffic-light-colours: if page {
+      (rgb("#ff5f56"), rgb("#ffbd2e"), rgb("#27c93f"))
+    } else {
+      (atelier-colour("terminal-dot"),) * 3
+    },
   )
 }
 
-// Answer a terminal: the code block in the terminal colours, with the
-// highlighting of the terminal surface.
+// Answer one source line of a terminal block. A prompt line takes the prompt
+// mark in the prompt colour and the command ink, a line that continues a
+// command takes the command ink, and any other line is output in the muted
+// ink. No token colours show in the line. Quarto gives its highlighter no line
+// number, so `atelier-terminal-skylighting` passes the number here.
+// - number: the number of the line.
+// - line: the highlighted line.
+#let atelier-terminal-line(number, line) = context {
+  let terminal = atelier-terminal-lines.get()
+  if terminal == none {
+    line
+  } else {
+    let prompt = number in terminal.prompts
+    let command = prompt or number in terminal.continuations
+    if prompt {
+      text(fill: atelier-colour("terminal-prompt"), raw("$$ "))
+    }
+    atelier-line-ink.update(atelier-colour(if command { "terminal-fg" } else { "terminal-muted" }))
+    line
+    atelier-line-ink.update(none)
+  }
+}
+
+// Answer the Pandoc highlighter with each line passed through
+// `atelier-terminal-line`. The call of a terminal block shadows `Skylighting`
+// with it for the block only. Pandoc writes `Skylighting` with no line hook.
+// Related upstream: https://github.com/quarto-dev/quarto-cli/pull/14170 (patches the same function for annotations)
+// Remove when: Quarto or Pandoc gives each line of a highlighted block to a template function.
+// - original: the `Skylighting` function of Quarto.
+#let atelier-terminal-skylighting(original) = (..args) => {
+  let positional = args.pos()
+  original(
+    ..args.named(),
+    ..positional.slice(0, -1),
+    positional.last().enumerate().map(((index, line)) => atelier-terminal-line(index + 1, line)),
+  )
+}
+
+// Answer a terminal: the code block in the terminal colours.
+// - prompts: the numbers of the lines that had a dollar prompt.
+// - continuations: the numbers of the lines that continue a command.
 // - body: the code block.
-#let atelier-terminal(body) = {
+#let atelier-terminal(prompts, continuations, body) = {
   atelier-code-scope.update("terminal")
+  atelier-terminal-lines.update((prompts: prompts, continuations: continuations))
   state("code-window-theme").update(theme => theme + atelier-code-window-theme("terminal"))
   body
+  atelier-terminal-lines.update(none)
   state("code-window-theme").update(theme => theme + atelier-code-window-theme("page"))
   atelier-code-scope.update("page")
 }
@@ -327,6 +384,46 @@
 // DOCUMENT
 // ===========================================================================
 
+// ===========================================================================
+// TERMINAL DECORATION
+// ===========================================================================
+// The terminal preset marks the title with a prompt and a cursor, a heading
+// of level 2 or 3 in the source with `##` or `###`, and a list item with `-`,
+// as `html/terminal.scss` does. Quarto moves each heading of a document with a
+// title up one level, so the marker has one `#` more than the Typst level. Each marker is an artefact, so a screen reader
+// skips it. The cursor is steady, because a page has no animation. The
+// `atelier-terminal-decoration` data is false for other presets and when the
+// brand turns the decoration off.
+
+// Answer a marker of the terminal decoration: text in a colour, as an artefact.
+// - mark: the text of the marker.
+// - ink: name of the colour token.
+#let atelier-terminal-mark(mark, ink) = pdf.artifact(text(fill: atelier-colour(ink), mark))
+
+// Answer a heading of Typst level 1 or 2 with its marker before it and its
+// dashed rule under it. The marker sits next to the heading, not in its body, so
+// the outline, the bookmarks and the running header do not hold it. The size
+// of the marker is the default size of the heading.
+// - it: the heading.
+#let atelier-terminal-heading(it) = {
+  let size = if it.level == 1 { 1.4em } else { 1.2em }
+  let marker = range(it.level + 1).map(_ => "#").join() + " "
+  block(above: 1.4em, below: 0.9em, width: 100%, {
+    grid(
+      columns: (auto, 1fr),
+      column-gutter: 0pt,
+      atelier-terminal-mark(text(size: size, weight: "bold", marker), "muted"),
+      it,
+    )
+    v(0.35em, weak: true)
+    pdf.artifact(line(length: 100%, stroke: (paint: atelier-colour("border"), thickness: 0.75pt, dash: "dashed")))
+  })
+}
+
+// Answer a heading, with the terminal decoration when it is on.
+// - it: the heading.
+#let atelier-terminal-chapter(it) = if atelier-terminal-decoration { atelier-terminal-heading(it) } else { it }
+
 // Style the elements of a document with the tokens.
 // - body: the content of the document.
 #let atelier-elements(body) = {
@@ -339,6 +436,8 @@
     width: 100%,
   )
   show quote: atelier-quote
+  show heading.where(level: 2): atelier-terminal-chapter
+  set list(marker: atelier-terminal-mark("-", "accent-ink")) if atelier-terminal-decoration
   show figure: it => {
     if type(it.kind) != str {
       it

@@ -17,14 +17,14 @@ Then add the page to the navigation in `_quarto.yml` and look at it in the previ
 
 :::
 
-::: {.solution title="Hint"}
+::: {.answer title="Hint"}
 
 The navigation of the site is in the key `website.navbar.left` of `_quarto.yml`.
 Add one item that has the key `href` with the value `notes.qmd`.
 
 :::
 
-::: {.solution}
+::: {.answer}
 
 ## Full answer
 

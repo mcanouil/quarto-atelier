@@ -7,16 +7,17 @@
 --- @description In workshop mode, the title block gets the workshop labels
 --- and the session duration, and the blocks of `workshop/core.lua` become the
 --- `atelier-ws-block` calls of `typst/workshop.typ`. Typst has no disclosure,
---- so `extensions.atelier.solutions` places each solution: `end` (the
---- default) collects the solutions at the end behind a "Solution: page n"
---- link, `inline` keeps each solution in place, and `hide` leaves them out.
---- The solutions are numbered in order, and a citation of a solution, such as
---- `@sol-a`, becomes a link with the label "Solution 1". A `.terminal` code
---- block becomes a terminal in its code window, with its `$` prompts.
+--- so `extensions.atelier.answers` places each answer: `end` (the default)
+--- collects the answers at the end behind an "Answer: page n" link, `inline`
+--- keeps each answer in place, and `hide` leaves them out. The answers are
+--- numbered in order. Quarto's own solutions stay as Quarto writes them. A
+--- `.terminal` code block becomes a terminal in its code window, with its `$`
+--- prompts.
 
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
+local citation = require(quarto.utils.resolve_path('workshop/citation.lua'):gsub('%.lua$', ''))
 
 local M = {}
 
@@ -24,16 +25,16 @@ local M = {}
 --- @type string
 local EXTENSION_NAME = 'atelier'
 
---- Values of `extensions.atelier.solutions`, the default first.
+--- Values of `extensions.atelier.answers`, the default first.
 --- @type string[]
 local PLACEMENTS = { 'end', 'inline', 'hide' }
 
---- The label of a numbered solution, such as "Solution 1". The text comes
---- from the `language` files.
---- @param number integer The number of the solution
+--- The label of a numbered answer, such as "Answer 1". The text comes from
+--- the `language` files.
+--- @param number integer The number of the answer
 --- @return string
-local function solution_name(number)
-  local value = (quarto.doc.language or {})['atelier-solution-title']
+local function answer_name(number)
+  local value = (quarto.doc.language or {})['atelier-answer-title']
   return (type(value) == 'string' and value or '') .. ' ' .. tostring(number)
 end
 
@@ -44,12 +45,12 @@ local function typst_string(text)
   return '"' .. str.escape_typst_string(text) .. '"'
 end
 
---- Read `extensions.atelier.solutions`. An unknown value logs a warning and
+--- Read `extensions.atelier.answers`. An unknown value logs a warning and
 --- gives the default.
 --- @param options table The `extensions.atelier` options
 --- @return string
 local function read_placement(options)
-  local value = options.solutions
+  local value = options.answers
   if value == nil then
     return PLACEMENTS[1]
   end
@@ -61,20 +62,20 @@ local function read_placement(options)
   end
   log.log_warning(
     EXTENSION_NAME,
-    'extensions.atelier.solutions must be end, inline, or hide, but was "' .. text .. '" in ' ..
-    (quarto.doc.input_file or '') .. ', so the solutions go to the end.'
+    'extensions.atelier.answers must be end, inline, or hide, but was "' .. text .. '" in ' ..
+    (quarto.doc.input_file or '') .. ', so the answers go to the end.'
   )
   return PLACEMENTS[1]
 end
 
---- Set the workshop labels and the duration of a workshop handout, and add
---- the solution state to the page model: where the solutions go, the
---- solutions to write at the end, and the number of each solution identifier.
+--- Add the answer state to the page model: where the answers go, the
+--- answers to write at the end, and their count. Set the workshop labels and
+--- the duration of a workshop handout.
 --- @param meta table The document metadata
 --- @param model table The page model of `core.page`
 --- @return table|nil The changed metadata of a workshop page, or nil
 function M.publish(meta, model)
-  model.solutions = { placement = read_placement(model.options), collected = {}, numbers = {}, count = 0 }
+  model.answers = { placement = read_placement(model.options), collected = {}, count = 0 }
   if model.mode ~= core.MODE_WORKSHOP then
     return nil
   end
@@ -88,7 +89,7 @@ end
 --- Wrap blocks in a call of a Typst function that takes content.
 --- @param call string The call without its content, such as `#atelier-terminal`
 --- @param blocks pandoc.Blocks The content
---- @param label string|nil A Typst label to attach, such as `<sol-a>`
+--- @param label string|nil A Typst label to attach, such as `<atelier-answer-1>`
 --- @return pandoc.Blocks
 local function wrap(call, blocks, label)
   local result = pandoc.Blocks({ pandoc.RawBlock('typst', call .. '[') })
@@ -98,7 +99,7 @@ local function wrap(call, blocks, label)
 end
 
 --- The call of a workshop block, without its content.
---- @param kind string `objectives`, `solution`, or a key of `core.BLOCKS`
+--- @param kind string `objectives`, `answer`, or a key of `core.BLOCKS`
 --- @param title string The title
 --- @param time string|nil The duration text
 --- @return string
@@ -111,14 +112,39 @@ local function block_call(kind, title, time)
   )
 end
 
---- Turn the objectives div and the divs of `core.BLOCKS` into blocks, in
---- workshop mode only.
+--- Place an answer after `extensions.atelier.answers`: in place, at the end
+--- behind a link, or nowhere. Its label is "Answer 1", and its own title
+--- after a colon.
+--- @param answer table The answer of `core.answer`
+--- @param model table The page model
+--- @return pandoc.Blocks
+local function answer_blocks(answer, model)
+  local page = model.answers
+  page.count = page.count + 1
+  local number = page.count
+  local title = answer_name(number)
+  if answer.title then
+    title = title .. ': ' .. answer.title
+  end
+  local target = '<' .. (answer.identifier ~= '' and answer.identifier or ('atelier-answer-' .. number)) .. '>'
+  if page.placement == 'hide' then
+    return pandoc.Blocks({})
+  elseif page.placement == 'inline' then
+    return wrap(block_call('answer', title, nil), answer.blocks, target)
+  end
+  page.collected[#page.collected + 1] = { title = title, target = target, content = answer.blocks }
+  return pandoc.Blocks({ pandoc.RawBlock('typst', '#atelier-ws-answer-link(' .. target .. ')') })
+end
+
+--- Turn the objectives div, the answer div and the divs of `core.BLOCKS`
+--- into blocks.
 --- @param div pandoc.Div The div
 --- @param model table The page model
 --- @return pandoc.Blocks|nil
 function M.div(div, model)
-  if model.mode ~= core.MODE_WORKSHOP then
-    return nil
+  local answer = core.answer(div, model)
+  if answer ~= nil then
+    return answer_blocks(answer, model)
   end
   if div.classes:includes('objectives') then
     local block = core.objectives(div, model)
@@ -138,93 +164,6 @@ function M.div(div, model)
     return wrap(block_call(kind, block.title, block.time), block.blocks)
   end
   return nil
-end
-
---- The label of a solution: "Solution 1", and its own title after a colon.
---- @param proof table The `Proof` node
---- @param number integer The number of the solution
---- @return string
-local function solution_label(proof, number)
-  local name = solution_name(number)
-  local own = proof.div.attributes.title or pandoc.utils.stringify(proof.name or '')
-  if own == '' then
-    return name
-  end
-  return name .. ': ' .. own
-end
-
---- Place a solution after `extensions.atelier.solutions`. Unlike HTML, a
---- solution with a `sol-` identifier follows the placement too: Typst has no
---- disclosure to keep it in.
---- @param proof table The `Proof` node
---- @param model table The page model
---- @return pandoc.Blocks|nil
-function M.proof(proof, model)
-  if model.mode ~= core.MODE_WORKSHOP or not core.is_solution(proof) then
-    return nil
-  end
-  local page = model.solutions
-  page.count = page.count + 1
-  local number = page.count
-  local identifier = proof.identifier or ''
-  if identifier ~= '' then
-    page.numbers[identifier] = number
-  end
-  local title = solution_label(proof, number)
-  local target = '<' .. (identifier ~= '' and identifier or ('atelier-solution-' .. number)) .. '>'
-  if page.placement == 'hide' then
-    return pandoc.Blocks({})
-  elseif page.placement == 'inline' then
-    return wrap(block_call('solution', title, nil), proof.div.content, target)
-  end
-  page.collected[#page.collected + 1] = { title = title, target = target, content = proof.div.content }
-  return pandoc.Blocks({ pandoc.RawBlock('typst', '#atelier-ws-solution-link(' .. target .. ')') })
-end
-
---- Replace a citation of solutions, such as `@sol-a` or `[@sol-a; @sol-b]`,
---- with a link to each solution, labelled "Solution 1". With `hide`, the
---- label has no link. A citation that mixes solutions with other references
---- is left to Quarto, with a warning.
---- @param cite pandoc.Cite The citation
---- @param page table The solution state of the page model
---- @return pandoc.Inlines|nil
-local function solution_cite(cite, page)
-  local known = 0
-  for _, citation in ipairs(cite.citations) do
-    if page.numbers[citation.id] ~= nil then
-      known = known + 1
-    end
-  end
-  if known == 0 then
-    return nil
-  end
-  if known < #cite.citations then
-    log.log_warning(
-      EXTENSION_NAME,
-      'A citation in ' .. (quarto.doc.input_file or '') .. ' mixes workshop solutions with other references, ' ..
-      'so Quarto cannot resolve the solutions. Cite the solutions in a citation of their own.'
-    )
-    return nil
-  end
-  local inlines = pandoc.Inlines({})
-  for index, citation in ipairs(cite.citations) do
-    if index > 1 then
-      inlines:insert(pandoc.Str(','))
-      inlines:insert(pandoc.Space())
-    end
-    inlines:extend(citation.prefix)
-    if #citation.prefix > 0 then
-      inlines:insert(pandoc.Space())
-    end
-    local name = solution_name(page.numbers[citation.id])
-    if page.placement == 'hide' then
-      inlines:insert(pandoc.Str(name))
-    else
-      inlines:insert(pandoc.RawInline('typst', '#link(<' .. citation.id .. '>)[' .. str.escape_typst(name) .. ']'))
-    end
-    inlines:extend(citation.suffix)
-  end
-  return inlines
 end
 
 --- The Typst code of the CRediT table: a call of `atelier-ws-credit` with
@@ -304,23 +243,46 @@ local function closing_update(closing)
   return blocks
 end
 
---- Finish the handout after its blocks: write the solutions collected for
---- the end, a "Solutions" heading, then one heading and the content of each
---- solution, then the CRediT table and the closing, which the template
---- shows after the body. Then resolve the citations of
---- solutions, the moved ones too.
+--- The Typst code that stores the citation in the state
+--- `atelier-citation-data`, which the template shows after the bibliography:
+--- the heading, the "cite as" label and the entry.
+--- @param entry pandoc.Inlines The entry of `citation.text`
+--- @return pandoc.Plain
+local function citation_update(entry)
+  local language = quarto.doc.language or {}
+  local function label(key, default)
+    local value = language[key]
+    return type(value) == 'string' and value or default
+  end
+  local inlines = pandoc.Inlines({ pandoc.RawInline('typst', string.format(
+    '#atelier-citation-data.update((title: %s, label: %s, body: [',
+    typst_string(label('section-title-citation', 'Citation')),
+    typst_string(label('appendix-attribution-cite-as', 'For attribution, please cite this work as:'))
+  )) })
+  inlines:extend(entry)
+  inlines:insert(pandoc.RawInline('typst', ']))'))
+  return pandoc.Plain(inlines)
+end
+
+--- Finish the handout after its blocks: write the answers collected for the
+--- end, an "Answers" heading, then one heading and the content of each
+--- answer, then the closing section, the funding and the CRediT table, in the
+--- order of the end matter. The bibliography follows, then the citation from
+--- the template, and a closing page, if the report has one, comes last.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
-  local page = model.solutions
+  local page = model.answers
   local credit = core.credit(doc.meta, model)
   local closing = core.closing(doc.meta, model)
-  if page.count == 0 and credit == nil and closing == nil then
+  local funding = core.funding(doc.meta)
+  local cite = citation.text(doc.meta)
+  if page.count == 0 and credit == nil and closing == nil and funding == nil and cite == nil then
     return nil
   end
   if #page.collected > 0 then
-    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-ws-solutions-heading()'))
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-ws-answers-heading()'))
     doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-chapter-end()'))
     for _, entry in ipairs(page.collected) do
       doc.blocks:insert(pandoc.RawBlock(
@@ -330,31 +292,49 @@ function M.finish(doc, model)
       doc.blocks:extend(entry.content)
     end
   end
+  if closing ~= nil then
+    doc.blocks:extend(closing_update(closing))
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-closing-section()'))
+  end
+  if funding ~= nil then
+    doc.blocks:insert(pandoc.RawBlock('typst', '#atelier-ws-funding(' .. typst_string(model.labels['funding-title']) .. ')['))
+    doc.blocks:extend(core.funding_blocks(funding, model.labels))
+    doc.blocks:insert(pandoc.RawBlock('typst', ']'))
+  end
   if credit ~= nil then
     doc.blocks:insert(pandoc.RawBlock('typst', credit_call(credit, model.labels)))
   end
-  if closing ~= nil then
-    doc.blocks:extend(closing_update(closing))
+  if cite ~= nil then
+    doc.blocks:insert(citation_update(cite))
   end
-  if page.count == 0 then
-    return doc
-  end
-  return doc:walk({ Cite = function(cite) return solution_cite(cite, page) end })
+  return doc
 end
 
 --- Draw a `.terminal` code block as a terminal: the code window takes the
---- terminal label and colours, and the prompts stay in the text.
+--- terminal label and colours, and the prompts stay in the text. The block
+--- keeps its commands and output without the `$`, and the Typst function
+--- draws the prompt in its own colour. The call shadows `Skylighting` for the
+--- block only, because Quarto gives its highlighter no line number.
 --- @param block pandoc.CodeBlock The code block
 --- @param model table The page model
 --- @return pandoc.Blocks|nil
 function M.code_block(block, model)
-  if core.terminal(block) == nil then
+  local terminal = core.terminal(block)
+  if terminal == nil then
     return nil
   end
+  block.text = terminal.text
   if (block.attributes['code-window-auto-label'] or '') == '' then
     block.attributes['code-window-auto-label'] = model.labels.terminal
   end
-  return wrap('#atelier-terminal', pandoc.Blocks({ block }))
+  local call = string.format(
+    '#{ let Skylighting = atelier-terminal-skylighting(Skylighting); atelier-terminal((%s), (%s))',
+    table.concat(terminal.prompts, ', ') .. (#terminal.prompts == 1 and ',' or ''),
+    table.concat(terminal.continuations, ', ') .. (#terminal.continuations == 1 and ',' or '')
+  )
+  local blocks = wrap(call, pandoc.Blocks({ block }))
+  blocks:insert(pandoc.RawBlock('typst', '}'))
+  return blocks
 end
 
 return M
