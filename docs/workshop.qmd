@@ -342,11 +342,11 @@ Select a picture to see it larger.
 
 ::: {layout-ncol=3}
 
-![HTML](assets/gallery/workshop-solution-html.png){.lightbox group="workshop-blocks" width="996" height="47" loading="lazy" fig-alt="A closed solution on a web page: one line with an arrow and the summary Solution, in a dashed frame."}
+![HTML](assets/gallery/workshop-solution-html.png){.lightbox group="workshop-blocks" width="996" height="47" loading="lazy" fig-alt="A closed answer on a web page: one line with an arrow and the summary Answer, in a dashed frame."}
 
-![PDF](assets/gallery/workshop-solution-typst.png){.lightbox group="workshop-blocks" width="909" height="126" loading="lazy" fig-alt="The solution at the end of a PDF: the heading Solutions, the heading Solution 1: Solution, and the text of the solution."}
+![PDF](assets/gallery/workshop-solution-typst.png){.lightbox group="workshop-blocks" width="909" height="126" loading="lazy" fig-alt="The answer at the end of a PDF: the heading Answers, the heading Answer 1: Answer, and the text of the answer."}
 
-![Reveal.js](assets/gallery/workshop-solution-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="A solution slide that shows only its heading, because the veil hides the solution when the deck opens."}
+![Reveal.js](assets/gallery/workshop-solution-revealjs.png){.lightbox group="workshop-blocks" width="1280" height="720" loading="lazy" fig-alt="An answer slide that shows only its heading, because the veil hides the answer when the deck opens."}
 
 :::
 
