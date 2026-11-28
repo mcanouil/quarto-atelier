@@ -208,6 +208,10 @@ Add that stylesheet under `format.atelier-html.theme`, not `format.html`, which 
 
 ###### A sixth-level heading with a [link](https://quarto.org)
 
+####### A seventh-level heading with a [link](https://quarto.org)
+
+A heading below the sixth level shows as bold body text, with no number, and it is not in the table of contents.
+
 Quarto fades the title block categories and the headings from the third level down.
 Atelier keeps their text readable in both schemes, and names the author email link for screen readers.
 

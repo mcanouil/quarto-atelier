@@ -20,6 +20,9 @@ $toc.typ()$
 
 $workshop.typ()$
 
+// The font of the body text, for the headings below level 6.
+#let atelier-body-font = state("atelier-body-font", ())
+
 // Answer the document: the text, heading, code and link styles, the page
 // set-up, then the title block or the cover, the table of contents, the
 // body and the closing page, after the five report switches. Code has no
@@ -44,6 +47,22 @@ $workshop.typ()$
   set text(font: fonts.base) if fonts.base != none
   show heading: set text(fill: atelier-colour("heading"))
   show heading: set text(font: fonts.headings) if fonts.headings != none
+  // A heading below level 6 shows as bold body text, as in HTML, where it is
+  // a `p.heading`. It keeps its label and its counter, so a reference to it
+  // works, but it shows no number and has no outline entry. Quarto's brand
+  // rule sets the heading font on every level, so the rule sets the body font
+  // and colour again, from the font of the body that `atelier-body-font` keeps.
+  // A selector cannot compare a level, so it lists the levels 7 to 20.
+  // Remove when: never.
+  context atelier-body-font.update(text.font)
+  let deep-heading = selector.or(..range(7, 21).map(level => heading.where(level: level)))
+  show deep-heading: set heading(outlined: false)
+  show deep-heading: it => context block(
+    above: par.spacing,
+    below: par.spacing,
+    sticky: true,
+    text(font: atelier-body-font.get(), fill: atelier-colour("fg"), weight: "bold", it.body),
+  )
   show raw: set text(ligatures: false, features: ("calt": 0))
   show raw: set text(font: fonts.monospace) if fonts.monospace != none
   show link: set text(fill: atelier-colour("link"))
