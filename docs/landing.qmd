@@ -270,15 +270,15 @@ You can use it with the split hero or with `.centred`.
 :::
 ````
 
-## Gradient
+## Framed figure
 
-The `.gradient` modifier fills the hero title, the h1 or the h2, with a gradient that starts at the primary colour.
-Atelier calculates each colour of the gradient to have a contrast of 4.5:1 or more against the page, in each colour scheme.
-If a colour cannot have this contrast, the title uses the primary colour only.
-In print and in forced colours mode, the title is plain text.
-The gradient does not move.
+The `.framed` modifier goes on the figure part, `.atelier-hero-figure`.
+It draws the image in the same frame as a card: an ink border, an offset ink shadow and padding around the image.
+The frame is turned by a small angle, which is the same for every framed image and does not move.
+Use it for a screenshot of a page.
+The frame is drawn from the page ink and paper, so it follows the colour scheme.
 
-::: {.atelier-hero .gradient}
+::: {.atelier-hero}
 
 ::: {.atelier-hero-text}
 
@@ -288,16 +288,16 @@ The gradient does not move.
 
 :::
 
-::: {.atelier-hero-figure}
+::: {.atelier-hero-figure .framed}
 
-[![The project logo.](assets/icons/icon-512.png){.nolightbox width="320" height="320"}]{}
+[![A documentation page in the default preset, in the light colour scheme.](assets/gallery/preset-default-light.png){.nolightbox width="1440" height="900"}]{}
 
 :::
 
 :::
 
 ````markdown
-::: {.atelier-hero .gradient}
+::: {.atelier-hero}
 
 ::: {.atelier-hero-text}
 
@@ -307,9 +307,9 @@ The gradient does not move.
 
 :::
 
-::: {.atelier-hero-figure}
+::: {.atelier-hero-figure .framed}
 
-[![The project logo.](logo.png){width="320" height="320"}]{}
+[![A screenshot of the project.](screenshot.png){width="1440" height="900"}]{}
 
 :::
 
@@ -488,6 +488,8 @@ quarto render
 A card grid holds cards in columns that fit the width of the page.
 Each card has an icon, a heading, one sentence and one link.
 The link covers the whole card, so a click on the card opens the link.
+On hover and on focus, the card gets an offset shadow in the accent colour, and moves up and to the left by 2px.
+Under `prefers-reduced-motion: reduce`, the card does not move, and keeps the shadow.
 The link text is the name of the link for a screen reader, so write text that says where the link goes.
 When the link has keyboard focus, the focus ring goes around the card.
 
@@ -642,7 +644,7 @@ anchor-sections: false
 
 ::: {.atelier-landing}
 
-::: {.atelier-hero .gradient}
+::: {.atelier-hero}
 
 ::: {.atelier-hero-text}
 
