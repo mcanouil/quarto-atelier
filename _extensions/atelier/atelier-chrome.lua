@@ -43,20 +43,24 @@ local LABELS = {
 
 --- Version of the `site_libs` folder of the fonts, not of one package.
 --- It changes when the vendored files change.
---- Vendored packages, all at 5.3.0 on npm:
---- `@fontsource/alegreya-sans`, `@fontsource-variable/fira-code`,
---- `@fontsource-variable/jetbrains-mono`.
-local FONTS_VERSION = '5.3.0'
+--- Sources: static files of `googlefonts/atkinson-hyperlegible-next`,
+--- `googlefonts/atkinson-hyperlegible-next-mono`, and `undercasetype/Fraunces`,
+--- and `@fontsource-variable/jetbrains-mono` 5.3.0 on npm.
+local FONTS_VERSION = '6.0.0'
 
 --- Font files that `fonts/fonts.css` refers to, relative to this file.
 --- @type table<integer, { name: string, path: string }>
 local FONT_FILES = {}
 for _, file in ipairs({
-  'alegreya-sans-latin-400-normal',
-  'alegreya-sans-latin-400-italic',
-  'alegreya-sans-latin-500-normal',
-  'alegreya-sans-latin-700-normal',
-  'fira-code-latin-wght-normal',
+  'AtkinsonHyperlegibleNext-Regular',
+  'AtkinsonHyperlegibleNext-Italic',
+  'AtkinsonHyperlegibleNext-Bold',
+  'AtkinsonHyperlegibleNext-BoldItalic',
+  'AtkinsonHyperlegibleMono-Regular',
+  'AtkinsonHyperlegibleMono-Italic',
+  'AtkinsonHyperlegibleMono-Bold',
+  'Fraunces72ptSuperSoft-SemiBold',
+  'Fraunces72ptSuperSoft-Bold',
   'jetbrains-mono-latin-wght-normal',
   'jetbrains-mono-latin-wght-italic',
 }) do
