@@ -5,11 +5,12 @@
 -->
 <!--
 Copy of the Quarto partials `title-block.html` and `banner/title-block.html`,
-the row `atelier-title-tools` as the first child of `.quarto-title`. The row
-holds the logo (`atelier-title-logo`, written by `atelier-html-logo.lua`), and,
-on a page with no navbar, the colour scheme toggle that
-`html/scripts/a11y-fixes.html` moves into it. A partial cannot add to the title block of Quarto, and a script that
-moves the logo leaves the page with no logo when JavaScript is off.
+with the row `atelier-title-tools` as the first child of `.quarto-title`.
+The row holds the logo (`atelier-title-logo`, written by
+`atelier-html-logo.lua`), and, on a page with no navbar, the colour scheme
+toggle that `html/scripts/a11y-fixes.html` moves into it.
+A partial cannot add to the title block of Quarto, and a script that moves
+the logo leaves the page with no logo when JavaScript is off.
 The manuscript title block is not supported.
 Upstream: none filed (no hook in the title block for extra content).
 Remove when: Quarto gives the title block a hook for extra content.
