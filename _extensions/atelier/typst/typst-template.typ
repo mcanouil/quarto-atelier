@@ -51,6 +51,23 @@ $workshop.typ()$
   atelier-document-fonts.update(fonts)
   show: atelier-elements
   show heading.where(level: 1): it => atelier-chapter(it, switches)
+  // A heading below level 6 shows as bold body text, as in HTML, where it is
+  // a `p.heading`. It keeps its label, and has no number and no outline entry.
+  // A selector cannot compare a level, so it lists the levels 7 to 20.
+  // Remove when: never.
+  let deep-heading = selector.or(..range(7, 21).map(level => heading.where(level: level)))
+  show deep-heading: set heading(numbering: none, outlined: false)
+  show deep-heading: it => context block(
+    above: par.spacing,
+    below: par.spacing,
+    sticky: true,
+    text(
+      font: if fonts.base != none { fonts.base } else { text.font },
+      fill: atelier-colour("fg"),
+      weight: "bold",
+      it.body,
+    ),
+  )
   // The frame of each page: the organisation is the first affiliation of the
   // first author, and the rights join the copyright and the licence.
   let first-author = atelier-people.authors.at(0, default: none)

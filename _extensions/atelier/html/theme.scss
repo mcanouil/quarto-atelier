@@ -350,6 +350,14 @@ h6 {
   color: var(--atelier-heading);
 }
 
+// HTML has no heading below level 6, so Pandoc writes a deeper heading as
+// `p.heading`, in a section that keeps its id. It shows as bold body text, as
+// in the PDF.
+// Remove when: never.
+p.heading {
+  font-weight: 700;
+}
+
 // ===========================================================================
 // FRAMED EMBEDS
 // ===========================================================================
