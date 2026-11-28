@@ -5,18 +5,11 @@
 -->
 <script id="atelier-chrome" type="text/javascript">
 	(function () {
-		// The other Atelier scripts that run after the body read the options from
-		// here. Of those scripts, this script runs first. page-load.html, in the
-		// head, reads the block.
 		var options = window.atelierStages.options();
 		window.atelierOptions = options;
 		var labels = options.labels || {};
 
-		// A preset can pin one colour scheme. The terminal preset is dark, so its
-		// SCSS sets --atelier-scheme-pin on the root. The dark bundle becomes the
-		// active one through Quarto's own toggle. The SCSS hides the toggles,
-		// because they would only switch to a look the preset does not have.
-		// A page without the property does nothing here.
+		// The dark bundle becomes the active one through Quarto's own toggle.
 		if (getComputedStyle(document.documentElement).getPropertyValue("--atelier-scheme-pin").trim() === "dark") {
 			// The body class alone cannot tell: Quarto takes it from the data-mode of
 			// the light bundle, and that bundle is already dark under this preset.

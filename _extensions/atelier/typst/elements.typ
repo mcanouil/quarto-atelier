@@ -10,15 +10,9 @@
 // @copyright 2026 Mickaël Canouil
 // @author Mickaël Canouil
 
-// Corner radius of the boxes: the terminal preset is square, as in HTML.
 #let atelier-radius = if atelier-preset == "terminal" { 0pt } else { 4pt }
 
-// Width of the frame of a callout, as `--atelier-c3-border` (1.5 px).
 #let atelier-frame-width = 1.125pt
-
-// ===========================================================================
-// HIGHLIGHTING
-// ===========================================================================
 
 // The surface that the code sits on: `page` for a code block or inline code,
 // `terminal` inside a terminal block, which has its own colours.
@@ -90,10 +84,6 @@
   radius: calc.min(atelier-radius, 3pt),
   text(fill: atelier-colour("code-ink"), raw(s)),
 )
-
-// ===========================================================================
-// CODE WINDOWS
-// ===========================================================================
 
 // Answer the code-window theme of a surface: the code block surface and its
 // border on the page, or the terminal colours.
@@ -172,10 +162,6 @@
   state("code-window-theme").update(theme => theme + atelier-code-window-theme("page"))
   atelier-code-scope.update("page")
 }
-
-// ===========================================================================
-// CALLOUTS
-// ===========================================================================
 
 // Glyph of the icon of each callout type. The check of tip is drawn, as some
 // fonts have no check mark.
@@ -266,8 +252,6 @@
       body
     },
   )
-  // The label rises above the frame by half its height: the top padding keeps
-  // it clear of the block above.
   pad(top: 0.45em, if terminal {
     grid(columns: (0.6em, 1fr), fill: (x, y) => if x == 0 { edge }, pdf.artifact[], frame)
   } else {
@@ -354,10 +338,6 @@
   align(left, atelier-callout-box(spec + (title: title, titled: true)))
 }
 
-// ===========================================================================
-// QUOTES, THEOREMS AND PROOFS
-// ===========================================================================
-
 // Answer a block quote: the muted text after a bar in the accent mark colour.
 // - it: the quote.
 #let atelier-quote(it) = {
@@ -377,24 +357,11 @@
   )
 }
 
-// Theorem and proof kinds, as Quarto renders them with theorion.
 #let atelier-theorem-kinds = ("theorem", "lemma", "corollary", "proposition", "conjecture", "definition", "example", "exercise", "algorithm")
 #let atelier-proof-kinds = ("proof", "remark", "solution")
 
-// ===========================================================================
-// DOCUMENT
-// ===========================================================================
-
-// ===========================================================================
-// TERMINAL DECORATION
-// ===========================================================================
-// The terminal preset marks the title with a prompt and a cursor, a heading
-// of level 2 or 3 in the source with `##` or `###`, and a list item with `-`,
-// as `html/terminal.scss` does. Quarto moves each heading of a document with a
-// title up one level, so the marker has one `#` more than the Typst level. Each marker is an artefact, so a screen reader
-// skips it. The cursor is steady, because a page has no animation. The
-// `atelier-terminal-decoration` data is false for other presets and when the
-// brand turns the decoration off.
+// Quarto moves each heading of a document with a title up one level, so the
+// marker has one `#` more than the Typst level.
 
 // Answer a marker of the terminal decoration: text in a colour, as an artefact.
 // - mark: the text of the marker.

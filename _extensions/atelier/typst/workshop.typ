@@ -25,7 +25,6 @@
   box(baseline: 0.15em, pdf.artifact(image(bytes(svg), format: "svg", height: 1em, alt: none)))
 }
 
-// The fonts of the document, for the parts that need the monospace font.
 #let atelier-document-fonts = state("atelier-document-fonts", (base: none, headings: none, monospace: none))
 
 // Answer the duration of a block, in a pill, in the monospace font.

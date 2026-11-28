@@ -62,10 +62,6 @@ local TOKEN_FUNCTIONS = {
   er = 'ErrorTok',
 }
 
--- ============================================================================
--- TYPST VALUES
--- ============================================================================
-
 --- A Typst string literal.
 --- @param text string
 --- @return string
@@ -109,10 +105,6 @@ end
 local function typst_colour(colour, bg)
   return 'rgb("' .. palette.hex(colour, bg) .. '")'
 end
-
--- ============================================================================
--- DOCUMENT DATA
--- ============================================================================
 
 --- The five switches, as a Typst dictionary of booleans. A value that is not
 --- a boolean logs a warning and counts as `false`.
@@ -313,10 +305,6 @@ local function publish(meta)
   meta['atelier-typst-data'] = pandoc.MetaBlocks({ pandoc.RawBlock('typst', table.concat(lines, '\n')) })
   return meta
 end
-
--- ============================================================================
--- ELEMENTS
--- ============================================================================
 
 -- Quarto's Typst `callout()` call carries no type and no appearance, so each
 -- callout gets a marker as the first block of its body, which the `callout`

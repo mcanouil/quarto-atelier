@@ -24,18 +24,12 @@
 
 local EXTENSION_NAME = 'atelier'
 
---- The directory of this file, so that the module loads its neighbours from
---- any filter that requires it.
 local HERE = debug.getinfo(1, 'S').source:match('^@(.*[/\\])') or './'
 
 local colour_mod = dofile(HERE .. '_vendor/quarto-lua-modules/colour.lua')
 local log = dofile(HERE .. '_vendor/quarto-lua-modules/logging.lua')
 
 local M = {}
-
--- ============================================================================
--- COLOURS
--- ============================================================================
 
 --- A colour: red, green and blue from 0 to 255, which can be fractional as
 --- in Dart Sass, and alpha from 0 to 1.
@@ -183,7 +177,6 @@ function M.mix(c1, c2, weight)
   }
 end
 
---- `atelier-mix()`: `mix()` rounded to whole channels.
 local function mix_rendered(c1, c2, weight)
   return rendered(M.mix(c1, c2, weight))
 end
@@ -239,12 +232,10 @@ local function theme_contrast(c, bg, goal)
   return result
 end
 
---- `atelier-toward()`: black on a light background, white on a dark one.
 local function toward(bg)
   return M.tone(bg) == 'light' and BLACK or WHITE
 end
 
---- `atelier-contrast-on-tint()`.
 local function contrast_on_tint(c, bg, alpha)
   local target = toward(bg)
   for step = 0, 100 do
@@ -256,7 +247,6 @@ local function contrast_on_tint(c, bg, alpha)
   return target
 end
 
---- `atelier-contrast-all()`.
 local function contrast_all(c, bgs, goal)
   local target = toward(bgs[1])
   local painted = {}
@@ -278,7 +268,6 @@ local function contrast_all(c, bgs, goal)
   return target
 end
 
---- `atelier-contrast()`.
 local function contrast(c, bg, goal)
   return contrast_all(c, { bg }, goal)
 end
@@ -320,12 +309,10 @@ function M.css(c)
   return string.format('rgba(%d, %d, %d, %s)', painted.r, painted.g, painted.b, alpha)
 end
 
---- `atelier-theme-contrast()`.
 local function atelier_theme_contrast(c, bg)
   return contrast(theme_contrast(c, bg, 4.5), bg, 4.5)
 end
 
---- `atelier-on()`.
 local function on(fill, bg, fg, goal)
   local start = M.ratio(fg, fill) > M.ratio(bg, fill) and fg or bg
   local target = M.ratio(WHITE, fill) > M.ratio(BLACK, fill) and WHITE or BLACK
@@ -339,7 +326,6 @@ local function on(fill, bg, fg, goal)
   return target
 end
 
---- `atelier-hue-border()` and `atelier-hue-ink()`.
 local function hue_border(hue, bg)
   return M.mix(hue, bg, 0.6)
 end
@@ -347,10 +333,6 @@ end
 local function hue_ink(hue, fg, bg)
   return contrast(M.mix(hue, fg, 0.62), bg, 4.5)
 end
-
--- ============================================================================
--- PRESETS
--- ============================================================================
 
 --- The presets that `html/presets.scss` accepts.
 --- @type table<string, boolean>
@@ -368,7 +350,6 @@ local PRESET_PAGE_BACKGROUNDS = {
   terminal = { light = '#101216', dark = '#101216' },
 }
 
---- The dark palette of `html/chrome.scss`.
 local ATELIER_DARK = { bg = '#1b242e', fg = '#e8edf2', accent = '#7fa8c4' }
 
 --- The Bootstrap colours that colour the callouts, and their defaults.
@@ -380,10 +361,6 @@ local CALLOUT_HUES = {
   { name = 'orange', callout = 'caution', default = '#fd7e14' },
   { name = 'red', callout = 'important', default = '#dc3545' },
 }
-
--- ============================================================================
--- RESOLUTION
--- ============================================================================
 
 --- The brand values that `colour()` has warned about, so that each warns once.
 --- @type table<string, boolean>
@@ -554,7 +531,6 @@ function M.resolve(inputs)
     apply_dark_fallback(v)
   end
 
-  -- html/chrome.scss: the brand palette names that colour the callouts.
   for _, hue in ipairs(CALLOUT_HUES) do
     if v.get('brand-' .. hue.name) ~= nil then
       v.default(hue.name, v.colour('brand-' .. hue.name))
@@ -585,7 +561,6 @@ function M.resolve(inputs)
 
   local t = {}
 
-  -- The chrome palette.
   local chrome_bg_source = pinned and pinned.bg or mix_rendered(page_bg, page_fg, 0.94)
   t['navbar-bg'] = v.colour('atelier-chrome-bg') or chrome_bg_source
   local chrome_fg_source = pinned and pinned.fg or page_fg
@@ -607,7 +582,6 @@ function M.resolve(inputs)
   t['navbar-border'] = with_alpha(t['navbar-fg'], 0.2)
   t['navbar-control-border'] = with_alpha(t['navbar-fg'], 0.55)
 
-  -- The workshop bar.
   t['workshop-bar-bg'] = t['navbar-bg']
   t['workshop-bar-fg'] = t['navbar-fg']
   t['workshop-bar-muted'] = t['navbar-muted']
@@ -618,7 +592,6 @@ function M.resolve(inputs)
   t['workshop-bar-accent-text'] = t['navbar-accent']
   t['workshop-bar-border'] = t['navbar-border']
 
-  -- The terminal block.
   local terminal = {
     bg = '#111418', fg = '#e6e8eb', muted = '#aeb6bf', border = '#2a3037',
     ['control-border'] = '#717a85', prompt = '#7cc4a3', dot = '#3a4048', highlight = '#1e252c',
@@ -627,7 +600,6 @@ function M.resolve(inputs)
     t['terminal-' .. name] = v.colour('atelier-terminal-' .. name) or M.parse(value)
   end
 
-  -- The page.
   t['bg'] = page_bg
   t['fg'] = page_fg
   t['surface'] = mix_rendered(page_bg, page_fg, 0.96)
@@ -647,24 +619,19 @@ function M.resolve(inputs)
   t['overlay'] = with_alpha(BLACK, 0.6)
   t['link'] = v.colour('link-color') or t['accent-text']
   t['link-hover'] = contrast(M.mix(page_fg, t['link'], 0.2), page_bg, 4.5)
-  -- html/terminal.scss: the terminal decoration frames code in the control border.
   if preset == 'terminal' and decoration_on(v.get('atelier-terminal-decoration')) then
     t['code-border'] = t['control-border']
   else
     t['code-border'] = t['border']
   end
-  -- `body-mix(95%)` of html/theme.scss: the landing cards and the band of a
-  -- highlighted code line. Code blocks themselves sit on `surface`.
   local landing_surface = M.mix(page_bg, page_fg, 0.95)
   t['code-accent-mark'] = contrast_all(page_accent, { landing_surface, t['accent-soft'] }, 3)
   local muted_source = v.colour('secondary') or M.mix(page_fg, page_bg, 0.65)
   t['muted'] = v.colour('atelier-text-muted') or atelier_theme_contrast(muted_source, t['surface-strong'])
 
-  -- html/theme.scss: the focus ring and the card link.
   t['focus'] = t['accent-ink']
   t['card-link'] = atelier_theme_contrast(t['link'], rendered(landing_surface))
 
-  -- html/content.scss: the callouts.
   t['callout-border'] = hue_border(t['muted'], page_bg)
   t['callout-ink'] = hue_ink(t['muted'], page_fg, page_bg)
   for _, hue in ipairs(CALLOUT_HUES) do
@@ -675,10 +642,6 @@ function M.resolve(inputs)
 
   return t
 end
-
--- ============================================================================
--- BRAND
--- ============================================================================
 
 -- Quarto's Lua `quarto.brand` API gives no access to the brand `defaults`, so
 -- this reads the brand data from Quarto's internal `param('brand')`.
@@ -719,7 +682,6 @@ function M.brand_defaults(scheme)
   return type(bootstrap) == 'table' and bootstrap or {}
 end
 
---- Turn a metadata value into a plain Lua value.
 local function plain(value)
   if type(value) == 'table' or type(value) == 'userdata' then
     return pandoc.utils.stringify(value)
@@ -857,10 +819,6 @@ function M.tokens(scheme)
   return M.resolve({ scheme = painted, preset = M.preset(painted), variables = brand_variables(painted) })
 end
 
--- ============================================================================
--- SYNTAX HIGHLIGHTING
--- ============================================================================
-
 --- The style of one highlighting token, with its colour held at 4.5:1 on
 --- every background, as `html/highlighting.scss` holds it.
 --- @param style table A token style of `M.highlighting`
@@ -910,7 +868,6 @@ function M.geometry(preset)
   }
 end
 
---- The token styles of every highlighting theme, loaded on first use.
 local highlighting_themes = nil
 
 --- The token styles of the highlighting theme of one preset and scheme.

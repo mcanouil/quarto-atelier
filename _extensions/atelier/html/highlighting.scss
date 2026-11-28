@@ -1,15 +1,7 @@
 /*-- scss:rules --*/
 
-// ===========================================================================
-// SYNTAX HIGHLIGHTING
-// ===========================================================================
-// The rules apply when the active highlighting theme is arrow, or an Atelier
-// `.theme` file. They come from the token maps in
-// `html/highlighting-tokens.scss`: the map of the active preset for arrow, the
-// map of the file for a `.theme` file. Any other theme keeps its own colours.
 // Each rule names its scheme, because the light bundle stays active under the
-// dark one. The terminal preset is pinned dark: both bundles take the dark map
-// and the rules match either scheme class.
+// dark one.
 // With arrow active, the map of the preset replaces every arrow token. This
 // fills the tokens that arrow-light leaves without a colour (BuiltIn,
 // Extension, RegionMarker) and removes the light band that arrow-dark paints
@@ -58,9 +50,6 @@ $_atelier-hl-scope: "body.quarto-light";
   $_atelier-hl-scope: "body:is(.quarto-light, .quarto-dark)";
 }
 
-// Write the rules of one token map under $scope. Each colour is held at 4.5:1
-// on every background in $bgs, which must share one tone. Normal is the empty
-// key: it goes on every span, and the class rules outrank it.
 @mixin atelier-highlighting-rules($tokens, $scope, $bgs, $normal) {
   @each $class, $style in $tokens {
     @if $class != "" or $normal {
@@ -84,8 +73,6 @@ $_atelier-hl-scope: "body.quarto-light";
         }
       }
 
-      // Only a code block resets the weight, the style, and the decoration.
-      // Inline code in a heading or in bold text keeps what it inherits.
       #{$selector}:is(pre *) {
         @if not map-get($style, "bold") {
           font-weight: normal;
@@ -111,8 +98,6 @@ $_atelier-hl-scope: "body.quarto-light";
     true
   );
 
-  // The K2 terminal block is dark in both bundles, so it takes the dark map.
-  // Its lines keep their own colours, so Normal is not written there.
   @include atelier-highlighting-rules(
     map-get($_atelier-hl-maps, "dark"),
     "#{$_atelier-hl-scope} .atelier-terminal",

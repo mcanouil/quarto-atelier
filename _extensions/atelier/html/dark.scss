@@ -1,8 +1,5 @@
 /*-- scss:defaults --*/
 
-// ===========================================================================
-// DARK PAGE FALLBACK
-// ===========================================================================
 // The dark theme reuses the files of the light theme, so a page with no brand,
 // or with a brand that gives light colours only, would compile a dark bundle
 // with a light page. Quarto would then mark that bundle as light and keep the
@@ -11,9 +8,7 @@
 // page when the page colours are still light here.
 //
 // This file is in the dark theme list only, and it comes before `brand`, so
-// its defaults are evaluated after the brand defaults and can read them. They
-// are evaluated before `html/chrome.scss`, which derives the chrome from the
-// page, so the colours come from the dark palette in its functions section.
+// its defaults are evaluated after the brand defaults and can read them.
 //
 // Each variable is declared here so that the `@if` below can assign it. A
 // `null` default leaves a variable unset for the Bootstrap and Quarto defaults.

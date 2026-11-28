@@ -8,7 +8,6 @@
 // @copyright 2026 Mickaël Canouil
 // @author Mickaël Canouil
 
-// The control distance of a cubic Bézier curve that draws a quarter circle.
 #let atelier-quarter-control = 0.5523
 
 // Answer a corner motif in one colour, its square placed flush in the page
@@ -54,7 +53,6 @@
   pdf.artifact(place(corner, flipped))
 }
 
-// The space that the motif keeps clear of text, past the edge of its shapes.
 #let atelier-motif-clearance = 2mm
 
 // Answer how far from the right page edge the shapes of a motif reach in a
@@ -73,7 +71,6 @@
     if shape.kind == "rect" {
       if shape.y < to and shape.y + shape.size > from { left = shape.x }
     } else if shape.kind == "quarter" {
-      // The straight edge at x runs the whole height of the quarter.
       if shape.y - shape.r < to and shape.y > from { left = shape.x }
     } else {
       let gap = if from <= shape.y and shape.y <= to { 0 } else { calc.min(calc.abs(from - shape.y), calc.abs(to - shape.y)) }

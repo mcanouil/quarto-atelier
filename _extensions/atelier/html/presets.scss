@@ -1,8 +1,5 @@
 /*-- scss:defaults --*/
 
-// ===========================================================================
-// PRESET
-// ===========================================================================
 // This file is listed second, so Quarto evaluates it after `brand` and before
 // `html/chrome.scss`. A brand value or a project value therefore wins over any
 // `!default` value set here. Set the preset in `_brand.yml`:
@@ -66,19 +63,9 @@ $atelier-terminal-bg: null !default;
 $atelier-terminal-prompt: null !default;
 
 // A brand base font sets `$font-family-base`, and Bootstrap headings take the
-// body font when `$headings-font-family` is `null`. So a preset sets no
-// heading font when the brand or the project sets a base font, and the
-// headings take that font, as in Reveal.js and Typst. A brand heading font
-// wins in either case.
+// body font when `$headings-font-family` is `null`.
 $_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $font-family-base != null;
 
-// ===========================================================================
-// DEFAULT PRESET
-// ===========================================================================
-// The Bootstrap colours, with two typefaces: one for the text and the
-// headings, and one for the code. Each font is a default, so a brand font
-// wins. `palette.lua` `PRESET_FONTS` holds the same names for Reveal.js and
-// Typst.
 @if $atelier-preset == default {
   $font-family-sans-serif: "Atkinson Hyperlegible Next", sans-serif !default;
   @if not $_atelier-brand-base-font {
@@ -87,18 +74,7 @@ $_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $f
   $font-family-monospace: "Atkinson Hyperlegible Mono", monospace !default;
 }
 
-// ===========================================================================
-// QUARTO PRESET
-// ===========================================================================
-// A blue tinted page, a filled blue chrome, and three typefaces, with no rules of
-// its own. The chrome values are set here as they are, so the contrast
-// functions in `html/chrome.scss` skip them: each one already passes AA. A
-// brand colour or font wins over every value, because each is a default. A
-// brand primary also drives the chrome accent, so the chrome accent here is
-// only set when the brand has no primary.
 @if $atelier-preset == quarto {
-  // The guard reads `$primary` before this block assigns it, so it sees only a
-  // primary that the brand or the project has set.
   $_quarto-brand-primary: atelier-meta.variable-exists(primary) and $primary != null;
 
   @if $atelier-scheme == dark {
@@ -127,7 +103,7 @@ $_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $f
 
     // The Bootstrap yellow and orange fall under 4.5:1 as callout ink on the
     // tinted page, so the chrome would have to correct them. These two steps
-    // pass without it. A brand colour of the same name wins.
+    // pass without it.
     @if not atelier-meta.variable-exists("brand-yellow") {
       $yellow: #b8860b !default;
     }
@@ -135,8 +111,6 @@ $_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $f
       $orange: #e8590c !default;
     }
 
-    // The derived muted ink reaches 4.5:1 only by correction, so it is set to
-    // a value with a margin. A brand secondary colour wins.
     @if not atelier-meta.variable-exists(secondary) {
       $atelier-text-muted: #55626f !default;
     }
@@ -149,14 +123,6 @@ $_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $f
   $font-family-monospace: "Atkinson Hyperlegible Mono", monospace !default;
 }
 
-// ===========================================================================
-// TERMINAL PRESET
-// ===========================================================================
-// A dark, monospace look, pinned: both bundles get the same values, so a
-// reader whose system prefers light still gets the dark look. The chrome is
-// pinned dark, and the terminal block takes the chrome background and the
-// accent. Every value is a default, so a brand colour or font wins. A brand
-// light value in the light bundle is kept, and a warning says so.
 @if $atelier-preset == terminal {
   $_terminal-green: #7ee08a;
   $_terminal-bg: #16191e;
@@ -167,8 +133,6 @@ $_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $f
   $body-color: $_terminal-fg !default !global;
   $primary: $_terminal-green !default !global;
 
-  // `html/chrome.scss` maps a brand palette colour to these names, and it runs
-  // after this file. A name that the brand sets is left unset here.
   @if not atelier-meta.variable-exists("brand-blue") {
     $blue: #6cb6ff !default;
   }

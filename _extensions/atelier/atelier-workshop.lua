@@ -55,7 +55,6 @@ end
 --- handlers read it. One table gives no such order between element types.
 --- The `Proof` pass runs before the `Div` pass, while the slot of a Quarto
 --- solution is still a div, so an answer with a `sol-` id stays Quarto's.
---- A writer can also finish the document after the blocks.
 return {
   { Meta = publish_workshop },
   {

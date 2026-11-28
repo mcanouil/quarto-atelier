@@ -7,13 +7,9 @@
 	(function () {
 		// The workshop bar, the stepper, the table of contents, and the objectives
 		// read the course from window.atelierCourse. It is built here once, from the
-		// workshop data block and Quarto's own sidebar. A page without a sidebar menu
-		// gets null. A workshop page that no sidebar of extensions.atelier.sidebars
-		// lists also gets null, so it keeps the plain sidebar.
-		// This script is in the head. It builds the course on the "sidebar" stage of
-		// page-load.html, before the first paint, so the scripts that change the side
-		// columns can read it. The page navigation is not parsed yet at that stage,
-		// thus "previous" and "next" read it each time a script asks for them.
+		// workshop data block and Quarto's own sidebar. This script runs in the head,
+		// before Quarto's page navigation is parsed, so "previous" and "next" read it
+		// each time a script asks for them.
 		window.atelierCourse = null;
 		window.atelierStages.on("sidebar", buildCourse);
 
@@ -32,8 +28,6 @@
 			if (workshop && data.listed !== true) return;
 			var durations = data.durations || {};
 
-			// The site root path is the page path with the offset applied. A folder
-			// URL gets "index.html", so it matches the sidebar link to that page.
 			var root = new URL(data.offset || "./", location.href).pathname;
 			function toHref(url) {
 				var path = url.pathname;
@@ -45,7 +39,6 @@
 				return toHref(new URL(raw, location.href));
 			}
 
-			// A page of the course is a link to this site, below the site root.
 			function isPage(url) {
 				return url.origin === location.origin && url.pathname.indexOf(root) === 0;
 			}
@@ -62,7 +55,6 @@
 				var key = "duration-minutes";
 				if (hours > 0 && rest > 0) key = "duration-hours-minutes";
 				else if (hours > 0) key = "duration-hours";
-				// No-break spaces keep a duration on one line.
 				return label(key, { h: hours, m: rest }).replace(/ /g, "\u00a0");
 			}
 
@@ -136,7 +128,6 @@
 				duration: typeof data.duration === "number" ? data.duration : null,
 				pages: pages,
 				modules: modules,
-				// The top-level sidebar items of the modules, in the order of modules.
 				moduleItems: moduleItems,
 				current: current,
 				currentModule: current === -1 ? -1 : pages[current].module,
@@ -165,9 +156,6 @@
 					}
 				};
 
-				// The share of the current module read, in whole percent. The current
-				// page counts by the share of its headings read, given as a number
-				// from 0 to 1. Each other page of the module counts once visited.
 				course.moduleShare = function (pageShare) {
 					var module = modules[course.currentModule];
 					if (!module) return 0;

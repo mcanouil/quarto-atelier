@@ -9,11 +9,7 @@
 	// for it, between the copyright and licence and the logo. This script gives
 	// that place the width of the number, `--atelier-number-width`, and puts the
 	// number over it with `--atelier-number-right`, the distance from the right
-	// edge of the deck to the place. A deck that shows no slide number keeps no
-	// place for it. `--atelier-end-min` is the width of the place and the logo,
-	// from the right edge of the deck, so the side columns of the row never
-	// get narrower than them. The script measures again after each slide
-	// change, because the number and the footer change with the slide.
+	// edge of the deck to the place.
 	(() => {
 		const shown = (el) => getComputedStyle(el).display !== "none";
 

@@ -7,16 +7,13 @@
 # @copyright 2026 Mickaël Canouil
 # @author Mickaël Canouil
 #
-# The website demonstrates the extension it documents, so the extension has to
-# be resolvable from docs/. Quarto builds its extension registry while reading
-# _quarto.yml, before any pre-render script runs and without following symlinks,
-# so a staged or linked copy is not found: shortcodes report "not found" and the
-# page renders empty. The copy therefore has to exist on disk before Quarto
-# starts.
+# Quarto builds its extension registry while reading _quarto.yml, before any
+# pre-render script runs and without following symlinks, so a staged or linked
+# copy is not found: shortcodes report "not found" and the page renders empty.
+# The copy therefore has to exist on disk before Quarto starts.
 #
-# The repository root stays the single source of truth, so the copy is ignored
-# by Git rather than committed. Run this script before previewing locally; the
-# Pages workflow runs it before every render.
+# Run this script before previewing locally; the Pages workflow runs it before
+# every render.
 #
 
 set -euo pipefail
@@ -24,10 +21,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 ROOT_DIR="$(dirname "${DOCS_DIR}")"
-# Under a `local` owner directory: the copy is generated from this repository
-# rather than installed from anywhere, and saying so in the path keeps it
-# distinct from the vendored dependencies. It also avoids a collision when the
-# extension is named after its owner.
 # An optional first argument names another target folder.
 TARGET_DIR="${1:-${DOCS_DIR}/_extensions/local}"
 TARGET_LABEL="docs/_extensions/local"

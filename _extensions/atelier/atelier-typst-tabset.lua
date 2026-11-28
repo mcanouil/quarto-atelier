@@ -70,9 +70,7 @@ local in_order
 
 --- Move the headings of a tabset under the heading before it, and remove
 --- the tabset class, also from a tabset with no tab heading, so Quarto never
---- falls back to its own rendering. The content is walked here, so a nested
---- tabset goes under its own tab, and the heading before the tabset stays
---- the parent of the next tabset of the same section.
+--- falls back to its own rendering.
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 --- @return boolean|nil False, so the walk does not enter the tabset again

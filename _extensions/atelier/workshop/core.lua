@@ -82,10 +82,6 @@ local LABELS = {
   'author-orcid-profile',
 }
 
--- ============================================================================
--- LABELS AND DURATIONS
--- ============================================================================
-
 --- Resolve every label from the `language` files and overrides.
 --- A missing value gives an empty string.
 --- @return table<string, string> The label text by key
@@ -137,10 +133,6 @@ function M.format_duration(minutes, labels)
   end
   return (template:gsub('{h}', tostring(hours)):gsub('{m}', tostring(rest)):gsub(' ', '\u{00A0}'))
 end
-
--- ============================================================================
--- OPTIONS
--- ============================================================================
 
 --- Read the `extensions.atelier` table of a metadata table.
 --- @param meta table The metadata
@@ -224,10 +216,6 @@ function M.read_mode(meta, source, quiet)
   return MODE_DOCUMENTATION
 end
 
--- ============================================================================
--- PAGE MODEL
--- ============================================================================
-
 --- Read the page model: what every writer needs to know about the page.
 --- @param meta table The document metadata
 --- @return { mode: string, duration: integer|nil, labels: table<string, string>, options: table, source: string } The model
@@ -237,7 +225,6 @@ function M.page(meta)
   return {
     options = M.read_options(meta),
     mode = mode,
-    -- The page duration is workshop metadata, so a page in another mode has none.
     duration = mode == M.MODE_WORKSHOP and M.read_duration(meta, source) or nil,
     labels = M.resolve_labels(),
     source = source,
@@ -279,10 +266,6 @@ function M.apply_title_labels(meta, labels)
   end
   meta.labels = values
 end
-
--- ============================================================================
--- AUTHORS
--- ============================================================================
 
 --- The media types of the photo files that an author can have, by extension.
 --- @type table<string, string>
@@ -338,7 +321,6 @@ local function photo_path(value)
   end
   local root = quarto.project.directory or pandoc.path.directory(quarto.doc.input_file)
   local file = pandoc.path.join({ root, value:sub(2) })
-  -- `unsafe` lets the answer start with `../`, for a page below the root.
   return pandoc.path.make_relative(file, pandoc.path.directory(quarto.doc.input_file), true)
 end
 
@@ -539,10 +521,6 @@ function M.authors_meta(authors, labels, photo_src)
   return list
 end
 
--- ============================================================================
--- CREDIT
--- ============================================================================
-
 --- The degrees of contribution that have a label of their own.
 --- @type table<string, boolean>
 local DEGREES = { lead = true, equal = true, supporting = true }
@@ -622,10 +600,6 @@ function M.credit_table(credit, labels)
     pandoc.TableFoot()
   )
 end
-
--- ============================================================================
--- CLOSING
--- ============================================================================
 
 --- Turn a metadata value into inlines.
 --- @param value any A string, inlines or blocks
@@ -869,10 +843,6 @@ function M.closing_parts_html(closing)
   return parts
 end
 
--- ============================================================================
--- FUNDING
--- ============================================================================
-
 --- @class Award
 --- @field source pandoc.Inlines|nil The sources, joined with ', '
 --- @field id string|nil The award id
@@ -977,10 +947,6 @@ function M.funding_blocks(funding, labels)
   end
   return blocks
 end
-
--- ============================================================================
--- COURSE MODEL
--- ============================================================================
 
 --- Normalise a path: forward slashes, no `.` parts, and `..` parts folded.
 --- A leading `/` marks a path from the project root and is dropped.
@@ -1292,10 +1258,6 @@ function M.course(model)
   end
   return course
 end
-
--- ============================================================================
--- BLOCKS
--- ============================================================================
 
 --- Read the duration attribute of a block.
 --- @param div pandoc.Div The block

@@ -50,8 +50,7 @@ local function geometry_declarations(preset)
   )
 end
 
---- Write the block geometry into the head. A brand can set a preset for each
---- scheme, so the dark page takes the geometry of its own preset.
+--- Write the block geometry into the head.
 local function publish_geometry()
   local light, dark = palette.preset('light'), palette.preset('dark')
   local style = ':root { ' .. geometry_declarations(light) .. ' }'
@@ -70,9 +69,6 @@ end
 function M.publish(meta, model)
   objectives = {}
   publish_geometry()
-  -- The motif of the preset, which `html/workshop.scss` draws in the title
-  -- block. A brand can set a preset for each scheme, so the dark page takes
-  -- the motif of its own preset.
   local light, dark = motifs.name(palette.preset('light')), motifs.name(palette.preset('dark'))
   local style = ':root { --atelier-motif: ' .. motifs.mask(light) .. '; }'
   if dark ~= light then
@@ -86,7 +82,6 @@ function M.publish(meta, model)
   }
   local authors = core.authors(meta, model.labels)
   if #authors > 0 then
-    -- A file, not a data URI: the pages of a course share it in the cache.
     meta['atelier-authors'] = core.authors_meta(authors, model.labels, function(path)
       quarto.doc.add_resource(path)
       return path
@@ -102,7 +97,6 @@ function M.publish(meta, model)
       data.sidebar = course.sidebar
       data.durations = course.durations
     end
-    -- An unlisted page gets no workshop bar, so its CSS must not reserve the bar row.
     local classes = '"atelier-workshop"'
     if not course.listed then
       classes = classes .. ', "atelier-workshop-unlisted"'
@@ -160,8 +154,7 @@ local function objective_id(inlines)
 end
 
 --- Turn each item of a bullet list into a checkbox label.
---- Each checkbox has the id of its objective text. The empty span after each
---- checkbox holds the tick that the style draws.
+--- Each checkbox has the id of its objective text.
 --- @param list pandoc.BulletList The list
 --- @return pandoc.Blocks The labels, followed by any further blocks of the items
 local function objective_labels(list)

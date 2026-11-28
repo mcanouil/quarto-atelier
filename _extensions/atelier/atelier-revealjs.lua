@@ -105,10 +105,6 @@ local SECTION_CLASS = 'atelier-section'
 --- @type string
 local MOTIF_CLASS = 'atelier-motif'
 
--- ============================================================================
--- CSS
--- ============================================================================
-
 --- Sorted keys of a table.
 --- @param entries table
 --- @return string[]
@@ -315,7 +311,6 @@ local function logo_rules(page_dark, section_dark)
   end
   local rules = show(':root', 'dark', 'light')
   if not section_dark then
-    -- A light chrome keeps the section slides light in a dark deck.
     for _, rule in ipairs(show('.' .. SECTION_STATE, 'light', 'dark')) do
       rules[#rules + 1] = rule
     end
@@ -369,10 +364,6 @@ local function deck_style(scheme, tokens, dark, state, buttons)
   lines[#lines + 1] = '</style>'
   return table.concat(lines, '\n')
 end
-
--- ============================================================================
--- DECK
--- ============================================================================
 
 --- What the block handlers read: the title of the deck, the background of
 --- the section slides and whether it is dark, and the backgrounds of the dark
@@ -430,7 +421,6 @@ local function publish(meta)
   local states = attributes['data-state'] and pandoc.utils.stringify(attributes['data-state']) or ''
   attributes['data-state'] = (states == '' and TITLE_STATE) or (states .. ' ' .. TITLE_STATE)
   meta['title-slide-attributes'] = attributes
-  -- `revealjs/title-slide.html` adds the motif class to the title slide.
   meta['atelier-motif'] = true
   return meta
 end
@@ -514,9 +504,7 @@ end
 --- @param div pandoc.Div
 --- @return pandoc.Div|nil
 local function fill_footer(div)
-  -- The footer of one slide replaces the footer of the deck on that slide,
-  -- and takes the same row, so the slide keeps the rights, the slide number
-  -- and the logo.
+  -- The footer of one slide replaces the footer of the deck on that slide.
   if not div.classes:includes('footer-default') and not div.classes:includes('footer') then
     return nil
   end
@@ -524,8 +512,6 @@ local function fill_footer(div)
   local slot = function(name, content)
     return pandoc.Span(content, pandoc.Attr('', { 'atelier-slot', 'atelier-slot-' .. name }))
   end
-  -- A slot can cut its text, so the text sits in a span that takes hover and
-  -- carries the full text as its title.
   local text = function(content, class)
     if #content == 0 then
       return {}

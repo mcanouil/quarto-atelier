@@ -7,41 +7,13 @@
 # @copyright 2026 Mickaël Canouil
 # @author Mickaël Canouil
 #
-# The generated files, _variables.yml, _atelier-version.yml, and changelog.qmd,
-# are ignored by Git and
-# removed by post-render.sh. The extension itself cannot be staged here, because
-# Quarto resolves extensions before pre-render runs; see sync-extension.sh.
+# The extension itself cannot be staged here, because Quarto resolves
+# extensions before pre-render runs; see sync-extension.sh.
 #
-# _variables.yml carries the reference a reader should install, so the pages can
-# write `quarto add {{< var extension.reference >}}` rather than a slug that
-# resolves to the default branch. The version is read from the extension
-# manifest, which the release workflow bumps, and the site is rendered from the
-# release tag, so the page names the version it documents. Quarto re-reads the
-# project configuration after pre-render, which is what makes a generated
-# variables file work at all.
+# Quarto re-reads the project configuration after pre-render, which is what
+# makes a generated variables file work at all.
 #
-# _atelier-version.yml sets extensions.atelier.version to the same version, so
-# the version pill shows the release that rendered the site. _quarto.yml reads
-# it through metadata-files. The pill reads the metadata, which a {{< var >}}
-# shortcode cannot set.
-#
-# Version headings are restructured into a three-level hierarchy:
-#
-#   ## X.Y.Z (date)          (in CHANGELOG.md)
-#
-# becomes:
-#
-#   ## X {#version-X}
-#   ### X.Y {#version-X-Y}
-#   #### X.Y.Z (date) {#version-X-Y-Z}
-#
-# A version heading is promoted by two levels, so every heading nested under it
-# shifts by the same two: "### New Features" becomes "##### New Features".
-# Without the shift a subsection closes the version it belongs to, and the
-# document outline stops matching the page.
-#
-# The "Unreleased" section is omitted, so the page describes released versions
-# only.
+# The pill reads the metadata, which a {{< var >}} shortcode cannot set.
 #
 
 set -euo pipefail
@@ -50,10 +22,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCS_DIR="$(dirname "${SCRIPT_DIR}")"
 ROOT_DIR="$(dirname "${DOCS_DIR}")"
 
-# The extension the site documents, named by the directory that holds it, which
-# is the name its shortcodes and filters are registered under. Deriving it keeps
-# this script identical in every repository. A repository with no extension
-# still gets a page, named after itself, rather than a failed render.
 EXTENSION_NAME=""
 for extension_dir in "${ROOT_DIR}"/_extensions/*/; do
 	[[ -f "${extension_dir}_extension.yml" ]] || continue
@@ -66,9 +34,6 @@ if [[ -z "${EXTENSION_NAME}" ]]; then
 		"${EXTENSION_NAME}"
 fi
 
-# The repository the extension is published from. Taken from the website
-# configuration rather than the Git remote, so a fork documents the repository
-# it publishes as, and a checkout with no remote still renders.
 REPO_SLUG="$(sed -n \
 	's|^[[:space:]]*repo-url:[[:space:]]*https://github.com/\([^[:space:]]*\)|\1|p' \
 	"${DOCS_DIR}/_quarto.yml" | head -n 1)"
@@ -102,8 +67,6 @@ fi
 	if [[ -n "${VERSION}" ]]; then
 		printf '  version: "%s"\n' "${VERSION}"
 		printf '  reference: "%s@%s"\n' "${REPO_SLUG}" "${VERSION}"
-		# The same reference, encoded for the repo query parameter of a Quarto
-		# Wizard URI.
 		printf '  wizard-reference: "%s%%40%s"\n' "${REPO_SLUG//\//%2F}" "${VERSION}"
 	fi
 } >"${DOCS_DIR}/_variables.yml"
@@ -112,8 +75,6 @@ if [[ -z "${VERSION}" ]]; then
 	printf '[pre-render] No %s; the pages have no version to install\n' \
 		"${MANIFEST}" >&2
 elif ! git -C "${ROOT_DIR}" rev-parse -q --verify "refs/tags/${VERSION}" >/dev/null; then
-	# Expected before a first release, and a warning rather than an error: the
-	# workflow renders from a tag, so this only fires on a local preview.
 	printf '[pre-render] warning: %s is not tagged; the install commands name an unreleased version\n' \
 		"${VERSION}" >&2
 fi
@@ -157,7 +118,6 @@ BEGIN {
   printf "description: \"Every released version of the %s extension, and what each one changed.\"\n---\n\n", name
 }
 
-# Emit a line, collapsing consecutive blank lines and suppressing leading ones.
 function emit(line,    is_blank) {
   is_blank = (line == "")
   if (is_blank) {
@@ -171,14 +131,12 @@ function emit(line,    is_blank) {
 /^# /             { next }
 /^## Unreleased$/ { in_unreleased = 1; next }
 
-# Inside the Unreleased block: skip content, stop on next versioned heading.
 in_unreleased && !/^## [0-9]/ { next }
 in_unreleased                  { in_unreleased = 0 }
 
 /^## [0-9]+\.[0-9]+\.[0-9]+ \(/ {
-  # Fields: $1="##"  $2="X.Y.Z"  $3="(date)"
   ver   = $2
-  date  = substr($3, 2, length($3) - 2)   # strip surrounding parens
+  date  = substr($3, 2, length($3) - 2)
   split(ver, v, ".")
   major = int(v[1])
   minor = int(v[2])
@@ -204,8 +162,6 @@ in_unreleased                  { in_unreleased = 0 }
   next
 }
 
-# Headings nested under a version follow it down by two levels, so they stay
-# inside the version they document.
 in_version && /^#+ / {
   if (length($1) + 2 > 6) {
     printf "[pre-render] heading too deep to nest: %s\n", $0 > "/dev/stderr"
