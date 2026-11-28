@@ -609,7 +609,7 @@
 		// Remove when: the minimum Quarto version includes all three fixes.
 		// Not SCSS: focus order follows the DOM order, which CSS cannot change.
 		const toggleButton = document.querySelector(".top-right.quarto-color-scheme-toggle");
-		const floatingToggle = toggleButton?.closest("body > *");
+		const floatingToggle = toggleButton?.closest(".quarto-color-scheme-toggle-container");
 		const titleBlock = document.querySelector("#title-block-header .quarto-title");
 		if (floatingToggle) {
 			if (titleBlock) {
