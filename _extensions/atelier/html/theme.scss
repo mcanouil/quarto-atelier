@@ -418,8 +418,8 @@ $atelier-landing-accent: atelier-theme-contrast($primary, $body-bg) !default;
 $atelier-landing-muted: atelier-theme-contrast($text-muted, $body-bg) !default;
 $atelier-landing-surface: atelier-rendered(body-mix(95%)) !default;
 $atelier-landing-border: var(--atelier-border) !default;
-$atelier-card-muted: atelier-theme-contrast($text-muted, $atelier-landing-surface) !default;
-$atelier-card-link: atelier-theme-contrast($link-color, $atelier-landing-surface) !default;
+$atelier-card-muted: atelier-theme-contrast($text-muted, $body-bg) !default;
+$atelier-card-link: atelier-theme-contrast($link-color, $body-bg) !default;
 
 :root {
   --atelier-card-link: #{$atelier-card-link};
