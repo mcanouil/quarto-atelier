@@ -65,6 +65,13 @@ $atelier-chrome-dark-accent: null !default;
 $atelier-terminal-bg: null !default;
 $atelier-terminal-prompt: null !default;
 
+// A brand base font sets `$font-family-base`, and Bootstrap headings take the
+// body font when `$headings-font-family` is `null`. So a preset sets no
+// heading font when the brand or the project sets a base font, and the
+// headings take that font, as in Reveal.js and Typst. A brand heading font
+// wins in either case.
+$_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $font-family-base != null;
+
 // ===========================================================================
 // DEFAULT PRESET
 // ===========================================================================
@@ -74,7 +81,9 @@ $atelier-terminal-prompt: null !default;
 // Typst.
 @if $atelier-preset == default {
   $font-family-sans-serif: "Atkinson Hyperlegible Next", sans-serif !default;
-  $headings-font-family: "Atkinson Hyperlegible Next", sans-serif !default;
+  @if not $_atelier-brand-base-font {
+    $headings-font-family: "Atkinson Hyperlegible Next", sans-serif !default;
+  }
   $font-family-monospace: "Atkinson Hyperlegible Mono", monospace !default;
 }
 
@@ -134,7 +143,9 @@ $atelier-terminal-prompt: null !default;
   }
 
   $font-family-sans-serif: "Atkinson Hyperlegible Next", sans-serif !default;
-  $headings-font-family: "Fraunces 72pt SuperSoft", serif !default;
+  @if not $_atelier-brand-base-font {
+    $headings-font-family: "Fraunces 72pt SuperSoft", serif !default;
+  }
   $font-family-monospace: "Atkinson Hyperlegible Mono", monospace !default;
 }
 
@@ -185,7 +196,9 @@ $atelier-terminal-prompt: null !default;
   $font-size-base: 0.95rem !default;
   $font-family-monospace: $_terminal-font !default;
   $font-family-sans-serif: $_terminal-font !default;
-  $headings-font-family: $_terminal-font !default;
+  @if not $_atelier-brand-base-font {
+    $headings-font-family: $_terminal-font !default;
+  }
 
   // Quarto does not show a Sass `@warn` in the render log, so a reader does
   // not see this warning yet.

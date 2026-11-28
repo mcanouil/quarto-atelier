@@ -214,14 +214,18 @@ local function brand_sets_font(scheme, role)
 end
 
 --- The font declarations of the preset, for the roles that the brand does
---- not set.
+--- not set. A brand with a base font and no heading font gets its base font
+--- on the headings, as in HTML and Typst. Quarto gives that brand font to
+--- `--r-main-font` only.
 --- @param scheme string `light` or `dark`
 --- @return string[]
 local function font_declarations(scheme)
   local fonts = palette.PRESET_FONTS[palette.preset(palette.painted_scheme(scheme))] or {}
   local lines = {}
   for _, role in ipairs({ 'base', 'headings', 'monospace' }) do
-    if fonts[role] ~= nil and not brand_sets_font(scheme, role) then
+    if role == 'headings' and brand_sets_font(scheme, 'base') and not brand_sets_font(scheme, 'headings') then
+      lines[#lines + 1] = '  --atelier-font-headings: var(--r-main-font);'
+    elseif fonts[role] ~= nil and not brand_sets_font(scheme, role) then
       lines[#lines + 1] = string.format('  --atelier-font-%s: "%s", %s;', role, fonts[role], FALLBACK_FONTS[role])
     end
   end
