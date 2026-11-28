@@ -13,6 +13,7 @@
 --- Load modules
 local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
+local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
 
 --- Keys of the labels, without the `atelier-` prefix, in output order.
 --- The text comes from the `language` files.
@@ -48,6 +49,13 @@ local LABELS = {
 --- and `@fontsource-variable/jetbrains-mono` 5.3.0 on npm.
 local FONTS_VERSION = '6.0.0'
 
+--- The dependency entry of one font file.
+--- @param file string The file name without the `.woff2` extension
+--- @return { name: string, path: string }
+local function font_entry(file)
+  return { name = file .. '.woff2', path = 'fonts/' .. file .. '.woff2' }
+end
+
 --- Font files that `fonts/fonts.css` refers to, relative to this file.
 --- @type table<integer, { name: string, path: string }>
 local FONT_FILES = {}
@@ -64,7 +72,7 @@ for _, file in ipairs({
   'jetbrains-mono-latin-wght-normal',
   'jetbrains-mono-latin-wght-italic',
 }) do
-  table.insert(FONT_FILES, { name = file .. '.woff2', path = 'fonts/' .. file .. '.woff2' })
+  table.insert(FONT_FILES, font_entry(file))
 end
 
 --- Read the version from `extensions.atelier.version`.
@@ -118,13 +126,49 @@ local function resolve_labels()
   return labels
 end
 
+--- Font files to preload, by the base font of a preset: the faces of the
+--- body text in the announcement bar and the navbar.
+--- @type table<string, table<integer, string>>
+local PRELOAD_FILES = {
+  ['Atkinson Hyperlegible Next'] = { 'AtkinsonHyperlegibleNext-Regular', 'AtkinsonHyperlegibleNext-Bold' },
+  ['JetBrains Mono'] = { 'jetbrains-mono-latin-wght-normal' },
+}
+
+--- Preload links for the base font of the preset of each colour scheme,
+--- unless the brand sets a base font for that scheme. A face that arrives
+--- after the first paint can change where the announcement text wraps, which
+--- changes the height of the header and moves the page content.
+--- Quarto writes the path of a dependency stylesheet relative to each page,
+--- and its `rel` attribute is replaced by the `rel` of `attribs`.
+--- @return table<integer, table> The `stylesheets` entries of the preloads
+local function preload_stylesheets()
+  local entries = {}
+  local seen = {}
+  for _, scheme in ipairs({ 'light', 'dark' }) do
+    local brand = quarto.brand.has_mode(scheme) and quarto.brand.get_typography(scheme, 'base')
+    local fonts = palette.PRESET_FONTS[palette.preset(palette.painted_scheme(scheme))] or {}
+    local files = not (brand and brand.family) and PRELOAD_FILES[fonts.base] or {}
+    for _, file in ipairs(files) do
+      if not seen[file] then
+        seen[file] = true
+        local entry = font_entry(file)
+        entry.attribs = { rel = 'preload', as = 'font', type = 'font/woff2', crossorigin = '' }
+        table.insert(entries, entry)
+      end
+    end
+  end
+  return entries
+end
+
 --- Add the font stylesheet and the font files that the presets use.
+--- @param stylesheets table<integer, table> Entries to write before `fonts/fonts.css`
 --- @return nil
-local function add_fonts()
+local function add_fonts(stylesheets)
+  table.insert(stylesheets, 'fonts/fonts.css')
   quarto.doc.add_html_dependency({
     name = 'atelier-fonts',
     version = FONTS_VERSION,
-    stylesheets = { 'fonts/fonts.css' },
+    stylesheets = stylesheets,
     resources = FONT_FILES,
   })
 end
@@ -134,14 +178,14 @@ end
 --- @return nil
 local function publish_options(meta)
   if quarto.doc.is_format('revealjs') then
-    add_fonts()
+    add_fonts({})
     return nil
   end
   if not quarto.doc.is_format('html') then
     return nil
   end
-  -- The preset is a Sass default, which Lua cannot read, so every page ships the fonts. The browser downloads a face only when a stylesheet names it.
-  add_fonts()
+  -- Every page ships the font files of all presets, because a project can also set the preset in its own Sass, which Lua cannot read. The browser downloads a face only when a stylesheet names it or a preload link asks for it.
+  add_fonts(preload_stylesheets())
   local options = { labels = resolve_labels(), version = read_version(meta) }
   -- With a light and a dark logo, Quarto drops `logo-alt` and writes `alt=""`
   -- on both images. The options carry each logo with its `logo-alt` for
