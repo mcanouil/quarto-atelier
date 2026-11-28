@@ -1562,8 +1562,8 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
 // toggle takes the colour of the title, which a title banner sets.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838 (focus order)
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294 (announcement bar)
-// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/1918
-// Remove when: the minimum Quarto version includes both fixes.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/1918 (toggle position)
+// Remove when: the minimum Quarto version includes all three fixes.
 .atelier-title-tools {
   display: flex;
   align-items: center;
