@@ -1554,6 +1554,34 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   margin-top: 1em;
 }
 
+// On a page with a title block, a11y-fixes.html moves the floating toggle
+// into a row at the start of the title, with the logo when there is one.
+// The toggle then flows with the title: the motif, the announcement bar and
+// the focus order no longer meet an absolute position. The row is a flex
+// box, so it sits beside the motif float and does not run under it. The
+// toggle takes the colour of the title, which a title banner sets.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838 (focus order)
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294 (announcement bar)
+// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/1918
+// Remove when: the minimum Quarto version includes both fixes.
+.atelier-title-tools {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: fit-content;
+  margin-block-end: 1rem;
+
+  .atelier-title-logo {
+    margin-block-end: 0;
+  }
+
+  .top-right.quarto-color-scheme-toggle {
+    position: static;
+    margin-top: 0;
+    color: inherit;
+  }
+}
+
 // In the sidebar tools row, Quarto sizes the tool icons from the font size of
 // the row, but the toggle glyph from the root font size, so the toggle is
 // larger than the icons beside it. Size the glyph from the row instead.

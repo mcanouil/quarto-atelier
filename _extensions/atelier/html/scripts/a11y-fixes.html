@@ -592,16 +592,33 @@
 		});
 
 		// Floating colour scheme toggle: on a page with no navbar and no sidebar
-		// tools, Quarto appends the toggle's container to the end of <body>. It is
-		// drawn at the top right, but focus reaches it last. Move it after the
-		// fixed header that holds the announcement bar, or after the skip link
-		// when there is no header. It stays a direct child of <body>.
+		// tools, Quarto appends the toggle's container to the end of <body> and
+		// draws the toggle with an absolute position at the top right. Focus
+		// reaches it last, the announcement bar covers it, and on a narrow
+		// page it sits on the motif of the title block. When the page has a
+		// title block, move the toggle into a row at the start of the title,
+		// with the logo when there is one, and remove the empty container.
+		// Otherwise, move the container after the fixed header that holds the
+		// announcement bar, or after the skip link when there is no header. It
+		// stays a direct child of <body>.
 		// The toggle position in theme.scss also depends on this move.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838
-		// Remove when: the minimum Quarto version includes the fix.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838 (focus order)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294 (announcement bar)
+		// Related upstream: https://github.com/quarto-dev/quarto-cli/issues/1918
+		// Remove when: the minimum Quarto version includes both fixes.
 		// Not SCSS: focus order follows the DOM order, which CSS cannot change.
-		const floatingToggle = document.querySelector(".top-right.quarto-color-scheme-toggle")?.closest("body > *");
-		if (floatingToggle) {
+		const toggleButton = document.querySelector(".top-right.quarto-color-scheme-toggle");
+		const floatingToggle = toggleButton?.closest("body > *");
+		const titleBlock = document.querySelector("#title-block-header .quarto-title");
+		if (floatingToggle && titleBlock) {
+			const row = document.createElement("div");
+			row.className = "atelier-title-tools";
+			const logo = titleBlock.querySelector(":scope > .atelier-title-logo");
+			if (logo) row.append(logo);
+			row.append(toggleButton);
+			titleBlock.prepend(row);
+			floatingToggle.remove();
+		} else if (floatingToggle) {
 			const anchor = document.body.querySelector(":scope > #quarto-header")
 				?? document.body.querySelector(":scope > #quarto-skip-link");
 			if (anchor) anchor.after(floatingToggle);
