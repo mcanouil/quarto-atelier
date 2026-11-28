@@ -15,11 +15,9 @@ anchor-sections: false
 
 ::: {.atelier-landing}
 
-::: {.atelier-hero .gradient}
+::: {.atelier-hero}
 
 ::: {.atelier-hero-text}
-
-[Quarto project type]{.atelier-eyebrow}
 
 # Atelier
 
@@ -59,9 +57,9 @@ Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto
 
 :::
 
-::: {.atelier-hero-figure}
+::: {.atelier-hero-figure .framed}
 
-[![The Atelier mark: a page frame with a pinned navbar.](assets/icons/icon-512.png){.nolightbox width="320" height="320"}]{}
+[![A documentation page in the default preset: a navbar, a sidebar, a table of contents and a code block, in the light colour scheme.](assets/gallery/preset-default-light.png){.nolightbox width="1440" height="900"}]{}
 
 :::
 
@@ -70,8 +68,6 @@ Or install it from your editor with [Quarto Wizard](https://m.canouil.dev/quarto
 ::: {.atelier-feature}
 
 ::: {.atelier-feature-text}
-
-[Layouts and modes]{.atelier-eyebrow}
 
 ## Two modes, two layouts
 
@@ -96,8 +92,6 @@ See all the combinations in the [gallery](gallery.qmd).
 ::: {.atelier-feature}
 
 ::: {.atelier-feature-text}
-
-[Brand]{.atelier-eyebrow}
 
 ## One brand file, every surface
 
@@ -125,8 +119,6 @@ The project type sets `format: atelier-html`, and contributes the theme, the bun
 ::: {.atelier-feature .reverse}
 
 ::: {.atelier-feature-text}
-
-[Quick start]{.atelier-eyebrow}
 
 ## Quick start {#quick-start}
 
@@ -164,8 +156,6 @@ website:
 ::: {.atelier-feature}
 
 ::: {.atelier-feature-text}
-
-[Configure]{.atelier-eyebrow}
 
 ## Configure `atelier-html`
 

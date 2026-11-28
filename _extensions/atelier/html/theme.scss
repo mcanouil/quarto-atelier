@@ -412,32 +412,17 @@ $atelier-landing-max-width: 1140px !default;
 $atelier-landing-gap: 3rem !default;
 $atelier-hero-title-size: clamp(2.2rem, 5vw, 3.4rem) !default;
 $atelier-hero-figure-max-width: 320px !default;
-$atelier-hero-gradient-shift: 40deg !default;
 $atelier-card-min-width: 13rem !default;
 
 $atelier-landing-accent: atelier-theme-contrast($primary, $body-bg) !default;
 $atelier-landing-muted: atelier-theme-contrast($text-muted, $body-bg) !default;
 $atelier-landing-surface: atelier-rendered(body-mix(95%)) !default;
 $atelier-landing-border: var(--atelier-border) !default;
-$atelier-card-muted: atelier-theme-contrast($text-muted, $atelier-landing-surface) !default;
-$atelier-card-link: atelier-theme-contrast($link-color, $atelier-landing-surface) !default;
+$atelier-card-muted: atelier-theme-contrast($text-muted, $body-bg) !default;
+$atelier-card-link: atelier-theme-contrast($link-color, $body-bg) !default;
 
 :root {
   --atelier-card-link: #{$atelier-card-link};
-}
-
-// Each stop of the title gradient is moved until it has 4.5:1 against the
-// page. The middle stop is calculated too, because a mix of two colours that
-// pass can have less contrast than both. If a stop cannot pass, the title
-// stays in the plain accent colour. This check also applies to stops that a
-// project sets itself.
-$atelier-hero-gradient-start: $atelier-landing-accent !default;
-$atelier-hero-gradient-end: atelier-theme-contrast(adjust-hue($primary, $atelier-hero-gradient-shift), $body-bg) !default;
-$atelier-hero-gradient-middle: atelier-theme-contrast(mix($atelier-hero-gradient-start, $atelier-hero-gradient-end), $body-bg) !default;
-$atelier-hero-gradient: null;
-
-@if atelier-ratio($atelier-hero-gradient-start, $body-bg) >= 4.5 and atelier-ratio($atelier-hero-gradient-middle, $body-bg) >= 4.5 and atelier-ratio($atelier-hero-gradient-end, $body-bg) >= 4.5 {
-  $atelier-hero-gradient: linear-gradient(92deg, $atelier-hero-gradient-start, $atelier-hero-gradient-middle, $atelier-hero-gradient-end);
 }
 
 // The title block of the page is hidden only on a page that holds a landing
@@ -529,6 +514,17 @@ main:has(> .atelier-landing) > #title-block-header {
   p {
     margin: 0;
   }
+
+  // The frame of `.embed-art` around a page screenshot: ink border, offset ink
+  // shadow, and a static tilt. The tilt does not move, so it needs no guard.
+  &.framed img {
+    padding: 0.75rem;
+    background: $body-bg;
+    border: 1.5px solid $body-color;
+    border-radius: $border-radius-lg;
+    box-shadow: 4px 4px 0 0 $body-color;
+    transform: rotate(var(--atelier-embed-art-tilt, -1.25deg));
+  }
 }
 
 .atelier-feature-figure img {
@@ -560,34 +556,6 @@ main:has(> .atelier-landing) > #title-block-header {
   border: 1px solid $atelier-landing-border;
   border-radius: $border-radius-lg;
   background: $atelier-landing-surface;
-}
-
-// The gradient fills the title only where the browser can clip a background
-// to text. Elsewhere, in print and in forced colours mode, the title is plain
-// text. The title is only as wide as its text, so that a short title shows
-// all of the gradient.
-@supports (background-clip: text) or (-webkit-background-clip: text) {
-  .atelier-hero.gradient :is(h1, h2) {
-    width: fit-content;
-    max-width: 100%;
-    color: $atelier-landing-accent;
-
-    @if $atelier-hero-gradient {
-      background: $atelier-hero-gradient;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-  }
-}
-
-// A browser prints without background images by default, which would leave a
-// transparent title with no gradient behind it.
-@media print, (forced-colors: active) {
-  .atelier-hero.gradient :is(h1, h2) {
-    background: none;
-    -webkit-text-fill-color: currentcolor;
-  }
 }
 
 .atelier-feature {
@@ -659,13 +627,13 @@ main:has(> .atelier-landing) > #title-block-header {
   flex-direction: column;
   gap: 0.5rem;
   padding: 1.25rem;
-  border: 1px solid $atelier-landing-border;
+  border: 1.5px solid $body-color;
   border-radius: $border-radius-lg;
-  background: $atelier-landing-surface;
+  background: $body-bg;
   color: $body-color;
 
-  &:hover {
-    border-color: $atelier-landing-accent;
+  &:is(:hover, :focus-within) {
+    box-shadow: 4px 4px 0 0 var(--atelier-accent-mark);
   }
 
   :is(h2, h3, h4) {
@@ -1813,6 +1781,16 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
   // of; hold the card at its resting angle instead.
   .embed-art:hover {
     transform: rotate(var(--atelier-embed-art-tilt, -1.25deg));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .atelier-card {
+    transition: transform 0.15s, box-shadow 0.15s;
+
+    &:is(:hover, :focus-within) {
+      transform: translate(-2px, -2px);
+    }
   }
 }
 

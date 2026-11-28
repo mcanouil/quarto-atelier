@@ -1028,11 +1028,13 @@ div.quarto-post {
   }
 }
 
-// A grid card is a bordered box on the page. The accent border, the lift, and
-// the shadow show on hover and on keyboard focus of the card link, so the
-// card reads as one target. The lift needs the motion guard.
+// A grid card is a bordered box on the page, with an ink border. An offset
+// shadow in the accent mark colour shows on hover and on keyboard focus of the
+// card link, so the card reads as one target. The shift needs the motion guard.
 .quarto-grid-item.card {
   overflow: hidden;
+  border: 1.5px solid $body-color;
+  background: $body-bg;
   border-radius: $border-radius-lg;
 
   p.card-img-top > img {
@@ -1064,18 +1066,17 @@ div.quarto-post {
 
 .quarto-grid-link:is(:hover, :focus-visible) > .quarto-grid-item.card,
 .quarto-grid-item.card:focus-within {
-  border-color: var(--atelier-accent-mark);
-  box-shadow: 0 10px 24px -16px var(--atelier-shadow);
+  box-shadow: 4px 4px 0 0 var(--atelier-accent-mark);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .quarto-grid-item.card {
-    transition: transform 0.15s;
+    transition: transform 0.15s, box-shadow 0.15s;
   }
 
   .quarto-grid-link:is(:hover, :focus-visible) > .quarto-grid-item.card,
   .quarto-grid-item.card:focus-within {
-    transform: translateY(-2px);
+    transform: translate(-2px, -2px);
   }
 }
 
