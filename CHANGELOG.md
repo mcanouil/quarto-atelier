@@ -61,6 +61,7 @@
 - feat: The quarto preset sets Atkinson Hyperlegible Next for text, Fraunces for headings and Atkinson Hyperlegible Mono for code, in HTML, Reveal.js and Typst. (#176)
 - feat: A brand that sets `typography.base` and no `typography.headings` gives the headings the base font, in every preset and format. (#176)
 - fix: On a page with no navbar, the colour scheme toggle now sits in a row above the title, so it no longer covers the corner motif on narrow screens. (#177)
+- fix: Each HTML page preloads the text font of its preset, so the header and the page content no longer move when the font arrives.
 
 ## 0.15.3 (2026-11-23)
 
