@@ -31,11 +31,6 @@ $_atelier-dark-accent: #7fa8c4;
   @return atelier-rendered(mix($color1, $color2, $weight));
 }
 
-// The contrast of two colours as the browser renders them.
-@function atelier-ratio($a, $b) {
-  @return quarto-contrast(atelier-rendered($a), atelier-rendered($b));
-}
-
 // The colour a text colour moves toward to gain contrast on $bg: black on a
 // light background and white on a dark one.
 @function atelier-toward($bg) {

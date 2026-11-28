@@ -510,7 +510,7 @@ One property applies to every card.
 
 | Property                   | Default    | Effect                                              |
 | -------------------------- | ---------- | --------------------------------------------------- |
-| `--atelier-embed-art-tilt` | `-1.25deg` | Resting rotation, relaxed toward straight on hover. |
+| `--atelier-embed-art-tilt` | `-1.25deg` | Resting rotation of an `.embed-art` image, relaxed toward straight on hover, and static rotation of a `.framed` hero figure. |
 
 : The property that applies to every card. {.striped .hover tbl-colwidths="[32,14,54]"}
 
@@ -567,7 +567,8 @@ On a page that has the container, Atelier hides the title block, because the her
 The title of the hero is an h1, or an h2 on a page that has its own h1.
 Each block stacks into one column below the `md` breakpoint, and a reversed feature row shows its text part first.
 
-Nothing in the blocks moves, so the reduced motion setting has no effect on them.
+The only movement in the blocks is the shift of a card on hover and on focus, and the reduced motion setting stops it.
+The tilt of a framed figure is static.
 
 A card holds an icon, a heading, one sentence and one link.
 The link covers the whole card, and the focus ring of the link goes around the card.
@@ -594,10 +595,10 @@ Atelier calculates each default from the brand for each colour scheme.
 
 | Variable                         | Default                                                 | Effect                                 |
 | -------------------------------- | ------------------------------------------------------- | -------------------------------------- |
-| `$atelier-landing-accent`        | `$primary`, moved to 4.5:1 against the page             | Eyebrow, legend numbers.               |
+| `$atelier-landing-accent`        | `$primary`, moved to 4.5:1 against the page             | Eyebrow, legend numbers, card icon.   |
 | `$atelier-landing-muted`         | `$text-muted`, moved to 4.5:1 against the page          | Lead and legend detail text.           |
 | `$atelier-landing-surface`       | `body-mix(95%)`                                         | Banner surface.                        |
-| `$atelier-landing-border`        | `var(--atelier-border)`                                 | Card, banner and feature row borders.  |
+| `$atelier-landing-border`        | `var(--atelier-border)`                                 | Banner, feature row and card icon borders. |
 | `$atelier-card-muted`            | `$text-muted`, moved to 4.5:1 against the page          | Card text.                             |
 | `$atelier-card-link`             | `$link-color`, moved to 4.5:1 against the page          | Card link.                             |
 
