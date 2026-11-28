@@ -880,10 +880,21 @@ function M.held_style(style, bgs)
 end
 
 --- The fonts of each preset, as `html/presets.scss` sets them, for the
---- formats with no Sass. A brand font wins. The `default` preset sets none.
+--- formats with no Sass. A brand font wins. Each name is the family name in
+--- the TTF name table of the bundled font, because Typst finds a font by that
+--- name and the CSS `@font-face` rules of `fonts/fonts.css` use the same name.
 --- @type table<string, table<string, string>>
 M.PRESET_FONTS = {
-  quarto = { base = 'Alegreya Sans', headings = 'Alegreya Sans', monospace = 'Fira Code' },
+  default = {
+    base = 'Atkinson Hyperlegible Next',
+    headings = 'Atkinson Hyperlegible Next',
+    monospace = 'Atkinson Hyperlegible Mono',
+  },
+  quarto = {
+    base = 'Atkinson Hyperlegible Next',
+    headings = 'Fraunces 72pt SuperSoft',
+    monospace = 'Atkinson Hyperlegible Mono',
+  },
   terminal = { base = 'JetBrains Mono', headings = 'JetBrains Mono', monospace = 'JetBrains Mono' },
 }
 

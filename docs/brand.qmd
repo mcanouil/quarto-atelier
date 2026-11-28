@@ -52,7 +52,9 @@ The [gallery](gallery.qmd#presets) shows each preset on a web page, in a PDF, an
 ### The default preset
 
 This is the Atelier look.
-It takes its colours and fonts from your `_brand.yml`, and it has a light and a dark colour scheme.
+It takes its colours from your `_brand.yml`, and it has a light and a dark colour scheme.
+The body and the headings use Atkinson Hyperlegible Next.
+The code uses Atkinson Hyperlegible Mono.
 
 | Light | Dark |
 | --- | --- |
@@ -63,7 +65,7 @@ It takes its colours and fonts from your `_brand.yml`, and it has a light and a 
 ### The quarto preset
 
 This preset is close to the look of the Quarto website.
-It has a light and a dark colour scheme, and it sets only colours and two typefaces.
+It has a light and a dark colour scheme, and it sets the colours and three typefaces.
 
 - The page has a blue tint: `#eef4fa` in light and `#0f1b2a` in dark.
 - The primary colour is `#47709a` in light and `#74aadb` in dark.
@@ -73,8 +75,8 @@ It has a light and a dark colour scheme, and it sets only colours and two typefa
   In dark, it is a navy bar, `#0a1524`, darker than the page, with `#e8edf2` text and a `#75aadb` accent.
 - A brand primary colour also sets the accent of the chrome and the colour of the links.
   In light, if that colour cannot reach the contrast minimum on the blue bar, the accent of the chrome stays white.
-- The body and the headings use Alegreya Sans.
-  The code uses Fira Code.
+- The body uses Atkinson Hyperlegible Next, and the headings use Fraunces.
+  The code uses Atkinson Hyperlegible Mono.
 
 | Light | Dark |
 | --- | --- |
@@ -118,8 +120,12 @@ defaults:
 
 The fonts are part of the extension, in `_extensions/mcanouil/atelier/fonts/` of your site.
 The pages do not make a request to Google or to any other third party.
-The fonts are Alegreya Sans, Fira Code, and JetBrains Mono.
+The fonts are Atkinson Hyperlegible Next, Atkinson Hyperlegible Mono, Fraunces, and JetBrains Mono.
 Each one is under the SIL Open Font License, and the licence text is next to the font files.
+The web page, the deck, and the PDF use the same fonts.
+Fraunces has no italic cut.
+Typst prefers a font of the same family that is installed on your system over the font of the extension.
+If a brand sets `typography.base` and no `typography.headings`, the headings use the base font.
 
 ### Syntax highlighting
 

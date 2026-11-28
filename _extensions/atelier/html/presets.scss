@@ -65,10 +65,32 @@ $atelier-chrome-dark-accent: null !default;
 $atelier-terminal-bg: null !default;
 $atelier-terminal-prompt: null !default;
 
+// A brand base font sets `$font-family-base`, and Bootstrap headings take the
+// body font when `$headings-font-family` is `null`. So a preset sets no
+// heading font when the brand or the project sets a base font, and the
+// headings take that font, as in Reveal.js and Typst. A brand heading font
+// wins in either case.
+$_atelier-brand-base-font: atelier-meta.variable-exists(font-family-base) and $font-family-base != null;
+
+// ===========================================================================
+// DEFAULT PRESET
+// ===========================================================================
+// The Bootstrap colours, with two typefaces: one for the text and the
+// headings, and one for the code. Each font is a default, so a brand font
+// wins. `palette.lua` `PRESET_FONTS` holds the same names for Reveal.js and
+// Typst.
+@if $atelier-preset == default {
+  $font-family-sans-serif: "Atkinson Hyperlegible Next", sans-serif !default;
+  @if not $_atelier-brand-base-font {
+    $headings-font-family: "Atkinson Hyperlegible Next", sans-serif !default;
+  }
+  $font-family-monospace: "Atkinson Hyperlegible Mono", monospace !default;
+}
+
 // ===========================================================================
 // QUARTO PRESET
 // ===========================================================================
-// A blue tinted page, a filled blue chrome, and two typefaces, with no rules of
+// A blue tinted page, a filled blue chrome, and three typefaces, with no rules of
 // its own. The chrome values are set here as they are, so the contrast
 // functions in `html/chrome.scss` skip them: each one already passes AA. A
 // brand colour or font wins over every value, because each is a default. A
@@ -120,9 +142,11 @@ $atelier-terminal-prompt: null !default;
     }
   }
 
-  $font-family-sans-serif: "Alegreya Sans", sans-serif !default;
-  $headings-font-family: "Alegreya Sans", sans-serif !default;
-  $font-family-monospace: "Fira Code", monospace !default;
+  $font-family-sans-serif: "Atkinson Hyperlegible Next", sans-serif !default;
+  @if not $_atelier-brand-base-font {
+    $headings-font-family: "Fraunces 72pt SuperSoft", serif !default;
+  }
+  $font-family-monospace: "Atkinson Hyperlegible Mono", monospace !default;
 }
 
 // ===========================================================================
@@ -172,7 +196,9 @@ $atelier-terminal-prompt: null !default;
   $font-size-base: 0.95rem !default;
   $font-family-monospace: $_terminal-font !default;
   $font-family-sans-serif: $_terminal-font !default;
-  $headings-font-family: $_terminal-font !default;
+  @if not $_atelier-brand-base-font {
+    $headings-font-family: $_terminal-font !default;
+  }
 
   // Quarto does not show a Sass `@warn` in the render log, so a reader does
   // not see this warning yet.
