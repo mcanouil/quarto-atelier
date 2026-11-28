@@ -326,15 +326,17 @@ end
 --- moves into its appendix before the references.
 --- The closing drops its copyright and its licence line when Quarto's
 --- appendix shows it, as Copyright or Reuse.
---- The pages of a website or a book share their authors, so such a page shows the
---- CRediT table only when it sets `extensions.atelier.closing`.
+--- The pages of a website or a book share their authors and their funding, so
+--- such a page shows the funding and the CRediT table only when it sets
+--- `extensions.atelier.closing`.
 --- @param doc pandoc.Pandoc The document
 --- @param model table The page model
 --- @return pandoc.Pandoc|nil
 function M.finish(doc, model)
   local closing = core.closing(doc.meta, model, core.appendix_rights(doc.meta))
-  local funding = core.funding(doc.meta)
-  local credit = (closing ~= nil or not (logo.in_website() or core.in_book(doc.meta))) and core.credit(doc.meta, model) or nil
+  local shows_end_matter = closing ~= nil or not (logo.in_website() or core.in_book(doc.meta))
+  local funding = shows_end_matter and core.funding(doc.meta) or nil
+  local credit = shows_end_matter and core.credit(doc.meta, model) or nil
   if closing == nil and funding == nil and credit == nil then
     return nil
   end

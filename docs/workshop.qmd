@@ -520,7 +520,7 @@ Quarto shortcodes in `text` and in the file do not expand.
 
 Put `closing` in the front matter of the one page that ends the workshop.
 Do not set it in `_quarto.yml`.
-There it reaches every page, and each page repeats the closing and the CRediT table.
+There it reaches every page, and each page repeats the closing, the funding and the CRediT table.
 A deck that cites sources shows a references slide before the closing slide.
 
 These pictures show the closing in each format.
@@ -566,6 +566,7 @@ funding:
 
 A recipient with `ref` shows the name of the author, not the identifier.
 A page with no `funding` shows no funding section.
+On a website or in a book, the funding shows only on the page that sets `closing`.
 
 ### CRediT table
 
