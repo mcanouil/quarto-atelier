@@ -11,6 +11,12 @@
   .quarto-color-scheme-toggle {
     display: none !important;
   }
+
+  // A title row that holds only the hidden toggle would leave its margin
+  // above the title.
+  .atelier-title-tools:not(:has(> :not(.quarto-color-scheme-toggle))) {
+    display: none;
+  }
 }
 
 // The terminal decoration: prompts, a cursor, dashed rules, and bracketed

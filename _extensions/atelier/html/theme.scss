@@ -1554,32 +1554,16 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   margin-top: 1em;
 }
 
-// On a page with a title block, a11y-fixes.html moves the floating toggle
-// into a row at the start of the title, with the logo when there is one.
-// The toggle then flows with the title: the motif, the announcement bar and
-// the focus order no longer meet an absolute position. The row is a flex
-// box, so it sits beside the motif float and does not run under it. The
-// toggle takes the colour of the title, which a title banner sets.
+// The toggle that a11y-fixes.html moves into the title row loses the
+// floating position and colour above.
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838 (focus order)
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294 (announcement bar)
 // Upstream: https://github.com/quarto-dev/quarto-cli/issues/1918 (toggle position)
 // Remove when: the minimum Quarto version includes all three fixes.
-.atelier-title-tools {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  width: fit-content;
-  margin-block-end: 1rem;
-
-  .atelier-title-logo {
-    margin-block-end: 0;
-  }
-
-  .top-right.quarto-color-scheme-toggle {
-    position: static;
-    margin-top: 0;
-    color: inherit;
-  }
+.atelier-title-tools .top-right.quarto-color-scheme-toggle {
+  position: static;
+  margin-top: 0;
+  color: inherit;
 }
 
 // In the sidebar tools row, Quarto sizes the tool icons from the font size of
@@ -1828,11 +1812,19 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
 // A standalone document puts its logo above the title, at the left of the
 // title block, clear of the workshop motif in the top right corner.
 // `atelier-html-logo.lua` writes both images, `html/title-block.html`
-// puts them above the title, and the colour scheme shows one.
+// puts them in the row `atelier-title-tools` above the title, and the colour
+// scheme shows one. The row also holds the colour scheme toggle on a page
+// with no navbar. The row is a flex box, so it sits beside the motif float.
 // Remove when: never.
-.atelier-title-logo {
+.atelier-title-tools {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   width: fit-content;
   margin-block-end: 1rem;
+}
+
+.atelier-title-logo {
   line-height: 0;
 
   img {
