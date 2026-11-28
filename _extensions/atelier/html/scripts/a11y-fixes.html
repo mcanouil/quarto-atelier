@@ -592,20 +592,35 @@
 		});
 
 		// Floating colour scheme toggle: on a page with no navbar and no sidebar
-		// tools, Quarto appends the toggle's container to the end of <body>. It is
-		// drawn at the top right, but focus reaches it last. Move it after the
-		// fixed header that holds the announcement bar, or after the skip link
-		// when there is no header. It stays a direct child of <body>.
+		// tools, Quarto appends the toggle's container to the end of <body> and
+		// draws the toggle with an absolute position at the top right. Focus
+		// reaches it last, the announcement bar covers it, and on a narrow
+		// page it sits on the motif of the title block. When the page has a
+		// title block, move the toggle into the row that html/title-block.html
+		// writes at the start of the title, after the logo, and remove the
+		// empty container.
+		// Otherwise, move the container after the fixed header that holds the
+		// announcement bar, or after the skip link when there is no header. It
+		// stays a direct child of <body>.
 		// The toggle position in theme.scss also depends on this move.
-		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838
-		// Remove when: the minimum Quarto version includes the fix.
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838 (focus order)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294 (announcement bar)
+		// Upstream: https://github.com/quarto-dev/quarto-cli/issues/1918 (toggle position)
+		// Remove when: the minimum Quarto version includes all three fixes.
 		// Not SCSS: focus order follows the DOM order, which CSS cannot change.
-		const floatingToggle = document.querySelector(".top-right.quarto-color-scheme-toggle")?.closest("body > *");
+		const toggleButton = document.querySelector(".top-right.quarto-color-scheme-toggle");
+		const floatingToggle = toggleButton?.closest(".quarto-color-scheme-toggle-container");
+		const titleRow = document.querySelector("#title-block-header .quarto-title > .atelier-title-tools");
 		if (floatingToggle) {
-			const anchor = document.body.querySelector(":scope > #quarto-header")
-				?? document.body.querySelector(":scope > #quarto-skip-link");
-			if (anchor) anchor.after(floatingToggle);
-			else document.body.prepend(floatingToggle);
+			if (titleRow) {
+				titleRow.append(toggleButton);
+				floatingToggle.remove();
+			} else {
+				const anchor = document.body.querySelector(":scope > #quarto-header")
+					?? document.body.querySelector(":scope > #quarto-skip-link");
+				if (anchor) anchor.after(floatingToggle);
+				else document.body.prepend(floatingToggle);
+			}
 		}
 	});
 </script>

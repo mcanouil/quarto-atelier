@@ -1554,6 +1554,18 @@ $atelier-icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/s
   margin-top: 1em;
 }
 
+// The toggle that a11y-fixes.html moves into the title row loses the
+// floating position and colour above.
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/14838 (focus order)
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/15294 (announcement bar)
+// Upstream: https://github.com/quarto-dev/quarto-cli/issues/1918 (toggle position)
+// Remove when: the minimum Quarto version includes all three fixes.
+.atelier-title-tools .top-right.quarto-color-scheme-toggle {
+  position: static;
+  margin-top: 0;
+  color: inherit;
+}
+
 // In the sidebar tools row, Quarto sizes the tool icons from the font size of
 // the row, but the toggle glyph from the root font size, so the toggle is
 // larger than the icons beside it. Size the glyph from the row instead.
@@ -1800,11 +1812,35 @@ h6.anchored:not(:where(.quarto-listing *, .quarto-appendix-heading)) {
 // A standalone document puts its logo above the title, at the left of the
 // title block, clear of the workshop motif in the top right corner.
 // `atelier-html-logo.lua` writes both images, `html/title-block.html`
-// puts them above the title, and the colour scheme shows one.
+// puts them in the row `atelier-title-tools` above the title, and the colour
+// scheme shows one. The row also holds the colour scheme toggle on a page
+// with no navbar. The row is a flex box, so it sits beside the motif float.
+// An empty row takes no space, except on a page that gets the floating
+// toggle: a dark scheme and no toggle in the markup. There the row keeps one
+// line for the toggle from the first paint, so the title does not move down
+// when the script adds the toggle. Without scripts, no toggle comes, so the
+// row keeps no line.
 // Remove when: never.
-.atelier-title-logo {
+.atelier-title-tools {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   width: fit-content;
   margin-block-end: 1rem;
+
+  &:empty {
+    display: none;
+  }
+}
+
+@media (scripting: enabled) {
+  html:has(link.quarto-color-alternate):not(:has(.quarto-color-scheme-toggle)) .atelier-title-tools:empty {
+    display: flex;
+    min-height: 1lh;
+  }
+}
+
+.atelier-title-logo {
   line-height: 0;
 
   img {
