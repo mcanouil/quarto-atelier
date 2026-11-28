@@ -10,7 +10,6 @@
 --- scripts need. It also marks a hero whose image is wide, so the stylesheet
 --- can put the image below the text.
 
---- Load modules
 local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))
 local logo = require(quarto.utils.resolve_path('logo.lua'):gsub('%.lua$', ''))
 local palette = require(quarto.utils.resolve_path('palette.lua'):gsub('%.lua$', ''))
@@ -43,7 +42,6 @@ local LABELS = {
 }
 
 --- Version of the `site_libs` folder of the fonts, not of one package.
---- It changes when the vendored files change.
 --- Sources: static files of `googlefonts/atkinson-hyperlegible-next`,
 --- `googlefonts/atkinson-hyperlegible-next-mono`, and `undercasetype/Fraunces`,
 --- and `@fontsource-variable/jetbrains-mono` 5.3.0 on npm.
@@ -268,10 +266,7 @@ local function is_wide(image)
 end
 
 --- Mark a hero whose figure holds a wide image with `atelier-wide-figure`,
---- and the wide image with `atelier-wide-image`. The stylesheet puts that
---- figure below the text, and the wide image at the full width of the hero,
---- as the text of a wide image such as a social card is only readable at
---- that size. Other images in the figure keep their cap.
+--- and the wide image with `atelier-wide-image`.
 --- @param div table The div
 --- @return table|nil The marked hero, or nil when nothing changes
 local function mark_wide_hero(div)

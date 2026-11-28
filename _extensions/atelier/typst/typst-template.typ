@@ -20,7 +20,6 @@ $toc.typ()$
 
 $workshop.typ()$
 
-// The font of the body text, for the headings below level 6.
 #let atelier-body-font = state("atelier-body-font", ())
 
 // Answer the document: the text, heading, code and link styles, the page
@@ -70,8 +69,6 @@ $workshop.typ()$
   atelier-document-fonts.update(fonts)
   show: atelier-elements
   show heading.where(level: 1): it => atelier-chapter(it, switches)
-  // The frame of each page: the organisation is the first affiliation of the
-  // first author, and the rights join the copyright and the licence.
   let first-author = atelier-people.authors.at(0, default: none)
   let organisation = if first-author != none and first-author.affiliations.len() > 0 {
     first-author.affiliations.first()

@@ -1,9 +1,7 @@
 /*-- scss:defaults --*/
 
-// The sizes of the Atelier deck. The colours are not Sass values: Quarto
-// gives the deck Sass no brand defaults, so it cannot read the preset.
-// `atelier-revealjs.lua` writes the colours as `--atelier-*` custom
-// properties from `palette.lua`, and the rules below read them.
+// The colours are not Sass values: Quarto gives the deck Sass no brand
+// defaults, so it cannot read the preset.
 $presentation-font-size-root: 32px !default;
 $presentation-line-height: 1.4 !default;
 $presentation-heading-font-weight: 700 !default;
@@ -15,10 +13,6 @@ $presentation-title-slide-text-align: left !default;
 $code-block-font-size: 0.6em !default;
 
 /*-- scss:rules --*/
-
-// ===========================================================================
-// PAGE
-// ===========================================================================
 
 :root {
   --atelier-radius: 8px;
@@ -46,7 +40,6 @@ $code-block-font-size: 0.6em !default;
   color: var(--atelier-fg);
 }
 
-// As on the site, h3 to h6 take the faded heading ink.
 .reveal .slides section :is(h3, h4, h5, h6) {
   color: var(--atelier-heading);
 }
@@ -90,10 +83,6 @@ $code-block-font-size: 0.6em !default;
   border-bottom: 2px solid var(--atelier-control-border);
 }
 
-// ===========================================================================
-// CODE
-// ===========================================================================
-
 .reveal .slides :not(pre) > code {
   padding: 0 0.2em;
   border-radius: 4px;
@@ -129,19 +118,16 @@ $code-block-font-size: 0.6em !default;
 }
 
 // The title bar holds a `pre` for its label, which must not take the code
-// surface. The muted ink holds 4.5:1 on the strong surface.
+// surface.
 .reveal .slides .code-with-filename .code-with-filename-file pre {
   border: 0;
   background: transparent;
   color: var(--atelier-muted);
 }
 
-// ===========================================================================
-// FRAME AROUND THE DECK
-// ===========================================================================
-// The progress bar, the controls, the slide number and the footer sit outside
-// the slides. Reveal.js puts the `data-state` of the current slide on the
-// viewport, so a section slide and a dark slide give them their own colours.
+// Reveal.js puts the `data-state` of the current slide on the viewport, so a
+// section slide and a dark slide give the progress bar, the controls, the slide
+// number and the footer their own colours.
 
 .reveal .progress {
   color: var(--atelier-accent-fill);
@@ -249,8 +235,7 @@ html.print-pdf:root {
 
 // Quarto sets `display` inline on the footer, to show the footer of the deck
 // or the footer of a slide. The row inside the footer of the deck holds the
-// layout, so that toggle works. The footer of a slide takes the same row,
-// centred.
+// layout, so that toggle works.
 .reveal.reveal > .footer {
   left: 0;
   right: 0;
@@ -274,18 +259,10 @@ html.print-pdf:root {
   font-family: var(--atelier-font-base, var(--r-main-font));
 }
 
-// The footer spans the row, so only its links take clicks.
 .reveal .footer a {
   pointer-events: auto;
 }
 
-// The side columns of the row are at least as wide as the left buttons, so
-// the centre slot stays at the centre and never runs into them. On a narrow
-// screen, the title slot can have no room left, and it does not show. The
-// centre slot takes at most half of the row, so the end slot keeps room for
-// the copyright and the licence. `revealjs/bottom-row.html` writes
-// `--atelier-end-min`, the width of the slide number and the logo, so the
-// side columns are at least that wide too.
 .reveal .footer .atelier-footer-row {
   display: grid;
   grid-template-columns: minmax(var(--atelier-row-side), 1fr) fit-content(50%) minmax(var(--atelier-row-side), 1fr);
@@ -315,8 +292,6 @@ html.print-pdf:root {
   white-space: nowrap;
 }
 
-// The text of a slot takes hover, so the title of a cut text shows, but the
-// rest of the row lets clicks through.
 .reveal .footer .atelier-slot-text {
   pointer-events: auto;
 }
@@ -325,10 +300,6 @@ html.print-pdf:root {
   visibility: hidden;
 }
 
-// The end slot holds the copyright and the licence, the place of the slide
-// number and the logo. The copyright and the licence give way first: they
-// are cut with an ellipsis, and their span carries the full text as its
-// title.
 .reveal .footer .atelier-slot-end {
   display: flex;
   align-items: center;
@@ -362,8 +333,6 @@ html.print-pdf:root {
   align-items: center;
 }
 
-// The title slide shows the copyright and the licence after the footer, in
-// the centre slot, and the other slides show them in the end slot.
 .reveal .footer .atelier-title-rights {
   display: none;
 }
@@ -400,8 +369,6 @@ html.print-pdf:root {
   display: none;
 }
 
-// A wide logo takes at most a quarter of the window, so the row keeps room
-// for the footer text. The image keeps its shape inside that width.
 .reveal .footer .atelier-slot-logo img {
   width: auto;
   max-width: 25vw;
@@ -474,10 +441,6 @@ html.print-pdf:root {
   visibility: hidden;
 }
 
-// On the title slide, the centre slot shows the footer, then the copyright
-// and the licence, on one line. The side slots are hidden, so the centre slot
-// takes the width that they leave. When the text does not fit, the line wraps
-// to two lines, and the row grows up from its bottom, so no text is cut.
 .atelier-title-state .reveal .footer .atelier-title-rights {
   display: inline;
 }
@@ -506,15 +469,10 @@ html.print-pdf:root {
   color: var(--atelier-navbar-accent);
 }
 
-// ===========================================================================
-// TITLE AND SECTION SLIDES
-// ===========================================================================
-
 .reveal .slides section.atelier-title-slide h1.title {
   margin-bottom: 0.2em;
 }
 
-// The rule under the title is decoration.
 .reveal .slides section.atelier-title-slide h1.title::after,
 .reveal .slides section.atelier-section > h1::after {
   content: "";
@@ -530,9 +488,6 @@ html.print-pdf:root {
   color: var(--atelier-muted);
 }
 
-// The author block is the same in every mode: a round photo, when the author
-// has one, next to the name, the degrees and the ORCID badge, then the
-// attributes, the email and the affiliations under it.
 .reveal .slides section.atelier-title-slide {
   .atelier-meta-group {
     margin-top: 0.7em;
@@ -646,16 +601,6 @@ html.print-pdf:root {
   color: var(--atelier-navbar-accent);
 }
 
-// ===========================================================================
-// CALLOUTS
-// ===========================================================================
-// A callout is a tinted outline with the title set into the top border as an
-// upper-case label, as in `html/content.scss`. The colours come from the
-// callout tokens of `palette.lua`. The icon is a mask in the label ink.
-// The label centres the cap band of its text on the icon and on the border:
-// the text box is trimmed to the cap band, the icon is a flex box, and the
-// label is one line high, so the margins put its middle on the border.
-
 .reveal .slides div.callout.callout {
   --atelier-c3-pad: 22px;
   --atelier-c3-border: 2px;
@@ -740,7 +685,6 @@ html.print-pdf:root {
   border-style: dashed;
 }
 
-// Forced colours draw the frame and the text, and remove the mask.
 @media (forced-colors: active) {
   .reveal .slides .atelier-block-head .bi,
   .reveal .slides div.callout.callout .callout-icon::before {
@@ -752,13 +696,6 @@ html.print-pdf:root {
     display: none;
   }
 }
-
-// ===========================================================================
-// WORKSHOP BLOCKS
-// ===========================================================================
-// Prerequisites, objectives, checkpoints, exercises and answers are blocks
-// with a hairline border and a head line, as in `html/workshop.scss`. A deck has no interaction for the
-// objectives, so each one has a box glyph.
 
 .reveal .slides :is(.atelier-prerequisites, .atelier-objectives, .atelier-checkpoint, .atelier-exercise, .atelier-answer) {
   margin: var(--r-block-margin) 0;
@@ -778,8 +715,7 @@ html.print-pdf:root {
 }
 
 // A deck loads no Bootstrap Icons font, so the icons of the HTML block heads
-// are masks in the colour of the head. `atelier-revealjs.lua` writes the
-// mask of each icon from `icons.lua`.
+// are masks in the colour of the head.
 .reveal .slides .atelier-block-head .bi {
   flex: none;
   width: 1em;
@@ -854,19 +790,11 @@ html.print-pdf:root {
   color: var(--atelier-accent-ink);
 }
 
-// ===========================================================================
-// MOTIF
-// ===========================================================================
-// The title slide and the section slides have the motif of the preset in
-// the top right corner of the window. Reveal.js scales the slide to fit the
-// window, centres it, and centres the content of a slide, so a corner of the
-// slide is not a corner of the window. Reveal.js copies the classes of a
-// slide to its background, which covers the window, moves with the slide, and
-// fills each page of the PDF export, so the motif sits on the background of
-// each slide with the class `atelier-motif`, at the size of the slide, from
-// `motifs.RATIO`. `atelier-revealjs.lua` adds the class and writes the mask,
-// its colour and its size. The motif only decorates: a pseudo-element with
-// no text, which forced colours remove.
+// Reveal.js scales the slide to fit the window, centres it, and centres the
+// content of a slide, so a corner of the slide is not a corner of the window.
+// Reveal.js copies the classes of a slide to its background, which covers the
+// window, moves with the slide, and fills each page of the PDF export, so the
+// motif sits on the background of each slide with the class `atelier-motif`.
 
 .reveal .slide-background.atelier-motif::after {
   content: "";
@@ -889,13 +817,8 @@ html.print-pdf:root {
   }
 }
 
-// The slide keeps its text clear of the motif with an empty float of the
-// same size, whose `shape-outside` is the motif mask, so the lines wrap
-// around the shapes. `revealjs/motif-guard.html` moves the float to the top
-// right corner of the window, where the background paints the motif, and
-// cuts its bottom margin at the end of the content. The slide clips the part
-// of the float below its content, so Reveal.js centres the content, not the
-// float.
+// The slide clips the part of the empty motif float below its content, so Reveal.js
+// centres the content, not the float.
 
 .reveal .slides section.atelier-motif::before {
   content: "";
@@ -908,13 +831,6 @@ html.print-pdf:root {
   shape-outside: var(--atelier-motif);
   shape-margin: 16px;
 }
-
-// ===========================================================================
-// CLOSING
-// ===========================================================================
-// The last slide of a workshop deck: a thank-you, your text, the links, the
-// copyright, the licence and the CRediT table of the authors. A deck with no
-// closing shows the CRediT table on a slide of its own.
 
 .reveal .slides section.atelier-closing .atelier-closing-links ul {
   margin-left: 0;
@@ -950,12 +866,6 @@ html.print-pdf:root {
   margin: 0;
 }
 
-// ===========================================================================
-// TERMINAL
-// ===========================================================================
-// A `.terminal` code block is dark in both schemes, in its code window. The
-// highlighting rules of `atelier-revealjs.lua` colour its tokens.
-
 .reveal .slides .code-with-filename:has(pre.atelier-terminal) {
   --code-window-bg: var(--atelier-terminal-bg);
   --code-window-title-bg: var(--atelier-terminal-bg);
@@ -972,9 +882,8 @@ html.print-pdf:root {
   color: var(--atelier-terminal-muted);
 }
 
-// Three grey dots before the label, as in the other formats. The dots are
-// background paint on an empty box, so they have no text for assistive
-// technology.
+// The dots are background paint on an empty box, so they have no text for
+// assistive technology.
 .reveal .slides .code-with-filename:has(pre.atelier-terminal) .code-with-filename-file {
   display: flex;
   align-items: center;

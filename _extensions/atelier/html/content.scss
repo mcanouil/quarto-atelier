@@ -1,8 +1,5 @@
 /*-- scss:mixins --*/
 
-// The C3 frame: a tinted outline that a label can sit on. The abstract takes
-// the same frame as a callout. The padding and the border width are custom
-// properties, so the label margins below read the same numbers.
 @mixin atelier-c3-frame($border) {
   --atelier-c3-pad: 1.15rem;
   --atelier-c3-border: 1.5px;
@@ -14,9 +11,6 @@
   margin-top: 1.5rem;
 }
 
-// The label stays in the flow, so a title that wraps pushes the body down. The
-// negative top margin puts the centre of the label's first line, $half high, on
-// the middle of the border, and the bottom margin gives back the frame padding.
 @mixin atelier-c3-label($half) {
   $_edge: calc(var(--atelier-c3-pad) + var(--atelier-c3-border) / 2);
   margin: calc(-1 * (#{$_edge} + #{$half})) 0 calc(#{$_edge} - #{$half}) -0.2rem;
@@ -24,9 +18,6 @@
 
 /*-- scss:rules --*/
 
-// ===========================================================================
-// NARROW SCREENS
-// ===========================================================================
 // A long URL, email, word or name has no break point, so on a phone it makes
 // the page wider than the screen. `break-word` breaks such a string only when
 // it cannot fit on its line, so the words of normal prose never split.
@@ -49,9 +40,6 @@ html div.callout > .callout-header .callout-title-container,
   }
 }
 
-// Media with a `width` attribute keeps that width on a narrow screen. Images,
-// videos and drawings with a `viewBox` keep their aspect ratio; an embed keeps
-// the height it was given.
 main :is(img, svg, video, canvas, iframe, embed, object) {
   max-width: 100%;
 }
@@ -60,9 +48,6 @@ main :is(img, video, svg[viewBox]) {
   height: auto;
 }
 
-// Display maths and wide tables cannot wrap, so they scroll in their own box,
-// and the page keeps the width of the screen. A script puts each table that
-// is not in a box that scrolls into a box that does (`atelier-table-scroll`).
 mjx-container[display="true"],
 .katex-display,
 .atelier-table-scroll {
@@ -74,13 +59,6 @@ mjx-container[display="true"],
 $_atelier-number-shift: 4em;
 $_atelier-pre-margin: 3em;
 
-// ===========================================================================
-// CALLOUTS
-// ===========================================================================
-// A callout is a tinted outline with the title set into the top border as an
-// upper-case label. The border and the ink come from the callout colour, mixed
-// with the page background and foreground of this bundle, so each scheme gets
-// its own pair. The ink is held to AA on the page background.
 $_atelier-callout-hues: (
   "note": $callout-color-note,
   "tip": $callout-color-tip,
@@ -149,17 +127,14 @@ html div.callout.callout .callout-toggle::before {
   margin-top: 0;
 }
 
-// The label sits on the page background, so the border breaks behind it. It
-// has no tint band and no fade: Quarto fades a title with opacity, which also
-// fades the inline code in it below AA.
+// Quarto fades a title with opacity, which also fades the inline code in it
+// below AA.
 html div.callout.callout > .callout-header {
   position: relative;
   width: fit-content;
   max-width: calc(100% + 0.4rem);
   align-items: center;
   gap: 0.4rem;
-  // The trimmed label is shorter than the icon, so the icon (1em) sets the
-  // height of the first line.
   @include atelier-c3-label(0.5em);
   padding: 0 0.45rem;
   border: 0;
@@ -174,8 +149,6 @@ html div.callout.callout > .callout-header {
   text-transform: uppercase;
 }
 
-// A collapsible label is 24px high for its target, with the line centred in
-// it, so its margins use half of that height.
 html div.callout.callout > .callout-header:has(> .callout-btn-toggle) {
   min-height: 24px;
   @include atelier-c3-label(12px);
@@ -196,8 +169,8 @@ html div.callout.callout > .callout-header .callout-title-container {
   text-box: trim-both cap alphabetic;
 }
 
-// The label margins assume a label one line high. Quarto pads the caution icon
-// lower than the others, and the icon box adds a baseline gap, so both go.
+// Quarto pads the caution icon lower than the others, and the icon box adds a
+// baseline gap, so both go.
 html div.callout.callout:not(.no-icon) > .callout-header div.callout-icon-container {
   display: flex;
   align-items: center;
@@ -218,13 +191,10 @@ html div.callout.callout-style-simple.callout .callout-body {
   padding-left: 0;
 }
 
-// A minimal callout drops the icon and keeps a dashed frame.
 html div.callout.callout-style-simple.no-icon {
   border-style: dashed;
 }
 
-// The link colour can fall below AA on the page background. A link in the
-// title takes the title ink, and its underline marks it as a link.
 html .callout > .callout-header a {
   color: inherit;
   text-decoration: underline;
@@ -257,11 +227,8 @@ html .callout > .callout-header > .callout-btn-toggle[aria-expanded] {
   }
 }
 
-// ===========================================================================
-// TITLE BLOCK
-// ===========================================================================
-// The rules restyle Quarto's own markup. Quarto keys its rules on the id of the
-// header, so each selector repeats it to win.
+// Quarto keys its rules on the id of the header, so each selector repeats it to
+// win.
 $_atelier-title-block: "#title-block-header.quarto-title-block.default";
 
 #{$_atelier-title-block} {
@@ -301,8 +268,6 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     margin: 0;
   }
 
-  // One item for each author, with its details and affiliations under the
-  // name. The items sit side by side while they fit.
   // Quarto lays the label and the contents of this group in two columns, which
   // leaves the left half empty under the label.
   .quarto-title-meta-author {
@@ -366,8 +331,6 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     width: 24px;
     height: 24px;
     border-radius: var(--bs-border-radius-sm);
-    // The flex row centres the badge on the line box, which sits a little
-    // below the middle of the capitals of the name.
     translate: 0 -0.04em;
 
     &:hover {
@@ -388,7 +351,6 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     }
   }
 
-  // The dates and the DOI in one strip between two hairlines.
   .quarto-title-meta {
     display: flex;
     flex-wrap: wrap;
@@ -408,7 +370,6 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
       display: none;
     }
 
-    // On a narrow screen the items stack, so a divider would only end a line.
     > div {
       @media (min-width: 640px) {
         padding-right: 1.4rem;
@@ -432,7 +393,6 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
     @include atelier-c3-frame(var(--atelier-border));
     margin-bottom: 0;
 
-    // The label stays in the flow, as the callout label does.
     .block-title {
       position: relative;
       width: fit-content;
@@ -491,11 +451,6 @@ $_atelier-title-block: "#title-block-header.quarto-title-block.default";
   }
 }
 
-// ===========================================================================
-// CODE BLOCKS
-// ===========================================================================
-// The Code Window header holds the file name, with the language pushed to the
-// right by the code-blocks script, and the copy button sits in the same row.
 $atelier-code-header-font-size: 0.78rem;
 $atelier-copy-button-size: 24px;
 $atelier-copy-button-inset: 5px;
@@ -514,10 +469,7 @@ html .code-with-filename .code-with-filename-file {
 }
 
 // Code Window gives the file name no width of its own and breaks it at any
-// character, which splits a short name such as `_brand.yml` on a narrow
-// screen. The name takes its full width, the language and the lines chip move
-// to a second row when there is no space, and a name that is wider than the
-// row breaks at a word boundary first.
+// character, which splits a short name such as `_brand.yml` on a narrow screen.
 html .code-with-filename .code-with-filename-file pre {
   flex: 1 1 auto;
   min-width: 0;
@@ -541,11 +493,11 @@ html .code-with-filename .atelier-code-language {
   text-transform: uppercase;
 }
 
-// The copy button is always visible, whatever the pointer does. For annotated
-// code, Quarto sets the size and the top inset of its own frameless button,
-// with a selector that outranks the first one here; the second selector keeps
-// the framed button the same on every block. Quarto sits the icon on the text
-// baseline, which leaves it high in the frame, so the button centres it.
+// For annotated code, Quarto sets the size and the top inset of its own
+// frameless button, with a selector that outranks the first one here; the
+// second selector keeps the framed button the same on every block. Quarto sits
+// the icon on the text baseline, which leaves it high in the frame, so the
+// button centres it.
 html .code-copy-button,
 html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
   display: inline-flex;
@@ -560,14 +512,10 @@ html .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
   border-radius: 5px;
 }
 
-// Quarto's right margin on annotated code, which keeps the button clear of the
-// annotation markers, stays. A Code Window puts the button in its header.
 html :not(.code-with-filename) > .code-copy-outer-scaffold:has(pre.code-annotated) > .code-copy-button {
   margin-top: $atelier-copy-button-inset;
 }
 
-// Annotated code has no vertical padding, so a block of one line is shorter
-// than the button. The block keeps the same inset below the button as above.
 html :not(.code-with-filename) > .code-copy-outer-scaffold:has(pre.code-annotated) > div.sourceCode {
   min-height: $atelier-copy-button-size + 2 * $atelier-copy-button-inset;
 }
@@ -578,10 +526,7 @@ html .code-with-filename .code-copy-outer-scaffold {
 }
 
 // Quarto's copy handler reads the code from the parent of the button, so the
-// button stays in the scaffold and is drawn over the header above it. The
-// header grows when its items wrap; the code-blocks script keeps its height in
-// --atelier-code-header-height, and the button is centred above its 1px bottom
-// border. The right inset matches the 1em left padding of the header.
+// button stays in the scaffold and is drawn over the header above it.
 html .code-with-filename .code-copy-outer-scaffold > .code-copy-button {
   position: absolute;
   top: calc(-1px - var(--atelier-code-header-height, 2.25rem) / 2);
@@ -592,18 +537,15 @@ html .code-with-filename .code-copy-outer-scaffold > .code-copy-button {
   transform: translateY(-50%);
 }
 
-// Line numbers are muted and are not copied with the code.
 html pre.numberSource code > span > a:first-child::before {
   color: var(--atelier-muted);
   user-select: none;
 }
 
-// A highlighted line fills the width of the block, past the padding of the
-// pre, on a tinted band with an accent marker. Quarto sets inline-block on the
-// lines of numbered code, so the selector names the code. A block span would
-// add an empty line after the band, because the newline between lines stays.
-// Quarto pads the code by 0.25em, which the first rule removes so the band can
-// reach the frame.
+// Quarto sets inline-block on the lines of numbered code, so the selector names
+// the code. A block span would add an empty line after the band, because the
+// newline between lines stays. Quarto pads the code by 0.25em, which the first
+// rule removes so the band can reach the frame.
 html pre.sourceCode > code {
   padding-inline: 0;
 }
@@ -617,9 +559,6 @@ html pre.sourceCode code > span.atelier-line-highlight {
   box-shadow: inset 3px 0 0 var(--atelier-code-accent-mark);
 }
 
-// The frame clips what hangs out, so the marker is drawn from the frame edge,
-// left of the pre by its margin or at the pre in a code window, and the text
-// stays where it is.
 html pre.numberSource code > span.atelier-line-highlight {
   width: calc(100% + #{$_atelier-number-shift} + #{$code-block-bg-padding});
   margin-inline: 0 calc(-#{$_atelier-number-shift} - #{$code-block-bg-padding});
@@ -703,14 +642,8 @@ html #code-annotation-line-highlight {
   background-color: var(--atelier-surface);
 }
 
-// ===========================================================================
-// BANNER
-// ===========================================================================
-// Quarto paints the banner and its text from $title-banner-bg and
-// $title-banner-color, which default to the chrome surface here. A page that
-// sets its own colours writes them into the page, so the rules below never set
-// a banner colour. The crumbs take the banner text at full strength, since
-// fading them is what leaves a custom colour under 4.5:1.
+// A page that sets its own colours writes them into the page, so the rules
+// below never set a banner colour.
 .quarto-title-banner {
   border-bottom: 1px solid var(--atelier-navbar-border);
 
@@ -754,9 +687,6 @@ html #code-annotation-line-highlight {
   }
 }
 
-// The title block rules above use the id of the header, so these selectors
-// repeat it. The subtitle takes the banner text, which the page may colour,
-// and a chip on the banner takes the border of the bar.
 #{$_atelier-title-block} .quarto-title-banner .subtitle {
   color: currentcolor;
 }
@@ -781,9 +711,6 @@ body.nav-sidebar {
   }
 }
 
-// ===========================================================================
-// FIGURES, KEYS AND MARGIN CONTENT
-// ===========================================================================
 figcaption,
 .figure-caption,
 .column-margin figcaption {
@@ -813,16 +740,11 @@ kbd.kbd {
   font-size: 0.8rem;
 }
 
-// A note gets the rule; a figure or table in the margin does not.
 .column-margin:not(:has(figure, .quarto-float)) {
   padding-left: 0.7rem;
   border-left: 2px solid var(--atelier-border);
 }
 
-// ===========================================================================
-// LISTINGS
-// ===========================================================================
-// The item is a row with a hairline divider below it and a 132 px thumbnail.
 div.quarto-post {
   gap: 1rem;
   margin-bottom: 0;
@@ -840,7 +762,6 @@ div.quarto-post {
     font-weight: 700;
     color: var(--atelier-fg);
 
-    // The bundle gives every link its own weight, so the link would not follow the heading.
     a {
       color: var(--atelier-fg);
       font-weight: inherit;
@@ -874,7 +795,6 @@ div.quarto-post {
   }
 }
 
-// The category chips are pills. Each is a button, so it keeps a 24 px target.
 // Quarto sets the pills of a grid card with a selector as strong as this one,
 // so the rule names both listings to take the same pills in each.
 :is(div.quarto-post, .quarto-grid-item) .listing-categories {
@@ -894,8 +814,6 @@ div.quarto-post {
   }
 }
 
-// The category list takes the upper-case label of the sidebar sections, and
-// the active category takes the current-item style of the sidebar menu.
 #quarto-margin-sidebar .quarto-listing-category-title {
   margin: 0 0 0.5rem;
   padding: 0;
@@ -924,8 +842,6 @@ div.quarto-post {
     color: var(--atelier-fg);
   }
 
-  // Quarto writes the class and the script adds `aria-pressed`, so the rule
-  // keys on both and holds without JavaScript.
   &:is(.active, [aria-pressed="true"]) {
     background: var(--atelier-accent-soft);
     color: var(--atelier-accent-ink);
@@ -939,8 +855,6 @@ div.quarto-post {
   }
 }
 
-// The filter and sort controls sit on one row that wraps. Each field is 32 px
-// high, on the page, with the control border.
 .listing-actions-group {
   flex-wrap: wrap;
   align-items: center;
@@ -979,9 +893,6 @@ div.quarto-post {
   }
 }
 
-// The script puts each label and its input group in one wrapper, which takes
-// the place of the group in the row: the sort field on the left, the filter
-// field pushed to the right.
 .listing-actions-group .atelier-listing-field {
   display: flex;
   align-items: center;
@@ -1003,8 +914,6 @@ div.quarto-post {
   white-space: nowrap;
 }
 
-// Pagination boxes are 32 px, and the current page is set in a heavier
-// weight. The colours come from the `$pagination-*` defaults in `chrome.scss`.
 .quarto-listing ul.pagination {
   gap: 0.3rem;
 
@@ -1028,9 +937,6 @@ div.quarto-post {
   }
 }
 
-// A grid card is a bordered box on the page, with an ink border. An offset
-// shadow in the accent mark colour shows on hover and on keyboard focus of the
-// card link, so the card reads as one target. The shift needs the motion guard.
 .quarto-grid-item.card {
   overflow: hidden;
   border: 1.5px solid $body-color;
@@ -1080,14 +986,6 @@ div.quarto-post {
   }
 }
 
-// ===========================================================================
-// TABLES
-// ===========================================================================
-// One style for the table listing and the tables in the page text: a small
-// upper-case header over a 2 px rule, hairline rows, and a tinted hover row.
-// Tables of a component (code annotations, listings other than the table
-// listing) keep their own rules. The colours come from the `$table-*` defaults
-// in `chrome.scss`.
 main table.table,
 table.quarto-listing-table {
   width: 100%;
@@ -1127,14 +1025,10 @@ table.quarto-listing-table {
     color: var(--atelier-fg);
   }
 
-  // A row with a Bootstrap variant class keeps its own fill on hover, so that
-  // its own ink stays readable.
   > tbody > tr:not([class*="table-"]):hover > * {
     background-color: var(--atelier-surface);
   }
 
-  // The link colour is held 4.5:1 on the page only. The hover row is darker,
-  // so its links take the page ink, and the underline still marks them.
   > tbody > tr:hover a {
     color: var(--atelier-fg);
   }
@@ -1219,8 +1113,6 @@ figure.quarto-float-tbl > figcaption {
   text-align: left;
 }
 
-// The sort header is a link with a button role, so it takes the pointer of a
-// button and keeps a 24 px target.
 table.quarto-listing-table th a.sort {
   display: inline-flex;
   align-items: center;
@@ -1254,12 +1146,6 @@ html table.quarto-listing-table a {
   text-decoration: underline;
 }
 
-// ===========================================================================
-// APPENDIX
-// ===========================================================================
-// The groups of the appendix (references, footnotes, reuse, citation) each get
-// an upper-case muted label over a body in the page foreground, below a
-// hairline.
 #quarto-appendix.default {
   padding-top: 1rem;
   font-size: 0.88rem;
@@ -1300,8 +1186,6 @@ html table.quarto-listing-table a {
 
   // Quarto writes the BibTeX entry as a `pre.sourceCode` with no
   // `div.sourceCode` around it, so the code block frame does not reach it.
-  // It takes the same frame here, with the language above the code as in a
-  // code window.
   pre.quarto-appendix-bibtex {
     position: relative;
     margin-bottom: 1rem;

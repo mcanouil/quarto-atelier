@@ -6,14 +6,8 @@
 <script id="atelier-course-stepper" type="text/javascript">
 	(function () {
 		// The sidebar menu shows each module with a number, its duration, and a
-		// tick when all its pages are visited. A summary above the menu shows
-		// the module position and the total time. Quarto's markup stays: the
-		// script adds classes and elements only. All modules other than the
-		// current module are collapsed, and Quarto's toggle opens them again.
-		//
-		// This script is in the head. It runs on the "sidebar" stage of
-		// page-load.html, after course-model.html built the course, so the
-		// stepper is in the first paint.
+		// tick when all its pages are visited. All modules other than the current
+		// module are collapsed, and Quarto's toggle opens them again.
 		var element = window.atelierStages.element;
 
 		window.atelierStages.on("sidebar", function () {

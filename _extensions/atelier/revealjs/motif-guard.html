@@ -9,10 +9,8 @@
 	// Reveal.js scales the slide and centres it, so this script moves the float
 	// to that corner: `--atelier-slide-top` and `--atelier-slide-right` are the
 	// distances from the corner to the content box of the slide, in slide
-	// pixels. `--atelier-motif-cut` ends the float at the bottom of the
-	// content, so the height of the float does not change the centring. The
-	// script then centres the slide again, as Reveal.js does, because the
-	// content can wrap to more lines around the float.
+	// pixels. The script then centres the slide again, as Reveal.js does,
+	// because the content can wrap to more lines around the float.
 	(() => {
 		const SELECTOR = "section.atelier-motif";
 		const ROUNDS = 3;

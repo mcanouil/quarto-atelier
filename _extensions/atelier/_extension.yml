@@ -97,8 +97,6 @@ contributes:
         - bundled/portable-links.lua
     html:
       respect-user-color-scheme: true
-      # The title block writes the authors of `workshop/core.lua`, with their
-      # photos and details, and the keywords as chips, with no script.
       # Quarto accepts a user partial only when its name is in the list of the
       # page, and a page with `title-block-style: none` has no
       # `title-metadata.html`, so the render fails. `html/toc.html` is a copy

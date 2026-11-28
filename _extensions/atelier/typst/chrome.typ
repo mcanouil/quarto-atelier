@@ -100,8 +100,6 @@
   }
   set page(
     fill: atelier-colour("bg"),
-    // The motif sits in the top right corner of the first page, with the
-    // title block or the cover, and of a chapter divider, which is larger.
     background: context {
       let motif = atelier-motif-data
       let ratio = if kind() == "divider" { motif.ratio.large } else if here().page() == 1 { motif.ratio.title }

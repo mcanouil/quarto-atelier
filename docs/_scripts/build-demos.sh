@@ -9,14 +9,7 @@
 #
 # Usage: build-demos.sh <output-dir> [<demo-id>...]
 #
-# Each demo id has a folder in docs/_demos/. Its `source` file names the
-# template (`workshop` or `documentation`) that the demo renders, and every
-# other file is copied over the template: an optional `_quarto-layout.yml`
-# profile with the keys that are unique to the demo and, for the presets, a
-# `_brand-demo.yml`. The keys that every demo shares are written into a
-# generated `_quarto-demo.yml` profile, and the site renders with both
-# profiles. A demo is rendered in a temporary copy of the template, so the
-# templates stay untouched.
+# Each demo id has a folder in docs/_demos/.
 #
 # With no ids, the script builds the ids in ATELIER_DEMO_IDS when that variable
 # is set, and otherwise the ids in DEFAULT_IDS: workshop-sidebar,
@@ -26,10 +19,8 @@
 # With ids, it replaces only the folders of those ids.
 # A relative <output-dir> is resolved against docs/.
 #
-# Each demo shows the Atelier version in its version pill, in place of the
-# placeholder version of the template, and the gitlink repository widget. The
-# version is read from the manifest of the extension; set ATELIER_MANIFEST to
-# read another manifest, as the tests do.
+# The version is read from the manifest of the extension; set ATELIER_MANIFEST
+# to read another manifest, as the tests do.
 #
 
 set -euo pipefail
@@ -58,7 +49,6 @@ else
 	rm -rf "${output_dir}/demos"
 fi
 
-# The same pattern as the version read in pre-render.sh.
 atelier_version=""
 if [[ -f "${MANIFEST}" ]]; then
 	atelier_version="$(sed -n \
@@ -70,7 +60,6 @@ if [[ -z "${atelier_version}" ]]; then
 	exit 1
 fi
 
-# The gitlink widget item, as a YAML list item. Each bar indents it.
 WIDGET_ITEM='- href: "#gitlink-widget"
   text: "GitHub"
   icon: github'
@@ -117,8 +106,7 @@ build_demo() {
 	done
 
 	# The widget shows only where a navbar item or a sidebar tool links to
-	# #gitlink-widget, so the item goes in the bar that the demo has. The layout
-	# profile decides before the template.
+	# #gitlink-widget, so the item goes in the bar that the demo has.
 	local navbar=true navbar_source="${site}/_quarto.yml" widget
 	if [[ -f "${site}/_quarto-layout.yml" ]] &&
 		grep -q '^[[:space:]]*navbar:' "${site}/_quarto-layout.yml"; then

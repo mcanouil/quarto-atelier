@@ -1,7 +1,5 @@
 /*-- scss:rules --*/
 
-// The terminal preset is dark in both bundles. The pin script in
-// `html/scripts/chrome.html` reads this property.
 @if $atelier-preset == terminal {
   :root {
     --atelier-scheme-pin: dark;
@@ -12,19 +10,14 @@
     display: none !important;
   }
 
-  // A title row that holds only the hidden toggle would leave its margin
-  // above the title. !important is needed: the rule in theme.scss that keeps
-  // the line for the floating toggle is more specific.
   .atelier-title-tools:not(:has(> :not(.quarto-color-scheme-toggle))) {
     display: none !important;
   }
 }
 
-// The terminal decoration: prompts, a cursor, dashed rules, and bracketed
-// markers. It applies to the terminal preset only, and a brand turns it off
-// with `atelier-terminal-decoration: false`. Each `content` has an empty
-// alternative text, so a screen reader skips the decoration. A browser without
-// alternative text reads the first declaration of each pair.
+// Each `content` has an empty alternative text, so a screen reader skips the
+// decoration. A browser without alternative text reads the first declaration
+// of each pair.
 @if $atelier-preset == terminal and $atelier-terminal-decoration {
   // The cursor blinks four times, 1.1 s each, and then stays steady. This is
   // slower than three flashes a second and stops within five seconds.
@@ -103,8 +96,6 @@
     border-left-width: 1ch;
   }
 
-  // Every code frame takes the control border. A `.terminal` block keeps the
-  // page border.
   :root {
     --atelier-code-border: var(--atelier-control-border);
   }

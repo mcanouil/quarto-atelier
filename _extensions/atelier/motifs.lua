@@ -83,15 +83,11 @@ GEOMETRY = {
       return { kind = 'rect', x = 88 - 13 * i, y = 13 * j, size = 12, opacity = opacity }
     end)
   end,
-  -- The quarter discs take only the geometry of the Quarto icon. Every disc
-  -- turns the same way, so the four-disc icon never forms.
   quadrants = function()
     return grid(function(i, j, opacity)
       return { kind = 'quarter', x = round(88 - 13.6 * i), y = round(13.6 * j + 12), r = 12, opacity = opacity }
     end)
   end,
-  -- The space from the outer dots to the top and right edges is the space
-  -- between two dots, so each format puts the motif in its corner as is.
   dots = function()
     local pitch, r = 7, 1.3
     local gap = pitch - 2 * r

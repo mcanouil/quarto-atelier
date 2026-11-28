@@ -61,8 +61,6 @@ TYPST_PPI = 110
 # The first page has no header, but the motif can be in its top margin.
 TYPST_FURNITURE = round(20 / 25.4 * TYPST_PPI)
 CROP_SUFFIX = "+trim"
-# The deck of a sample with more than one format has `output-file:
-# <stem>-slides.html`, because its HTML page takes `<stem>.html`.
 DECK_SUFFIX = "-slides"
 FONT_WARNING = "unknown font family"
 DECK_READY = "() => window.Reveal !== undefined && window.Reveal.isReady()"
@@ -198,10 +196,7 @@ class _Server(http.server.ThreadingHTTPServer):
 
 
 class _Handler(http.server.SimpleHTTPRequestHandler):
-    """Static handler that maps the deployed sub-path to the build folder."""
-
     def translate_path(self, path: str) -> str:
-        """Strip the site prefix before resolving the file."""
         if path.startswith(PREFIX + "/"):
             path = path[len(PREFIX) :]
         return super().translate_path(path)

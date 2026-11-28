@@ -13,10 +13,8 @@
 --- fills those gaps and nothing else. The canonical link is Quarto's own
 --- `canonical-url`, which the format turns on.
 
---- Extension name constant
 local EXTENSION_NAME = 'atelier'
 
---- Load modules
 local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string.lua'):gsub('%.lua$', ''))
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local meta_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/metadata.lua'):gsub('%.lua$', ''))

@@ -8,20 +8,6 @@
 	// written each part, before the browser paints the page. A mutation observer
 	// callback runs before the next paint, so each change is in the first paint.
 	// A change that comes later moves the content.
-	// The changes run in four stages, in this order:
-	// - "header" when #quarto-content exists, so the header is complete.
-	// - "sidebar" when #quarto-margin-sidebar or #quarto-document-content
-	//   exists, so the sidebar is complete.
-	// - "toc" when #quarto-document-content exists, so the table of contents
-	//   is complete.
-	// - "title" when the title block has a next element, or the main content
-	//   has more than one child, so the title block is complete.
-	// Other scripts in the head add their changes to a stage with
-	// window.atelierStages.on(name, fn). A stage that the parser does not
-	// reach runs on DOMContentLoaded. A function added after its stage ran
-	// runs at once. window.atelierStages also gives the options and the small
-	// builders that the Atelier scripts share: element, afterTitle and
-	// versionPill.
 	(function () {
 		function pageOf(path) {
 			return path.replace(/index\.html$/, "");
@@ -86,7 +72,6 @@
 				menuItem.setAttribute("aria-current", "page");
 				return;
 			}
-			// The sidebar comes after the navbar, so the section tab waits for it.
 			markTab(links, null);
 			window.atelierStages.on("sidebar", function () {
 				markSectionTab(links);
@@ -126,8 +111,6 @@
 			return node;
 		}
 
-		// A row of the table of contents goes after its title, or first when the
-		// table of contents has no title.
 		function afterTitle(toc, node) {
 			var title = toc.querySelector("#toc-title");
 			if (title) {
@@ -141,16 +124,8 @@
 			return element("span", "atelier-version", version);
 		}
 
-		// The version pill follows the brand in the navbar. A navbar with a logo
-		// has two brand links in one container, so the pill goes once after the
-		// last child of the container. sidebar-header.html adds the pill of the
-		// sidebar, because the parser has not written the sidebar when this
-		// script runs. A page without a navbar shows the pill also at the end of
-		// the phone bar, because the sidebar drawer that holds the other pill is
-		// closed on narrow screens. A page with a navbar keeps the navbar pill
-		// there, so the phone bar gets no second pill. In the phone bar the pill
-		// does not follow the site title, so a hidden label names it for screen
-		// readers.
+		// A navbar with a logo has two brand links in one container, so the pill
+		// goes once after the last child of the container.
 		function addVersionPill(version, labels) {
 			if (!version) return;
 			var brand = document.querySelector(".navbar-brand-container > :last-child");
@@ -167,16 +142,12 @@
 			}
 		}
 
-		// Next to the pill, the crumbs or the page title of the phone bar can end
-		// with an ellipsis, so each one carries its full text in a tooltip.
 		function titleBarText(bar) {
 			bar.querySelectorAll(".breadcrumb-item, .quarto-secondary-nav-title").forEach(function (item) {
 				item.title = item.textContent.replace(/\s+/g, " ").trim();
 			});
 		}
 
-		// The label of the announcement names its type. The theme colours map
-		// to the notice label.
 		function labelAnnouncement(bar, labels) {
 			var typeClass = Array.prototype.find.call(bar.classList, function (name) {
 				return name.indexOf("alert-") === 0;
@@ -221,10 +192,6 @@
 			if (header) document.body.style.paddingTop = header.clientHeight + "px";
 		}
 
-		// On a workshop page with a navbar, reading-bar.html puts the module row
-		// right after the navbar. The frame of the row goes there first, so the
-		// header has its final height and order before the first paint, and the
-		// script swaps the frame for the row.
 		function addModuleRowFrame() {
 			var root = document.documentElement.classList;
 			var navbar = document.querySelector("#quarto-header > nav.navbar");
@@ -234,9 +201,6 @@
 			navbar.after(frame);
 		}
 
-		// The options block comes after the head scripts, so it is read on the
-		// first call after the parser has written it. Each later call gives the
-		// same object. The other Atelier scripts read the options from here.
 		var parsedOptions = null;
 		function readOptions() {
 			if (parsedOptions) return parsedOptions;
@@ -261,7 +225,6 @@
 			settleHeader(bar);
 		}
 
-		// An element that a ready check finds stays the same, so it is kept.
 		var found = {};
 		function byId(id) {
 			if (!found[id]) found[id] = document.getElementById(id);
@@ -286,10 +249,8 @@
 			},
 		};
 		var tasks = { header: [settlePage], sidebar: [], toc: [], title: [] };
-		// The stages before this index have run.
 		var next = 0;
 
-		// A failed task warns and does not stop the other tasks of the page.
 		function runTask(name, fn) {
 			try {
 				fn();
@@ -298,7 +259,6 @@
 			}
 		}
 
-		// A stage runs only after the stages before it.
 		function advance(force) {
 			while (next < order.length) {
 				var name = order[next];

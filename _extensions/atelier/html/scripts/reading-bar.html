@@ -6,13 +6,7 @@
 <script id="atelier-reading-bar" type="text/javascript">
 	(function () {
 		// Without a navbar, a bar sits at the top of the content, beside the
-		// sidebar. In documentation mode it shows the section, the page, the page
-		// position, and the previous and next links. In workshop mode it shows the
-		// module, the module position, and a session timer when the page has a
-		// duration. With a navbar, only workshop mode has the bar: it is the module
-		// row under the navbar, inside the header, so it stays with the navbar.
-		// page-load.html puts a frame of the module row under the navbar. The
-		// row takes its place, and a page that gets no row loses the frame.
+		// sidebar.
 		var frame = document.querySelector("#quarto-header > .atelier-bar-frame");
 		function noBar() {
 			if (frame) frame.remove();
@@ -29,7 +23,6 @@
 		var module = course.modules[course.currentModule];
 
 		var element = window.atelierStages.element;
-		// An empty label sets no attribute, so a control never gets an empty name.
 		function setLabel(node, name, text) {
 			if (text) node.setAttribute(name, text);
 		}
@@ -45,9 +38,6 @@
 
 		var row = element("div", "atelier-bar-row");
 		var crumb = element("p", "atelier-bar-crumb");
-		// In documentation mode a top-level page has no section, so the crumb
-		// shows the page title only. A module with the same title as the page,
-		// such as a module of one page, also shows the page title only.
 		var active = document.querySelector("#quarto-sidebar .sidebar-link.active");
 		var inSection = Boolean(active && active.closest(".sidebar-item-section"));
 		if (module && module.title && module.title !== page.title && (workshop || inSection)) {
@@ -60,7 +50,6 @@
 		if (workshop && course.duration !== null) {
 			actions.appendChild(timer(course.duration * 60));
 		}
-		// Quarto's bottom page navigation holds the link relative to this page.
 		function navLink(kind, target, iconName) {
 			if (!target) return;
 			var link = element("a", "atelier-bar-" + kind);
@@ -105,8 +94,6 @@
 			else navbar.after(bar);
 		} else {
 			content.insertBefore(bar, content.firstChild);
-			// The table of contents and the scroll padding sit below the bar. The
-			// bar grows when the crumb wraps, so its height is kept current.
 			var measure = function () {
 				document.documentElement.style.setProperty("--atelier-bar-height", bar.getBoundingClientRect().height + "px");
 			};

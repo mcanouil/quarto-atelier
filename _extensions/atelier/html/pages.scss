@@ -1,9 +1,6 @@
 /*-- scss:rules --*/
 
-// Quarto lightens the about link colour by 20% of the body colour. That passes
-// with its own colours, but the link takes the muted ink here, so it follows the
-// brand and the colour scheme, and the border and hover state match the other
-// controls.
+// Quarto lightens the about link colour by 20% of the body colour.
 // The selectors match the strength of Quarto's own, and this file comes last.
 div[class*="quarto-about-"] {
   .about-links .about-link {

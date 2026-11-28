@@ -5,22 +5,15 @@
 -->
 <script id="atelier-course" type="text/javascript">
 	(function () {
-		// In workshop mode, these components show the course from
-		// window.atelierCourse. Each block below is one component.
+		// In workshop mode, the components of this script show the course from
+		// window.atelierCourse.
 		var course = window.atelierCourse;
 		if (!course || course.mode !== "workshop") return;
 
 		var element = window.atelierStages.element;
 
-		// =====================================================================
-		// T3 PROGRESS DOTS
-		// =====================================================================
-		// The table of contents gets a dot for each heading, filled once the
-		// heading has passed the top of the viewport, and a ring with the share
-		// of the module read. The read headings are stored under the page in
-		// the course progress. Quarto clones the table of contents into a
-		// toggle on narrow pages. The clone is found again on every update, so
-		// it shows the same dots.
+		// Quarto clones the table of contents into a toggle on narrow pages. The
+		// clone is found again on every update, so it shows the same dots.
 		(function () {
 			var toc = document.querySelector("#quarto-margin-sidebar #TOC");
 			if (!toc) return;
@@ -28,8 +21,6 @@
 			var anchors = Array.prototype.filter.call(toc.querySelectorAll("a.nav-link[data-scroll-target^='#']"), function (link) {
 				return link.getAttribute("data-scroll-target").length > 1;
 			});
-			// Another script makes the href of a link absolute, so the entries
-			// are matched on the target that Quarto keeps in a data attribute.
 			var headings = [];
 			anchors.forEach(function (link) {
 				var target = link.getAttribute("data-scroll-target");
@@ -43,10 +34,6 @@
 				var heading = document.getElementById(id);
 				if (heading) headings.push({ href: target, node: heading });
 			});
-			// html/scripts/toc-early.html adds the class and the line in the head,
-			// from the links of the table of contents only. When no link has its
-			// heading on the page, nothing is tracked, and the table of contents
-			// goes back to the card.
 			if (!headings.length) {
 				toc.classList.remove("atelier-toc-dots");
 				toc.querySelectorAll(".atelier-toc-progress").forEach(function (line) {
@@ -57,18 +44,14 @@
 
 			var key = course.current !== -1 ? course.pages[course.current].href : location.pathname;
 			var stored = course.progress.read[key];
-			// Only the headings that are on the page now count as read.
 			var read = (Array.isArray(stored) ? stored : []).filter(function (href) {
 				return headings.some(function (heading) { return heading.href === href; });
 			});
 			var inModule = course.currentModule !== -1;
 
-			// html/scripts/toc-early.html adds the class and the line in the head,
-			// so a clone that Quarto makes on DOMContentLoaded has them. A clone
-			// made in another way can lack them, so render() calls this on every
-			// root, and a root without the line gets a copy of the line of the
-			// margin. It returns the ring and the text node of the line, or null
-			// outside a module.
+			// html/scripts/toc-early.html adds the class and the line in the head, so a
+			// clone that Quarto makes on DOMContentLoaded has them. A clone made in
+			// another way can lack them, so render() calls this on every root.
 			var originalLine = toc.querySelector(".atelier-toc-progress");
 			function prepare(root) {
 				root.classList.add("atelier-toc-dots");
@@ -133,14 +116,12 @@
 				if (read.indexOf(heading.href) === -1) observer.observe(heading.node);
 			});
 
-			// The last headings of a short final section never reach the top.
 			function checkEnd() {
 				var root = document.documentElement;
 				if (window.innerHeight + window.scrollY >= root.scrollHeight - 2) {
 					mark(headings.map(function (heading) { return heading.href; }));
 				}
 			}
-			// A scroll fires many events in one frame, so the check runs once a frame.
 			var endCheckQueued = false;
 			function onScroll() {
 				if (endCheckQueued) return;
@@ -152,7 +133,6 @@
 			}
 			window.addEventListener("scroll", onScroll, { passive: true });
 
-			// Once every heading is read, nothing is left to watch.
 			function stopWatchingWhenRead() {
 				if (read.length < headings.length) return;
 				observer.disconnect();
@@ -179,14 +159,6 @@
 			render();
 		})();
 
-		// =====================================================================
-		// W1 OBJECTIVES
-		// =====================================================================
-		// The Lua filter writes a checkbox for each objective, with an id made
-		// from the objective text. The ticked boxes are stored under the page in
-		// the course progress, as these ids. Only the ids of the boxes that are
-		// on the page now count, so the id of a changed objective goes on the
-		// next save.
 		(function () {
 			var boxes = document.querySelectorAll(".atelier-objectives input[data-atelier-objective]");
 			if (!boxes.length) return;

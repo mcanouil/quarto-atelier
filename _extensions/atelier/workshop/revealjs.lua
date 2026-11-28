@@ -15,7 +15,7 @@
 --- that declares the group keeps its own declaration. Quarto's own solutions
 --- stay as Quarto writes them. This writer runs before Veil, in the same
 --- stage, so Veil finds the class. A `.terminal` code block becomes a
---- terminal in both modes, with its `$` prompts in the text.
+--- terminal in both modes.
 
 local core = require(quarto.utils.resolve_path('workshop/core.lua'):gsub('%.lua$', ''))
 local html = require(quarto.utils.resolve_path('workshop/html.lua'):gsub('%.lua$', ''))
@@ -261,8 +261,6 @@ function M.finish(doc, model)
   if model.answers_used then
     declare_group(doc.meta)
   end
-  -- The bottom row shows the copyright and the licence on every slide, so the
-  -- closing leaves them out.
   local closing = core.closing(doc.meta, model, { copyright = true, licence = true })
   local credit = core.credit(doc.meta, model)
   local funding = core.funding(doc.meta)

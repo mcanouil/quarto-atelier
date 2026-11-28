@@ -24,8 +24,6 @@
 		var labels = (window.atelierOptions || {}).labels || {};
 		var hasTippy = typeof window.tippy === "function";
 		var config = {
-			// The `quarto` theme gives the popup surface and the arrow, and `atelier`
-			// the smaller type of a tooltip.
 			theme: "quarto atelier",
 			placement: "bottom",
 			delay: [100, 0],
@@ -36,7 +34,6 @@
 			},
 		};
 
-		// Without tippy, the browser's own tooltip on the control is the fallback.
 		function bind(el, content, extra) {
 			if (!el || !content || el.dataset.tippyBound === "1") return;
 			if (hasTippy) {
@@ -48,12 +45,10 @@
 			}
 		}
 
-		// An icon-only link carries its name on the glyph. Iconify puts it on an
-		// <iconify-icon>, but a glyph is just as often an empty element painted
-		// with a CSS mask or holding an inline SVG, so fall back to the first
-		// empty labelled descendant instead of assuming one element type.
-		// Emptiness is what distinguishes a glyph from a labelled control that
-		// happens to sit inside the link.
+		// An icon-only link carries its name on the glyph. Iconify puts the name on an
+		// <iconify-icon>, but a glyph is just as often an
+		// empty element painted with a CSS mask or holding an inline SVG, so fall
+		// back to the first empty labelled descendant.
 		function glyphOf(link) {
 			var icon = link.querySelector("iconify-icon");
 			if (icon) return icon;
@@ -78,7 +73,6 @@
 				icon.removeAttribute("aria-label");
 			}
 			if (!visibleText && label) {
-				// Icon-only control: give the link a name and a styled tooltip.
 				var ariaLabel = label;
 				if (link.target === "_blank" && !/new tab/i.test(ariaLabel)) {
 					ariaLabel += " (opens in a new tab)";
@@ -91,7 +85,6 @@
 		});
 
 		document.querySelectorAll(".quarto-color-scheme-toggle").forEach(function (toggle) {
-			// Hover-only and hide on click, so the tooltip does not linger after toggling.
 			bind(toggle, toggle.getAttribute("aria-label") || toggle.getAttribute("title") || labels["toggle-dark-mode"], {
 				trigger: "mouseenter",
 				hideOnClick: true,

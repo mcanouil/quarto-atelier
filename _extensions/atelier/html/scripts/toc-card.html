@@ -8,21 +8,15 @@
 		var toc = document.querySelector("#quarto-margin-sidebar #TOC");
 		if (!toc) return;
 
-		// In workshop mode, the table of contents shows progress dots in place of
-		// this card. html/scripts/toc-early.html adds them, and
-		// html/scripts/course.html updates them.
 		if (window.atelierCourse && window.atelierCourse.mode === "workshop") return;
 
-		// html/scripts/toc-early.html adds the rows of the card in the head. This
-		// script fills the reading time, and handles the copy-link button.
 		var labels = (window.atelierOptions || {}).labels || {};
 		var readingTime = labels["toc-reading-time"];
 		var copyLabel = labels["toc-copy-link"];
 		var copiedLabel = labels["toc-link-copied"];
 
-		// Reading time counts 200 words a minute, at least one minute, of the
-		// content that shows: the veil extension hides content with the hidden
-		// attribute.
+		// Reading time counts only the content that shows: the veil extension hides
+		// content with the hidden attribute.
 		var content = document.getElementById("quarto-document-content");
 		function countWords() {
 			if (!content) return 0;
@@ -39,7 +33,6 @@
 			}
 			return text.join("").split(/\s+/).filter(Boolean).length;
 		}
-		// toc-early.html adds the reading time only when it has a label.
 		var readingSlot = toc.querySelector(".atelier-toc-reading-time");
 		if (readingSlot) {
 			// When content spans into the margin, Quarto clones the table of
@@ -51,9 +44,8 @@
 				});
 			};
 			updateReadingTime();
-			// The first text makes the meta row visible to assistive technology,
-			// and fades it in. Quarto makes the clone later, on DOMContentLoaded,
-			// so the clone copies the row as it is now.
+			// Quarto makes the clone later, on DOMContentLoaded, so the clone copies
+			// the row as it is now.
 			var meta = readingSlot.closest(".atelier-toc-meta");
 			meta.removeAttribute("aria-hidden");
 			meta.classList.add("atelier-filled");

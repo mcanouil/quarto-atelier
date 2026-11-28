@@ -14,7 +14,6 @@
     // scrolls only below its breakpoint, so it counts at every width.
     const SCROLLS = ['auto', 'scroll'];
     const RESPONSIVE = '[class*="table-responsive"]';
-    // Marks the attributes that this script adds, so that it removes only those.
     const MARKER = 'data-atelier-table-scroll';
     // The same selector as Quarto's scrollable-regions.js. Content that the
     // keyboard reaches already scrolls the box, so the box needs no tab stop.
@@ -25,8 +24,6 @@
       'select:not([tabindex="-1"]):not(:disabled), ' +
       'textarea:not([tabindex="-1"]):not(:disabled), ' +
       '[tabindex]:not([tabindex="-1"]):not(:disabled)';
-    // For each box: whether the box needs a tab stop of its own, because the
-    // table holds no focusable content, and the caption that names the box.
     const boxes = new Map();
     let captions = 0;
     let label = '';
@@ -86,7 +83,6 @@
         new Set(entries.map((entry) => entry.target.closest('.atelier-table-scroll')))
           .forEach(syncFocus);
       });
-      // A table in the cell of a wrapped table scrolls with the outer box.
       tables.forEach((table) => {
         if (table.parentElement.closest('.atelier-table-scroll')) return;
         const box = document.createElement('div');

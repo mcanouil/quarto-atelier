@@ -7,7 +7,6 @@
 // @copyright 2026 Mickaël Canouil
 // @author Mickaël Canouil
 
-// Path data of the ORCID glyph and of its disc, in a 32 by 32 view box.
 #let atelier-orcid-disc = "M32 16c0 8.837-7.163 16-16 16-8.838 0-16-7.163-16-16C0 7.162 7.162 0 16 0c8.837 0 16 7.162 16 16Z"
 #let atelier-orcid-glyph = "M18.813 9.637h-5.45v13.9h5.474c4.555 0 7.35-3.378 7.35-6.95 0-1.635-.562-3.372-1.77-4.704-1.215-1.336-3.065-2.246-5.605-2.246ZM18.6 21.3h-2.813v-9.425H18.5c1.823 0 3.12.552 3.96 1.4.842.849 1.252 2.021 1.252 3.312 0 .784-.239 1.967-.993 2.948-.745.969-2.01 1.765-4.119 1.765ZM8.363 9.675v13.887h2.425V9.675H8.363ZM9.575 8.65c.84 0 1.513-.689 1.513-1.513 0-.823-.673-1.512-1.513-1.512-.838 0-1.512.674-1.512 1.513 0 .823.672 1.512 1.512 1.512Z"
 
@@ -143,8 +142,6 @@
     block(below: 1.2em, atelier-motif-guard(if meta.logo.alt == none { pdf.artifact(mark) } else { mark }))
   }
   if meta.title != none {
-    // The terminal decoration puts a prompt before the title and a steady
-    // cursor after it. Both are artefacts.
     let decorate(mark) = if atelier-terminal-decoration { atelier-terminal-mark(mark, "accent-ink") }
     block(
       below: 0.5em,
@@ -155,7 +152,6 @@
       })),
     )
   }
-  // The gap follows the title size, so the rule clears the descenders.
   block(
     above: title-size * 0.45,
     below: 0.9em,
