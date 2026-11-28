@@ -57,9 +57,9 @@
 - feat: A landing page card has an ink border, and shows an offset shadow in the accent colour and moves up and to the left on hover and on focus. The cards of a grid listing do the same. (#175)
 - feat: Add the `.framed` modifier for `.atelier-hero-figure`, which draws a page screenshot in an ink frame with an offset shadow and a small tilt. (#175)
 - refactor: Remove the `.gradient` modifier of the hero and its Sass variables, so a hero title is plain text. Remove the class from your pages. (#175)
-- feat: The default preset sets Atkinson Hyperlegible Next for text and headings and Atkinson Hyperlegible Mono for code, in HTML, Reveal.js and Typst.
-- feat: The quarto preset sets Atkinson Hyperlegible Next for text, Fraunces for headings and Atkinson Hyperlegible Mono for code, in HTML, Reveal.js and Typst.
-- feat: A brand that sets `typography.base` and no `typography.headings` gives the headings the base font, in every preset and format.
+- feat: The default preset sets Atkinson Hyperlegible Next for text and headings and Atkinson Hyperlegible Mono for code, in HTML, Reveal.js and Typst. (#176)
+- feat: The quarto preset sets Atkinson Hyperlegible Next for text, Fraunces for headings and Atkinson Hyperlegible Mono for code, in HTML, Reveal.js and Typst. (#176)
+- feat: A brand that sets `typography.base` and no `typography.headings` gives the headings the base font, in every preset and format. (#176)
 
 ## 0.15.3 (2026-11-23)
 
