@@ -1117,7 +1117,7 @@ body.quarto-dark a.lightbox:has(> img.light-content) {
   display: none !important;
 }
 
-// Glightbox paints it at 0.7 black from a rule of the same weight, so the
+// Glightbox paints the backdrop at 0.7 black from a rule of the same weight, so the
 // selector is one element heavier.
 body .goverlay {
   background: var(--atelier-overlay);

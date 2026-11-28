@@ -311,10 +311,10 @@ function M.finish(doc, model)
 end
 
 --- Draw a `.terminal` code block as a terminal: the code window takes the
---- terminal label and colours. The block
---- keeps its commands and output without the `$`, and the Typst function
---- draws the prompt in its own colour. The call shadows `Skylighting` for the
---- block only, because Quarto gives its highlighter no line number.
+--- terminal label and colours. The block keeps its commands and output
+--- without the `$`, and the Typst function draws the prompt in its own colour.
+--- The call shadows `Skylighting` for the block only, because Quarto gives its
+--- highlighter no line number.
 --- @param block pandoc.CodeBlock The code block
 --- @param model table The page model
 --- @return pandoc.Blocks|nil

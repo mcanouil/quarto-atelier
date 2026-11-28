@@ -5,7 +5,7 @@
 -->
 <script id="atelier-course" type="text/javascript">
 	(function () {
-		// In workshop mode, these components show the course from
+		// In workshop mode, the components of this script show the course from
 		// window.atelierCourse.
 		var course = window.atelierCourse;
 		if (!course || course.mode !== "workshop") return;
@@ -49,7 +49,8 @@
 			});
 			var inModule = course.currentModule !== -1;
 
-			// A clone that Quarto makes on DOMContentLoaded has them. A clone made in
+			// html/scripts/toc-early.html adds the class and the line in the head, so a
+			// clone that Quarto makes on DOMContentLoaded has them. A clone made in
 			// another way can lack them, so render() calls this on every root.
 			var originalLine = toc.querySelector(".atelier-toc-progress");
 			function prepare(root) {

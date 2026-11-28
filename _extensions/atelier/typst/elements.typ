@@ -360,9 +360,6 @@
 #let atelier-theorem-kinds = ("theorem", "lemma", "corollary", "proposition", "conjecture", "definition", "example", "exercise", "algorithm")
 #let atelier-proof-kinds = ("proof", "remark", "solution")
 
-// Quarto moves each heading of a document with a title up one level, so the
-// marker has one `#` more than the Typst level.
-
 // Answer a marker of the terminal decoration: text in a colour, as an artefact.
 // - mark: the text of the marker.
 // - ink: name of the colour token.
@@ -375,6 +372,8 @@
 // - it: the heading.
 #let atelier-terminal-heading(it) = {
   let size = if it.level == 1 { 1.4em } else { 1.2em }
+  // Quarto moves each heading of a document with a title up one level, so the
+  // marker has one `#` more than the Typst level.
   let marker = range(it.level + 1).map(_ => "#").join() + " "
   block(above: 1.4em, below: 0.9em, width: 100%, {
     grid(

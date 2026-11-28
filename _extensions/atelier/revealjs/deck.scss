@@ -126,7 +126,8 @@ $code-block-font-size: 0.6em !default;
 }
 
 // Reveal.js puts the `data-state` of the current slide on the viewport, so a
-// section slide and a dark slide give them their own colours.
+// section slide and a dark slide give the progress bar, the controls, the slide
+// number and the footer their own colours.
 
 .reveal .progress {
   color: var(--atelier-accent-fill);
@@ -816,7 +817,7 @@ html.print-pdf:root {
   }
 }
 
-// The slide clips the part of the float below its content, so Reveal.js
+// The slide clips the part of the empty motif float below its content, so Reveal.js
 // centres the content, not the float.
 
 .reveal .slides section.atelier-motif::before {

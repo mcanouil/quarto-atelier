@@ -45,7 +45,8 @@
 			}
 		}
 
-		// Iconify puts it on an <iconify-icon>, but a glyph is just as often an
+		// An icon-only link carries its name on the glyph. Iconify puts the name on an
+		// <iconify-icon>, but a glyph is just as often an
 		// empty element painted with a CSS mask or holding an inline SVG, so fall
 		// back to the first empty labelled descendant.
 		function glyphOf(link) {

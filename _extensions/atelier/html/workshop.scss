@@ -352,8 +352,8 @@ $_atelier-step-centre: calc(#{$_atelier-step-pad} + #{$_atelier-step-dot * 0.5})
   }
 }
 
-// The same rules apply to the clone in the toggle that Quarto adds when
-// content spans into the margin.
+// The progress-dot rules also apply to the clone in the toggle that Quarto adds
+// when content spans into the margin.
 :is(#quarto-margin-sidebar, .quarto-sidebar-toggle-contents) #TOC.atelier-toc-dots {
   .atelier-toc-progress {
     display: flex;

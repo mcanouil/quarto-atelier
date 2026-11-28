@@ -13,7 +13,8 @@
 # Quarto re-reads the project configuration after pre-render, which is what
 # makes a generated variables file work at all.
 #
-# The pill reads the metadata, which a {{< var >}} shortcode cannot set.
+# The version pill reads the metadata of `_atelier-version.yml`, which a
+# {{< var >}} shortcode cannot set.
 #
 
 set -euo pipefail

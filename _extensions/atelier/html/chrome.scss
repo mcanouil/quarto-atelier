@@ -192,7 +192,7 @@ $atelier-chrome-page-accent: #0d6efd;
 // any page.
 $pre-color: $atelier-chrome-page-fg !default;
 
-// These sit in this file because it is listed first, so its defaults are
+// The radius and Mermaid tokens sit in this file because it is listed first, so its defaults are
 // evaluated after those of the project theme and of `brand`, which therefore
 // win.
 $border-radius: 0.5rem !default;

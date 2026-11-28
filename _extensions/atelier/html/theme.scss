@@ -108,7 +108,8 @@ $border-color: null;
 
 /*-- scss:rules --*/
 
-// These tokens republish it as custom properties, which is what the rules below
+// These tokens republish the chrome palette of `html/chrome.scss` as custom
+// properties, which is what the rules below
 // read and what a project overrides for a single part of a bar; re-point the
 // Sass variables instead when the change should also reach the colours Quarto
 // bakes into its own markup.
@@ -203,7 +204,7 @@ $border-color: null;
   --mobile-toc-sheet-shadow: 0 -6px 20px var(--atelier-shadow);
   --mobile-toc-backdrop: var(--atelier-overlay);
 
-  // They sit on `:root`, because the toast is not inside the button.
+  // The veil tokens sit on `:root`, because the toast is not inside the button.
   --veil-border: var(--atelier-control-border);
   --veil-shadow: var(--atelier-shadow);
   --veil-toast-bg: var(--atelier-fg);
@@ -748,15 +749,17 @@ html .code-with-filename .code-with-filename-file pre {
   border-radius: 0;
 }
 
-// Its defaults sit in :where(:root), so this rule wins in each scheme bundle.
+// Code Window sets its defaults in :where(:root), so this rule wins in each
+// scheme bundle.
 :root {
   --code-window-bg: var(--atelier-surface);
   --code-window-title-bg: var(--atelier-surface-strong);
 }
 
 // Quarto's filename block has a title bar in a fixed grey (`#555` in dark)
-// that the next rule replaces. The dark selector matches Quarto's. With $code-block-bg off, Quarto's page
-// colour on div.sourceCode is `!important`, so this needs `!important` too.
+// that the next rule replaces. The dark selector matches Quarto's. With
+// $code-block-bg off, Quarto's page colour on div.sourceCode is `!important`,
+// so this needs `!important` too.
 html .code-with-filename div.sourceCode {
   @if $code-block-bg {
     background-color: var(--code-window-bg);
