@@ -145,9 +145,10 @@
 
 // Answer the Pandoc highlighter with each line passed through
 // `atelier-terminal-line`. The call of a terminal block shadows `Skylighting`
-// with it for the block only. Pandoc writes `Skylighting` with no line hook.
-// Related upstream: https://github.com/quarto-dev/quarto-cli/pull/14170 (patches the same function for annotations)
-// Remove when: Quarto or Pandoc gives each line of a highlighted block to a template function.
+// with it for the block only. Skylighting writes `Skylighting` for a document
+// to style, and passes it the lines as one array, so the wrapper gives each
+// line its number.
+// Remove when: never.
 // - original: the `Skylighting` function of Quarto.
 #let atelier-terminal-skylighting(original) = (..args) => {
   let positional = args.pos()
